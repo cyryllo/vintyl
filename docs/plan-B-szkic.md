@@ -4,67 +4,127 @@ To szkic przygotowany przed testami z ploterem. Miejsca oznaczone
 **[po A4]** uzupełnię po poniedziałku i dopiero wtedy dam Ci plan do
 akceptacji. Kodu programu (etap C) nie zaczynam bez niej.
 
+**Już ustalone (14.11.2026):**
+- nazwa **Vintyl**, ikona B (nóż i pasek folii w kształcie V);
+- licencja **GPL-3.0-or-later**, tak jak Kerfly;
+- Vintyl ma **własne okno**. Rysowanie będzie podobne do Kerfly, ale lewy
+  panel ma mniej opcji niż w laserze;
+- głównie Linux, inne systemy w późniejszych etapach.
+
 ---
 
 ## 1. Co budujemy
 
-**Vintyl**: program do ploterów tnących, głównie na Linuksa (inne systemy
-później). Składa się z trzech części:
+Vintyl to program do ploterów tnących. Składa się z dwóch części
+w jednym repo:
 
-1. **Rdzeń `vintyl`:** pakiet Pythona **bez Qt**. Zamienia ścieżki na
+1. **Rdzeń `vintyl.core`:** pakiet **bez Qt**. Zamienia ścieżki na
    polecenia plotera i wysyła je do pliku albo na port. Można go testować
-   bez okienek.
-2. **Wiersz poleceń:** `vintyl cut projekt.svg --profil sk-870t` (domyślnie
-   na sucho, czyli do pliku `.hpgl`).
-3. **Wpięcie w Kerfly:** Kerfly woła rdzeń z tego samego okna, w którym
-   rysujesz.
+   bez okienek i używać z wiersza poleceń
+   (`vintyl cut projekt.svg --profil sk-870t`, domyślnie na sucho do pliku).
+2. **Okno `vintyl.gui`:** PySide6, jak w Kerfly. Rysowanie, wczytywanie
+   SVG i DXF, podgląd ścieżki noża, wysyłka i Stop. Okno tylko woła rdzeń.
 
-**Pytanie do Ciebie:** czy Vintyl ma być też **osobnym programem
-z okienkiem** (stąd ikona), czy wystarczy rdzeń, wiersz poleceń i okno
-w Kerfly? Plan poniżej zakłada to drugie. Osobne okno można dołożyć
-później na tym samym rdzeniu.
+Zasada ta sama co w Kerfly: nic w `vintyl/core/` nie importuje Qt, a test
+to pilnuje.
 
 ---
 
-## 2. Struktura pakietu rdzenia
+## 2. Okno Vintyl
+
+Układ jak w Kerfly: wstążka na górze, pasek opcji kształtu, narzędzia
+rysowania po prawej, obszar roboczy na środku, panel zadania po lewej.
+
+**Obszar roboczy:**
+- zamiast stołu lasera jest **pas folii**: szerokość cięcia z profilu
+  (SK-870T: 780 mm), a długość bez limitu, bo to rolka;
+- widać punkt zerowy (Origin z panelu plotera) i kierunek podawania folii.
+
+**Narzędzia rysowania (prawy pasek), jak w Kerfly:**
+- zaznaczanie i edycja węzłów;
+- prostokąt, elipsa, wielokąt, linia, linia łamana, krzywa;
+- tekst, także tekst na ścieżce.
+
+Bez narzędzi typowo laserowych: rastra, wypełnienia liniami, wzorów,
+zawiasów.
+
+**Lewy panel: mniej niż w laserze.** Propozycja do przejrzenia:
+- **Projekt:** lista elementów z ptaszkiem „tnij” i kolejnością (jak w
+  Kerfly) oraz rozmiar całości w mm.
+- **Ploter:**
+  - wybór profilu (SK-870T, mniejszy ploter);
+  - port i stan połączenia;
+  - przesunięcie noża i nadcięcie, w trybie pisaka bez kompensacji;
+  - opcjonalnie prędkość i nacisk; puste pole = ustawienie z panelu
+    plotera.
+- **Na dole:**
+  - „Zapisz .hpgl”;
+  - Start, Stop (wysyłka przerwana, nóż w górę);
+  - ptaszek „na sucho”, domyślnie włączony;
+  - szacowany czas cięcia.
+
+Bez warstw z mocą, przejściami i kerfem, bez materiałów lasera, bez
+przejazdu głowicy po obrysie lasera.
+
+**[po A4]** jakie funkcje dokładnie zostają, ustalimy na podstawie tego,
+co umie Twój ploter (np. czy reaguje na prędkość i nacisk z komputera).
+
+---
+
+## 3. Struktura repo
 
 ```
-vintyl/                      repo github.com/cyryllo/vintyl
-  pyproject.toml             zależności: pyserial; svgelements tylko dla wiersza poleceń
+vintyl/                      github.com/cyryllo/vintyl
+  pyproject.toml             rdzeń: pyserial; okno: PySide6-Essentials, svgelements
   src/vintyl/
-    geometry.py              linie łamane w mm: długości, kierunki, łuki, punkt w wielokącie
-    order.py                 kolejność cięcia: najpierw kształty wewnętrzne, krótkie przejazdy
-    knife.py                 nadcięcie, kompensacja noża, podnoszenie na ostrych kątach
-    profile.py               profil urządzenia: odczyt, zapis, sprawdzanie wartości
-    profiles/sk-870t.toml    profile dostarczane z programem
-    protocols.py             HPGL, DMPL: zamiana ruchów na tekst dla plotera
-    safety.py                kontrola przed wysłaniem: pole robocze, ujemne współrzędne
-    transport.py             wyjście: plik albo port szeregowy (porcje, przepływ, czekanie, stop)
-    job.py                   cała droga: ścieżki -> osie -> kolejność -> nadcięcie -> nóż -> polecenia
-    cli.py                   wiersz poleceń
+    core/
+      geometry.py            linie łamane w mm: długości, kierunki, łuki, punkt w wielokącie
+      order.py               kolejność cięcia: najpierw kształty wewnętrzne, krótkie przejazdy
+      knife.py               nadcięcie, kompensacja noża, podnoszenie na ostrych kątach
+      profile.py             profil urządzenia: odczyt, zapis, sprawdzanie wartości
+      profiles/sk-870t.toml  profile dostarczane z programem
+      protocols.py           HPGL, DMPL: zamiana ruchów na tekst dla plotera
+      safety.py              kontrola przed wysłaniem: pole robocze, ujemne współrzędne
+      transport.py           plik albo port szeregowy (porcje, przepływ, czekanie, Stop)
+      job.py                 cała droga: ścieżki -> osie -> kolejność -> nadcięcie -> nóż -> polecenia
+      shapes.py, curves.py   kształty i krzywe (przeniesione z Kerfly, w mm)
+      loaders.py             SVG i DXF przez svgelements i czytnik DXF z Kerfly
+      cli.py                 wiersz poleceń
+    gui/                     okno PySide6 (rysowanie przeniesione z Kerfly)
   tests/                     testy automatyczne (pytest)
-  tools/                     narzędzia pomocnicze (ikony, wzorce Inkcuta, kroki A4)
+  tools/                     ikony, wzorce Inkcuta, kroki A4
   assets/                    ikona, logo
 ```
 
-**Wejście rdzenia:** lista linii łamanych w **milimetrach**, oś Y w górę,
-zero w lewym dolnym rogu materiału. Krzywe zamienia na odcinki ten, kto
-woła rdzeń, czyli Kerfly albo wiersz poleceń. Rdzeń nie zna formatów
-plików.
-
-**Punkt wpięcia w Kerfly:** mały plik w Kerfly (np.
-`kerfly/core/plotter.py`), który:
-1. bierze warstwę „cięcie” przez `layers.compile_layer(...)`;
-2. zamienia wiersze `[x, y, pętla]` w calach na linie łamane w mm;
-3. woła `vintyl.job`.
-
-W oknie Kerfly dochodzi menu „Ploter”: wybór profilu, podgląd ścieżki
-noża, zapis do pliku, wysyłka, Stop. Kod lasera się nie zmienia. Vintyl
-jest dla Kerfly zależnością opcjonalną: bez niego menu jest wyszarzone.
+**Jednostki w całym Vintyl: milimetry.** Rdzeń Kerfly liczy w calach,
+z osią Y w górę, bo tak było w K40 Whisperer. Przy przenoszeniu kodu
+z Kerfly zamieniamy to na mm od razu.
 
 ---
 
-## 3. Format profilu urządzenia
+## 4. Co bierzemy z Kerfly do okna
+
+Ta sama licencja (GPL-3.0-or-later) i ten sam autor, więc można przenosić
+wprost, z nagłówkami „Kerfly contributors” i źródłem.
+
+| Z Kerfly | Do czego | Uwagi |
+|---|---|---|
+| `kerfly/gui/preview.py` | obszar roboczy, zaznaczanie, uchwyty | stół lasera zamieniamy na pas folii |
+| `kerfly/gui/node_editor.py`, `core/curves.py`, `core/snap.py` | edycja węzłów i krzywych, przyciąganie | już w mm |
+| `kerfly/core/shapes.py`, `gui/text_shapes.py`, `gui/tool_options.py` | kształty, tekst, pasek opcji | bez operacji raster, wypełnienie, wzory, zawiasy |
+| `kerfly/core/layout.py`, `core/pathopt.py` | elementy na pasie, kolejność cięcia | z cali na mm |
+| `kerfly/gui/icons`, `i18n` | ikony, tłumaczenia | — |
+| okno główne | **nie kopiujemy w całości** | `main_window.py` ma 4680 linii, głównie laser; piszemy nowe, mniejsze, z kawałków |
+
+**Do decyzji:** kopiujemy kod z Kerfly, a nie robimy wspólnej biblioteki.
+Wspólna biblioteka wymagałaby przebudowy Kerfly, a w nim właśnie
+pracujesz. Wady kopiowania: poprawki w rysowaniu trzeba przenosić ręcznie
+w obie strony. Wspólną część można wydzielić później, gdy Vintyl się
+ustabilizuje.
+
+---
+
+## 5. Format profilu urządzenia
 
 Plik TOML, czytelny i z komentarzami. Odczyt przez `tomllib` z biblioteki
 standardowej, zapis przez prosty własny zapis płaskich pól.
@@ -111,87 +171,92 @@ Drugi profil (mniejszy ploter) powstanie po odczycie tabliczki.
 
 ---
 
-## 4. Skąd bierzemy kod (licencje)
+## 6. Skąd bierzemy kod rdzenia (licencje)
 
 | Fragment | Źródło | Licencja, autorzy | Jak |
 |---|---|---|---|
-| Kompensacja noża, nadcięcie, łuki | CutScape `filters.py`, `geometry.py` (pomysł z Inkcuta) | GPL-3.0; jetpax, Jairus Martin i autorzy Inkcuta | **piszemy sami na podstawie pomysłu**, z podziękowaniem w nagłówku (patrz niżej) |
-| Kolejność „najpierw wewnętrzne” | Kerfly `pathopt.py` albo CutScape `order()` | GPL-3.0-or-later (Scorch, Kerfly) / GPL-3.0 | wersja z Kerfly: ta sama licencja co Kerfly |
-| HPGL, DMPL (z poprawioną skalą trybu 1) | CutScape `protocols.py` | GPL-3.0 | kilka linii; piszemy sami, sprawdzamy na wzorcach |
+| Kompensacja noża, nadcięcie, łuki | pomysł z Inkcuta i CutScape (`filters.py`, `geometry.py`) | GPL-3.0 (bez „or later”); Jairus Martin i autorzy Inkcuta, jetpax | **piszemy sami na podstawie pomysłu**, z podziękowaniem w nagłówku |
+| HPGL, DMPL (z poprawioną skalą trybu 1) | CutScape `protocols.py` | jw. | kilka linii, piszemy sami, sprawdzamy na wzorcach |
+| Wysyłka porcjami, czekanie na opróżnienie bufora | CutScape `transports.py` | jw. | pomysł, piszemy sami |
+| Kolejność „najpierw wewnętrzne” | Kerfly `core/pathopt.py` | GPL-3.0-or-later; Scorch, Kerfly contributors | przeniesienie z nagłówkiem |
 | Podnoszenie noża na ostrych kątach | RedsailCut `sharp_corners.py` | MIT, Anders Lorentzen | przeniesienie z nagłówkiem MIT |
 | Kontrola przed wysłaniem, czekanie wg czasu ruchu, DTR/RTS po otwarciu | RedsailCut `hpgl.py`, `serial_io.py` | MIT, Anders Lorentzen | przeniesienie fragmentów z nagłówkiem MIT |
-| Wysyłka porcjami, czekanie na opróżnienie bufora | CutScape `transports.py` | GPL-3.0 | pomysł; piszemy sami |
 | Inkcut, cuthulhu, KM Plot | — | — | tylko do porównania, nic nie kopiujemy |
 
-**Licencja Vintyl, do decyzji:** proponuję **GPL-3.0-or-later**, tak jak
-Kerfly.
-- Pliki CutScape i Inkcuta mają „GPL v3” bez „or later”. Gdybyśmy
-  skopiowali z nich kod, Vintyl byłby w praktyce na samej GPL-3.0.
-- Dlatego te kilkadziesiąt linii (kompensacja, nadcięcie, protokoły)
-  proponuję napisać samemu na podstawie opisanego pomysłu. Pomysł nie
-  podlega prawu autorskiemu. Źródło inspiracji i tak podamy w nagłówku.
-- Kod z MIT (RedsailCut) i GPL-3.0-or-later (Kerfly) można przenosić
-  wprost.
+Dlaczego piszemy sami zamiast kopiować z CutScape i Inkcuta: ich pliki
+mają „GPL v3” bez „or later”. Skopiowany kod zamknąłby Vintyl na samej
+GPL-3.0, a ustaliliśmy GPL-3.0-or-later.
 
 ---
 
-## 5. Testy automatyczne
+## 7. Testy automatyczne
 
-1. **Jednostki:** 20 mm = 800 jednostek HPGL. Cale z Kerfly z osią Y w górę
-   zamieniają się poprawnie na mm.
+**Rdzeń:**
+1. **Jednostki:** 20 mm = 800 jednostek HPGL.
 2. **HPGL:** kwadrat daje dokładnie oczekiwany tekst. Zawsze jest `PU`
    przed powrotem do zera i na końcu. Brak ujemnych współrzędnych.
 3. **DMPL:** tryb 1 (1000 jednostek na cal) i tryb 3 dają oczekiwany tekst.
-4. **Porównanie z Inkcutem:** nasze wyjście zgadza się ze wzorcami
-   z `tests/wzorce_inkcut/` po uwzględnieniu skali 1021/1016 i marginesu
+4. **Porównanie z Inkcutem:** zgodność ze wzorcami z
+   `tests/wzorce_inkcut/` po uwzględnieniu skali 1021/1016 i marginesu
    2,8 mm.
-5. **Nadcięcie:** tylko kształty zamknięte, dalej po obwodzie o zadaną
-   długość. Otwarte linie bez zmian.
-6. **Kompensacja noża:** offset 0 nie zmienia ścieżki (tryb pisaka).
-   Kwadrat ma wysunięte narożniki z łukami. Nadcięcie nie ginie (błąd
-   Inkcuta). Powrót do zera bez przesunięcia.
+5. **Nadcięcie:** tylko kształty zamknięte, dalej po obwodzie. Otwarte
+   linie bez zmian.
+6. **Kompensacja noża:** offset 0 nie zmienia ścieżki. Kwadrat ma wysunięte
+   narożniki z łukami. Nadcięcie nie ginie (błąd Inkcuta). Powrót do zera
+   bez przesunięcia.
 7. **Kolejność:** dziura przed obrysem, a litera „O” wnętrzem przed
    zewnętrzem.
 8. **Pole robocze:** za szeroki projekt jest odrzucany z podaniem, o ile mm
    wystaje. Projekt dokładnie na krawędzi przechodzi.
 9. **Osie:** zamiana i odwrócenie osi zostawiają projekt przy zerze.
-10. **Profil:** zapis i odczyt dają to samo. Brakujące pola dostają wartości
-    domyślne, a złe wartości są odrzucane z czytelnym komunikatem.
-11. **Wysyłka** (port testowy `loop://`, bez plotera):
+10. **Profil:** zapis i odczyt dają to samo. Brakujące pola dostają
+    wartości domyślne, a złe wartości są odrzucane z czytelnym komunikatem.
+11. **Wysyłka** (port testowy `loop://`):
     - trafiają dokładnie te bajty, w porcjach;
     - czekanie wynika z prędkości;
     - Stop dosyła `PU;`;
     - zablokowany port przy RTS/CTS daje błąd po czasie, a nie zawieszenie;
     - tryb na sucho w ogóle nie otwiera portu.
 12. **Wiersz poleceń:** SVG zamienia się na plik `.hpgl`.
-13. **Brak Qt:** rdzeń nie importuje Qt (jak test w Kerfly).
-14. **(w Kerfly)** wiersze `[x, y, pętla]` z warstwy cięcia zamieniają się
-    na linie łamane w mm.
+13. **Brak Qt w rdzeniu.**
+14. **Wczytywanie:** SVG i DXF dają te same wymiary w mm co w Kerfly.
+
+**Okno** (jak w Kerfly, `QT_QPA_PLATFORM=offscreen`):
+
+15. Narysowany kształt trafia do zadania z właściwym rozmiarem
+    i położeniem.
+16. Element z odznaczonym „tnij” nie trafia do zadania.
+17. Podgląd ścieżki noża pokazuje to samo, co pójdzie do pliku.
+18. Stop w trakcie wysyłki (na porcie testowym) kończy wysyłkę i dosyła
+    `PU;`.
+19. Projekt poza pasem folii blokuje Start z komunikatem.
 
 ---
 
-## 6. Kolejność prac (etap C)
+## 8. Kolejność prac (etap C)
 
-1. Generator HPGL z zapisem do pliku i testami 1–4, 8–10, 12–13.
+1. Generator HPGL z zapisem do pliku i testami (1–4, 8–10, 12–13).
 2. Wysyłka na port (test 11), potem próba na ploterze z pisakiem.
 3. Kompensacja noża, nadcięcie, kolejność (testy 5–7), potem próba z nożem
    na folii.
-4. Wpięcie w Kerfly: menu, podgląd ścieżki noża, Stop (test 14).
+4. Okno: najpierw wczytanie SVG, podgląd ścieżki noża, zapis i wysyłka,
+   Stop. Potem rysowanie przeniesione z Kerfly (testy 14–19).
 
 ---
 
-## 7. Świadomie odkładamy
+## 9. Świadomie odkładamy
 
 - kopie, odbicie lustrzane (poza ustawieniem osi), ramka do obierania;
 - cięcie po nadruku: ploter nie ma czujnika znaczników;
 - DMPL poza trybami 1 i 3, inne języki (GP-GL, CAMM);
 - Windows i macOS;
-- osobny program z okienkiem (jeśli zdecydujesz, że ma być);
+- wysyłanie na ploter prosto z Kerfly: rdzeń to umożliwia, ale skoro
+  Vintyl ma własne okno, robimy to później albo wcale (**do decyzji**);
 - `vpype`: niepotrzebny, kolejność ścieżek mamy własną.
 
 ---
 
-## 8. Otwarte punkty do uzupełnienia po A4
+## 10. Otwarte punkty do uzupełnienia po A4
 
 - skala: 40 czy 40,2 jednostki na mm;
 - język: HPGL czy DMPL (i który tryb);
