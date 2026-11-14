@@ -137,7 +137,11 @@ z pokrewnego sprzętu, **[BRAK]** nie dało się ustalić.
   (połącz, zwolnij, pozycja domowa, start zadania i inne). Wątki w
   `worker.py` też wywołują `laser.send` wprost. `PauseControl` jest wspólny,
   ale opisany pod pakiety USB.
-- **Wniosek:** rdzeń plotera da się dołożyć obok bez zmian w kodzie lasera.
+- **Nieaktualne po decyzji z 14.11.2026:** Kerfly zostaje tylko dla
+  laserów, a Vintyl jest osobnym programem z własnym oknem. Z Kerfly
+  kopiujemy tylko kod rysowania. Poniższy wniosek zostaje jako zapis
+  z weryfikacji.
+- **Wniosek (z weryfikacji):** rdzeń plotera da się dołożyć obok bez zmian w kodzie lasera.
   Bierze z Kerfly tylko pętle `[x, y, pętla]`, a resztę robi sam. W oknie
   potrzebne będzie osobne menu lub panel „Ploter” i osobny wątek wysyłki,
   wzorowany na `worker.py`, ale bez wspólnej klasy z laserem. Pojęcia

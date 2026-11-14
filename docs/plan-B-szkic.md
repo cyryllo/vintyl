@@ -9,7 +9,10 @@ akceptacji. Kodu programu (etap C) nie zaczynam bez niej.
 - licencja **GPL-3.0-or-later**, tak jak Kerfly;
 - Vintyl ma **własne okno**. Rysowanie będzie podobne do Kerfly, ale lewy
   panel ma mniej opcji niż w laserze;
-- głównie Linux, inne systemy w późniejszych etapach.
+- głównie Linux, inne systemy w późniejszych etapach;
+- Vintyl obsługuje **tylko plotery tnące do folii**. Kerfly zostaje
+  wyłącznie dla laserów i nie będzie wysyłać na ploter. Z Kerfly tylko
+  **kopiujemy kod rysowania**; wspólnej biblioteki nie robimy.
 
 ---
 
@@ -24,6 +27,9 @@ w jednym repo:
    (`vintyl cut projekt.svg --profil sk-870t`, domyślnie na sucho do pliku).
 2. **Okno `vintyl.gui`:** PySide6, jak w Kerfly. Rysowanie, wczytywanie
    SVG i DXF, podgląd ścieżki noża, wysyłka i Stop. Okno tylko woła rdzeń.
+
+Kerfly nie korzysta z Vintyl ani odwrotnie. Z Kerfly bierzemy tylko kopię
+kodu rysowania.
 
 Zasada ta sama co w Kerfly: nic w `vintyl/core/` nie importuje Qt, a test
 to pilnuje.
@@ -116,11 +122,9 @@ wprost, z nagłówkami „Kerfly contributors” i źródłem.
 | `kerfly/gui/icons`, `i18n` | ikony, tłumaczenia | — |
 | okno główne | **nie kopiujemy w całości** | `main_window.py` ma 4680 linii, głównie laser; piszemy nowe, mniejsze, z kawałków |
 
-**Do decyzji:** kopiujemy kod z Kerfly, a nie robimy wspólnej biblioteki.
-Wspólna biblioteka wymagałaby przebudowy Kerfly, a w nim właśnie
-pracujesz. Wady kopiowania: poprawki w rysowaniu trzeba przenosić ręcznie
-w obie strony. Wspólną część można wydzielić później, gdy Vintyl się
-ustabilizuje.
+**Ustalone:** kopiujemy kod z Kerfly, bez wspólnej biblioteki. Kerfly
+zostaje bez zmian. Pamiętamy, że poprawki w rysowaniu trzeba przenosić
+ręcznie, jeśli mają trafić do obu programów.
 
 ---
 
@@ -250,8 +254,6 @@ GPL-3.0, a ustaliliśmy GPL-3.0-or-later.
 - cięcie po nadruku: ploter nie ma czujnika znaczników;
 - DMPL poza trybami 1 i 3, inne języki (GP-GL, CAMM);
 - Windows i macOS;
-- wysyłanie na ploter prosto z Kerfly: rdzeń to umożliwia, ale skoro
-  Vintyl ma własne okno, robimy to później albo wcale (**do decyzji**);
 - `vpype`: niepotrzebny, kolejność ścieżek mamy własną.
 
 ---
