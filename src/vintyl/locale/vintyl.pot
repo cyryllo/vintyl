@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-15 17:49+0100\n"
+"POT-Creation-Date: 2026-11-15 17:53+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,6 +24,12 @@ msgstr ""
 #, python-format
 msgid "%d element"
 msgid_plural "%d elements"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "%d node selected"
+msgid_plural "%d nodes selected"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -113,7 +119,18 @@ msgstr ""
 msgid "Delete the selected element"
 msgstr ""
 
+msgid "Do again what was taken back"
+msgstr ""
+
+msgid ""
+"Drag nodes and handles · double-click a side: add a node · D delete · L "
+"line · C curve · O smooth · Z close/open · B break"
+msgstr ""
+
 msgid "Dry run: only save to a file"
+msgstr ""
+
+msgid "Edit nodes (or double-click an element)"
 msgstr ""
 
 msgid "Ellipse"
@@ -199,6 +216,9 @@ msgstr ""
 msgid "Pointer: %.1f / %.1f mm"
 msgstr ""
 
+msgid "Polygon"
+msgstr ""
+
 msgid "Port"
 msgstr ""
 
@@ -212,6 +232,12 @@ msgid "Quit"
 msgstr ""
 
 msgid "Rectangle"
+msgstr ""
+
+msgid "Redo"
+msgstr ""
+
+msgid "Regular polygon"
 msgstr ""
 
 msgid "Remove everything from the material?"
@@ -245,6 +271,9 @@ msgstr ""
 msgid "Show the whole material and design"
 msgstr ""
 
+msgid "Sides"
+msgstr ""
+
 msgid "Speed"
 msgstr ""
 
@@ -255,6 +284,9 @@ msgid "Start an empty design"
 msgstr ""
 
 msgid "Stop"
+msgstr ""
+
+msgid "Take back the last change"
 msgstr ""
 
 #, python-format
@@ -271,6 +303,9 @@ msgid "Ticked: cut. Not ticked: shown only."
 msgstr ""
 
 msgid "Tools"
+msgstr ""
+
+msgid "Undo"
 msgstr ""
 
 #, python-format
@@ -299,13 +334,28 @@ msgstr ""
 msgid "before the origin (along the material)"
 msgstr ""
 
+msgid "centre"
+msgstr ""
+
+msgid "corner"
+msgstr ""
+
 msgid "feed →"
 msgstr ""
 
 msgid "from the panel"
 msgstr ""
 
+msgid "in line"
+msgstr ""
+
+msgid "middle"
+msgstr ""
+
 msgid "not connected (sending comes later)"
+msgstr ""
+
+msgid "on line"
 msgstr ""
 
 #, python-format

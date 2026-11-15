@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-15 17:49+0100\n"
+"POT-Creation-Date: 2026-11-15 17:53+0100\n"
 "PO-Revision-Date: 2026-11-15 17:49+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -29,6 +29,13 @@ msgid_plural "%d elements"
 msgstr[0] "%d element"
 msgstr[1] "%d elementy"
 msgstr[2] "%d elementów"
+
+#, python-format
+msgid "%d node selected"
+msgid_plural "%d nodes selected"
+msgstr[0] "Zaznaczono %d węzeł"
+msgstr[1] "Zaznaczono %d węzły"
+msgstr[2] "Zaznaczono %d węzłów"
 
 #, python-format
 msgid ""
@@ -122,8 +129,21 @@ msgstr "Usuń"
 msgid "Delete the selected element"
 msgstr "Usuń zaznaczony element"
 
+msgid "Do again what was taken back"
+msgstr "Zrób ponownie to, co zostało cofnięte"
+
+msgid ""
+"Drag nodes and handles · double-click a side: add a node · D delete · L "
+"line · C curve · O smooth · Z close/open · B break"
+msgstr ""
+"Przeciągaj węzły i uchwyty · dwuklik na boku: nowy węzeł · D usuń · L "
+"linia · C krzywa · O gładki · Z zamknij/otwórz · B rozetnij"
+
 msgid "Dry run: only save to a file"
 msgstr "Na sucho: tylko zapis do pliku"
+
+msgid "Edit nodes (or double-click an element)"
+msgstr "Edycja węzłów (albo dwuklik na elemencie)"
 
 msgid "Ellipse"
 msgstr "Elipsa"
@@ -213,6 +233,9 @@ msgstr "Nadcięcie"
 msgid "Pointer: %.1f / %.1f mm"
 msgstr "Kursor: %.1f / %.1f mm"
 
+msgid "Polygon"
+msgstr "Wielokąt"
+
 msgid "Port"
 msgstr "Port"
 
@@ -227,6 +250,12 @@ msgstr "Zakończ"
 
 msgid "Rectangle"
 msgstr "Prostokąt"
+
+msgid "Redo"
+msgstr "Ponów"
+
+msgid "Regular polygon"
+msgstr "Wielokąt foremny"
 
 msgid "Remove everything from the material?"
 msgstr "Usunąć wszystko z folii?"
@@ -259,6 +288,9 @@ msgstr "Pokaż dokładnie, gdzie pojedzie nóż: cięcia, przejazdy i ich kolejn
 msgid "Show the whole material and design"
 msgstr "Pokaż całą folię i projekt"
 
+msgid "Sides"
+msgstr "Boki"
+
 msgid "Speed"
 msgstr "Prędkość"
 
@@ -270,6 +302,9 @@ msgstr "Zacznij pusty projekt"
 
 msgid "Stop"
 msgstr "Stop"
+
+msgid "Take back the last change"
+msgstr "Cofnij ostatnią zmianę"
 
 #, python-format
 msgid "The design does not fit on the material: it sticks out %s by %.1f mm."
@@ -286,6 +321,9 @@ msgstr "Zaznaczone: tnij. Niezaznaczone: tylko widoczne."
 
 msgid "Tools"
 msgstr "Narzędzia"
+
+msgid "Undo"
+msgstr "Cofnij"
 
 #, python-format
 msgid ""
@@ -316,14 +354,29 @@ msgstr "w poprzek folii, poza szerokość cięcia %g mm"
 msgid "before the origin (along the material)"
 msgstr "przed punktem zerowym (wzdłuż folii)"
 
+msgid "centre"
+msgstr "środek"
+
+msgid "corner"
+msgstr "narożnik"
+
 msgid "feed →"
 msgstr "podawanie →"
 
 msgid "from the panel"
 msgstr "z panelu"
 
+msgid "in line"
+msgstr "w linii"
+
+msgid "middle"
+msgstr "połowa"
+
 msgid "not connected (sending comes later)"
 msgstr "brak połączenia (wysyłanie będzie później)"
+
+msgid "on line"
+msgstr "na linii"
 
 #, python-format
 msgid "past the length of %g mm"

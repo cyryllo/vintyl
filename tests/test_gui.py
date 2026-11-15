@@ -181,3 +181,80 @@ def test_knife_values_reach_the_job(win, svg_file):
     win.overcut.setValue(0.5)
     assert win.build().text != plain
     assert win.build().cut_mm > win.last_job.cut_mm - 1e-9
+
+
+# ---- drawing from Kerfly: undo, polygon, nodes, snapping, keys ----------------------
+
+def test_undo_and_redo(win, svg_file):
+    e = win.import_svg(svg_file)
+    x0 = e.bounds[0]
+    win.opt_x.setValue(x0 + 30)
+    assert win.design.elements[0].bounds[0] == pytest.approx(x0 + 30)
+    win.undo()
+    assert win.design.elements[0].bounds[0] == pytest.approx(x0)
+    win.redo()
+    assert win.design.elements[0].bounds[0] == pytest.approx(x0 + 30)
+    win.undo()
+    win.undo()                                        # before the file was opened
+    assert win.design.elements == []
+    assert not win.act_undo.isEnabled() and win.act_redo.isEnabled()
+
+
+def test_polygon_with_the_sides_set(win):
+    win.set_tool("polygon")
+    assert win.opt_sides.isVisible() or not win.isVisible()   # shown with the polygon tool
+    win.opt_sides.setValue(5)
+    win._on_drawn("polygon", QRectF(20, -60, 40, 40))
+    e = win.design.elements[-1]
+    assert len(e.paths[0]["nodes"]) == 5 and e.paths[0]["closed"]
+    assert e.name.startswith("Polygon")
+
+
+def test_arrow_keys_nudge_the_selected_element(win, svg_file):
+    from PySide6.QtTest import QTest
+    e = win.import_svg(svg_file)
+    x0, _x1, _y0, y1 = e.bounds
+    win.view.setFocus()
+    QTest.keyClick(win.view.viewport(), Qt.Key_Right)
+    QTest.keyClick(win.view.viewport(), Qt.Key_Up, Qt.ShiftModifier)
+    e = win.design.elements[0]
+    assert e.bounds[0] == pytest.approx(x0 + 1.0)
+    assert e.bounds[3] == pytest.approx(y1 - 10.0)          # up on screen: 10 mm further across
+
+
+def test_double_click_edits_nodes_and_a_node_can_be_deleted(win):
+    win._on_drawn("rectangle", QRectF(20, -60, 40, 40))
+    e = win.design.elements[-1]
+    win.view.signals.edit_nodes.emit(e)
+    assert win.view.tool == "nodes" and win.tool_actions["nodes"].isChecked()
+    ed = win.view.node_editor
+    assert ed.item is not None and len(ed._marks) == 4
+    ed.select({(0, 0)})
+    assert ed.action("delete")
+    e = win.design.elements[-1]
+    assert len(e.paths[0]["nodes"]) == 3                # a triangle now
+    assert len(win.view.node_editor._marks) == 3        # the editor follows the rebuilt scene
+    win.undo()
+    assert len(win.design.elements[-1].paths[0]["nodes"]) == 4
+
+
+def test_escape_leaves_a_drawing_tool(win):
+    from PySide6.QtTest import QTest
+    win.set_tool("ellipse")
+    QTest.keyClick(win.view.viewport(), Qt.Key_Escape)
+    assert win.view.tool == "select" and win.tool_actions["select"].isChecked()
+
+
+def test_snapping_to_the_origin_and_alt_turns_it_off(win, monkeypatch):
+    v = win.view
+    tol = v._snap_tolerance()
+    p = v.snap_point(QPointF(tol / 3, -tol / 3))
+    assert (p.x(), p.y()) == (0.0, 0.0)
+    monkeypatch.setattr(type(v), "snap_suspended", staticmethod(lambda: True))
+    p = v.snap_point(QPointF(tol / 3, -tol / 3))
+    assert p.x() == pytest.approx(tol / 3)
+
+
+def test_node_tool_hint_does_not_widen_the_window(win):
+    win.set_tool("nodes")
+    assert win.minimumSizeHint().width() <= 1440

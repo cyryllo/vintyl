@@ -16,7 +16,7 @@ import os
 
 from PySide6.QtCore import QSize, Qt
 from PySide6.QtGui import QAction, QActionGroup, QKeySequence
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QDoubleSpinBox, QFileDialog, QFormLayout,
+from PySide6.QtWidgets import (QCheckBox, QComboBox, QDoubleSpinBox, QFileDialog, QFormLayout, QSpinBox,
                                QGridLayout, QGroupBox, QHBoxLayout, QLabel, QListWidget,
                                QListWidgetItem, QMainWindow, QMessageBox, QPushButton, QSizePolicy,
                                QToolBar, QVBoxLayout, QWidget)
@@ -57,6 +57,8 @@ class MainWindow(QMainWindow):
         self.profile_names = profiles.builtin_names()
         self.profile = profiles.load_builtin(self.profile_names[0])
         self._updating = False
+        self._undo = []                   # snapshots before each change (see _checkpoint)
+        self._redo = []
 
         self.view = MaterialView()
         self._make_actions()
@@ -87,6 +89,11 @@ class MainWindow(QMainWindow):
         s.moved.connect(self._on_moved)
         s.drawn.connect(self._on_drawn)
         s.line_drawn.connect(self._on_line_drawn)
+        s.nudged.connect(self._on_moved)
+        s.nodes_changed.connect(self._on_nodes_changed)
+        s.edit_nodes.connect(self._on_edit_nodes)
+        s.cancel_tool.connect(lambda: self.set_tool("select"))
+        s.node_selection.connect(self._on_node_selection)
         s.cursor.connect(lambda x, y: self.cursor_label.setText(_("Pointer: %.1f / %.1f mm") % (x, y)))
         self.resize(1440, 900)
         self._profile_changed(self.profile_box.currentIndex())   # fills the panel and draws
@@ -115,6 +122,10 @@ class MainWindow(QMainWindow):
                                          "Ctrl+Shift+S", _("Save exactly what would go to the cutter, as a file"))
         self.act_delete = self._action(_("Delete"), self.delete_selected, "trash", QKeySequence.Delete,
                                        _("Delete the selected element"))
+        self.act_undo = self._action(_("Undo"), self.undo, "arrow-back-up", QKeySequence.Undo,
+                                     _("Take back the last change"))
+        self.act_redo = self._action(_("Redo"), self.redo, "arrow-forward-up", QKeySequence.Redo,
+                                     _("Do again what was taken back"))
         self.act_fit = self._action(_("Fit"), self.view.fit_requested, "zoom-scan", "Ctrl+0",
                                     _("Show the whole material and design"))
         self.act_knife = self._action(_("Knife path"), None, "route", "Ctrl+K",
@@ -131,7 +142,8 @@ class MainWindow(QMainWindow):
         for a in (self.act_new, self.act_open, self.act_save_cut, None, self.act_quit):
             m.addSeparator() if a is None else m.addAction(a)
         m = mb.addMenu(_("&Edit"))
-        m.addAction(self.act_delete)
+        for a in (self.act_undo, self.act_redo, None, self.act_delete):
+            m.addSeparator() if a is None else m.addAction(a)
         m = mb.addMenu(_("&Cutter"))
         for a in (self.act_connect, self.act_profile):
             m.addAction(a)
@@ -147,7 +159,8 @@ class MainWindow(QMainWindow):
         tb.setMovable(False)
         tb.setIconSize(QSize(24, 24))
         tb.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        for a in (self.act_new, self.act_open, self.act_save_cut, None, self.act_delete, None,
+        for a in (self.act_new, self.act_open, self.act_save_cut, None, self.act_undo, self.act_redo,
+                  self.act_delete, None,
                   self.act_fit, self.act_knife, None, self.act_connect, self.act_profile):
             tb.addSeparator() if a is None else tb.addAction(a)
         self.addToolBar(Qt.TopToolBarArea, tb)
@@ -160,8 +173,10 @@ class MainWindow(QMainWindow):
         group = QActionGroup(self)
         self.tool_actions = {}
         for key, text, icon in (("select", _("Select and move"), "pointer"),
+                                ("nodes", _("Edit nodes (or double-click an element)"), "vector-bezier-2"),
                                 ("rectangle", _("Rectangle"), "square"),
                                 ("ellipse", _("Ellipse"), "circle"),
+                                ("polygon", _("Regular polygon"), "polygon"),
                                 ("line", _("Line"), "line")):
             a = self._action(text, lambda _c=False, k=key: self.set_tool(k), icon, tip=text)
             a.setCheckable(True)
@@ -174,6 +189,9 @@ class MainWindow(QMainWindow):
     def set_tool(self, tool):
         self.tool_actions[tool].setChecked(True)
         self.view.set_tool(tool)
+        self.sides_label.setVisible(tool == "polygon")
+        self.opt_sides.setVisible(tool == "polygon")
+        self.node_hint.setVisible(tool == "nodes")
 
     # ---- options bar: the selected element ------------------------------------
     def _make_options_bar(self):
@@ -197,6 +215,24 @@ class MainWindow(QMainWindow):
         self.opt_cut.toggled.connect(self._options_changed)
         row.addSpacing(16)
         row.addWidget(self.opt_cut)
+        row.addSpacing(16)
+        self.sides_label = QLabel(_("Sides"))
+        self.opt_sides = QSpinBox()
+        self.opt_sides.setRange(3, 64)
+        self.opt_sides.setValue(self.view.polygon_sides)
+        self.opt_sides.valueChanged.connect(lambda v: setattr(self.view, "polygon_sides", v))
+        self.sides_label.setBuddy(self.opt_sides)
+        row.addWidget(self.sides_label)
+        row.addWidget(self.opt_sides)
+        self.node_hint = QLabel(_("Drag nodes and handles · double-click a side: add a node · "
+                                  "D delete · L line · C curve · O smooth · Z close/open · B break"))
+        self.node_hint.setStyleSheet("color: #4b5563")
+        # the hint wraps and never makes the window wider than the screen
+        self.node_hint.setWordWrap(True)
+        self.node_hint.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
+        row.addWidget(self.node_hint, 1)
+        for w in (self.sides_label, self.opt_sides, self.node_hint):
+            w.setVisible(False)
         row.addStretch(1)
         self.options_widgets = (self.opt_x, self.opt_y, self.opt_w, self.opt_h, self.opt_cut)
         return bar
@@ -219,6 +255,7 @@ class MainWindow(QMainWindow):
         e = self.selected
         if self._updating or e is None:
             return
+        self._checkpoint()
         w, h = self.opt_w.value(), self.opt_h.value()
         if (w, h) != tuple(round(v, 2) for v in e.size) and w > 0 and h > 0:
             e.set_size(w, h)
@@ -367,6 +404,7 @@ class MainWindow(QMainWindow):
         return "%s %d" % (base, self.counter[base])
 
     def add_element(self, element):
+        self._checkpoint()
         self.design.elements.append(element)
         self.selected = element
         self.refresh()
@@ -375,6 +413,7 @@ class MainWindow(QMainWindow):
         if self.design.elements and QMessageBox.question(
                 self, _("New design"), _("Remove everything from the material?")) != QMessageBox.Yes:
             return
+        self._checkpoint()
         self.design = Design()
         self.selected = None
         self.view.fit_requested()
@@ -399,7 +438,8 @@ class MainWindow(QMainWindow):
 
     def _on_drawn(self, tool, rect):
         make = {"rectangle": (shapes.rectangle, _("Rectangle")),
-                "ellipse": (shapes.ellipse, _("Ellipse"))}[tool]
+                "ellipse": (shapes.ellipse, _("Ellipse")),
+                "polygon": (lambda *r: shapes.polygon(*r, sides=self.opt_sides.value()), _("Polygon"))}[tool]
         paths = make[0](rect.left(), rect.top(), rect.right(), rect.bottom())
         self.add_element(Element(self._name(make[1]), paths))
         self.set_tool("select")
@@ -409,8 +449,24 @@ class MainWindow(QMainWindow):
         self.set_tool("select")
 
     def _on_moved(self, element, dx, dy):
+        self._checkpoint()
         element.move_by(dx, dy)
+        self.selected = element
         self.refresh()
+
+    def _on_nodes_changed(self, element, paths, _unused):
+        self._checkpoint()
+        element.paths = paths
+        self.refresh()
+
+    def _on_edit_nodes(self, element):
+        self.selected = element
+        self.view.select(element)
+        self.set_tool("nodes")
+
+    def _on_node_selection(self, n):
+        if self.view.tool == "nodes" and n:
+            self.statusBar().showMessage(ngettext("%d node selected", "%d nodes selected", n) % n, 3000)
 
     def _on_selected(self, element):
         if self._updating:
@@ -421,6 +477,7 @@ class MainWindow(QMainWindow):
 
     def delete_selected(self):
         if self.selected in self.design.elements:
+            self._checkpoint()
             self.design.elements.remove(self.selected)
             self.selected = None
             self.refresh()
@@ -432,6 +489,7 @@ class MainWindow(QMainWindow):
         i = els.index(self.selected)
         j = i + step
         if 0 <= j < len(els):
+            self._checkpoint()
             els[i], els[j] = els[j], els[i]
             self.refresh()
 
@@ -454,6 +512,7 @@ class MainWindow(QMainWindow):
         if self._updating:
             return
         e = self.design.elements[self.element_list.row(item)]
+        self._checkpoint()
         e.cut = item.checkState() == Qt.Checked
         self.refresh()
 
@@ -465,6 +524,35 @@ class MainWindow(QMainWindow):
         self.view.select(self.selected)
         self._updating = False
         self._show_options()
+
+    # ---- undo / redo ----------------------------------------------------------------------
+    UNDO_LIMIT = 100
+
+    def _snapshot(self):
+        els = self.design.elements
+        return ([e.copy() for e in els], els.index(self.selected) if self.selected in els else None)
+
+    def _restore(self, snap):
+        elements, index = snap
+        self.design.elements = elements
+        self.selected = elements[index] if index is not None else None
+        self.refresh()
+
+    def _checkpoint(self):
+        """Remember the design as it is, before a change: Undo goes back to it."""
+        self._undo.append(self._snapshot())
+        del self._undo[:-self.UNDO_LIMIT]
+        self._redo.clear()
+
+    def undo(self):
+        if self._undo:
+            self._redo.append(self._snapshot())
+            self._restore(self._undo.pop())
+
+    def redo(self):
+        if self._redo:
+            self._undo.append(self._snapshot())
+            self._restore(self._redo.pop())
 
     # ---- refresh -------------------------------------------------------------------------
     def refresh(self):
@@ -481,6 +569,8 @@ class MainWindow(QMainWindow):
             self.summary.setText(ngettext("%d element", "%d elements", n) % n
                                  + " · " + _("%.1f × %.1f mm") % (box[1] - box[0], box[3] - box[2]))
         self.act_delete.setEnabled(self.selected is not None)
+        self.act_undo.setEnabled(bool(self._undo))
+        self.act_redo.setEnabled(bool(self._redo))
         self.refresh_job()
 
     def refresh_job(self):
