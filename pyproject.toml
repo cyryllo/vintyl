@@ -18,11 +18,15 @@ dependencies = ["pyserial>=3.5"]
 gui = ["PySide6-Essentials>=6.6", "svgelements>=1.9"]
 dev = ["pytest>=8"]
 
+[project.gui-scripts]
+vintyl = "vintyl.gui.app:main"
+
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
 "vintyl.core" = ["profiles/*.toml"]
+"vintyl.gui" = ["icons/*.svg", "icons/tabler/*.svg", "icons/tabler/LICENSE"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

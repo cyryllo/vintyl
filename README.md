@@ -6,19 +6,23 @@ Software for vinyl cutters, for Linux first. Draw or open a design and cut
 it on a drag-knife vinyl cutter over a serial (or USB-serial) port, in
 HPGL or DMPL.
 
-**Status: early development.** The cutter core (profiles, HPGL / DMPL
-output to a file) works and is tested; sending to a port, knife offset,
-overcut and the window come next. Nothing is sent to a cutter yet.
+**Status: early development.** Works now: the window with the strip of
+material, opening SVG files, drawing rectangles, ellipses and lines,
+moving and resizing, choosing what is cut, cutter profiles, and saving the
+cutter commands (HPGL / DMPL) to a file. Next: sending to a port, knife
+offset, overcut, the knife path preview, and the rest of the drawing tools
+from Kerfly. Nothing is sent to a cutter yet.
 
 First cutters: Seiki SK-870T and VEVOR KI-375A (profiles still being
 checked on the machines).
 
-## Run the tests
+## Run it
 
 ```bash
 python3 -m venv .venv
-.venv/bin/pip install -e '.[dev]'
-.venv/bin/python -m pytest
+.venv/bin/pip install -e '.[gui,dev]'
+.venv/bin/python -m vintyl            # the window; add an .svg file to open it
+.venv/bin/python -m pytest            # the tests (the window ones run offscreen)
 ```
 
 ## License
