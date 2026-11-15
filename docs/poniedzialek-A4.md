@@ -1,5 +1,20 @@
 # Kroki A4: lista na poniedziałek 16.11.2026
 
+**Jutro testujemy mniejszy ploter: VEVOR KI-375A** (potwierdziłeś
+15.11; wcześniej zapisany jako „SK420” i „KI-275A”). Według opisu
+sprzedawcy: 375 mm podawania, ok. 285 mm szerokości cięcia, nacisk do
+500 g [POSR]. Dokładny napis z tabliczki i tak zapiszemy (krok 4).
+
+Na obu ploterach tniesz tym samym sterownikiem (SignMaster), więc
+najpewniej mówią tym samym językiem i mają te same ustawienia portu.
+To, co ustalimy jutro, sprawdzimy potem na SK-870T jednym kwadratem.
+[POSR: do potwierdzenia]
+
+Inkcut ma gotowy profil tylko dla SK-870T, ale to nie znaczy, że na pewno
+działa. Na forum ktoś potwierdził na nim tylko ruchy, nie cięcie folii.
+Dla KI-375A Inkcut ani CutScape nie mają profilu. Kwadrat 20 mm
+z odstępem 10 mm mieści się na obu ploterach.
+
 Każdy krok robię dopiero po Twoim „tak”. Przy krokach z ruchem: **pisak
 zamiast noża i papier**.
 

@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vintyl"
+version = "0.1.0.dev0"
+description = "Software for vinyl cutters"
+readme = "README.md"
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
+requires-python = ">=3.11"
+authors = [{ name = "Vintyl contributors" }]
+# The core needs no GUI toolkit; pyserial is only imported when sending to a port.
+dependencies = ["pyserial>=3.5"]
+
+[project.optional-dependencies]
+gui = ["PySide6-Essentials>=6.6", "svgelements>=1.9"]
+dev = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"vintyl.core" = ["profiles/*.toml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

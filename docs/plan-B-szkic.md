@@ -58,7 +58,7 @@ zawiasów.
 - **Projekt:** lista elementów z ptaszkiem „tnij” i kolejnością (jak w
   Kerfly) oraz rozmiar całości w mm.
 - **Ploter:**
-  - wybór profilu (SK-870T, mniejszy ploter);
+  - wybór profilu (Seiki SK-870T, VEVOR KI-375A);
   - port i stan połączenia;
   - przesunięcie noża i nadcięcie, w trybie pisaka bez kompensacji;
   - opcjonalnie prędkość i nacisk; puste pole = ustawienie z panelu
@@ -171,7 +171,9 @@ pacing = "time"           # none / time (czekanie wg szacowanego czasu ruchu)
 lookahead_s = 0.3         # ile ruchu ploter może mieć naprzód (krótko = szybki Stop)
 ```
 
-Drugi profil (mniejszy ploter) powstanie po odczycie tabliczki.
+Drugi profil: **VEVOR KI-375A** (ok. 285 mm szerokości cięcia według
+sprzedawcy). Na obu ploterach tniesz tym samym sterownikiem, więc
+najpewniej różnią się tylko polem roboczym. [po A4]
 
 ---
 
@@ -266,4 +268,4 @@ GPL-3.0, a ustaliliśmy GPL-3.0-or-later.
 - kontrola przepływu i prędkość portu;
 - czy ploter reaguje na `VS` i `FS`, czy odpowiada na `OH;` i `OI;`;
 - układ USB (CH340 czy FTDI) i nazwa portu;
-- model mniejszego plotera.
+- napis z tabliczki KI-375A i jego szerokość cięcia.
