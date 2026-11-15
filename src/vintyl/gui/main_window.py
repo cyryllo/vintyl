@@ -28,11 +28,11 @@ from vintyl.core.design import Design, Element
 from vintyl.core.job import JobError, build_job
 from vintyl.core.loaders import LoadError, load_svg
 from vintyl.core.profile import ProfileError
-from vintyl.gui import _
+from vintyl.gui import N_, _, ngettext
 from vintyl.gui import icons
 from vintyl.gui.canvas import MaterialView
 
-LATER = _("Comes in a later step of Vintyl")
+LATER = N_("Comes in a later step of Vintyl")   # translated where it is shown
 PLACE_MARGIN_MM = 10.0        # a new file is placed this far from the origin
 
 
@@ -117,9 +117,12 @@ class MainWindow(QMainWindow):
                                        _("Delete the selected element"))
         self.act_fit = self._action(_("Fit"), self.view.fit_requested, "zoom-scan", "Ctrl+0",
                                     _("Show the whole material and design"))
-        self.act_knife = self._action(_("Knife path"), None, "route", tip=LATER, enabled=False)
-        self.act_connect = self._action(_("Connect"), None, "plug-connected", tip=LATER, enabled=False)
-        self.act_profile = self._action(_("Profile"), None, "settings-2", tip=LATER, enabled=False)
+        self.act_knife = self._action(_("Knife path"), None, "route", "Ctrl+K",
+                                      _("Show exactly where the knife goes: cuts, travels and their order"))
+        self.act_knife.setCheckable(True)
+        self.act_knife.toggled.connect(lambda on: self.set_knife_preview(on))
+        self.act_connect = self._action(_("Connect"), None, "plug-connected", tip=_(LATER), enabled=False)
+        self.act_profile = self._action(_("Profile"), None, "settings-2", tip=_(LATER), enabled=False)
         self.act_quit = self._action(_("Quit"), self.close, None, QKeySequence.Quit)
 
     def _make_menu(self):
@@ -265,12 +268,19 @@ class MainWindow(QMainWindow):
         self.profile_box.currentIndexChanged.connect(self._profile_changed)
         form.addRow(_("Profile"), self.profile_box)
         self.port_label = QLabel(_("not connected (sending comes later)"))
+        self.port_label.setWordWrap(True)
         form.addRow(_("Port"), self.port_label)
         self.knife = _spin(5, 2, minimum=0)
+        self.knife.setSingleStep(0.05)
+        self.knife.setSpecialValueText(_("pen (no offset)"))
+        self.knife.setToolTip(_("How far the blade tip trails the holder's axis. "
+                                "A 45° blade: usually 0.20–0.30 mm. 0 = pen."))
         self.overcut = _spin(5, 2, minimum=0)
+        self.overcut.setSingleStep(0.1)
+        self.overcut.setToolTip(_("Closed shapes are cut this far past their start, "
+                                  "so the cut closes cleanly"))
         for w in (self.knife, self.overcut):
-            w.setEnabled(False)
-            w.setToolTip(LATER)
+            w.valueChanged.connect(lambda _v: self.refresh_job())
         form.addRow(_("Knife offset"), self.knife)
         form.addRow(_("Overcut"), self.overcut)
         self.speed = _spin(80, 1, " cm/s", minimum=0)
@@ -283,8 +293,10 @@ class MainWindow(QMainWindow):
         form.addRow(_("Force"), self.force)
         self.inside_first = QCheckBox(_("Inside shapes first"))
         self.inside_first.setChecked(True)
-        self.inside_first.setEnabled(False)
-        self.inside_first.setToolTip(LATER)
+        self.inside_first.setToolTip(_("Holes and shapes inside others are cut before them, so a piece "
+                                       "is never cut free while its holes are still to be cut. "
+                                       "Off: exactly the order of the list."))
+        self.inside_first.toggled.connect(lambda _v: self.refresh_job())
         form.addRow(self.inside_first)
         col.addWidget(box)
 
@@ -300,8 +312,9 @@ class MainWindow(QMainWindow):
         lay.addWidget(self.dry_run)
         grid = QGridLayout()
         self.btn_preview = QPushButton(icons.tabler("route"), _("Knife path"))
-        self.btn_preview.setEnabled(False)
-        self.btn_preview.setToolTip(LATER)
+        self.btn_preview.setCheckable(True)
+        self.btn_preview.setToolTip(_("Show exactly where the knife goes: cuts, travels and their order"))
+        self.btn_preview.toggled.connect(self.set_knife_preview)
         self.btn_save = QPushButton(icons.tabler("device-floppy"), _("Save .hpgl"))
         self.btn_save.clicked.connect(lambda: self.save_cutter_file())
         self.btn_start = QPushButton(icons.tabler("player-play"), _("Start"))
@@ -309,7 +322,7 @@ class MainWindow(QMainWindow):
         self.btn_stop = QPushButton(icons.tabler("player-stop"), _("Stop"))
         for b in (self.btn_start, self.btn_stop):
             b.setEnabled(False)
-            b.setToolTip(LATER)
+            b.setToolTip(_(LATER))
         for i, b in enumerate((self.btn_preview, self.btn_save, self.btn_start, self.btn_stop)):
             b.setMinimumHeight(40)
             b.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -326,10 +339,27 @@ class MainWindow(QMainWindow):
         self.refresh()
 
     def job_profile(self):
-        """The chosen profile with the panel's speed and force (0 = from the panel)."""
+        """The chosen profile with the panel's knife, overcut, speed and force
+        (speed and force 0 = from the cutter's panel)."""
         return dataclasses.replace(self.profile,
+                                   knife_offset_mm=self.knife.value(),
+                                   overcut_mm=self.overcut.value(),
                                    speed_cm_s=self.speed.value() or None,
                                    force_g=self.force.value() or None)
+
+    def build(self):
+        """The job as it would go to the cutter now (raises JobError / ProfileError)."""
+        polys, groups = self.design.material_paths()
+        return build_job(polys, self.job_profile(), groups, self.inside_first.isChecked())
+
+    # ---- knife path preview --------------------------------------------------------
+    def set_knife_preview(self, on):
+        for w in (self.btn_preview, self.act_knife):
+            if w.isChecked() != on:
+                w.blockSignals(True)
+                w.setChecked(on)
+                w.blockSignals(False)
+        self.view.show_knife(self.last_job.knife_paths if on and self.last_job else None)
 
     # ---- design changes -----------------------------------------------------------
     def _name(self, base):
@@ -448,7 +478,8 @@ class MainWindow(QMainWindow):
         if box is None:
             self.summary.setText(_("Empty. Open an SVG file or draw a shape."))
         else:
-            self.summary.setText(_("%d elements · %.1f × %.1f mm") % (n, box[1] - box[0], box[3] - box[2]))
+            self.summary.setText(ngettext("%d element", "%d elements", n) % n
+                                 + " · " + _("%.1f × %.1f mm") % (box[1] - box[0], box[3] - box[2]))
         self.act_delete.setEnabled(self.selected is not None)
         self.refresh_job()
 
@@ -457,13 +488,15 @@ class MainWindow(QMainWindow):
         self.profile_label.setText("%s · %s · %d" % (p.name, p.language.upper(), p.baud))
         self.last_job = None
         try:
-            self.last_job = build_job(self.design.material_polylines(), p)
+            self.last_job = self.build()
         except (JobError, ProfileError) as e:
             self.job_label.setText(str(e))
             self.job_label.setStyleSheet("color: #b91c1c")
             self.btn_save.setEnabled(False)
             self.act_save_cut.setEnabled(False)
+            self.view.show_knife(None)
             return
+        self.view.show_knife(self.last_job.knife_paths if self.btn_preview.isChecked() else None)
         j = self.last_job
         text = _("Cut length: %.2f m · travel: %.2f m") % (j.cut_mm / 1000.0, j.travel_mm / 1000.0)
         if p.speed_cm_s:
@@ -478,7 +511,7 @@ class MainWindow(QMainWindow):
     def save_cutter_file(self, path=None):
         """Save the cutter commands to a file. Returns the path, or None."""
         try:
-            job = build_job(self.design.material_polylines(), self.job_profile())
+            job = self.build()
         except (JobError, ProfileError) as e:
             QMessageBox.warning(self, _("Save cutter file"), str(e))
             return None

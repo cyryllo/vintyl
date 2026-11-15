@@ -18,6 +18,8 @@ QGroupBox QLabel, QGroupBox QCheckBox { font-weight: normal; }
 
 def main(argv=None):
     from PySide6.QtWidgets import QApplication
+    from vintyl import i18n
+    i18n.setup()                       # the system language, if Vintyl has it
     from vintyl.gui.main_window import MainWindow
     argv = list(sys.argv if argv is None else argv)
     app = QApplication.instance() or QApplication(argv)

@@ -18,6 +18,7 @@ import os
 
 from . import curves
 from .design import Element
+from ..i18n import _
 
 SVG_PPI = 96.0               # CSS pixels per inch, as in Inkscape
 MM_PER_PX = 25.4 / SVG_PPI
@@ -46,7 +47,7 @@ def svg_subpaths(path):
     try:
         svg = se.SVG.parse(path, ppi=SVG_PPI)
     except Exception as e:                      # svgelements raises many kinds
-        raise LoadError("Cannot read %s: %s" % (os.path.basename(path), e)) from None
+        raise LoadError(_("Cannot read %s: %s") % (os.path.basename(path), e)) from None
     out = []
     for el in svg.elements():
         if not isinstance(el, se.Shape) or _hidden(el) or not _painted(el):
@@ -88,6 +89,6 @@ def load_svg(path):
     """One element with every visible shape of the file."""
     paths = svg_subpaths(path)
     if not paths:
-        raise LoadError("%s has no visible shapes to cut." % os.path.basename(path))
+        raise LoadError(_("%s has no visible shapes to cut.") % os.path.basename(path))
     name = os.path.splitext(os.path.basename(path))[0]
     return Element(name=name, paths=paths, source=path)

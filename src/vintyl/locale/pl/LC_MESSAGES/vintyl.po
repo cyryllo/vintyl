@@ -1,0 +1,334 @@
+# Polish translations for Vintyl.
+# Copyright (C) 2026 Vintyl contributors
+# This file is distributed under the same license as the Vintyl project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Vintyl VERSION\n"
+"Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
+"POT-Creation-Date: 2026-11-15 17:49+0100\n"
+"PO-Revision-Date: 2026-11-15 17:49+0100\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: pl\n"
+"Language-Team: Polish\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && "
+"(n%100<10 || n%100>=20) ? 1 : 2);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#, python-format
+msgid "%.1f × %.1f mm"
+msgstr "%.1f × %.1f mm"
+
+#, python-format
+msgid "%d element"
+msgid_plural "%d elements"
+msgstr[0] "%d element"
+msgstr[1] "%d elementy"
+msgstr[2] "%d elementów"
+
+#, python-format
+msgid ""
+"%s The knife offset and the overcut need %.2f mm of room; move the design"
+" that far from the edge."
+msgstr ""
+"%s Przesunięcie noża i nadcięcie potrzebują %.2f mm zapasu; odsuń projekt"
+" o tyle od krawędzi."
+
+#, python-format
+msgid "%s has no visible shapes to cut."
+msgstr "W pliku %s nie ma widocznych kształtów do cięcia."
+
+msgid "&Cutter"
+msgstr "&Ploter"
+
+msgid "&Edit"
+msgstr "&Edycja"
+
+msgid "&File"
+msgstr "&Plik"
+
+msgid "&Help"
+msgstr "Pomo&c"
+
+msgid "&View"
+msgstr "&Widok"
+
+msgid "A path has a point that is not a number."
+msgstr "Ścieżka ma punkt, który nie jest liczbą."
+
+#, python-format
+msgid ""
+"A point would go to the cutter at %d,%d (below zero). Check the axis "
+"settings of the profile."
+msgstr ""
+"Punkt trafiłby do plotera jako %d,%d (poniżej zera). Sprawdź ustawienia "
+"osi w profilu."
+
+#, python-format
+msgid "About %.1f min at %g cm/s"
+msgstr "Około %.1f min przy %g cm/s"
+
+msgid "About Vintyl"
+msgstr "O programie Vintyl"
+
+msgid "Add the shapes of an SVG file to the design"
+msgstr "Dodaj do projektu kształty z pliku SVG"
+
+msgid "Bottom edge, across the material from the origin"
+msgstr "Dolna krawędź, w poprzek folii od punktu zerowego"
+
+#, python-format
+msgid "Cannot read %s: %s"
+msgstr "Nie można odczytać %s: %s"
+
+msgid "Closed shapes are cut this far past their start, so the cut closes cleanly"
+msgstr ""
+"Kształty zamknięte są cięte o tyle dalej za punkt startu, żeby cięcie "
+"dobrze się domknęło"
+
+msgid "Comes in a later step of Vintyl"
+msgstr "Będzie w kolejnym kroku Vintyl"
+
+msgid "Connect"
+msgstr "Połącz"
+
+msgid "Cut earlier"
+msgstr "Tnij wcześniej"
+
+msgid "Cut later"
+msgstr "Tnij później"
+
+#, python-format
+msgid "Cut length: %.2f m · travel: %.2f m"
+msgstr "Długość cięcia: %.2f m · przejazdy: %.2f m"
+
+msgid "Cut this element"
+msgstr "Tnij ten element"
+
+msgid "Cutter"
+msgstr "Ploter"
+
+#, python-format
+msgid "Cutter files (*%s)"
+msgstr "Pliki plotera (*%s)"
+
+msgid "Delete"
+msgstr "Usuń"
+
+msgid "Delete the selected element"
+msgstr "Usuń zaznaczony element"
+
+msgid "Dry run: only save to a file"
+msgstr "Na sucho: tylko zapis do pliku"
+
+msgid "Ellipse"
+msgstr "Elipsa"
+
+msgid "Empty. Open an SVG file or draw a shape."
+msgstr "Pusto. Otwórz plik SVG albo narysuj kształt."
+
+msgid "Empty: the cutter uses what is set on its panel"
+msgstr "Puste: ploter użyje ustawienia ze swojego panelu"
+
+msgid "Fit"
+msgstr "Dopasuj"
+
+msgid "Force"
+msgstr "Nacisk"
+
+msgid "Height"
+msgstr "Wysokość"
+
+msgid ""
+"Holes and shapes inside others are cut before them, so a piece is never "
+"cut free while its holes are still to be cut. Off: exactly the order of "
+"the list."
+msgstr ""
+"Otwory i kształty leżące w innych są cięte przed nimi, więc żaden kawałek"
+" nie zostanie odcięty, zanim wytniesz jego otwory. Wyłączone: dokładnie "
+"kolejność z listy."
+
+msgid ""
+"How far the blade tip trails the holder's axis. A 45° blade: usually "
+"0.20–0.30 mm. 0 = pen."
+msgstr ""
+"O ile czubek ostrza jest za osią oprawki. Ostrze 45°: zwykle 0,20–0,30 "
+"mm. 0 = pisak."
+
+msgid "Inside shapes first"
+msgstr "Najpierw kształty wewnętrzne"
+
+msgid "Job"
+msgstr "Zadanie"
+
+msgid "Knife offset"
+msgstr "Przesunięcie noża"
+
+msgid "Knife path"
+msgstr "Ścieżka noża"
+
+msgid "Left edge, along the material from the origin"
+msgstr "Lewa krawędź, wzdłuż folii od punktu zerowego"
+
+msgid "Line"
+msgstr "Linia"
+
+msgid "Main"
+msgstr "Główny"
+
+#, python-format
+msgid "Material: cutting width %g mm, no length limit"
+msgstr "Folia: szerokość cięcia %g mm, długość bez limitu"
+
+msgid "Move down"
+msgstr "Przesuń w dół"
+
+msgid "Move up"
+msgstr "Przesuń w górę"
+
+msgid "New"
+msgstr "Nowy"
+
+msgid "New design"
+msgstr "Nowy projekt"
+
+msgid "Open SVG"
+msgstr "Otwórz SVG"
+
+#, python-format
+msgid "Opened %s"
+msgstr "Otwarto %s"
+
+msgid "Origin"
+msgstr "Punkt zerowy"
+
+msgid "Overcut"
+msgstr "Nadcięcie"
+
+#, python-format
+msgid "Pointer: %.1f / %.1f mm"
+msgstr "Kursor: %.1f / %.1f mm"
+
+msgid "Port"
+msgstr "Port"
+
+msgid "Profile"
+msgstr "Profil"
+
+msgid "Project"
+msgstr "Projekt"
+
+msgid "Quit"
+msgstr "Zakończ"
+
+msgid "Rectangle"
+msgstr "Prostokąt"
+
+msgid "Remove everything from the material?"
+msgstr "Usunąć wszystko z folii?"
+
+msgid "SVG files (*.svg)"
+msgstr "Pliki SVG (*.svg)"
+
+msgid "Save .hpgl"
+msgstr "Zapisz .hpgl"
+
+msgid "Save cutter file"
+msgstr "Zapisz plik plotera"
+
+msgid "Save exactly what would go to the cutter, as a file"
+msgstr "Zapisz do pliku dokładnie to, co poszłoby do plotera"
+
+#, python-format
+msgid "Saved %s (%d bytes)"
+msgstr "Zapisano %s (%d bajtów)"
+
+msgid "Select and move"
+msgstr "Zaznaczanie i przesuwanie"
+
+msgid "Sending to the cutter comes in a later step"
+msgstr "Wysyłanie do plotera będzie w kolejnym kroku"
+
+msgid "Show exactly where the knife goes: cuts, travels and their order"
+msgstr "Pokaż dokładnie, gdzie pojedzie nóż: cięcia, przejazdy i ich kolejność"
+
+msgid "Show the whole material and design"
+msgstr "Pokaż całą folię i projekt"
+
+msgid "Speed"
+msgstr "Prędkość"
+
+msgid "Start"
+msgstr "Start"
+
+msgid "Start an empty design"
+msgstr "Zacznij pusty projekt"
+
+msgid "Stop"
+msgstr "Stop"
+
+#, python-format
+msgid "The design does not fit on the material: it sticks out %s by %.1f mm."
+msgstr "Projekt nie mieści się na folii: wystaje %s o %.1f mm."
+
+msgid "There is nothing to cut."
+msgstr "Nie ma nic do cięcia."
+
+msgid "There is nothing to cut: every path is shorter than one cutter step."
+msgstr "Nie ma nic do cięcia: każda ścieżka jest krótsza niż jeden krok plotera."
+
+msgid "Ticked: cut. Not ticked: shown only."
+msgstr "Zaznaczone: tnij. Niezaznaczone: tylko widoczne."
+
+msgid "Tools"
+msgstr "Narzędzia"
+
+#, python-format
+msgid ""
+"Vintyl %s\n"
+"Software for vinyl cutters.\n"
+"GPL-3.0-or-later."
+msgstr ""
+"Vintyl %s\n"
+"Program do ploterów tnących folię.\n"
+"GPL-3.0-or-later."
+
+msgid "Width"
+msgstr "Szerokość"
+
+msgid "X"
+msgstr "X"
+
+msgid "Y"
+msgstr "Y"
+
+msgid "across the material, below 0"
+msgstr "w poprzek folii, poniżej 0"
+
+#, python-format
+msgid "across the material, past the cutting width of %g mm"
+msgstr "w poprzek folii, poza szerokość cięcia %g mm"
+
+msgid "before the origin (along the material)"
+msgstr "przed punktem zerowym (wzdłuż folii)"
+
+msgid "feed →"
+msgstr "podawanie →"
+
+msgid "from the panel"
+msgstr "z panelu"
+
+msgid "not connected (sending comes later)"
+msgstr "brak połączenia (wysyłanie będzie później)"
+
+#, python-format
+msgid "past the length of %g mm"
+msgstr "poza długość %g mm"
+
+msgid "pen (no offset)"
+msgstr "pisak (bez przesunięcia)"
+

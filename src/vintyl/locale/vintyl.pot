@@ -1,0 +1,317 @@
+# Translations template for Vintyl.
+# Copyright (C) 2026 Vintyl contributors
+# This file is distributed under the same license as the Vintyl project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Vintyl VERSION\n"
+"Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
+"POT-Creation-Date: 2026-11-15 17:49+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#, python-format
+msgid "%.1f × %.1f mm"
+msgstr ""
+
+#, python-format
+msgid "%d element"
+msgid_plural "%d elements"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid ""
+"%s The knife offset and the overcut need %.2f mm of room; move the design"
+" that far from the edge."
+msgstr ""
+
+#, python-format
+msgid "%s has no visible shapes to cut."
+msgstr ""
+
+msgid "&Cutter"
+msgstr ""
+
+msgid "&Edit"
+msgstr ""
+
+msgid "&File"
+msgstr ""
+
+msgid "&Help"
+msgstr ""
+
+msgid "&View"
+msgstr ""
+
+msgid "A path has a point that is not a number."
+msgstr ""
+
+#, python-format
+msgid ""
+"A point would go to the cutter at %d,%d (below zero). Check the axis "
+"settings of the profile."
+msgstr ""
+
+#, python-format
+msgid "About %.1f min at %g cm/s"
+msgstr ""
+
+msgid "About Vintyl"
+msgstr ""
+
+msgid "Add the shapes of an SVG file to the design"
+msgstr ""
+
+msgid "Bottom edge, across the material from the origin"
+msgstr ""
+
+#, python-format
+msgid "Cannot read %s: %s"
+msgstr ""
+
+msgid "Closed shapes are cut this far past their start, so the cut closes cleanly"
+msgstr ""
+
+msgid "Comes in a later step of Vintyl"
+msgstr ""
+
+msgid "Connect"
+msgstr ""
+
+msgid "Cut earlier"
+msgstr ""
+
+msgid "Cut later"
+msgstr ""
+
+#, python-format
+msgid "Cut length: %.2f m · travel: %.2f m"
+msgstr ""
+
+msgid "Cut this element"
+msgstr ""
+
+msgid "Cutter"
+msgstr ""
+
+#, python-format
+msgid "Cutter files (*%s)"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "Delete the selected element"
+msgstr ""
+
+msgid "Dry run: only save to a file"
+msgstr ""
+
+msgid "Ellipse"
+msgstr ""
+
+msgid "Empty. Open an SVG file or draw a shape."
+msgstr ""
+
+msgid "Empty: the cutter uses what is set on its panel"
+msgstr ""
+
+msgid "Fit"
+msgstr ""
+
+msgid "Force"
+msgstr ""
+
+msgid "Height"
+msgstr ""
+
+msgid ""
+"Holes and shapes inside others are cut before them, so a piece is never "
+"cut free while its holes are still to be cut. Off: exactly the order of "
+"the list."
+msgstr ""
+
+msgid ""
+"How far the blade tip trails the holder's axis. A 45° blade: usually "
+"0.20–0.30 mm. 0 = pen."
+msgstr ""
+
+msgid "Inside shapes first"
+msgstr ""
+
+msgid "Job"
+msgstr ""
+
+msgid "Knife offset"
+msgstr ""
+
+msgid "Knife path"
+msgstr ""
+
+msgid "Left edge, along the material from the origin"
+msgstr ""
+
+msgid "Line"
+msgstr ""
+
+msgid "Main"
+msgstr ""
+
+#, python-format
+msgid "Material: cutting width %g mm, no length limit"
+msgstr ""
+
+msgid "Move down"
+msgstr ""
+
+msgid "Move up"
+msgstr ""
+
+msgid "New"
+msgstr ""
+
+msgid "New design"
+msgstr ""
+
+msgid "Open SVG"
+msgstr ""
+
+#, python-format
+msgid "Opened %s"
+msgstr ""
+
+msgid "Origin"
+msgstr ""
+
+msgid "Overcut"
+msgstr ""
+
+#, python-format
+msgid "Pointer: %.1f / %.1f mm"
+msgstr ""
+
+msgid "Port"
+msgstr ""
+
+msgid "Profile"
+msgstr ""
+
+msgid "Project"
+msgstr ""
+
+msgid "Quit"
+msgstr ""
+
+msgid "Rectangle"
+msgstr ""
+
+msgid "Remove everything from the material?"
+msgstr ""
+
+msgid "SVG files (*.svg)"
+msgstr ""
+
+msgid "Save .hpgl"
+msgstr ""
+
+msgid "Save cutter file"
+msgstr ""
+
+msgid "Save exactly what would go to the cutter, as a file"
+msgstr ""
+
+#, python-format
+msgid "Saved %s (%d bytes)"
+msgstr ""
+
+msgid "Select and move"
+msgstr ""
+
+msgid "Sending to the cutter comes in a later step"
+msgstr ""
+
+msgid "Show exactly where the knife goes: cuts, travels and their order"
+msgstr ""
+
+msgid "Show the whole material and design"
+msgstr ""
+
+msgid "Speed"
+msgstr ""
+
+msgid "Start"
+msgstr ""
+
+msgid "Start an empty design"
+msgstr ""
+
+msgid "Stop"
+msgstr ""
+
+#, python-format
+msgid "The design does not fit on the material: it sticks out %s by %.1f mm."
+msgstr ""
+
+msgid "There is nothing to cut."
+msgstr ""
+
+msgid "There is nothing to cut: every path is shorter than one cutter step."
+msgstr ""
+
+msgid "Ticked: cut. Not ticked: shown only."
+msgstr ""
+
+msgid "Tools"
+msgstr ""
+
+#, python-format
+msgid ""
+"Vintyl %s\n"
+"Software for vinyl cutters.\n"
+"GPL-3.0-or-later."
+msgstr ""
+
+msgid "Width"
+msgstr ""
+
+msgid "X"
+msgstr ""
+
+msgid "Y"
+msgstr ""
+
+msgid "across the material, below 0"
+msgstr ""
+
+#, python-format
+msgid "across the material, past the cutting width of %g mm"
+msgstr ""
+
+msgid "before the origin (along the material)"
+msgstr ""
+
+msgid "feed →"
+msgstr ""
+
+msgid "from the panel"
+msgstr ""
+
+msgid "not connected (sending comes later)"
+msgstr ""
+
+#, python-format
+msgid "past the length of %g mm"
+msgstr ""
+
+msgid "pen (no offset)"
+msgstr ""
+

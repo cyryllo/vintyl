@@ -82,13 +82,15 @@ def test_save_gives_the_same_bytes_as_the_core(win, svg_file, tmp_path):
     win.import_svg(svg_file)
     out = tmp_path / "out.hpgl"
     assert win.save_cutter_file(str(out)) == str(out)
-    expected = build_job(win.design.material_polylines(), win.job_profile()).text
+    expected = win.build().text
     assert out.read_text() == expected
     assert expected.startswith("IN;SP1;PU") and expected.endswith("PU0,0;")
 
 
 def test_drawn_rectangle_is_cut_where_it_was_drawn(win, tmp_path):
     # view mm: x 20..40 along, y -50..-30 (y down) = 30..50 mm across
+    win.knife.setValue(0)           # a pen: no knife offset, no overcut
+    win.overcut.setValue(0)
     win._on_drawn("rectangle", QRectF(QPointF(20, -50), QPointF(40, -30)))
     out = tmp_path / "r.hpgl"
     win.save_cutter_file(str(out))
@@ -140,7 +142,7 @@ def test_speed_from_the_panel_or_set(win, svg_file):
     win.import_svg(svg_file)
     assert win.job_profile().speed_cm_s is None
     win.speed.setValue(20)
-    assert "VS20;" in build_job(win.design.material_polylines(), win.job_profile()).text
+    assert "VS20;" in win.build().text
     assert "min at 20 cm/s" in win.job_label.text()
 
 
@@ -152,3 +154,30 @@ def test_delete_and_reorder(win, svg_file):
     assert win.design.elements == [b, a]
     win.delete_selected()
     assert win.design.elements == [a]
+
+
+def test_knife_path_preview_follows_the_job(win, svg_file):
+    win.import_svg(svg_file)
+    assert win.view._knife_items == []
+    win.btn_preview.setChecked(True)
+    assert win.act_knife.isChecked()
+    n_paths = len(win.last_job.knife_paths)
+    # one item for the cuts, one for the travels, one numbered dot per path
+    assert len(win.view._knife_items) == 2 + n_paths
+    win.knife.setValue(0.3)                       # a change redraws it, no stale items
+    assert len(win.view._knife_items) == 2 + len(win.last_job.knife_paths)
+    win.opt_x.setValue(50)                        # so does a move (the scene is rebuilt)
+    assert len(win.view._knife_items) == 2 + len(win.last_job.knife_paths)
+    win.act_knife.setChecked(False)
+    assert win.view._knife_items == [] and not win.btn_preview.isChecked()
+
+
+def test_knife_values_reach_the_job(win, svg_file):
+    win.import_svg(svg_file)
+    win.knife.setValue(0)
+    win.overcut.setValue(0)
+    plain = win.build().text
+    win.knife.setValue(0.25)
+    win.overcut.setValue(0.5)
+    assert win.build().text != plain
+    assert win.build().cut_mm > win.last_job.cut_mm - 1e-9

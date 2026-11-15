@@ -6,14 +6,20 @@ A cutting job: paths in material coordinates -> checked -> cutter commands.
 
 Steps, in this order:
     1. tidy:    drop empty paths and repeated points
-    2. check:   everything lies on the material (cutting width, length)
-    3. axes:    material coordinates -> the cutter's own axes (profile)
-    4. units:   millimetres -> whole machine units
-    5. safety:  no negative coordinate reaches the cutter
-    6. encode:  HPGL / DMPL text, knife always up before the travel home
+    2. check:   the design lies on the material (cutting width, length)
+    3. order:   inside shapes first, the user's element order, short travel
+    4. overcut: closed shapes are cut a little further along themselves
+    5. knife:   drag-knife compensation (the path of the holder's axis)
+    6. check:   the knife's path still lies on the material
+    7. axes:    material coordinates -> the cutter's own axes (profile)
+    8. units:   millimetres -> whole machine units
+    9. safety:  no negative coordinate reaches the cutter
+   10. encode:  HPGL / DMPL text, knife always up before every travel
 
-Path order, overcut and knife compensation come between 2 and 3 in later
-steps of the plan.
+Overcut comes BEFORE the knife compensation: compensated, a closed shape
+no longer ends exactly where it starts, and Inkcut, which does it the
+other way round, silently drops the overcut. The travel home is a separate
+move and is never compensated.
 
 Copyright (C) 2026 Vintyl contributors
 Licensed under the GNU General Public License v3 or later. See LICENSE.
@@ -21,6 +27,8 @@ Licensed under the GNU General Public License v3 or later. See LICENSE.
 import math
 from dataclasses import dataclass
 
+from . import knife
+from ..i18n import _
 from .protocols import encoder_for
 
 #: a point counts as on the material up to this far outside (rounding)
@@ -39,6 +47,7 @@ class Job:
     cut_mm: float             # knife down
     travel_mm: float          # knife up, from the origin and back
     paths: int
+    knife_paths: list = None  # what the knife does, in order, material mm (for the preview)
 
     def save(self, path):
         # ASCII only: these languages have no other characters, and the
@@ -47,21 +56,22 @@ class Job:
             f.write(self.text)
 
 
-def _tidy(polylines):
+def _tidy(polylines, groups):
     """Copies as lists of (x, y) floats; paths shorter than 2 points dropped,
-    a point equal to the one before dropped."""
-    out = []
-    for poly in polylines:
+    a point equal to the one before dropped. Returns (paths, their groups)."""
+    out, out_groups = [], []
+    for poly, group in zip(polylines, groups):
         pts = []
         for p in poly:
             x, y = float(p[0]), float(p[1])
             if not (math.isfinite(x) and math.isfinite(y)):
-                raise JobError("A path has a point that is not a number.")
+                raise JobError(_("A path has a point that is not a number."))
             if not pts or (x, y) != pts[-1]:
                 pts.append((x, y))
         if len(pts) >= 2:
             out.append(pts)
-    return out
+            out_groups.append(group)
+    return out, out_groups
 
 
 def _bounds(polylines):
@@ -73,15 +83,15 @@ def _bounds(polylines):
 def check_on_material(bounds, profile):
     """Raise JobError naming the worst overrun in mm, or return None."""
     xmin, xmax, ymin, ymax = bounds
-    over = [("before the origin (along the material)", -xmin),
-            ("across the material, below 0", -ymin),
-            ("across the material, past the cutting width of %g mm" % profile.width_mm,
+    over = [(_("before the origin (along the material)"), -xmin),
+            (_("across the material, below 0"), -ymin),
+            (_("across the material, past the cutting width of %g mm") % profile.width_mm,
              ymax - profile.width_mm)]
     if profile.length_mm > 0:
-        over.append(("past the length of %g mm" % profile.length_mm, xmax - profile.length_mm))
+        over.append((_("past the length of %g mm") % profile.length_mm, xmax - profile.length_mm))
     where, mm = max(over, key=lambda o: o[1])
     if mm > EDGE_TOLERANCE_MM:
-        raise JobError("The design does not fit on the material: it sticks out %s by %.1f mm."
+        raise JobError(_("The design does not fit on the material: it sticks out %s by %.1f mm.")
                        % (where, mm))
 
 
@@ -129,19 +139,39 @@ def _round(v):
     return int(math.floor(v + 0.5)) if v >= 0 else -int(math.floor(-v + 0.5))
 
 
-def build_job(polylines, profile):
+def build_job(polylines, profile, groups=None, inside_first=False):
     """Turn paths (lists of (x, y) in material mm) into a Job. Raises
-    JobError when there is nothing to cut or the design does not fit."""
+    JobError when there is nothing to cut or the design does not fit.
+
+    groups: the element number of each path (the user's cutting order);
+    inside_first: reorder (see knife.order). Without it the paths are cut
+    exactly in the order given."""
     profile.validate()
-    polys = _tidy(polylines)
+    groups = list(groups) if groups is not None else [0] * len(polylines)
+    if len(groups) != len(polylines):
+        raise ValueError("groups must have one entry per path")
+    polys, groups = _tidy(polylines, groups)
     if not polys:
-        raise JobError("There is nothing to cut.")
+        raise JobError(_("There is nothing to cut."))
     bounds = _bounds(polys)
     check_on_material(bounds, profile)
 
+    if inside_first:
+        polys = knife.order(polys, groups)
+    polys = [knife.overcut(p, profile.overcut_mm) for p in polys]
+    polys = knife.compensate(polys, profile.knife_offset_mm, profile.corner_deg)
+    if profile.knife_offset_mm > 0 or profile.overcut_mm > 0:
+        try:
+            check_on_material(_bounds(polys), profile)
+        except JobError as e:
+            raise JobError(_("%s The knife offset and the overcut need %.2f mm of room; "
+                             "move the design that far from the edge.")
+                           % (e, profile.knife_offset_mm + profile.overcut_mm)) from None
+
     enc = encoder_for(profile)
     scale = enc.units_per_mm
-    machine = to_machine(polys, profile, bounds)
+    # mirror within the box of what the knife really does (after compensation)
+    machine = to_machine(polys, profile, _bounds(polys))
 
     # units, and the safety check on what really goes out
     unit_polys = []
@@ -150,14 +180,14 @@ def build_job(polylines, profile):
         for x, y in poly:
             ux, uy = _round(x * scale), _round(y * scale)
             if ux < 0 or uy < 0:
-                raise JobError("A point would go to the cutter at %d,%d (below zero). "
-                               "Check the axis settings of the profile." % (ux, uy))
+                raise JobError(_("A point would go to the cutter at %d,%d (below zero). "
+                                 "Check the axis settings of the profile.") % (ux, uy))
             if not pts or (ux, uy) != pts[-1]:
                 pts.append((ux, uy))
         if len(pts) >= 2:
             unit_polys.append(pts)
     if not unit_polys:
-        raise JobError("There is nothing to cut: every path is shorter than one cutter step.")
+        raise JobError(_("There is nothing to cut: every path is shorter than one cutter step."))
 
     # encode; lengths are measured on what is sent
     parts = [enc.begin()]
@@ -180,4 +210,5 @@ def build_job(polylines, profile):
     parts.append(enc.end(pos[0], pos[1]))
 
     return Job(text="".join(parts), extension=enc.extension, bounds_mm=bounds,
-               cut_mm=cut / scale, travel_mm=travel / scale, paths=len(unit_polys))
+               cut_mm=cut / scale, travel_mm=travel / scale, paths=len(unit_polys),
+               knife_paths=polys)

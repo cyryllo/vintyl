@@ -155,6 +155,7 @@ class MaterialView(QGraphicsView):
         scene.blockSignals(True)
         scene.clear()
         self._items = []
+        self._knife_items = []          # cleared with the scene; the window draws them again
         box = design.bounds()
         length = max(MIN_STRIP_LENGTH, (box[1] + 200.0) if box else 0.0)
         strip = self.material_rect(length)
@@ -218,6 +219,64 @@ class MaterialView(QGraphicsView):
         item.setPen(pen)
         item.setZValue(10)
         self.scene().addItem(item)
+
+    # ---- knife path preview ------------------------------------------------------
+    def show_knife(self, paths):
+        """Draw what the knife does over the design (paths in material mm,
+        in cutting order), or remove that drawing (paths None).
+
+        Cuts are solid, travels (knife up) dashed, from the origin through
+        every path and back; a numbered dot marks where each path starts."""
+        for item in getattr(self, "_knife_items", []):
+            if item.scene() is self.scene():
+                self.scene().removeItem(item)
+        self._knife_items = []
+        if not paths:
+            return
+        cut, travel = QPainterPath(), QPainterPath()
+        pos = QPointF(0, 0)
+        for poly in paths:
+            start = QPointF(poly[0][0], -poly[0][1])
+            travel.moveTo(pos)
+            travel.lineTo(start)
+            cut.moveTo(start)
+            for x, y in poly[1:]:
+                cut.lineTo(x, -y)
+            pos = QPointF(poly[-1][0], -poly[-1][1])
+        travel.moveTo(pos)
+        travel.lineTo(0, 0)
+        for path, pen in ((travel, cosmetic_pen(COLORS["selection"], 1.2, Qt.DashLine)),
+                          (cut, cosmetic_pen(COLORS["cut"], 2.4))):
+            item = QGraphicsPathItem(path)
+            item.setPen(pen)
+            item.setZValue(20)
+            item.setAcceptedMouseButtons(Qt.NoButton)
+            self.scene().addItem(item)
+            self._knife_items.append(item)
+        for k, poly in enumerate(paths, 1):
+            self._knife_items.append(self._order_dot(k, QPointF(poly[0][0], -poly[0][1])))
+
+    def _order_dot(self, number, at):
+        """A small numbered dot that keeps its size on screen."""
+        dot = QGraphicsPathItem()
+        p = QPainterPath()
+        p.addEllipse(QPointF(0, 0), 8, 8)
+        dot.setPath(p)
+        dot.setBrush(QBrush(QColor("#1f2937")))
+        dot.setPen(QPen(Qt.NoPen))
+        dot.setFlag(QGraphicsItem.ItemIgnoresTransformations, True)
+        dot.setPos(at)
+        dot.setZValue(21)
+        dot.setAcceptedMouseButtons(Qt.NoButton)
+        text = QGraphicsSimpleTextItem(str(number), dot)
+        f = QFont()
+        f.setPointSizeF(7)
+        text.setFont(f)
+        text.setBrush(QColor("white"))
+        r = text.boundingRect()
+        text.setPos(-r.width() / 2, -r.height() / 2)
+        self.scene().addItem(dot)
+        return dot
 
     # ---- selection ------------------------------------------------------------
     def _selection_changed(self):

@@ -95,10 +95,16 @@ class Design:
     def material_polylines(self, tol=curves.FLATNESS_MM):
         """What goes to the cutter: the elements marked "cut", in list order,
         as polylines in material coordinates (x along, y across = -view y)."""
-        out = []
-        for e in self.elements:
+        return self.material_paths(tol)[0]
+
+    def material_paths(self, tol=curves.FLATNESS_MM):
+        """(polylines, groups): as material_polylines, plus the element number
+        of each polyline, so the job keeps the user's element order."""
+        out, groups = [], []
+        for k, e in enumerate(self.elements):
             if not e.cut:
                 continue
             for poly in curves.flatten(e.paths, tol):
                 out.append([(x, -y) for x, y in poly])
-        return out
+                groups.append(k)
+        return out, groups
