@@ -200,7 +200,7 @@ def test_save_writes_exactly_the_commands(tmp_path):
 # ---- profiles ----------------------------------------------------------------------
 
 def test_builtin_profiles_load():
-    assert prof.builtin_names() == ["seiki-sk-870t", "vevor-ki-375a"]
+    assert prof.builtin_names() == ["seiki-sk-870t", "vevor-870", "vevor-ki-375a"]
     sk = prof.load_builtin("seiki-sk-870t")
     assert sk.width_mm == 780.0 and sk.language == "hpgl" and sk.units_per_mm == 40.0
     assert prof.load_builtin("vevor-ki-375a").width_mm == 285.0
@@ -240,3 +240,40 @@ def test_core_imports_no_gui_toolkit():
             "print(bad); sys.exit(1 if bad else 0)")
     r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True)
     assert r.returncode == 0, r.stdout + r.stderr
+
+
+# ---- the user's cutter profiles ---------------------------------------------------------------
+def test_three_built_in_cutters():
+    from vintyl.core import profile
+    names = {e["id"]: e["profile"] for e in profile.catalogue()}
+    assert set(names) >= {"seiki-sk-870t", "vevor-ki-375a", "vevor-870"}
+    assert names["vevor-870"].width_mm == 780.0 and names["vevor-870"].connection == "usb-printer"
+
+
+def test_a_changed_built_in_cutter_is_the_users_copy_and_can_be_restored(tmp_path, monkeypatch):
+    import dataclasses
+    from vintyl.core import profile
+    monkeypatch.setenv("VINTYL_PROFILES", str(tmp_path / "profiles"))
+    entry = {e["id"]: e for e in profile.catalogue()}["vevor-ki-375a"]
+    assert entry["builtin"] and not entry["changed"]
+    profile.save_user("vevor-ki-375a", dataclasses.replace(entry["profile"], port="/dev/usb/lp7"))
+    entry = {e["id"]: e for e in profile.catalogue()}["vevor-ki-375a"]
+    assert entry["changed"] and entry["profile"].port == "/dev/usb/lp7"
+    profile.delete_user("vevor-ki-375a")                       # restore: the built-in one again
+    entry = {e["id"]: e for e in profile.catalogue()}["vevor-ki-375a"]
+    assert not entry["changed"] and entry["profile"].port == "/dev/usb/lp1"
+
+
+def test_a_new_cutter_gets_its_own_file_and_a_broken_one_is_reported(tmp_path, monkeypatch):
+    import dataclasses
+    from vintyl.core import profile
+    monkeypatch.setenv("VINTYL_PROFILES", str(tmp_path / "profiles"))
+    base = profile.load_builtin("vevor-ki-375a")
+    pid = profile.new_id("My big cutter")
+    assert pid == "my-big-cutter"
+    profile.save_user(pid, dataclasses.replace(base, name="My big cutter", width_mm=1260.0))
+    assert profile.new_id("My big cutter") == "my-big-cutter-2"
+    (tmp_path / "profiles" / "broken.toml").write_text("width_mm = \"wide\"\n")
+    entries = {e["id"]: e for e in profile.catalogue()}
+    assert entries["my-big-cutter"]["profile"].width_mm == 1260.0 and not entries["my-big-cutter"]["builtin"]
+    assert entries["broken"]["profile"] is None and entries["broken"]["error"]

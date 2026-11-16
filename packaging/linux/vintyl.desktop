@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Name=Vintyl
+GenericName=Vinyl cutter
+GenericName[pl]=Ploter tnący
+Comment=Draw and cut designs on a vinyl cutter
+Comment[pl]=Rysowanie i cięcie projektów na ploterze do folii
+Exec=vintyl %F
+Icon=vintyl
+Terminal=false
+Categories=Graphics;Engineering;
+MimeType=application/x-vintyl;image/svg+xml;
+Keywords=vinyl;cutter;plotter;HPGL;sticker;folia;ploter;
+StartupWMClass=Vintyl

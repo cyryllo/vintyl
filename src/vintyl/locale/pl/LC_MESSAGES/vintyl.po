@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-16 21:45+0100\n"
+"POT-Creation-Date: 2026-11-16 22:20+0100\n"
 "PO-Revision-Date: 2026-11-15 17:49+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -52,6 +52,10 @@ msgstr[1] "Wstawiono %d kształty."
 msgstr[2] "Wstawiono %d kształtów."
 
 #, python-format
+msgid "%s (mine)"
+msgstr "%s (mój)"
+
+#, python-format
 msgid ""
 "%s The knife offset and the overcut need %.2f mm of room; move the design"
 " that far from the edge."
@@ -74,6 +78,14 @@ msgstr "Plik %s jest uszkodzony: nie da się go odczytać jako projektu."
 #, python-format
 msgid "%s is not a Vintyl project."
 msgstr "%s nie jest projektem Vintyl."
+
+#, python-format
+msgid ""
+"%s is not there now: plug the cutter in and switch it on, or choose its "
+"port in the cutter's settings."
+msgstr ""
+"Nie ma teraz %s: podłącz i włącz ploter albo wybierz jego port w "
+"ustawieniach plotera."
 
 #, python-format
 msgid "%s is not there. Is the cutter connected by USB and switched on?"
@@ -112,6 +124,10 @@ msgstr "Kod QR do wycięcia: adres albo tekst"
 msgid "A copy of the selected element, a little to the side"
 msgstr "Kopia zaznaczonego elementu, obok niego"
 
+#, python-format
+msgid "A cutter profile cannot be read: %s"
+msgstr "Nie da się odczytać profilu plotera: %s"
+
 msgid ""
 "A new outline round the selected shapes (or inside them), a set distance "
 "away: an edge round a text, a backing in another colour"
@@ -130,6 +146,9 @@ msgstr ""
 "Punkt trafiłby do plotera jako %d,%d (poniżej zera). Sprawdź ustawienia "
 "osi w profilu."
 
+msgid "A profile of your own, starting from these settings"
+msgstr "Własny profil, zaczynający od tych ustawień"
+
 msgid ""
 "A rectangle round everything that is cut, cut last: the waste vinyl "
 "inside it peels off in one piece"
@@ -143,6 +162,12 @@ msgstr "Około %.1f min przy %g cm/s"
 
 msgid "About Vintyl"
 msgstr "O programie Vintyl"
+
+msgid "Access to the cutter"
+msgstr "Dostęp do plotera"
+
+msgid "Access to the cutter (Linux groups)"
+msgstr "Dostęp do plotera (grupy w Linuksie)"
 
 msgid "Align"
 msgstr "Wyrównaj"
@@ -159,6 +184,9 @@ msgstr "Ramiona"
 
 msgid "Arrow"
 msgstr "Strzałka"
+
+msgid "Axes"
+msgstr "Osie"
 
 msgid "Axle hole (mm)"
 msgstr "Otwór na oś (mm)"
@@ -177,6 +205,13 @@ msgstr "Dolne krawędzie"
 
 msgid "Bricks"
 msgstr "Cegiełki"
+
+msgid ""
+"Built-in profile: your changes are kept as your own copy; \"Restore "
+"factory settings\" brings back the original."
+msgstr ""
+"Profil wbudowany: zmiany są zapisywane jako Twoja kopia; „Przywróć "
+"ustawienia fabryczne” przywraca oryginał."
 
 #, python-format
 msgid "Cannot open %s: %s"
@@ -200,6 +235,11 @@ msgstr "Środki w poziomie"
 msgid "Centres up and down"
 msgstr "Środki w pionie"
 
+msgid "Change one size and the others follow, so the shape keeps its look"
+msgstr ""
+"Zmień jeden wymiar, a pozostałe pójdą za nim, więc kształt zachowa swój "
+"wygląd"
+
 msgid "Circle"
 msgstr "Koło"
 
@@ -217,11 +257,17 @@ msgstr "Będzie w kolejnym kroku Vintyl"
 msgid "Command"
 msgstr "Polecenie"
 
+msgid "Commands"
+msgstr "Polecenia"
+
 msgid "Concentric"
 msgstr "Koncentryczne"
 
-msgid "Connect"
-msgstr "Połącz"
+msgid "Connection"
+msgstr "Połączenie"
+
+msgid "Connects as"
+msgstr "Łączy się jako"
 
 #, python-format
 msgid "Copied %d element."
@@ -232,6 +278,9 @@ msgstr[2] "Skopiowano %d elementów."
 
 msgid "Copy"
 msgstr "Kopiuj"
+
+msgid "Corner from"
+msgstr "Narożnik od"
 
 msgid "Corner radius (mm)"
 msgstr "Promień narożników (mm)"
@@ -277,18 +326,37 @@ msgstr "Ploter"
 msgid "Cutter files (*%s)"
 msgstr "Pliki plotera (*%s)"
 
+msgid "Cutter settings"
+msgstr "Ustawienia plotera"
+
+msgid "Cutter settings…"
+msgstr "Ustawienia plotera…"
+
 msgid "Cutting"
 msgstr "Cięcie"
+
+msgid "Cutting width"
+msgstr "Szerokość cięcia"
 
 #, python-format
 msgid "Cutting width %g mm"
 msgstr "Szerokość cięcia %g mm"
 
+msgid "DMPL mode"
+msgstr "Tryb DMPL"
+
 msgid "Delete"
 msgstr "Usuń"
 
+#, python-format
+msgid "Delete the cutter profile \"%s\"?"
+msgstr "Usunąć profil plotera „%s”?"
+
 msgid "Delete the selected element"
 msgstr "Usuń zaznaczony element"
+
+msgid "Delete this cutter"
+msgstr "Usuń ten ploter"
 
 msgid "Diamonds"
 msgstr "Romby"
@@ -363,9 +431,6 @@ msgstr "Elipsa: przeciągnij prostokąt, w który ma się wpisać"
 msgid "Empty. Open an SVG file or draw a shape."
 msgstr "Pusto. Otwórz plik SVG albo narysuj kształt."
 
-msgid "Empty: the cutter uses what is set on its panel"
-msgstr "Puste: ploter użyje ustawienia ze swojego panelu"
-
 msgid "Error correction"
 msgstr "Korekcja błędów"
 
@@ -374,6 +439,13 @@ msgstr "Wszystkie skróty w jednym oknie"
 
 msgid "Every second row shifted"
 msgstr "Co drugi rząd przesunięty"
+
+msgid ""
+"Everything at once: the cutter keeps the job in its memory (the KI-375A)."
+" As fast as it cuts: for cutters with a small memory"
+msgstr ""
+"Wszystko naraz: ploter trzyma zadanie w swojej pamięci (KI-375A). Tak "
+"szybko, jak tnie: dla ploterów z małą pamięcią"
 
 msgid "Exclusion"
 msgstr "Wykluczenie"
@@ -404,6 +476,9 @@ msgstr ""
 "Wypełnij zaznaczone zamknięte kształty wzorem z linii, rysowanym pisakiem"
 " (tylko gdy narzędziem jest pisak)"
 
+msgid "Find"
+msgstr "Szukaj"
+
 msgid "Fit"
 msgstr "Dopasuj"
 
@@ -412,6 +487,9 @@ msgstr "Odwróć"
 
 msgid "Flip top to bottom"
 msgstr "Odbij w pionie (góra–dół)"
+
+msgid "Flow control"
+msgstr "Kontrola przepływu"
 
 msgid "Font"
 msgstr "Czcionka"
@@ -429,6 +507,13 @@ msgstr ""
 msgid "Force"
 msgstr "Nacisk"
 
+#, python-format
+msgid "Forget your changes of \"%s\" and use the settings it came with?"
+msgstr "Zapomnieć zmiany w „%s” i użyć ustawień fabrycznych?"
+
+msgid "Found, and you may use it."
+msgstr "Znaleziony, masz do niego dostęp."
+
 msgid "Frame round the design"
 msgstr "Ramka dookoła projektu"
 
@@ -445,6 +530,9 @@ msgstr "Odstęp"
 
 msgid "Gear"
 msgstr "Koło zębate"
+
+msgid "Give the cutter a name."
+msgstr "Nadaj ploterowi nazwę."
 
 msgid "Grid"
 msgstr "Siatka"
@@ -464,6 +552,9 @@ msgid_plural "Grouped %d elements."
 msgstr[0] "Zgrupowano %d element."
 msgstr[1] "Zgrupowano %d elementy."
 msgstr[2] "Zgrupowano %d elementów."
+
+msgid "HPGL: 40 units per mm on most cutters. Check with a 20 mm square."
+msgstr "HPGL: w większości ploterów 40 jednostek na mm. Sprawdź kwadratem 20 mm."
 
 msgid "Head length (%)"
 msgstr "Długość grotu (%)"
@@ -515,6 +606,13 @@ msgstr ""
 
 msgid "How wide a line the pen or pencil draws (a fineliner: 0.3–0.5 mm)"
 msgstr "Jak grubą linię rysuje pisak lub ołówek (cienkopis: 0,3–0,5 mm)"
+
+msgid ""
+"How wide the knife can cut (not how wide the material may be: an \"870 "
+"mm\" cutter cuts about 780 mm)"
+msgstr ""
+"Jak szeroko nóż może ciąć (nie jak szeroki może być materiał: ploter „870"
+" mm” tnie około 780 mm)"
 
 msgid "Inner corners (%)"
 msgstr "Wcięcie (%)"
@@ -569,11 +667,25 @@ msgstr "Nóż"
 msgid "Knife offset"
 msgstr "Przesunięcie noża"
 
+#, python-format
+msgid ""
+"Knife offset %(k).2f mm, overcut %(o).2f mm, %(lang)s. Change them in the"
+" cutter's settings (the button beside it)."
+msgstr ""
+"Przesunięcie noża %(k).2f mm, nadcięcie %(o).2f mm, %(lang)s. Zmienisz je"
+" w ustawieniach plotera (przycisk obok)."
+
 msgid "Knife path"
 msgstr "Ścieżka noża"
 
+msgid "Language"
+msgstr "Język"
+
 msgid "Left edges"
 msgstr "Lewe krawędzie"
+
+msgid "Length"
+msgstr "Długość"
 
 msgid "Length (mm)"
 msgstr "Długość (mm)"
@@ -587,11 +699,17 @@ msgstr "Linia: przeciągnij od końca do końca"
 msgid "Lines"
 msgstr "Linie"
 
+msgid "Look again for cutters plugged in"
+msgstr "Poszukaj ponownie podłączonych ploterów"
+
 msgid "Look closer (the mouse wheel does the same)"
 msgstr "Przybliż widok (to samo robi kółko myszy)"
 
 msgid "Look from further away"
 msgstr "Oddal widok"
+
+msgid "Machine"
+msgstr "Maszyna"
 
 msgid "Main"
 msgstr "Główny"
@@ -625,28 +743,36 @@ msgstr "Przesuń w dół"
 msgid "Move up"
 msgstr "Przesuń w górę"
 
+msgid "Name"
+msgstr "Nazwa"
+
+msgid "Name of the new cutter:"
+msgstr "Nazwa nowego plotera:"
+
 msgid "New"
 msgstr "Nowy"
 
-#, python-format
-msgid ""
-"No permission to use %s. Add yourself to the group dialout:\n"
-"  sudo usermod -aG dialout $USER\n"
-"then log out and in again."
-msgstr ""
-"Brak uprawnień do %s. Dodaj się do grupy dialout:\n"
-"  sudo usermod -aG dialout $USER\n"
-"potem wyloguj się i zaloguj ponownie."
+msgid "New cutter"
+msgstr "Nowy ploter"
+
+msgid "New cutter (a copy)"
+msgstr "Nowy ploter (kopia)"
 
 #, python-format
 msgid ""
-"No permission to use %s. Add yourself to the group lp:\n"
-"  sudo usermod -aG lp $USER\n"
+"No permission to use %(port)s: it belongs to the group %(group)s. Join "
+"that group once (in a terminal):\n"
+"  sudo usermod -aG %(group)s $USER\n"
 "then log out and in again."
 msgstr ""
-"Brak uprawnień do %s. Dodaj się do grupy lp:\n"
-"  sudo usermod -aG lp $USER\n"
+"Brak uprawnień do %(port)s: należy do grupy %(group)s. Dołącz do tej "
+"grupy raz (w terminalu):\n"
+"  sudo usermod -aG %(group)s $USER\n"
 "potem wyloguj się i zaloguj ponownie."
+
+#, python-format
+msgid "No permission to use %s."
+msgstr "Brak uprawnień do %s."
 
 msgid "No port is set. Choose the cutter's port in the panel."
 msgstr "Nie ustawiono portu. Wybierz port plotera w panelu."
@@ -657,12 +783,8 @@ msgstr "Żaden kształt się nie mieści: zmniejsz je albo zwęź margines."
 msgid "Nodes"
 msgstr "Węzły"
 
-msgid ""
-"Not sent: this cutter takes its speed from its panel. Enter it here for "
-"the time estimate."
-msgstr ""
-"Nie jest wysyłana: ten ploter bierze prędkość ze swojego panelu. Wpisz ją"
-" tu, żeby oszacować czas."
+msgid "Not plugged in now (or switched off)."
+msgstr "Teraz niepodłączony (albo wyłączony)."
 
 msgid "Nothing is left after the offset (the shape is thinner than that)."
 msgstr "Po odsunięciu nic nie zostaje (kształt jest cieńszy niż ta odległość)."
@@ -673,8 +795,60 @@ msgstr "Po tej operacji z kształtów nic nie zostaje."
 msgid "Nothing to split: one outline, no group."
 msgstr "Nie ma czego rozdzielać: jeden kontur, bez grupy."
 
+#, python-format
+msgid "Now: %s"
+msgstr "Teraz: %s"
+
+msgid "Now: no port is chosen."
+msgstr "Teraz: nie wybrano portu."
+
+#, python-format
+msgid "Now: you may use %s."
+msgstr "Teraz: możesz używać %s."
+
+msgid ""
+"Off: the cutter takes them from its panel only (as the VEVOR KI-375A); "
+"the speed is then just for the time estimate"
+msgstr ""
+"Wyłączone: ploter bierze je tylko ze swojego panelu (jak VEVOR KI-375A); "
+"prędkość służy wtedy tylko do oszacowania czasu"
+
 msgid "Offset"
 msgstr "Odsunięcie"
+
+msgid ""
+"On Linux a cutter is a device file, and only the members of its group may"
+" send to it:\n"
+"\n"
+"• a cutter connected as a USB printer (/dev/usb/lp0, as the VEVOR KI-"
+"375A): the group lp\n"
+"• a serial port or a USB-serial cable (/dev/ttyUSB0, /dev/ttyACM0): the "
+"group dialout (on Arch and Manjaro: uucp)\n"
+"\n"
+"Join the group once, in a terminal:\n"
+"    sudo usermod -aG lp $USER\n"
+"    sudo usermod -aG dialout $USER\n"
+"then log out and in again (a running session keeps its old groups).\n"
+"\n"
+"Vintyl checks the port you choose and says under it which group that "
+"device needs."
+msgstr ""
+"W Linuksie ploter to plik urządzenia i wysyłać do niego mogą tylko "
+"członkowie jego grupy:\n"
+"\n"
+"• ploter podłączony jako drukarka USB (/dev/usb/lp0, jak VEVOR KI-375A): "
+"grupa lp\n"
+"• port szeregowy albo kabel USB-szeregowy (/dev/ttyUSB0, /dev/ttyACM0): "
+"grupa dialout (w Archu i Manjaro: uucp)\n"
+"\n"
+"Dołącz do grupy raz, w terminalu:\n"
+"    sudo usermod -aG lp $USER\n"
+"    sudo usermod -aG dialout $USER\n"
+"potem wyloguj się i zaloguj ponownie (trwająca sesja zachowuje stare "
+"grupy).\n"
+"\n"
+"Vintyl sprawdza wybrany port i pisze pod nim, której grupy wymaga to "
+"urządzenie."
 
 msgid "Only shapes that fit whole are placed; they are cut before the outline."
 msgstr ""
@@ -758,8 +932,8 @@ msgstr ""
 msgid "Port"
 msgstr "Port"
 
-msgid "Profile"
-msgstr "Profil"
+msgid "Port speed (baud)"
+msgstr "Prędkość portu (bod)"
 
 msgid "Project"
 msgstr "Projekt"
@@ -800,6 +974,9 @@ msgstr "Usuń wypełnienie"
 
 msgid "Remove the holes inside"
 msgstr "Usuń wewnętrzne otwory"
+
+msgid "Restore factory settings"
+msgstr "Przywróć ustawienia fabryczne"
 
 msgid "Right edge: how far left from the origin, across the material"
 msgstr "Prawa krawędź: ile w lewo od punktu zerowego, w poprzek folii"
@@ -948,6 +1125,9 @@ msgstr ""
 "\n"
 "Żeby od razu zatrzymać ploter: Test (pauza) albo Reset na jego panelu."
 
+msgid "Sending"
+msgstr "Wysyłanie"
+
 #, python-format
 msgid "Sending failed: %s"
 msgstr "Wysyłanie nie powiodło się: %s"
@@ -1005,8 +1185,8 @@ msgstr "Odstęp"
 msgid "Speed"
 msgstr "Prędkość"
 
-msgid "Speed on the panel"
-msgstr "Prędkość na panelu"
+msgid "Speed and force"
+msgstr "Prędkość i nacisk"
 
 msgid ""
 "Split the selected group into separate elements; a single element with "
@@ -1088,6 +1268,9 @@ msgstr "Tekst albo adres"
 msgid "Text: click where it should start"
 msgstr "Tekst: kliknij, gdzie ma się zaczynać"
 
+msgid "The chosen cutter's port, connection, knife and speed; new cutters"
+msgstr "Port, połączenie, nóż i prędkość wybranego plotera; nowe plotery"
+
 #, python-format
 msgid ""
 "The cutter has taken no data for %d s. Is it online (not Leave) and is "
@@ -1107,6 +1290,9 @@ msgstr ""
 #, python-format
 msgid "The design does not fit on the material: it sticks out %s by %.1f mm."
 msgstr "Projekt nie mieści się na folii: wystaje %s o %.1f mm."
+
+msgid "The port speed must be a whole number."
+msgstr "Prędkość portu musi być liczbą całkowitą."
 
 msgid "The text; Enter applies it"
 msgstr "Treść napisu; Enter zatwierdza"
@@ -1132,16 +1318,24 @@ msgstr "Przekształć"
 msgid "Triangle"
 msgstr "Trójkąt"
 
+msgid ""
+"Turns smaller than this count as straight: the knife is turned only at "
+"sharper corners, so curves are cut smoothly"
+msgstr ""
+"Zakręty mniejsze niż ten kąt są traktowane jak prosta: nóż jest obracany "
+"tylko na ostrzejszych narożnikach, więc łuki są cięte płynnie"
+
 msgid "Type the text in the options bar first."
 msgstr "Najpierw wpisz napis w pasku opcji."
 
 msgid "Type the text or address the QR code should hold."
 msgstr "Wpisz tekst albo adres, który ma zawierać kod QR."
 
-msgid "USB printer (/dev/usb/lp…) or serial port (/dev/ttyUSB…, /dev/ttyACM…)"
-msgstr ""
-"Drukarka USB (/dev/usb/lp…) albo port szeregowy (/dev/ttyUSB…, "
-"/dev/ttyACM…)"
+msgid "USB printer"
+msgstr "drukarka USB"
+
+msgid "USB printer (/dev/usb/lp…)"
+msgstr "drukarka USB (/dev/usb/lp…)"
 
 msgid "Undo"
 msgstr "Cofnij"
@@ -1154,6 +1348,9 @@ msgstr "Suma"
 
 msgid "Union: join the selected shapes into one outline"
 msgstr "Suma: połącz zaznaczone kształty w jeden kontur"
+
+msgid "Units per mm"
+msgstr "Jednostki na mm"
 
 msgid "Unsaved changes"
 msgstr "Niezapisane zmiany"
@@ -1227,11 +1424,30 @@ msgstr "Zapis do %s nie powiódł się: %s"
 msgid "X"
 msgstr "X"
 
+msgid "X the other way"
+msgstr "X odwrotnie"
+
 msgid "X ↑ along the material"
 msgstr "X ↑ wzdłuż folii"
 
 msgid "Y"
 msgstr "Y"
+
+msgid "Y the other way"
+msgstr "Y odwrotnie"
+
+#, python-format
+msgid ""
+"You are in the group %(group)s, but this session started before you "
+"joined it. Log out and in again (or restart the computer) to use "
+"%(port)s."
+msgstr ""
+"Jesteś już w grupie %(group)s, ale ta sesja zaczęła się wcześniej. "
+"Wyloguj się i zaloguj ponownie (albo uruchom ponownie komputer), żeby "
+"używać %(port)s."
+
+msgid "Your own cutter profile."
+msgstr "Twój własny profil plotera."
 
 msgid "Zigzag"
 msgstr "Zygzak"
@@ -1249,6 +1465,9 @@ msgstr "w poprzek folii, poniżej 0"
 msgid "across the material, past the cutting width of %g mm"
 msgstr "w poprzek folii, poza szerokość cięcia %g mm"
 
+msgid "as fast as it cuts"
+msgstr "tak szybko, jak tnie"
+
 msgid "before the origin (along the material)"
 msgstr "przed punktem zerowym (wzdłuż folii)"
 
@@ -1258,11 +1477,21 @@ msgstr "środek"
 msgid "corner"
 msgstr "narożnik"
 
+#, python-format
+msgid "cuts %g mm"
+msgstr "tnie %g mm"
+
 msgid "design"
 msgstr "projekt"
 
+msgid "everything at once"
+msgstr "wszystko naraz"
+
 msgid "from the panel"
 msgstr "z panelu"
+
+msgid "hardware (RTS/CTS)"
+msgstr "sprzętowa (RTS/CTS)"
 
 msgid "high (25%)"
 msgstr "wysoka (25%)"
@@ -1291,8 +1520,14 @@ msgstr "połowa"
 msgid "new project"
 msgstr "nowy projekt"
 
+msgid "no limit (roll)"
+msgstr "bez limitu (rolka)"
+
 msgid "no port"
 msgstr "brak portu"
+
+msgid "none"
+msgstr "brak"
 
 msgid "on line"
 msgstr "na linii"
@@ -1313,8 +1548,23 @@ msgstr "poza długość %g mm"
 msgid "round"
 msgstr "zaokrąglone"
 
+msgid "sent by the computer"
+msgstr "wysyłane z komputera"
+
+msgid "serial port"
+msgstr "port szeregowy"
+
+msgid "serial port (/dev/ttyUSB…, /dev/ttyACM…)"
+msgstr "port szeregowy (/dev/ttyUSB…, /dev/ttyACM…)"
+
 msgid "sharp"
 msgstr "ostre"
+
+msgid "software (XON/XOFF)"
+msgstr "programowa (XON/XOFF)"
+
+msgid "swap X and Y"
+msgstr "zamień X i Y"
 
 msgid "← Y across"
 msgstr "← Y w poprzek"
@@ -1465,4 +1715,48 @@ msgstr "← Y w poprzek"
 #~ "Wypełniono. Wypełnienie rysuje tylko pisak "
 #~ "(Ploter → Narzędzie: Pisak); nóż je "
 #~ "pomija."
+
+#~ msgid ""
+#~ "No permission to use %s. Add yourself to the group dialout:\n"
+#~ "  sudo usermod -aG dialout $USER\n"
+#~ "then log out and in again."
+#~ msgstr ""
+#~ "Brak uprawnień do %s. Dodaj się do grupy dialout:\n"
+#~ "  sudo usermod -aG dialout $USER\n"
+#~ "potem wyloguj się i zaloguj ponownie."
+
+#~ msgid ""
+#~ "No permission to use %s. Add yourself to the group lp:\n"
+#~ "  sudo usermod -aG lp $USER\n"
+#~ "then log out and in again."
+#~ msgstr ""
+#~ "Brak uprawnień do %s. Dodaj się do grupy lp:\n"
+#~ "  sudo usermod -aG lp $USER\n"
+#~ "potem wyloguj się i zaloguj ponownie."
+
+#~ msgid "Connect"
+#~ msgstr "Połącz"
+
+#~ msgid "Empty: the cutter uses what is set on its panel"
+#~ msgstr "Puste: ploter użyje ustawienia ze swojego panelu"
+
+#~ msgid ""
+#~ "Not sent: this cutter takes its "
+#~ "speed from its panel. Enter it "
+#~ "here for the time estimate."
+#~ msgstr ""
+#~ "Nie jest wysyłana: ten ploter bierze "
+#~ "prędkość ze swojego panelu. Wpisz ją "
+#~ "tu, żeby oszacować czas."
+
+#~ msgid "Profile"
+#~ msgstr "Profil"
+
+#~ msgid "Speed on the panel"
+#~ msgstr "Prędkość na panelu"
+
+#~ msgid "USB printer (/dev/usb/lp…) or serial port (/dev/ttyUSB…, /dev/ttyACM…)"
+#~ msgstr ""
+#~ "Drukarka USB (/dev/usb/lp…) albo port "
+#~ "szeregowy (/dev/ttyUSB…, /dev/ttyACM…)"
 

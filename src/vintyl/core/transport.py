@@ -56,8 +56,7 @@ class UsbPrinterOutput:
         try:
             self.fd = os.open(path, os.O_RDWR | os.O_NONBLOCK)
         except PermissionError:
-            raise TransportError(_("No permission to use %s. Add yourself to the group lp:\n"
-                                   "  sudo usermod -aG lp $USER\nthen log out and in again.") % path) from None
+            raise TransportError(access_problem(path) or _("No permission to use %s.") % path) from None
         except FileNotFoundError:
             raise TransportError(_("%s is not there. Is the cutter connected by USB and switched on?")
                                  % path) from None
@@ -111,9 +110,7 @@ class SerialOutput:
         except serial.SerialException as e:
             text = str(e)
             if "ermission" in text:
-                raise TransportError(_("No permission to use %s. Add yourself to the group dialout:\n"
-                                       "  sudo usermod -aG dialout $USER\nthen log out and in again.")
-                                     % path) from None
+                raise TransportError(access_problem(path) or _("No permission to use %s.") % path) from None
             raise TransportError(_("Cannot open %s: %s") % (path, text)) from None
 
     def write(self, data):
@@ -147,6 +144,40 @@ def open_output(profile, port=None):
     if profile.connection == "usb-printer":
         return UsbPrinterOutput(path)
     return SerialOutput(path, profile.baud, profile.flow)
+
+
+# ---- may this user use the port? ---------------------------------------------------------
+# On Linux a cutter's device file belongs to a group: lp for a USB printer
+# (/dev/usb/lp0), dialout for a serial port (/dev/ttyUSB0; uucp on Arch).
+# Only that group's members may write to it, so the user joins it once:
+#     sudo usermod -aG lp $USER        (or dialout, or what the device says)
+# and logs out and in again: a running session keeps its old groups.
+
+def access_problem(path):
+    """None when this user may use the port (or it is not there: that is
+    said when sending); else a message saying what to do, with the group
+    the device really belongs to."""
+    if not path or not os.path.exists(path) or os.access(path, os.R_OK | os.W_OK):
+        return None
+    try:
+        import grp
+        import pwd
+        st = os.stat(path)
+        gid = st.st_gid
+        group = grp.getgrgid(gid)
+    except (ImportError, KeyError, OSError):
+        return _("No permission to use %s.") % path
+    if st.st_mode & 0o060 != 0o060:                  # the group itself may not write: joining it does not help
+        return _("No permission to use %s.") % path
+    user = pwd.getpwuid(os.getuid()).pw_name
+    if user in group.gr_mem or pwd.getpwuid(os.getuid()).pw_gid == gid:
+        # in the group already, but this session started before that
+        return (_("You are in the group %(group)s, but this session started before you joined it. "
+                  "Log out and in again (or restart the computer) to use %(port)s.")
+                % {"group": group.gr_name, "port": path})
+    return (_("No permission to use %(port)s: it belongs to the group %(group)s. Join that group once "
+              "(in a terminal):\n  sudo usermod -aG %(group)s $USER\nthen log out and in again.")
+            % {"group": group.gr_name, "port": path})
 
 
 def find_ports():

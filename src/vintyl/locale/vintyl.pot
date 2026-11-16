@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-16 21:45+0100\n"
+"POT-Creation-Date: 2026-11-16 22:20+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -46,6 +46,10 @@ msgstr[0] ""
 msgstr[1] ""
 
 #, python-format
+msgid "%s (mine)"
+msgstr ""
+
+#, python-format
 msgid ""
 "%s The knife offset and the overcut need %.2f mm of room; move the design"
 " that far from the edge."
@@ -65,6 +69,12 @@ msgstr ""
 
 #, python-format
 msgid "%s is not a Vintyl project."
+msgstr ""
+
+#, python-format
+msgid ""
+"%s is not there now: plug the cutter in and switch it on, or choose its "
+"port in the cutter's settings."
 msgstr ""
 
 #, python-format
@@ -102,6 +112,10 @@ msgstr ""
 msgid "A copy of the selected element, a little to the side"
 msgstr ""
 
+#, python-format
+msgid "A cutter profile cannot be read: %s"
+msgstr ""
+
 msgid ""
 "A new outline round the selected shapes (or inside them), a set distance "
 "away: an edge round a text, a backing in another colour"
@@ -116,6 +130,9 @@ msgid ""
 "settings of the profile."
 msgstr ""
 
+msgid "A profile of your own, starting from these settings"
+msgstr ""
+
 msgid ""
 "A rectangle round everything that is cut, cut last: the waste vinyl "
 "inside it peels off in one piece"
@@ -126,6 +143,12 @@ msgid "About %.1f min at %g cm/s"
 msgstr ""
 
 msgid "About Vintyl"
+msgstr ""
+
+msgid "Access to the cutter"
+msgstr ""
+
+msgid "Access to the cutter (Linux groups)"
 msgstr ""
 
 msgid "Align"
@@ -144,6 +167,9 @@ msgstr ""
 msgid "Arrow"
 msgstr ""
 
+msgid "Axes"
+msgstr ""
+
 msgid "Axle hole (mm)"
 msgstr ""
 
@@ -160,6 +186,11 @@ msgid "Bottom edges"
 msgstr ""
 
 msgid "Bricks"
+msgstr ""
+
+msgid ""
+"Built-in profile: your changes are kept as your own copy; \"Restore "
+"factory settings\" brings back the original."
 msgstr ""
 
 #, python-format
@@ -184,6 +215,9 @@ msgstr ""
 msgid "Centres up and down"
 msgstr ""
 
+msgid "Change one size and the others follow, so the shape keeps its look"
+msgstr ""
+
 msgid "Circle"
 msgstr ""
 
@@ -199,10 +233,16 @@ msgstr ""
 msgid "Command"
 msgstr ""
 
+msgid "Commands"
+msgstr ""
+
 msgid "Concentric"
 msgstr ""
 
-msgid "Connect"
+msgid "Connection"
+msgstr ""
+
+msgid "Connects as"
 msgstr ""
 
 #, python-format
@@ -212,6 +252,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "Copy"
+msgstr ""
+
+msgid "Corner from"
 msgstr ""
 
 msgid "Corner radius (mm)"
@@ -258,17 +301,36 @@ msgstr ""
 msgid "Cutter files (*%s)"
 msgstr ""
 
+msgid "Cutter settings"
+msgstr ""
+
+msgid "Cutter settings…"
+msgstr ""
+
 msgid "Cutting"
+msgstr ""
+
+msgid "Cutting width"
 msgstr ""
 
 #, python-format
 msgid "Cutting width %g mm"
 msgstr ""
 
+msgid "DMPL mode"
+msgstr ""
+
 msgid "Delete"
 msgstr ""
 
+#, python-format
+msgid "Delete the cutter profile \"%s\"?"
+msgstr ""
+
 msgid "Delete the selected element"
+msgstr ""
+
+msgid "Delete this cutter"
 msgstr ""
 
 msgid "Diamonds"
@@ -338,9 +400,6 @@ msgstr ""
 msgid "Empty. Open an SVG file or draw a shape."
 msgstr ""
 
-msgid "Empty: the cutter uses what is set on its panel"
-msgstr ""
-
 msgid "Error correction"
 msgstr ""
 
@@ -348,6 +407,11 @@ msgid "Every key in one window"
 msgstr ""
 
 msgid "Every second row shifted"
+msgstr ""
+
+msgid ""
+"Everything at once: the cutter keeps the job in its memory (the KI-375A)."
+" As fast as it cuts: for cutters with a small memory"
 msgstr ""
 
 msgid "Exclusion"
@@ -375,6 +439,9 @@ msgid ""
 "pen (only when the tool is the pen)"
 msgstr ""
 
+msgid "Find"
+msgstr ""
+
 msgid "Fit"
 msgstr ""
 
@@ -382,6 +449,9 @@ msgid "Flip"
 msgstr ""
 
 msgid "Flip top to bottom"
+msgstr ""
+
+msgid "Flow control"
 msgstr ""
 
 msgid "Font"
@@ -398,6 +468,13 @@ msgstr ""
 msgid "Force"
 msgstr ""
 
+#, python-format
+msgid "Forget your changes of \"%s\" and use the settings it came with?"
+msgstr ""
+
+msgid "Found, and you may use it."
+msgstr ""
+
 msgid "Frame round the design"
 msgstr ""
 
@@ -411,6 +488,9 @@ msgid "Gap"
 msgstr ""
 
 msgid "Gear"
+msgstr ""
+
+msgid "Give the cutter a name."
 msgstr ""
 
 msgid "Grid"
@@ -430,6 +510,9 @@ msgid "Grouped %d element."
 msgid_plural "Grouped %d elements."
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "HPGL: 40 units per mm on most cutters. Check with a 20 mm square."
+msgstr ""
 
 msgid "Head length (%)"
 msgstr ""
@@ -475,6 +558,11 @@ msgid ""
 msgstr ""
 
 msgid "How wide a line the pen or pencil draws (a fineliner: 0.3–0.5 mm)"
+msgstr ""
+
+msgid ""
+"How wide the knife can cut (not how wide the material may be: an \"870 "
+"mm\" cutter cuts about 780 mm)"
 msgstr ""
 
 msgid "Inner corners (%)"
@@ -528,10 +616,22 @@ msgstr ""
 msgid "Knife offset"
 msgstr ""
 
+#, python-format
+msgid ""
+"Knife offset %(k).2f mm, overcut %(o).2f mm, %(lang)s. Change them in the"
+" cutter's settings (the button beside it)."
+msgstr ""
+
 msgid "Knife path"
 msgstr ""
 
+msgid "Language"
+msgstr ""
+
 msgid "Left edges"
+msgstr ""
+
+msgid "Length"
 msgstr ""
 
 msgid "Length (mm)"
@@ -546,10 +646,16 @@ msgstr ""
 msgid "Lines"
 msgstr ""
 
+msgid "Look again for cutters plugged in"
+msgstr ""
+
 msgid "Look closer (the mouse wheel does the same)"
 msgstr ""
 
 msgid "Look from further away"
+msgstr ""
+
+msgid "Machine"
 msgstr ""
 
 msgid "Main"
@@ -582,21 +688,31 @@ msgstr ""
 msgid "Move up"
 msgstr ""
 
+msgid "Name"
+msgstr ""
+
+msgid "Name of the new cutter:"
+msgstr ""
+
 msgid "New"
 msgstr ""
 
-#, python-format
-msgid ""
-"No permission to use %s. Add yourself to the group dialout:\n"
-"  sudo usermod -aG dialout $USER\n"
-"then log out and in again."
+msgid "New cutter"
+msgstr ""
+
+msgid "New cutter (a copy)"
 msgstr ""
 
 #, python-format
 msgid ""
-"No permission to use %s. Add yourself to the group lp:\n"
-"  sudo usermod -aG lp $USER\n"
+"No permission to use %(port)s: it belongs to the group %(group)s. Join "
+"that group once (in a terminal):\n"
+"  sudo usermod -aG %(group)s $USER\n"
 "then log out and in again."
+msgstr ""
+
+#, python-format
+msgid "No permission to use %s."
 msgstr ""
 
 msgid "No port is set. Choose the cutter's port in the panel."
@@ -608,9 +724,7 @@ msgstr ""
 msgid "Nodes"
 msgstr ""
 
-msgid ""
-"Not sent: this cutter takes its speed from its panel. Enter it here for "
-"the time estimate."
+msgid "Not plugged in now (or switched off)."
 msgstr ""
 
 msgid "Nothing is left after the offset (the shape is thinner than that)."
@@ -622,7 +736,41 @@ msgstr ""
 msgid "Nothing to split: one outline, no group."
 msgstr ""
 
+#, python-format
+msgid "Now: %s"
+msgstr ""
+
+msgid "Now: no port is chosen."
+msgstr ""
+
+#, python-format
+msgid "Now: you may use %s."
+msgstr ""
+
+msgid ""
+"Off: the cutter takes them from its panel only (as the VEVOR KI-375A); "
+"the speed is then just for the time estimate"
+msgstr ""
+
 msgid "Offset"
+msgstr ""
+
+msgid ""
+"On Linux a cutter is a device file, and only the members of its group may"
+" send to it:\n"
+"\n"
+"• a cutter connected as a USB printer (/dev/usb/lp0, as the VEVOR KI-"
+"375A): the group lp\n"
+"• a serial port or a USB-serial cable (/dev/ttyUSB0, /dev/ttyACM0): the "
+"group dialout (on Arch and Manjaro: uucp)\n"
+"\n"
+"Join the group once, in a terminal:\n"
+"    sudo usermod -aG lp $USER\n"
+"    sudo usermod -aG dialout $USER\n"
+"then log out and in again (a running session keeps its old groups).\n"
+"\n"
+"Vintyl checks the port you choose and says under it which group that "
+"device needs."
 msgstr ""
 
 msgid "Only shapes that fit whole are placed; they are cut before the outline."
@@ -699,7 +847,7 @@ msgstr ""
 msgid "Port"
 msgstr ""
 
-msgid "Profile"
+msgid "Port speed (baud)"
 msgstr ""
 
 msgid "Project"
@@ -738,6 +886,9 @@ msgid "Remove the fill"
 msgstr ""
 
 msgid "Remove the holes inside"
+msgstr ""
+
+msgid "Restore factory settings"
 msgstr ""
 
 msgid "Right edge: how far left from the origin, across the material"
@@ -867,6 +1018,9 @@ msgid ""
 "To stop the cutter at once: Test (pause) or Reset on its panel."
 msgstr ""
 
+msgid "Sending"
+msgstr ""
+
 #, python-format
 msgid "Sending failed: %s"
 msgstr ""
@@ -922,7 +1076,7 @@ msgstr ""
 msgid "Speed"
 msgstr ""
 
-msgid "Speed on the panel"
+msgid "Speed and force"
 msgstr ""
 
 msgid ""
@@ -994,6 +1148,9 @@ msgstr ""
 msgid "Text: click where it should start"
 msgstr ""
 
+msgid "The chosen cutter's port, connection, knife and speed; new cutters"
+msgstr ""
+
 #, python-format
 msgid ""
 "The cutter has taken no data for %d s. Is it online (not Leave) and is "
@@ -1008,6 +1165,9 @@ msgstr ""
 
 #, python-format
 msgid "The design does not fit on the material: it sticks out %s by %.1f mm."
+msgstr ""
+
+msgid "The port speed must be a whole number."
 msgstr ""
 
 msgid "The text; Enter applies it"
@@ -1034,13 +1194,21 @@ msgstr ""
 msgid "Triangle"
 msgstr ""
 
+msgid ""
+"Turns smaller than this count as straight: the knife is turned only at "
+"sharper corners, so curves are cut smoothly"
+msgstr ""
+
 msgid "Type the text in the options bar first."
 msgstr ""
 
 msgid "Type the text or address the QR code should hold."
 msgstr ""
 
-msgid "USB printer (/dev/usb/lp…) or serial port (/dev/ttyUSB…, /dev/ttyACM…)"
+msgid "USB printer"
+msgstr ""
+
+msgid "USB printer (/dev/usb/lp…)"
 msgstr ""
 
 msgid "Undo"
@@ -1053,6 +1221,9 @@ msgid "Union"
 msgstr ""
 
 msgid "Union: join the selected shapes into one outline"
+msgstr ""
+
+msgid "Units per mm"
 msgstr ""
 
 msgid "Unsaved changes"
@@ -1115,10 +1286,26 @@ msgstr ""
 msgid "X"
 msgstr ""
 
+msgid "X the other way"
+msgstr ""
+
 msgid "X ↑ along the material"
 msgstr ""
 
 msgid "Y"
+msgstr ""
+
+msgid "Y the other way"
+msgstr ""
+
+#, python-format
+msgid ""
+"You are in the group %(group)s, but this session started before you "
+"joined it. Log out and in again (or restart the computer) to use "
+"%(port)s."
+msgstr ""
+
+msgid "Your own cutter profile."
 msgstr ""
 
 msgid "Zigzag"
@@ -1137,6 +1324,9 @@ msgstr ""
 msgid "across the material, past the cutting width of %g mm"
 msgstr ""
 
+msgid "as fast as it cuts"
+msgstr ""
+
 msgid "before the origin (along the material)"
 msgstr ""
 
@@ -1146,10 +1336,20 @@ msgstr ""
 msgid "corner"
 msgstr ""
 
+#, python-format
+msgid "cuts %g mm"
+msgstr ""
+
 msgid "design"
 msgstr ""
 
+msgid "everything at once"
+msgstr ""
+
 msgid "from the panel"
+msgstr ""
+
+msgid "hardware (RTS/CTS)"
 msgstr ""
 
 msgid "high (25%)"
@@ -1179,7 +1379,13 @@ msgstr ""
 msgid "new project"
 msgstr ""
 
+msgid "no limit (roll)"
+msgstr ""
+
 msgid "no port"
+msgstr ""
+
+msgid "none"
 msgstr ""
 
 msgid "on line"
@@ -1201,7 +1407,22 @@ msgstr ""
 msgid "round"
 msgstr ""
 
+msgid "sent by the computer"
+msgstr ""
+
+msgid "serial port"
+msgstr ""
+
+msgid "serial port (/dev/ttyUSB…, /dev/ttyACM…)"
+msgstr ""
+
 msgid "sharp"
+msgstr ""
+
+msgid "software (XON/XOFF)"
+msgstr ""
+
+msgid "swap X and Y"
 msgstr ""
 
 msgid "← Y across"

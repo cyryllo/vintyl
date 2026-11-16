@@ -248,6 +248,18 @@ READY = {
 }
 
 
+# the sizes of a shape that change together while its proportions are kept
+# (the lock in the window's dialog, on by default): the shape grows or shrinks
+# without changing its look; percentages and counts stay as they are
+LINKED = {
+    "heart": ("width", "height"),
+    "ring": ("outer", "hole"),
+    "rounded": ("width", "height", "radius"),
+    "arrow": ("length", "width"),
+    "drop": ("width", "height"),
+}
+
+
 def make(key, **params):
     """The shape `key` (see READY) with the given parameters (the rest: defaults)."""
     _name, func, spec = READY[key]

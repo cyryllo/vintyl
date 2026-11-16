@@ -79,7 +79,27 @@ class _SideScroll(QScrollArea):
     def fit(self):
         panel = self.widget()
         if panel is not None:
-            panel.resize(panel.width(), max(self.viewport().height(), panel.minimumSizeHint().height()))
+            panel.resize(panel.width(), max(self.viewport().height(), self._least_height(panel)))
+
+    @staticmethod
+    def _least_height(panel):
+        """The least height the panel's boxes need. A box with wrapped text
+        (the port's message) needs its height at this width, which Qt's
+        minimum leaves out, so it was squeezed."""
+        col = panel.layout()
+        m = col.contentsMargins()
+        width = panel.width() - m.left() - m.right()
+        total, shown = m.top() + m.bottom(), 0
+        for i in range(col.count()):
+            w = col.itemAt(i).widget()
+            if w is None or w.isHidden():
+                continue
+            h = w.minimumSizeHint().height()
+            if w.hasHeightForWidth():
+                h = max(h, w.heightForWidth(width))
+            total += h
+            shown += 1
+        return total + col.spacing() * max(0, shown - 1)
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
@@ -115,8 +135,9 @@ class MainWindow(QMainWindow):
         self.counter = {}
         self.last_job = None              # the last successful build (for the summary)
         self.settings = open_settings()
-        self.profile_names = profiles.builtin_names()
-        self.profile = profiles.load_builtin(self.profile_names[0])
+        self.profile_names = []              # the ids of the cutters in the machine list
+        self.profile_entries = {}
+        self.profile = profiles.load_builtin(profiles.builtin_names()[0])
         self._updating = False
         self._undo = []                   # snapshots before each change (see _checkpoint)
         self._redo = []
@@ -179,12 +200,8 @@ class MainWindow(QMainWindow):
         s.node_selection.connect(self._on_node_selection)
         s.cursor.connect(lambda x, y: self.cursor_label.setText(_("Pointer: %.1f / %.1f mm") % (x, y)))
         self.resize(1440, 900)
-        # the cutter used last time (and its port), not always the first profile
-        last = self.settings.value("cutter/profile", "")
-        if last in self.profile_names:
-            self.profile_box.blockSignals(True)
-            self.profile_box.setCurrentIndex(self.profile_names.index(last))
-            self.profile_box.blockSignals(False)
+        # the cutter used last time, not always the first one
+        self.reload_profiles(self.settings.value("cutter/profile", ""), apply=False)
         self.grid_step = float(self.settings.value("view/grid_step", 10.0))
         self.view.snap_objects = str(self.settings.value("view/snap_objects", "true")).lower() == "true"
         self.act_grid.blockSignals(True)
@@ -303,7 +320,7 @@ class MainWindow(QMainWindow):
                                      _("Show the grid and snap to it (its step is in the Settings)"))
         self.act_grid.setCheckable(True)
         self.act_grid.toggled.connect(self.set_grid)
-        self.act_settings = self._action(_("Settings…"), self.show_settings, "settings", "Ctrl+,",
+        self.act_settings = self._action(_("Settings…"), lambda: self.show_settings(), "settings", "Ctrl+,",
                                          _("Grid step, snapping"))
         self.act_shortcuts = self._action(_("Keyboard shortcuts"), self.show_shortcuts, None, "Ctrl+F1",
                                           _("Every key in one window"))
@@ -313,8 +330,9 @@ class MainWindow(QMainWindow):
                                       _("Show exactly where the knife goes: cuts, travels and their order"))
         self.act_knife.setCheckable(True)
         self.act_knife.toggled.connect(lambda on: self.set_knife_preview(on))
-        self.act_connect = self._action(_("Connect"), None, "plug-connected", tip=_(LATER), enabled=False)
-        self.act_profile = self._action(_("Profile"), None, "settings-2", tip=_(LATER), enabled=False)
+        self.act_profile = self._action(_("Cutter settings…"), lambda: self.edit_profile(), "settings-2", None,
+                                        _("The chosen cutter's port, connection, knife and speed; "
+                                          "new cutters"))
         self.act_quit = self._action(_("Quit"), self.close, None, QKeySequence.Quit)
 
     def _make_menu(self):
@@ -333,8 +351,7 @@ class MainWindow(QMainWindow):
                 list(self.act_align.values()) + [None, self.act_offset, self.act_tile, self.act_fill]:
             m.addSeparator() if a is None else m.addAction(a)
         m = mb.addMenu(_("&Cutter"))
-        for a in (self.act_connect, self.act_profile):
-            m.addAction(a)
+        m.addAction(self.act_profile)
         m = mb.addMenu(_("&View"))
         for a in (self.act_fit, self.act_zoom_in, self.act_zoom_out, None, self.act_knife, self.act_grid):
             m.addSeparator() if a is None else m.addAction(a)
@@ -342,6 +359,7 @@ class MainWindow(QMainWindow):
         m.addAction(self.act_settings)
         m = mb.addMenu(_("&Help"))
         m.addAction(self.act_shortcuts)
+        m.addAction(self._action(_("Access to the cutter (Linux groups)"), self.show_access_help))
         m.addAction(self._action(_("About Vintyl"), self.about))
 
     def _make_ribbon(self):
@@ -570,7 +588,7 @@ class MainWindow(QMainWindow):
         10 mm from the origin, like an opened file. Returns the element or None."""
         name, _func, spec = ready.READY[key]
         if values is None:
-            values = self._ask_ready(_(name), spec)
+            values = self._ask_ready(_(name), spec, ready.LINKED.get(key, ()))
             if values is None:
                 return None
         paths = ready.make(key, **values)
@@ -631,7 +649,9 @@ class MainWindow(QMainWindow):
         distribute(chosen, across)
         self.refresh()
 
-    def _ask_ready(self, title, spec):
+    def _ask_ready(self, title, spec, linked=()):
+        """The parameters of a ready shape. linked: the sizes that keep their
+        proportions while the lock is on (on by default)."""
         from PySide6.QtWidgets import QDialog, QDialogButtonBox
         dlg = QDialog(self)
         dlg.setWindowTitle(title)
@@ -649,10 +669,40 @@ class MainWindow(QMainWindow):
             w.setValue(default)
             form.addRow(_(label), w)
             fields[key] = w
+        self.ready_lock = None
+        linked = [k for k in linked if k in fields]
+        if len(linked) >= 2:
+            # the lock: change one size and the others follow, so the shape keeps its look
+            lock = QCheckBox(_("Keep the proportions"))
+            lock.setIcon(icons.tabler("link"))
+            lock.setChecked(str(self.settings.value("ready/keep_ratio", "true")).lower() == "true")
+            lock.setToolTip(_("Change one size and the others follow, so the shape keeps its look"))
+            lock.toggled.connect(lambda on: (lock.setIcon(icons.tabler("link" if on else "link-off")),
+                                             self.settings.setValue("ready/keep_ratio", "true" if on else "false")))
+            lock.toggled.emit(lock.isChecked())
+            form.addRow(lock)
+            self.ready_lock = lock
+            last = {k: fields[k].value() for k in linked}
+
+            def follow(key, value):
+                old = last[key]
+                if lock.isChecked() and old > 1e-9:
+                    k = value / old
+                    for other in linked:
+                        if other != key:
+                            w = fields[other]
+                            w.blockSignals(True)
+                            w.setValue(min(w.maximum(), max(w.minimum(), last[other] * k)))
+                            w.blockSignals(False)
+                for other in linked:
+                    last[other] = fields[other].value()
+            for k in linked:
+                fields[k].valueChanged.connect(lambda v, key=k: follow(key, v))
         buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         buttons.accepted.connect(dlg.accept)
         buttons.rejected.connect(dlg.reject)
         form.addRow(buttons)
+        self._ready_fields = fields
         if dlg.exec() != QDialog.Accepted:
             return None
         return {k: w.value() for k, w in fields.items()}
@@ -857,17 +907,30 @@ class MainWindow(QMainWindow):
         box = QGroupBox(_("Cutter"))
         self.cutter_box = box
         form = QFormLayout(box)
+        # only the machine is chosen here; its port, knife and speed are in its settings
         self.profile_box = QComboBox()
-        for name in self.profile_names:
-            self.profile_box.addItem(profiles.load_builtin(name).name, name)
+        self.profile_box.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
+        self.profile_box.setMinimumContentsLength(10)
         self.profile_box.currentIndexChanged.connect(self._profile_changed)
-        form.addRow(_("Profile"), self.profile_box)
-        # the cutter's port: the profile's, plus whatever cutter-like device is plugged in
-        self.port_box = QComboBox()
-        self.port_box.setEditable(True)
-        self.port_box.setToolTip(_("USB printer (/dev/usb/lp…) or serial port (/dev/ttyUSB…, /dev/ttyACM…)"))
-        self.port_box.currentTextChanged.connect(self._port_changed)
-        form.addRow(_("Port"), self.port_box)
+        self.btn_profile = QToolButton()
+        self.btn_profile.setDefaultAction(self.act_profile)
+        self.btn_profile.setToolButtonStyle(Qt.ToolButtonIconOnly)
+        machine = QWidget()
+        ml = QHBoxLayout(machine)
+        ml.setContentsMargins(0, 0, 0, 0)
+        ml.addWidget(self.profile_box, 1)
+        ml.addWidget(self.btn_profile)
+        form.addRow(_("Machine"), machine)
+        # what the machine is set to: its port and width, in one line
+        self.cutter_info = QLabel()
+        self.cutter_info.setWordWrap(False)
+        self.cutter_info.setStyleSheet("color: #6b7280")
+        form.addRow(self.cutter_info)
+        # no permission for the port (or it is not plugged in): what to do, right under it
+        self.port_problem = QLabel()
+        self.port_problem.setWordWrap(True)
+        self.port_problem.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        form.addRow(self.port_problem)
         self.cutter_form = form
         # what is in the holder: the knife cuts, a pen (or a pencil) draws
         self.tool_box = QComboBox()
@@ -907,34 +970,6 @@ class MainWindow(QMainWindow):
                 lambda _v: self._tool_changed())
         form.addRow(_("Pen width"), self.pen_width)
         form.addRow(_("Draw"), self.pen_place)
-        self.knife = _spin(5, 2, minimum=0)
-        self.knife.setSingleStep(0.05)
-        self.knife.setToolTip(_("How far the blade tip trails the holder's axis. "
-                                "A 45° blade: usually 0.20–0.30 mm."))
-        self.overcut = _spin(5, 2, minimum=0)
-        self.overcut.setSingleStep(0.1)
-        self.overcut.setToolTip(_("Closed shapes are cut this far past their start, "
-                                  "so the cut closes cleanly"))
-        for w in (self.knife, self.overcut):
-            w.valueChanged.connect(lambda _v: self.refresh_job())
-        form.addRow(_("Knife offset"), self.knife)
-        form.addRow(_("Overcut"), self.overcut)
-        self.speed = _spin(80, 1, " cm/s", minimum=0)
-        self.force = _spin(1000, 0, " g", minimum=0)
-        for w in (self.speed, self.force):
-            w.setSpecialValueText(_("from the panel"))
-            w.valueChanged.connect(lambda _v: self.refresh_job())
-        self.speed_label = QLabel(_("Speed"))
-        self.force_label = QLabel(_("Force"))
-        form.addRow(self.speed_label, self.speed)
-        form.addRow(self.force_label, self.force)
-        self.inside_first = QCheckBox(_("Inside shapes first"))
-        self.inside_first.setChecked(True)
-        self.inside_first.setToolTip(_("Holes and shapes inside others are cut before them, so a piece "
-                                       "is never cut free while its holes are still to be cut. "
-                                       "Off: exactly the order of the list."))
-        self.inside_first.toggled.connect(lambda _v: self.refresh_job())
-        form.addRow(self.inside_first)
         col.addWidget(box)
 
         box = QGroupBox(_("Job"))
@@ -943,6 +978,13 @@ class MainWindow(QMainWindow):
         self.job_label = QLabel()
         self.job_label.setWordWrap(True)
         lay.addWidget(self.job_label)
+        self.inside_first = QCheckBox(_("Inside shapes first"))
+        self.inside_first.setChecked(True)
+        self.inside_first.setToolTip(_("Holes and shapes inside others are cut before them, so a piece "
+                                       "is never cut free while its holes are still to be cut. "
+                                       "Off: exactly the order of the list."))
+        self.inside_first.toggled.connect(lambda _v: self.refresh_job())
+        lay.addWidget(self.inside_first)
         # a frame round the whole design, cut last, for weeding
         frame_row = QHBoxLayout()
         self.weed_frame = QCheckBox(_("Frame round the design"))
@@ -983,38 +1025,71 @@ class MainWindow(QMainWindow):
         col.addWidget(box)
         return panel
 
-    # ---- profile -----------------------------------------------------------------
+    # ---- the machine ----------------------------------------------------------------
+    def reload_profiles(self, select=None, apply=True):
+        """Fill the machine list from the profiles (built-in and the user's);
+        choose `select` (an id), else the one chosen now, else the first."""
+        entries = profiles.catalogue()
+        broken = [e for e in entries if e["profile"] is None]
+        entries = [e for e in entries if e["profile"] is not None]
+        self.profile_entries = {e["id"]: e for e in entries}
+        self.profile_names = [e["id"] for e in entries]
+        want = select if select in self.profile_entries else self.profile_box.currentData()
+        if want not in self.profile_entries:
+            want = self.profile_names[0]
+        self.profile_box.blockSignals(True)
+        self.profile_box.clear()
+        for e in entries:
+            self.profile_box.addItem(e["profile"].name + (" *" if e["changed"] else ""), e["id"])
+        self.profile_box.setCurrentIndex(self.profile_names.index(want))
+        self.profile_box.blockSignals(False)
+        for e in broken:
+            self.statusBar().showMessage(_("A cutter profile cannot be read: %s") % e["error"], 15000)
+        if apply:
+            self._profile_changed(self.profile_box.currentIndex())
+
+    def use_profile_values(self, **changes):
+        """Use the chosen machine with some values changed, for now only (not
+        saved; the settings window saves). E.g. knife_offset_mm=0, port=..."""
+        self.profile = dataclasses.replace(self.profile, **changes).validate()
+        self.refresh()
+
+    def edit_profile(self):
+        """The chosen machine's settings window; saved: use what it says."""
+        from vintyl.gui.profile_editor import ProfileEditor
+        entry = self.profile_entries.get(self.profile_box.currentData())
+        if entry is None:
+            return None
+        dlg = ProfileEditor(entry, self)
+        dlg.exec()
+        if dlg.chosen is not None:
+            self.reload_profiles(dlg.chosen or None)
+        return dlg
+
     def _profile_changed(self, index):
-        self.profile = profiles.load_builtin(self.profile_box.itemData(index))
-        self.knife.setValue(self.profile.knife_offset_mm)
-        self.overcut.setValue(self.profile.overcut_mm)
-        self.fill_ports()
-        self.settings.setValue("cutter/profile", self.profile_box.itemData(index))
-        saved_port = self.settings.value("cutter/port/" + self.profile_box.itemData(index), "")
-        if saved_port:
-            self.port_box.blockSignals(True)
-            self.port_box.setEditText(saved_port)
-            self.port_box.blockSignals(False)
-        # cutters set on their panel only: speed is just for the time estimate, no force field
-        sends = self.profile.send_speed_force
-        self.speed_label.setText(_("Speed") if sends else _("Speed on the panel"))
-        self.speed.setToolTip(_("Empty: the cutter uses what is set on its panel") if sends else
-                              _("Not sent: this cutter takes its speed from its panel. "
-                                "Enter it here for the time estimate."))
-        self.force.setToolTip(_("Empty: the cutter uses what is set on its panel"))
-        self.force_label.setVisible(sends)
-        self.force.setVisible(sends)
+        pid = self.profile_box.itemData(index)
+        entry = self.profile_entries.get(pid)
+        if entry is None:
+            return
+        self.profile = entry["profile"]
+        self.settings.setValue("cutter/profile", pid)
+        p = self.profile
+        conn = _("USB printer") if p.connection == "usb-printer" else _("serial port")
+        self.cutter_info.setText("%s · %s · %s" % (conn, p.port or _("no port"),
+                                                    _("cuts %g mm") % p.width_mm))
+        self.cutter_info.setToolTip(_("Knife offset %(k).2f mm, overcut %(o).2f mm, %(lang)s. "
+                                      "Change them in the cutter's settings (the button beside it).")
+                                    % {"k": p.knife_offset_mm, "o": p.overcut_mm, "lang": p.language.upper()})
         # the tool last used in this cutter (a pen stays a pen until changed)
-        key = self.profile_box.itemData(index)
         self._loading_tool = True
-        tool = self.settings.value("cutter/tool/" + key, "knife")
+        tool = self.settings.value("cutter/tool/" + pid, "knife")
         self.tool_box.setCurrentIndex(max(0, self.tool_box.findData(tool)))
         try:
-            self.pen_width.setValue(float(self.settings.value("cutter/pen_width/" + key, pens.DEFAULT_WIDTH_MM)))
+            self.pen_width.setValue(float(self.settings.value("cutter/pen_width/" + pid, pens.DEFAULT_WIDTH_MM)))
         except (TypeError, ValueError):
             self.pen_width.setValue(pens.DEFAULT_WIDTH_MM)
         self.pen_place.setCurrentIndex(max(0, self.pen_place.findData(
-            self.settings.value("cutter/pen_place/" + key, "on"))))
+            self.settings.value("cutter/pen_place/" + pid, "on"))))
         self._loading_tool = False
         self._tool_changed(refresh=False)
         self.refresh()
@@ -1027,8 +1102,7 @@ class MainWindow(QMainWindow):
         and remember the choice for this cutter."""
         pen = self.is_pen()
         form = self.cutter_form
-        for w in (self.knife, self.overcut, self.inside_first):
-            form.setRowVisible(w, not pen)
+        self.inside_first.setVisible(not pen)
         for w in (self.pen_width, self.pen_place):
             form.setRowVisible(w, pen)
         form.setRowVisible(self.pen_note, pen)
@@ -1046,33 +1120,12 @@ class MainWindow(QMainWindow):
         if refresh and not getattr(self, "_loading_tool", False):
             self.refresh()
 
-    def _port_changed(self, text):
-        """Remember the port chosen for this cutter."""
-        name = self.profile_box.currentData()
-        if name:
-            self.settings.setValue("cutter/port/" + name, text.strip())
-        self.refresh_job()
-
-    def fill_ports(self):
-        """The profile's port first, then every cutter-like device plugged in now."""
-        self.port_box.blockSignals(True)
-        self.port_box.clear()
-        ports = [self.profile.port] if self.profile.port else []
-        ports += [p for p in transport.find_ports() if p not in ports]
-        self.port_box.addItems(ports)
-        self.port_box.setCurrentIndex(0 if ports else -1)
-        self.port_box.blockSignals(False)
-
     def job_profile(self):
-        """The chosen profile with the panel's knife, overcut, speed and force
-        (speed and force 0 = from the cutter's panel)."""
-        pen = self.is_pen()                  # a pen: no blade trailing behind, nothing to overcut
-        return dataclasses.replace(self.profile,
-                                   port=self.port_box.currentText().strip(),
-                                   knife_offset_mm=0.0 if pen else self.knife.value(),
-                                   overcut_mm=0.0 if pen else self.overcut.value(),
-                                   speed_cm_s=self.speed.value() or None,
-                                   force_g=self.force.value() or None)
+        """The chosen machine's profile; with the pen: no knife offset and no
+        overcut (no blade trails behind, nothing to close)."""
+        if self.is_pen():
+            return dataclasses.replace(self.profile, knife_offset_mm=0.0, overcut_mm=0.0)
+        return self.profile
 
     def build(self):
         """The job as it would go to the cutter now (raises JobError / ProfileError)."""
@@ -1136,21 +1189,20 @@ class MainWindow(QMainWindow):
     # ---- project files (.vintyl) -------------------------------------------------------------
     def project_settings(self):
         """What a project keeps besides the design: the cutter and the job."""
-        return {"profile": self.profile_box.currentData(), "knife_offset_mm": self.knife.value(),
-                "overcut_mm": self.overcut.value(), "inside_first": self.inside_first.isChecked(),
+        return {"profile": self.profile_box.currentData(), "inside_first": self.inside_first.isChecked(),
                 "weed_frame": self.weed_frame.isChecked(), "weed_margin_mm": self.weed_margin.value(),
                 "tool": self.tool_box.currentData(), "pen_width_mm": self.pen_width.value(),
                 "pen_place": self.pen_place.currentData()}
 
     def _apply_project_settings(self, st):
+        # the machine (its knife and port are its own settings, not the project's)
         if st.get("profile") in self.profile_names:
             self.profile_box.setCurrentIndex(self.profile_names.index(st["profile"]))
         if st.get("tool") in ("knife", "pen"):
             self.tool_box.setCurrentIndex(self.tool_box.findData(st["tool"]))
         if st.get("pen_place") in pens.PLACES:
             self.pen_place.setCurrentIndex(self.pen_place.findData(st["pen_place"]))
-        for key, widget in (("knife_offset_mm", self.knife), ("overcut_mm", self.overcut),
-                            ("weed_margin_mm", self.weed_margin), ("pen_width_mm", self.pen_width)):
+        for key, widget in (("weed_margin_mm", self.weed_margin), ("pen_width_mm", self.pen_width)):
             if isinstance(st.get(key), (int, float)):
                 widget.setValue(float(st[key]))
         for key, box in (("inside_first", self.inside_first), ("weed_frame", self.weed_frame)):
@@ -2139,7 +2191,46 @@ class MainWindow(QMainWindow):
         self._update_title()
         self.refresh_job()
 
+    def check_port_access(self):
+        """Show under the machine what to do when this user may not use its
+        port, or that it is not plugged in. Returns the problem (or None)."""
+        port = self.profile.port
+        problem = transport.access_problem(port)
+        if problem:
+            text, color = problem, "#b91c1c"
+        elif port and not os.path.exists(port):
+            text, color = _("%s is not there now: plug the cutter in and switch it on, or choose "
+                            "its port in the cutter's settings.") % port, "#6b7280"
+        else:
+            text, color = "", "#6b7280"
+        self.port_problem.setText(text)
+        self.port_problem.setStyleSheet("color: %s" % color)
+        self.cutter_form.setRowVisible(self.port_problem, bool(text))
+        return problem
+
+    def show_access_help(self):
+        port = self.profile.port
+        problem = transport.access_problem(port)
+        now = (_("Now: %s") % problem) if problem else (
+            _("Now: you may use %s.") % port if port else _("Now: no port is chosen."))
+        box = QMessageBox(self)
+        box.setWindowTitle(_("Access to the cutter"))
+        box.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        box.setText(_(
+            "On Linux a cutter is a device file, and only the members of its group may send to it:\n\n"
+            "• a cutter connected as a USB printer (/dev/usb/lp0, as the VEVOR KI-375A): the group lp\n"
+            "• a serial port or a USB-serial cable (/dev/ttyUSB0, /dev/ttyACM0): the group dialout "
+            "(on Arch and Manjaro: uucp)\n\n"
+            "Join the group once, in a terminal:\n"
+            "    sudo usermod -aG lp $USER\n"
+            "    sudo usermod -aG dialout $USER\n"
+            "then log out and in again (a running session keeps its old groups).\n\n"
+            "Vintyl checks the port you choose and says under it which group that device needs.")
+            + "\n\n" + now)
+        box.exec()
+
     def refresh_job(self):
+        self.check_port_access()
         self.view.show_frame(self.weed_frame_polyline(self.design.material_paths()[0]))
         p = self.job_profile()
         self.profile_label.setText("%s · %s · %s" % (p.name, p.language.upper(), p.port or _("no port")))
@@ -2244,7 +2335,7 @@ class MainWindow(QMainWindow):
         self.sending = on
         self.progress.setVisible(on)
         self.btn_stop.setEnabled(on)
-        for w in (self.btn_start, self.btn_save, self.act_save_cut, self.profile_box, self.port_box,
+        for w in (self.btn_start, self.btn_save, self.act_save_cut, self.profile_box, self.act_profile,
                   self.view):
             w.setEnabled(not on)
 

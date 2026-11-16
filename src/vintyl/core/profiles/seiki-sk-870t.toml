@@ -4,7 +4,7 @@
 
 name = "Seiki SK-870T"
 
-width_mm = 780.0          # cutting width from the manual
+width_mm = 780.0          # cutting width from the manual (870 mm is the feed)
 length_mm = 0.0           # roll: no limit
 
 connection = "serial"     # check: the manual says RS-232; it may be a USB printer like the KI-375A

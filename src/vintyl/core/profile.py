@@ -2,14 +2,19 @@
 Device profiles: everything Vintyl needs to know about one cutter.
 
 A profile is a small TOML file (readable, with comments). Built-in profiles
-live in vintyl/core/profiles/; the user's own are saved next to their
-settings. Reading uses tomllib from the standard library; writing uses
+live in vintyl/core/profiles/; the user's own are in user_dir() (by default
+~/.config/vintyl/profiles). A user's file with the same name as a built-in
+one is that built-in profile as the user changed it: it is used instead,
+and deleting it brings the built-in one back (catalogue(), save_user(),
+delete_user()). Reading uses tomllib from the standard library; writing uses
 to_toml() below, which is enough for a flat list of keys.
 
 Copyright (C) 2026 Vintyl contributors
 Licensed under the GNU General Public License v3 or later. See LICENSE.
 """
 import math
+import os
+import re
 import tomllib
 from dataclasses import dataclass, fields
 from importlib import resources
@@ -180,3 +185,73 @@ def to_toml(profile):
 def save(profile, path):
     with open(path, "w", encoding="utf-8") as f:
         f.write(to_toml(profile))
+
+
+# ---- the user's profiles ---------------------------------------------------------------
+
+def user_dir():
+    """Where the user's profiles are: VINTYL_PROFILES, else a "profiles"
+    folder next to VINTYL_SETTINGS (the tests), else ~/.config/vintyl/profiles."""
+    if os.environ.get("VINTYL_PROFILES"):
+        return os.environ["VINTYL_PROFILES"]
+    if os.environ.get("VINTYL_SETTINGS"):
+        return os.path.join(os.path.dirname(os.path.abspath(os.environ["VINTYL_SETTINGS"])), "profiles")
+    base = os.environ.get("XDG_CONFIG_HOME") or os.path.join(os.path.expanduser("~"), ".config")
+    return os.path.join(base, "vintyl", "profiles")
+
+
+def catalogue():
+    """Every cutter the user can choose, sorted by name: a list of dicts
+    {"id", "profile", "builtin" (comes with Vintyl), "changed" (a built-in
+    one the user changed), "error" (a user file that cannot be read: its
+    message; "profile" is then None)}."""
+    entries = {}
+    for name in builtin_names():
+        entries[name] = {"id": name, "profile": load_builtin(name), "builtin": True, "changed": False,
+                         "error": None}
+    folder = user_dir()
+    if os.path.isdir(folder):
+        for fname in sorted(os.listdir(folder)):
+            if not fname.endswith(".toml"):
+                continue
+            pid = fname[:-5]
+            builtin = pid in entries
+            try:
+                prof = load(os.path.join(folder, fname))
+                entries[pid] = {"id": pid, "profile": prof, "builtin": builtin, "changed": builtin, "error": None}
+            except (ProfileError, OSError, TypeError, ValueError) as e:
+                if not builtin:                        # a broken change of a built-in one: the built-in stays
+                    entries[pid] = {"id": pid, "profile": None, "builtin": False, "changed": False,
+                                    "error": str(e)}
+    return sorted(entries.values(), key=lambda e: (e["profile"].name if e["profile"] else e["id"]).lower())
+
+
+def save_user(pid, profile):
+    """Save the user's profile (or their change of a built-in one) as pid.toml."""
+    folder = user_dir()
+    os.makedirs(folder, exist_ok=True)
+    path = os.path.join(folder, pid + ".toml")
+    tmp = path + ".tmp"
+    save(profile, tmp)
+    os.replace(tmp, path)
+    return path
+
+
+def delete_user(pid):
+    """Delete the user's profile pid; for a built-in one: back to as it came."""
+    path = os.path.join(user_dir(), pid + ".toml")
+    if os.path.exists(path):
+        os.remove(path)
+
+
+def new_id(name):
+    """A file name for a new profile named `name`, not used yet."""
+    base = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-") or "cutter"
+    taken = set(builtin_names())
+    folder = user_dir()
+    if os.path.isdir(folder):
+        taken |= {f[:-5] for f in os.listdir(folder) if f.endswith(".toml")}
+    pid, n = base, 2
+    while pid in taken:
+        pid, n = "%s-%d" % (base, n), n + 1
+    return pid

@@ -1,5 +1,6 @@
 """
-Start the Vintyl window:  python -m vintyl [design.svg ...]
+Start the Vintyl window:  python -m vintyl [design.svg | project.vintyl ...]
+Checks:                   python -m vintyl --self-test   (or --version)
 
 Copyright (C) 2026 Vintyl contributors
 Licensed under the GNU General Public License v3 or later. See LICENSE.
@@ -19,6 +20,13 @@ QGroupBox QLabel, QGroupBox QCheckBox { font-weight: normal; }
 
 
 def main(argv=None):
+    if "--self-test" in (sys.argv if argv is None else argv):
+        from vintyl import selftest              # checks without a cutter and without a window on screen
+        return selftest.run()
+    if "--version" in (sys.argv if argv is None else argv):
+        from vintyl import __version__
+        print("Vintyl", __version__)
+        return 0
     from PySide6.QtWidgets import QApplication
     from vintyl import i18n
     i18n.setup()                       # the system language, if Vintyl has it

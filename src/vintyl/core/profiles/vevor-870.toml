@@ -1,0 +1,30 @@
+# VEVOR 870 mm (34 inch) vinyl cutter, sold as KH-870A, KW-870 and similar.
+# Feeds 870 mm, cuts 780 mm (the owner, 16.11.2026; VEVOR's listing says
+# 780 mm too, one answer in its questions 765 mm).
+# The owner of a KI-375A says VEVOR's larger cutters have the same control
+# board, so this profile starts from the KI-375A's checked values. Not yet
+# tested on this cutter: everything marked "check".
+
+name = "VEVOR 870 mm (34 in)"
+
+width_mm = 780.0          # cutting width (the owner)
+length_mm = 0.0           # roll: no limit
+
+connection = "usb-printer" # check: as the KI-375A (mode "Printer" in its menu)
+port = "/dev/usb/lp0"     # check: the number depends on other USB printers
+send_speed_force = false  # check: as the KI-375A, speed and force on the panel
+
+baud = 9600               # only for Virtual COM mode; check
+flow = "none"             # only for Virtual COM mode; check
+
+language = "hpgl"         # check: as the KI-375A
+units_per_mm = 40.0       # check: as the KI-375A
+
+swap_xy = false           # check with the 20 mm test square
+invert_x = false
+invert_y = false
+
+knife_offset_mm = 0.25    # usual for a 45 degree blade (ideal on the KI-375A)
+overcut_mm = 0.5
+
+pacing = "none"           # check: everything at once worked on the KI-375A

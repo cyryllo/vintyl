@@ -127,9 +127,32 @@ def test_missing_device_and_no_permission_say_what_to_do(tmp_path):
     os.chmod(locked, 0)
     if os.access(locked, os.W_OK):               # running as root: no permission check
         pytest.skip("root can open anything")
-    with pytest.raises(transport.TransportError, match="group lp"):
+    with pytest.raises(transport.TransportError, match="No permission"):
         transport.open_output(USB, str(locked))
     os.chmod(locked, stat.S_IRUSR | stat.S_IWUSR)
+
+
+def test_no_permission_names_the_devices_group(tmp_path, monkeypatch):
+    """A device of the group lp the user is not in: join it; in it already
+    (in /etc/group) but not in this session: log out and in."""
+    import grp
+    import pwd
+    from types import SimpleNamespace
+    dev = tmp_path / "lp0"
+    dev.write_bytes(b"")
+    os.chmod(dev, 0o660)
+    me = pwd.getpwuid(os.getuid()).pw_name
+    monkeypatch.setattr(os, "access", lambda *a, **k: False)
+    monkeypatch.setattr(os, "stat", lambda p, *a, **k: SimpleNamespace(st_gid=4242, st_mode=0o20660))
+    members = []
+    monkeypatch.setattr(grp, "getgrgid", lambda gid: SimpleNamespace(gr_name="lp", gr_mem=members))
+    text = transport.access_problem(str(dev))
+    assert "group lp" in text and "usermod -aG lp" in text
+    members.append(me)
+    assert "log out" in transport.access_problem(str(dev)).lower()
+    monkeypatch.undo()
+    assert transport.access_problem(str(tmp_path / "nothing")) is None          # not there: said later
+    assert transport.access_problem(str(dev)) is None                           # the owner may
 
 
 def test_no_port_set():

@@ -62,8 +62,9 @@ def test_window_opens_empty(win):
     assert "Empty" in win.summary.text()
     assert win.profile.name == "Seiki SK-870T"
     assert not win.btn_start.isEnabled() and not win.btn_stop.isEnabled()
-    # the panel shows the profile's knife values from the start
-    assert win.knife.value() == pytest.approx(0.25) and win.overcut.value() == pytest.approx(0.5)
+    # the panel shows only the machine; its port and width in one line
+    assert win.job_profile().knife_offset_mm == pytest.approx(0.25)
+    assert "780" in win.cutter_info.text() and "/dev/ttyUSB0" in win.cutter_info.text()
 
 
 def test_open_svg_places_it_near_the_origin(win, svg_file):
@@ -90,8 +91,7 @@ def test_save_gives_the_same_bytes_as_the_core(win, svg_file, tmp_path):
 
 def test_drawn_rectangle_is_cut_where_it_was_drawn(win, tmp_path):
     # view mm: x -50..-30 = 30..50 mm across (to the left), y -40..-20 = 20..40 mm along (up)
-    win.knife.setValue(0)           # a pen: no knife offset, no overcut
-    win.overcut.setValue(0)
+    win.use_profile_values(knife_offset_mm=0.0, overcut_mm=0.0)     # no knife offset, no overcut
     win._on_drawn("rectangle", QRectF(QPointF(-50, -40), QPointF(-30, -20)))
     out = tmp_path / "r.hpgl"
     win.save_cutter_file(str(out))
@@ -145,8 +145,7 @@ def test_speed_on_the_panel_only_or_sent(win, svg_file):
     assert win.job_profile().speed_cm_s is None
     # both built-in cutters take speed and force from their panel only (checked 16.11.2026)
     assert not win.profile.send_speed_force
-    assert win.speed_label.text() == "Speed on the panel" and not win.force.isVisibleTo(win)
-    win.speed.setValue(20)
+    win.use_profile_values(speed_cm_s=20.0)            # the panel's speed, written in its settings
     assert "VS" not in win.build().text                # not sent ...
     assert "min at 20 cm/s" in win.job_label.text()     # ... but used for the time estimate
     # a cutter that takes them from the computer gets them
@@ -171,7 +170,7 @@ def test_knife_path_preview_follows_the_job(win, svg_file):
     n_paths = len(win.last_job.knife_paths)
     # one item for the cuts, one for the travels, one numbered dot per path
     assert len(win.view._knife_items) == 2 + n_paths
-    win.knife.setValue(0.3)                       # a change redraws it, no stale items
+    win.use_profile_values(knife_offset_mm=0.3)    # a change redraws it, no stale items
     assert len(win.view._knife_items) == 2 + len(win.last_job.knife_paths)
     win.opt_x.setValue(50)                        # so does a move (the scene is rebuilt)
     assert len(win.view._knife_items) == 2 + len(win.last_job.knife_paths)
@@ -181,11 +180,9 @@ def test_knife_path_preview_follows_the_job(win, svg_file):
 
 def test_knife_values_reach_the_job(win, svg_file):
     win.import_svg(svg_file)
-    win.knife.setValue(0)
-    win.overcut.setValue(0)
+    win.use_profile_values(knife_offset_mm=0.0, overcut_mm=0.0)
     plain = win.build().text
-    win.knife.setValue(0.25)
-    win.overcut.setValue(0.5)
+    win.use_profile_values(knife_offset_mm=0.25, overcut_mm=0.5)
     assert win.build().text != plain
     assert win.build().cut_mm > win.last_job.cut_mm - 1e-9
 
@@ -278,7 +275,7 @@ def _cut_to_fifo(win, svg_file, tmp_path):
     os.mkfifo(fifo)
     win.profile_box.setCurrentIndex(win.profile_names.index("vevor-ki-375a"))
     win.import_svg(svg_file)
-    win.port_box.setEditText(fifo)
+    win.use_profile_values(port=fifo)
     return FifoReader(fifo)
 
 
@@ -310,7 +307,7 @@ def test_stop_lifts_and_says_how_to_stop_the_cutter(win, svg_file, tmp_path, mes
 def test_start_without_a_cutter_explains(win, svg_file, tmp_path, messages):
     win.profile_box.setCurrentIndex(win.profile_names.index("vevor-ki-375a"))
     win.import_svg(svg_file)
-    win.port_box.setEditText(str(tmp_path / "lp9"))
+    win.use_profile_values(port=str(tmp_path / "lp9"))
     w = win.start()
     assert w.wait(5000)
     QApplication.processEvents()
@@ -322,8 +319,7 @@ def test_start_without_a_cutter_explains(win, svg_file, tmp_path, messages):
 def test_what_is_on_screen_is_cut_the_same_way_round(win, tmp_path):
     """The view is the cutter seen from the front: a shape drawn up and to the
     left of the origin is cut further along (X) and further across (Y)."""
-    win.knife.setValue(0)
-    win.overcut.setValue(0)
+    win.use_profile_values(knife_offset_mm=0.0, overcut_mm=0.0)
     # a 10 mm line going UP the screen, 30 mm left of the origin, from 20 to 30 mm up
     win._on_line_drawn(QPointF(-30, -20), QPointF(-30, -30))
     text = win.build().text
@@ -635,17 +631,15 @@ def test_a_drawn_polygon_keeps_its_number_of_sides_to_change(win):
     assert win.selected.spec is None and not win.opt_sides.isVisibleTo(win)
 
 
-def test_the_last_cutter_and_its_port_are_remembered(app, tmp_path, monkeypatch):
+def test_the_last_cutter_is_remembered(app, tmp_path, monkeypatch):
     monkeypatch.setenv("VINTYL_SETTINGS", str(tmp_path / "remember.ini"))
     w = MainWindow()
     assert w.profile.name == "Seiki SK-870T"              # nothing remembered yet: the first
     w.profile_box.setCurrentIndex(w.profile_names.index("vevor-ki-375a"))
-    w.port_box.setEditText("/dev/usb/lp3")
     w.settings.sync()
     w.close()
     w2 = MainWindow()                                     # the next start
     assert w2.profile.name == "VEVOR KI-375A"
-    assert w2.port_box.currentText() == "/dev/usb/lp3"
     w2.close()
 
 
@@ -893,14 +887,13 @@ def test_save_and_open_a_project_with_its_settings(win, tmp_path, app):
     win.profile_box.setCurrentIndex(win.profile_names.index("vevor-ki-375a"))
     win.opt_text.setText("AB")
     win._on_text_clicked(QPointF(-150, -80))
-    win.knife.setValue(0.3)
     win.weed_frame.setChecked(True)
     assert win.modified and win.windowTitle().startswith("new project *")
     path = win.save_project(str(tmp_path / "test.vintyl"))
     assert path and not win.modified and win.windowTitle().startswith("test.vintyl –")
     w2 = MainWindow()
     assert w2.open_file(path) is not None
-    assert w2.profile.name == "VEVOR KI-375A" and w2.knife.value() == pytest.approx(0.3)
+    assert w2.profile.name == "VEVOR KI-375A"
     assert w2.weed_frame.isChecked()
     e = w2.design.elements[0]
     assert e.spec["text"] == "AB" and w2.build().text == win.build().text
@@ -971,16 +964,16 @@ def test_qr_code_is_inserted_as_cut_outlines(win):
 # ---- knife or pen ------------------------------------------------------------------------------------
 def test_the_pen_switch_shows_its_own_settings_and_hides_the_knifes(win):
     form = win.cutter_form
-    assert form.isRowVisible(win.knife) and not form.isRowVisible(win.pen_width)
+    assert not form.isRowVisible(win.pen_width) and not win.inside_first.isHidden()
     win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
     assert win.is_pen()
-    for w in (win.knife, win.overcut, win.inside_first):
-        assert not form.isRowVisible(w)
+    assert win.inside_first.isHidden()
     assert form.isRowVisible(win.pen_width) and form.isRowVisible(win.pen_place)
     assert win.frame_row.isHidden()
+    assert win.job_profile().knife_offset_mm == 0 and win.job_profile().overcut_mm == 0
     win.tool_box.setCurrentIndex(win.tool_box.findData("knife"))
-    assert form.isRowVisible(win.knife) and not win.frame_row.isHidden()
-    assert win.knife.value() == pytest.approx(win.profile.knife_offset_mm)       # kept meanwhile
+    assert not win.frame_row.isHidden()
+    assert win.job_profile().knife_offset_mm == pytest.approx(win.profile.knife_offset_mm)   # kept meanwhile
 
 
 def test_a_pen_job_has_no_offset_no_overcut_no_frame(win):
@@ -1171,3 +1164,87 @@ def test_the_left_panel_never_squeezes_its_boxes_into_each_other(win):
             r = [b.geometry() for b in boxes]
             assert all(r[i].bottom() < r[i + 1].top() for i in range(len(r) - 1)), (tool, h, r)
             assert all(b.height() >= b.minimumSizeHint().height() for b in boxes), (tool, h)
+
+
+def test_the_settings_menu_opens_its_window(win, app):
+    """The menu's action passes "checked" (False) to its slot: the window must
+    still open (it once failed, taking False for the values)."""
+    from PySide6.QtWidgets import QDoubleSpinBox
+    seen = {}
+
+    def steps(dlg):
+        spin = dlg.findChildren(QDoubleSpinBox)[0]
+        spin.setValue(7.5)
+        seen["ok"] = True
+        dlg.accept()
+    _in_dialog(app, steps)
+    win.act_settings.trigger()
+    if _in_dialog.failed:
+        raise _in_dialog.failed[0]
+    assert seen.get("ok") and win.grid_step == pytest.approx(7.5)
+
+
+def test_ready_shape_sizes_keep_their_proportions_by_default(win, app):
+    """The heart's width and height change together (the lock is on by
+    default); unlocked, they change alone."""
+    seen = {}
+
+    def steps(dlg):
+        f = win._ready_fields
+        assert win.ready_lock.isChecked()                          # on by default
+        f["width"].setValue(120.0)                                 # twice as wide
+        seen["h"] = f["height"].value()
+        win.ready_lock.setChecked(False)
+        f["width"].setValue(60.0)
+        seen["h_free"] = f["height"].value()
+        win.ready_lock.setChecked(True)                            # back on for the next tests
+        dlg.accept()
+    _in_dialog(app, steps)
+    e = win.insert_ready("heart")
+    if _in_dialog.failed:
+        raise _in_dialog.failed[0]
+    assert seen["h"] == pytest.approx(104.0) and seen["h_free"] == pytest.approx(104.0)
+    assert e.spec["width"] == pytest.approx(60.0) and e.spec["height"] == pytest.approx(104.0)
+
+
+# ---- cutter profiles ------------------------------------------------------------------------------
+def test_the_cutter_settings_window_saves_a_copy_and_restores(win, app):
+    """Change the KI-375A's port in its settings: the machine list marks it
+    changed (*) and the job uses the new port; Restore brings the original."""
+    from vintyl.gui.profile_editor import ProfileEditor
+    win.profile_box.setCurrentIndex(win.profile_names.index("vevor-ki-375a"))
+    entry = win.profile_entries["vevor-ki-375a"]
+    dlg = ProfileEditor(entry, win)
+    assert not dlg.btn_reset.isEnabled()                           # nothing to restore yet
+    dlg.port.setCurrentText("/dev/usb/lp5")
+    dlg.knife.setValue(0.3)
+    dlg.save()
+    assert dlg.chosen == "vevor-ki-375a"
+    win.reload_profiles(dlg.chosen)
+    assert win.profile.port == "/dev/usb/lp5" and win.job_profile().knife_offset_mm == pytest.approx(0.3)
+    assert win.profile_box.currentText().endswith("*") and "/dev/usb/lp5" in win.cutter_info.text()
+    dlg = ProfileEditor(win.profile_entries["vevor-ki-375a"], win)
+    assert dlg.btn_reset.isEnabled()
+    dlg.restore()                                                  # (the question is answered Yes)
+    win.reload_profiles(dlg.chosen)
+    assert win.profile.port == "/dev/usb/lp1" and not win.profile_box.currentText().endswith("*")
+
+
+def test_a_new_cutter_appears_in_the_list_and_can_be_deleted(win):
+    from vintyl.gui.profile_editor import ProfileEditor
+    dlg = ProfileEditor(win.profile_entries["vevor-870"], win)
+    dlg.width.setValue(630.0)
+    dlg.save_new("VEVOR KI-720A (mine)")
+    win.reload_profiles(dlg.chosen)
+    assert win.profile.name == "VEVOR KI-720A (mine)" and win.profile.width_mm == 630.0
+    assert "vevor-870" in win.profile_names                        # the built-in one is still there
+    dlg = ProfileEditor(win.profile_entries[dlg.chosen], win)
+    dlg.delete()
+    win.reload_profiles(dlg.chosen or None)
+    assert "VEVOR KI-720A (mine)" not in [win.profile_entries[i]["profile"].name for i in win.profile_names]
+
+
+def test_the_machine_line_says_when_the_port_is_missing(win, tmp_path):
+    win.use_profile_values(port=str(tmp_path / "lp9"))
+    win.refresh_job()
+    assert win.cutter_form.isRowVisible(win.port_problem) and "not there" in win.port_problem.text()
