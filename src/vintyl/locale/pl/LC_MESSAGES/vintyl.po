@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-15 17:53+0100\n"
+"POT-Creation-Date: 2026-11-16 20:07+0100\n"
 "PO-Revision-Date: 2026-11-15 17:49+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -49,6 +49,10 @@ msgstr ""
 msgid "%s has no visible shapes to cut."
 msgstr "W pliku %s nie ma widocznych kształtów do cięcia."
 
+#, python-format
+msgid "%s is not there. Is the cutter connected by USB and switched on?"
+msgstr "Nie ma %s. Czy ploter jest podłączony przez USB i włączony?"
+
 msgid "&Cutter"
 msgstr "&Ploter"
 
@@ -89,6 +93,10 @@ msgid "Bottom edge, across the material from the origin"
 msgstr "Dolna krawędź, w poprzek folii od punktu zerowego"
 
 #, python-format
+msgid "Cannot open %s: %s"
+msgstr "Nie można otworzyć %s: %s"
+
+#, python-format
 msgid "Cannot read %s: %s"
 msgstr "Nie można odczytać %s: %s"
 
@@ -113,6 +121,12 @@ msgstr "Tnij później"
 msgid "Cut length: %.2f m · travel: %.2f m"
 msgstr "Długość cięcia: %.2f m · przejazdy: %.2f m"
 
+msgid "Cut now?"
+msgstr "Ciąć teraz?"
+
+msgid "Cut the design (with Dry run ticked: save it to a file)"
+msgstr "Wytnij projekt (z zaznaczonym „Na sucho”: zapisz go do pliku)"
+
 msgid "Cut this element"
 msgstr "Tnij ten element"
 
@@ -122,6 +136,9 @@ msgstr "Ploter"
 #, python-format
 msgid "Cutter files (*%s)"
 msgstr "Pliki plotera (*%s)"
+
+msgid "Cutting"
+msgstr "Cięcie"
 
 msgid "Delete"
 msgstr "Usuń"
@@ -216,6 +233,36 @@ msgstr "Nowy"
 msgid "New design"
 msgstr "Nowy projekt"
 
+#, python-format
+msgid ""
+"No permission to use %s. Add yourself to the group dialout:\n"
+"  sudo usermod -aG dialout $USER\n"
+"then log out and in again."
+msgstr ""
+"Brak uprawnień do %s. Dodaj się do grupy dialout:\n"
+"  sudo usermod -aG dialout $USER\n"
+"potem wyloguj się i zaloguj ponownie."
+
+#, python-format
+msgid ""
+"No permission to use %s. Add yourself to the group lp:\n"
+"  sudo usermod -aG lp $USER\n"
+"then log out and in again."
+msgstr ""
+"Brak uprawnień do %s. Dodaj się do grupy lp:\n"
+"  sudo usermod -aG lp $USER\n"
+"potem wyloguj się i zaloguj ponownie."
+
+msgid "No port is set. Choose the cutter's port in the panel."
+msgstr "Nie ustawiono portu. Wybierz port plotera w panelu."
+
+msgid ""
+"Not sent: this cutter takes its speed from its panel. Enter it here for "
+"the time estimate."
+msgstr ""
+"Nie jest wysyłana: ten ploter bierze prędkość ze swojego panelu. Wpisz ją"
+" tu, żeby oszacować czas."
+
 msgid "Open SVG"
 msgstr "Otwórz SVG"
 
@@ -279,8 +326,40 @@ msgstr "Zapisano %s (%d bajtów)"
 msgid "Select and move"
 msgstr "Zaznaczanie i przesuwanie"
 
-msgid "Sending to the cutter comes in a later step"
-msgstr "Wysyłanie do plotera będzie w kolejnym kroku"
+#, python-format
+msgid ""
+"Send the design to %s (%s)?\n"
+"\n"
+"Check before you go on:\n"
+"• the knife is in the holder (or the pen for a test)\n"
+"• the material is under the pinch rollers\n"
+"• the origin is set (Origin key) where the design should start\n"
+"• speed and force are set on the cutter's panel\n"
+"\n"
+"To stop the cutter at once: Test (pause) or Reset on its panel."
+msgstr ""
+"Wysłać projekt do %s (%s)?\n"
+"\n"
+"Sprawdź przed wysłaniem:\n"
+"• nóż jest w uchwycie (albo pisak do próby)\n"
+"• materiał jest pod rolkami dociskowymi\n"
+"• punkt zerowy jest ustawiony (klawisz Origin) tam, gdzie ma się zacząć "
+"projekt\n"
+"• prędkość i nacisk są ustawione na panelu plotera\n"
+"\n"
+"Żeby natychmiast zatrzymać ploter: Test (pauza) albo Reset na jego panelu."
+
+#, python-format
+msgid "Sending failed: %s"
+msgstr "Wysyłanie nie powiodło się: %s"
+
+#, python-format
+msgid ""
+"Sent %d bytes to %s. The cutter cuts from its own memory at the speed set"
+" on its panel."
+msgstr ""
+"Wysłano %d bajtów do %s. Ploter tnie ze swojej pamięci z prędkością "
+"ustawioną na panelu."
 
 msgid "Show exactly where the knife goes: cuts, travels and their order"
 msgstr "Pokaż dokładnie, gdzie pojedzie nóż: cięcia, przejazdy i ich kolejność"
@@ -294,6 +373,9 @@ msgstr "Boki"
 msgid "Speed"
 msgstr "Prędkość"
 
+msgid "Speed on the panel"
+msgstr "Prędkość na panelu"
+
 msgid "Start"
 msgstr "Start"
 
@@ -303,8 +385,44 @@ msgstr "Zacznij pusty projekt"
 msgid "Stop"
 msgstr "Stop"
 
+msgid ""
+"Stop sending and lift the knife. What the cutter already has is stopped "
+"with Test or Reset on its panel."
+msgstr ""
+"Przerwij wysyłanie i podnieś nóż. To, co ploter już dostał, zatrzymasz "
+"klawiszem Test albo Reset na jego panelu."
+
+#, python-format
+msgid ""
+"Stopped after %d bytes; the knife was lifted. The cutter still cuts what "
+"it already has: press Test (pause) or Reset on its panel to stop it at "
+"once."
+msgstr ""
+"Przerwano po %d bajtach, nóż podniesiony. Ploter dalej tnie to, co już "
+"ma: naciśnij Test (pauza) albo Reset na jego panelu, żeby zatrzymać go od"
+" razu."
+
+msgid "Stopping: lifting the knife…"
+msgstr "Zatrzymywanie: podnoszę nóż…"
+
 msgid "Take back the last change"
 msgstr "Cofnij ostatnią zmianę"
+
+#, python-format
+msgid ""
+"The cutter has taken no data for %d s. Is it online (not Leave) and is "
+"there material in it?"
+msgstr ""
+"Ploter nie przyjmuje danych od %d s. Czy jest online (nie Leave) i ma "
+"załadowany materiał?"
+
+#, python-format
+msgid ""
+"The cutter has taken no data for %d s. Is it online (not Leave), and do "
+"the port's speed and flow control match its menu?"
+msgstr ""
+"Ploter nie przyjmuje danych od %d s. Czy jest online (nie Leave) i czy "
+"prędkość portu oraz kontrola przepływu zgadzają się z jego menu?"
 
 #, python-format
 msgid "The design does not fit on the material: it sticks out %s by %.1f mm."
@@ -316,11 +434,19 @@ msgstr "Nie ma nic do cięcia."
 msgid "There is nothing to cut: every path is shorter than one cutter step."
 msgstr "Nie ma nic do cięcia: każda ścieżka jest krótsza niż jeden krok plotera."
 
+msgid "Ticked: Start only saves the cutter file. Untick it to cut."
+msgstr "Zaznaczone: Start tylko zapisuje plik plotera. Odznacz, żeby ciąć."
+
 msgid "Ticked: cut. Not ticked: shown only."
 msgstr "Zaznaczone: tnij. Niezaznaczone: tylko widoczne."
 
 msgid "Tools"
 msgstr "Narzędzia"
+
+msgid "USB printer (/dev/usb/lp…) or serial port (/dev/ttyUSB…, /dev/ttyACM…)"
+msgstr ""
+"Drukarka USB (/dev/usb/lp…) albo port szeregowy (/dev/ttyUSB…, "
+"/dev/ttyACM…)"
 
 msgid "Undo"
 msgstr "Cofnij"
@@ -337,6 +463,10 @@ msgstr ""
 
 msgid "Width"
 msgstr "Szerokość"
+
+#, python-format
+msgid "Writing to %s failed: %s"
+msgstr "Zapis do %s nie powiódł się: %s"
 
 msgid "X"
 msgstr "X"
@@ -372,8 +502,8 @@ msgstr "w linii"
 msgid "middle"
 msgstr "połowa"
 
-msgid "not connected (sending comes later)"
-msgstr "brak połączenia (wysyłanie będzie później)"
+msgid "no port"
+msgstr "brak portu"
 
 msgid "on line"
 msgstr "na linii"
@@ -384,4 +514,10 @@ msgstr "poza długość %g mm"
 
 msgid "pen (no offset)"
 msgstr "pisak (bez przesunięcia)"
+
+#~ msgid "Sending to the cutter comes in a later step"
+#~ msgstr "Wysyłanie do plotera będzie w kolejnym kroku"
+
+#~ msgid "not connected (sending comes later)"
+#~ msgstr "brak połączenia (wysyłanie będzie później)"
 

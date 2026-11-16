@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-15 17:53+0100\n"
+"POT-Creation-Date: 2026-11-16 20:07+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,6 +41,10 @@ msgstr ""
 
 #, python-format
 msgid "%s has no visible shapes to cut."
+msgstr ""
+
+#, python-format
+msgid "%s is not there. Is the cutter connected by USB and switched on?"
 msgstr ""
 
 msgid "&Cutter"
@@ -81,6 +85,10 @@ msgid "Bottom edge, across the material from the origin"
 msgstr ""
 
 #, python-format
+msgid "Cannot open %s: %s"
+msgstr ""
+
+#, python-format
 msgid "Cannot read %s: %s"
 msgstr ""
 
@@ -103,6 +111,12 @@ msgstr ""
 msgid "Cut length: %.2f m · travel: %.2f m"
 msgstr ""
 
+msgid "Cut now?"
+msgstr ""
+
+msgid "Cut the design (with Dry run ticked: save it to a file)"
+msgstr ""
+
 msgid "Cut this element"
 msgstr ""
 
@@ -111,6 +125,9 @@ msgstr ""
 
 #, python-format
 msgid "Cutter files (*%s)"
+msgstr ""
+
+msgid "Cutting"
 msgstr ""
 
 msgid "Delete"
@@ -199,6 +216,28 @@ msgstr ""
 msgid "New design"
 msgstr ""
 
+#, python-format
+msgid ""
+"No permission to use %s. Add yourself to the group dialout:\n"
+"  sudo usermod -aG dialout $USER\n"
+"then log out and in again."
+msgstr ""
+
+#, python-format
+msgid ""
+"No permission to use %s. Add yourself to the group lp:\n"
+"  sudo usermod -aG lp $USER\n"
+"then log out and in again."
+msgstr ""
+
+msgid "No port is set. Choose the cutter's port in the panel."
+msgstr ""
+
+msgid ""
+"Not sent: this cutter takes its speed from its panel. Enter it here for "
+"the time estimate."
+msgstr ""
+
 msgid "Open SVG"
 msgstr ""
 
@@ -262,7 +301,27 @@ msgstr ""
 msgid "Select and move"
 msgstr ""
 
-msgid "Sending to the cutter comes in a later step"
+#, python-format
+msgid ""
+"Send the design to %s (%s)?\n"
+"\n"
+"Check before you go on:\n"
+"• the knife is in the holder (or the pen for a test)\n"
+"• the material is under the pinch rollers\n"
+"• the origin is set (Origin key) where the design should start\n"
+"• speed and force are set on the cutter's panel\n"
+"\n"
+"To stop the cutter at once: Test (pause) or Reset on its panel."
+msgstr ""
+
+#, python-format
+msgid "Sending failed: %s"
+msgstr ""
+
+#, python-format
+msgid ""
+"Sent %d bytes to %s. The cutter cuts from its own memory at the speed set"
+" on its panel."
 msgstr ""
 
 msgid "Show exactly where the knife goes: cuts, travels and their order"
@@ -277,6 +336,9 @@ msgstr ""
 msgid "Speed"
 msgstr ""
 
+msgid "Speed on the panel"
+msgstr ""
+
 msgid "Start"
 msgstr ""
 
@@ -286,7 +348,34 @@ msgstr ""
 msgid "Stop"
 msgstr ""
 
+msgid ""
+"Stop sending and lift the knife. What the cutter already has is stopped "
+"with Test or Reset on its panel."
+msgstr ""
+
+#, python-format
+msgid ""
+"Stopped after %d bytes; the knife was lifted. The cutter still cuts what "
+"it already has: press Test (pause) or Reset on its panel to stop it at "
+"once."
+msgstr ""
+
+msgid "Stopping: lifting the knife…"
+msgstr ""
+
 msgid "Take back the last change"
+msgstr ""
+
+#, python-format
+msgid ""
+"The cutter has taken no data for %d s. Is it online (not Leave) and is "
+"there material in it?"
+msgstr ""
+
+#, python-format
+msgid ""
+"The cutter has taken no data for %d s. Is it online (not Leave), and do "
+"the port's speed and flow control match its menu?"
 msgstr ""
 
 #, python-format
@@ -299,10 +388,16 @@ msgstr ""
 msgid "There is nothing to cut: every path is shorter than one cutter step."
 msgstr ""
 
+msgid "Ticked: Start only saves the cutter file. Untick it to cut."
+msgstr ""
+
 msgid "Ticked: cut. Not ticked: shown only."
 msgstr ""
 
 msgid "Tools"
+msgstr ""
+
+msgid "USB printer (/dev/usb/lp…) or serial port (/dev/ttyUSB…, /dev/ttyACM…)"
 msgstr ""
 
 msgid "Undo"
@@ -316,6 +411,10 @@ msgid ""
 msgstr ""
 
 msgid "Width"
+msgstr ""
+
+#, python-format
+msgid "Writing to %s failed: %s"
 msgstr ""
 
 msgid "X"
@@ -352,7 +451,7 @@ msgstr ""
 msgid "middle"
 msgstr ""
 
-msgid "not connected (sending comes later)"
+msgid "no port"
 msgstr ""
 
 msgid "on line"

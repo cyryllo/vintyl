@@ -138,12 +138,19 @@ def test_profile_change_moves_the_material_edge(win, svg_file):
     assert not win.btn_save.isEnabled()
 
 
-def test_speed_from_the_panel_or_set(win, svg_file):
+def test_speed_on_the_panel_only_or_sent(win, svg_file):
+    import dataclasses
     win.import_svg(svg_file)
     assert win.job_profile().speed_cm_s is None
+    # both built-in cutters take speed and force from their panel only (checked 16.11.2026)
+    assert not win.profile.send_speed_force
+    assert win.speed_label.text() == "Speed on the panel" and not win.force.isVisibleTo(win)
     win.speed.setValue(20)
+    assert "VS" not in win.build().text                # not sent ...
+    assert "min at 20 cm/s" in win.job_label.text()     # ... but used for the time estimate
+    # a cutter that takes them from the computer gets them
+    win.profile = dataclasses.replace(win.profile, send_speed_force=True)
     assert "VS20;" in win.build().text
-    assert "min at 20 cm/s" in win.job_label.text()
 
 
 def test_delete_and_reorder(win, svg_file):
@@ -258,3 +265,66 @@ def test_snapping_to_the_origin_and_alt_turns_it_off(win, monkeypatch):
 def test_node_tool_hint_does_not_widen_the_window(win):
     win.set_tool("nodes")
     assert win.minimumSizeHint().width() <= 1440
+
+
+# ---- Start and Stop --------------------------------------------------------------------
+
+def _cut_to_fifo(win, svg_file, tmp_path):
+    """Set the window up to cut to a FIFO standing in for the KI-375A."""
+    import sys
+    sys.path.insert(0, os.path.dirname(__file__))
+    from test_transport import FifoReader
+    fifo = str(tmp_path / "lp0")
+    os.mkfifo(fifo)
+    win.profile_box.setCurrentIndex(win.profile_names.index("vevor-ki-375a"))
+    win.import_svg(svg_file)
+    win.port_box.setEditText(fifo)
+    win.dry_run.setChecked(False)
+    return FifoReader(fifo)
+
+
+def test_start_with_dry_run_only_saves(win, svg_file, tmp_path, monkeypatch):
+    from PySide6.QtWidgets import QFileDialog
+    out = tmp_path / "dry.hpgl"
+    monkeypatch.setattr(QFileDialog, "getSaveFileName", lambda *a, **k: (str(out), ""))
+    win.import_svg(svg_file)
+    assert win.dry_run.isChecked()                      # the default
+    assert win.start() == str(out)
+    assert out.read_text() == win.build().text
+
+
+def test_start_cuts_exactly_the_job(win, svg_file, tmp_path, messages):
+    reader = _cut_to_fifo(win, svg_file, tmp_path)
+    expected = win.build().text
+    w = win.start()
+    assert w is not None and win.btn_stop.isEnabled() and not win.btn_start.isEnabled()
+    assert w.wait(5000)
+    QApplication.processEvents()
+    assert reader.join() == expected.encode("ascii")
+    assert win.btn_start.isEnabled() and not win.btn_stop.isEnabled()
+    assert "Sent %d bytes" % len(expected) in win.statusBar().currentMessage()
+    assert messages == []
+
+
+def test_stop_lifts_and_says_how_to_stop_the_cutter(win, svg_file, tmp_path, messages):
+    reader = _cut_to_fifo(win, svg_file, tmp_path)
+    w = win.start()
+    w.request_stop()            # as if Stop came at once (before or while sending)
+    assert w.wait(5000)
+    QApplication.processEvents()
+    got = reader.join().decode("ascii")
+    assert got.endswith(";") and got.rsplit(";", 2)[-2].startswith("PU")
+    if messages:                # it may have finished before the stop was seen
+        assert "Test" in messages[-1] and "Reset" in messages[-1]
+
+
+def test_start_without_a_cutter_explains(win, svg_file, tmp_path, messages):
+    win.profile_box.setCurrentIndex(win.profile_names.index("vevor-ki-375a"))
+    win.import_svg(svg_file)
+    win.port_box.setEditText(str(tmp_path / "lp9"))
+    win.dry_run.setChecked(False)
+    w = win.start()
+    assert w.wait(5000)
+    QApplication.processEvents()
+    assert messages and "not there" in messages[-1]
+    assert win.btn_start.isEnabled()

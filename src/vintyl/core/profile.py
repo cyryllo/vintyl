@@ -17,6 +17,7 @@ from importlib import resources
 LANGUAGES = ("hpgl", "dmpl")
 DMPL_MODES = (1, 3)
 FLOW_CONTROLS = ("none", "rtscts", "xonxoff")
+CONNECTIONS = ("serial", "usb-printer")
 PACINGS = ("none", "time")
 
 
@@ -32,7 +33,8 @@ class Profile:
     width_mm: float = 600.0          # cutting width, across the material (y)
     length_mm: float = 0.0           # along the material (x); 0 = no limit (roll)
 
-    # connection
+    # connection: "usb-printer" (Linux /dev/usb/lpN) or "serial" (/dev/ttyUSB0, /dev/ttyACM0)
+    connection: str = "serial"
     port: str = ""
     baud: int = 9600
     flow: str = "none"               # none / rtscts / xonxoff
@@ -53,9 +55,13 @@ class Profile:
     corner_deg: float = 5.0          # smaller turns count as straight
     lift_below_deg: float = 0.0      # 0 = off; lift the knife at corners sharper than this
 
-    # sent only when set; None = keep what is set on the cutter's panel
-    speed_cm_s: float | None = None  # HPGL VS, DMPL V
-    force_g: float | None = None     # HPGL FS, DMPL BP
+    # speed and force: sent (HPGL VS / FS, DMPL V / BP) only when set and when
+    # the cutter takes them from the computer (send_speed_force). Cutters set
+    # only on their panel: speed_cm_s is then just what the panel says, used
+    # for the time estimate and the pacing.
+    send_speed_force: bool = True
+    speed_cm_s: float | None = None
+    force_g: float | None = None
     pen: int = 1                     # HPGL SP
 
     # sending (used from step 2 of the plan on)
@@ -76,10 +82,12 @@ class Profile:
         need(_number(self.length_mm) and self.length_mm >= 0, "length_mm must be 0 (no limit) or more")
         need(isinstance(self.baud, int) and self.baud > 0, "baud must be a whole number above 0")
         need(self.flow in FLOW_CONTROLS, "flow must be one of: " + ", ".join(FLOW_CONTROLS))
+        need(self.connection in CONNECTIONS, "connection must be one of: " + ", ".join(CONNECTIONS))
+        need(isinstance(self.port, str), "port must be text")
         need(self.language in LANGUAGES, "language must be one of: " + ", ".join(LANGUAGES))
         need(self.dmpl_mode in DMPL_MODES, "dmpl_mode must be one of: " + ", ".join(map(str, DMPL_MODES)))
         need(_positive(self.units_per_mm), "units_per_mm must be a number above 0")
-        for key in ("swap_xy", "invert_x", "invert_y"):
+        for key in ("swap_xy", "invert_x", "invert_y", "send_speed_force"):
             need(isinstance(getattr(self, key), bool), key + " must be true or false")
         for key in ("knife_offset_mm", "overcut_mm", "lift_below_deg"):
             v = getattr(self, key)

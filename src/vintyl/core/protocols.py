@@ -63,9 +63,9 @@ class HPGL(Encoder):
         out = "IN;"
         if p.pen:
             out += "SP%d;" % p.pen
-        if p.speed_cm_s is not None:
+        if p.send_speed_force and p.speed_cm_s is not None:
             out += "VS%s;" % _num(p.speed_cm_s)
-        if p.force_g is not None:
+        if p.send_speed_force and p.force_g is not None:
             out += "FS%s;" % _num(p.force_g)
         return out
 
@@ -103,9 +103,9 @@ class DMPL(Encoder):
         out = self.INIT[p.dmpl_mode]
         if p.pen and p.pen != 1:
             out += "P%d " % p.pen
-        if p.speed_cm_s is not None:
+        if p.send_speed_force and p.speed_cm_s is not None:
             out += "V%s " % _num(p.speed_cm_s)
-        if p.force_g is not None:
+        if p.send_speed_force and p.force_g is not None:
             out += "BP%s " % _num(p.force_g)
         return out
 

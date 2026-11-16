@@ -16,7 +16,7 @@ import os
 
 from PySide6.QtCore import QSize, Qt
 from PySide6.QtGui import QAction, QActionGroup, QKeySequence
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QDoubleSpinBox, QFileDialog, QFormLayout, QSpinBox,
+from PySide6.QtWidgets import (QCheckBox, QComboBox, QDoubleSpinBox, QFileDialog, QFormLayout, QProgressBar, QSpinBox,
                                QGridLayout, QGroupBox, QHBoxLayout, QLabel, QListWidget,
                                QListWidgetItem, QMainWindow, QMessageBox, QPushButton, QSizePolicy,
                                QToolBar, QVBoxLayout, QWidget)
@@ -24,6 +24,7 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QDoubleSpinBox, QFileDialog
 from vintyl import __version__
 from vintyl.core import profile as profiles
 from vintyl.core import shapes
+from vintyl.core import transport
 from vintyl.core.design import Design, Element
 from vintyl.core.job import JobError, build_job
 from vintyl.core.loaders import LoadError, load_svg
@@ -31,6 +32,7 @@ from vintyl.core.profile import ProfileError
 from vintyl.gui import N_, _, ngettext
 from vintyl.gui import icons
 from vintyl.gui.canvas import MaterialView
+from vintyl.gui.sender import SendWorker
 
 LATER = N_("Comes in a later step of Vintyl")   # translated where it is shown
 PLACE_MARGIN_MM = 10.0        # a new file is placed this far from the origin
@@ -304,9 +306,11 @@ class MainWindow(QMainWindow):
             self.profile_box.addItem(profiles.load_builtin(name).name, name)
         self.profile_box.currentIndexChanged.connect(self._profile_changed)
         form.addRow(_("Profile"), self.profile_box)
-        self.port_label = QLabel(_("not connected (sending comes later)"))
-        self.port_label.setWordWrap(True)
-        form.addRow(_("Port"), self.port_label)
+        # the cutter's port: the profile's, plus whatever cutter-like device is plugged in
+        self.port_box = QComboBox()
+        self.port_box.setEditable(True)
+        self.port_box.setToolTip(_("USB printer (/dev/usb/lp…) or serial port (/dev/ttyUSB…, /dev/ttyACM…)"))
+        form.addRow(_("Port"), self.port_box)
         self.knife = _spin(5, 2, minimum=0)
         self.knife.setSingleStep(0.05)
         self.knife.setSpecialValueText(_("pen (no offset)"))
@@ -324,10 +328,11 @@ class MainWindow(QMainWindow):
         self.force = _spin(1000, 0, " g", minimum=0)
         for w in (self.speed, self.force):
             w.setSpecialValueText(_("from the panel"))
-            w.setToolTip(_("Empty: the cutter uses what is set on its panel"))
             w.valueChanged.connect(lambda _v: self.refresh_job())
-        form.addRow(_("Speed"), self.speed)
-        form.addRow(_("Force"), self.force)
+        self.speed_label = QLabel(_("Speed"))
+        self.force_label = QLabel(_("Force"))
+        form.addRow(self.speed_label, self.speed)
+        form.addRow(self.force_label, self.force)
         self.inside_first = QCheckBox(_("Inside shapes first"))
         self.inside_first.setChecked(True)
         self.inside_first.setToolTip(_("Holes and shapes inside others are cut before them, so a piece "
@@ -344,9 +349,11 @@ class MainWindow(QMainWindow):
         lay.addWidget(self.job_label)
         self.dry_run = QCheckBox(_("Dry run: only save to a file"))
         self.dry_run.setChecked(True)
-        self.dry_run.setEnabled(False)
-        self.dry_run.setToolTip(_("Sending to the cutter comes in a later step"))
+        self.dry_run.setToolTip(_("Ticked: Start only saves the cutter file. Untick it to cut."))
         lay.addWidget(self.dry_run)
+        self.progress = QProgressBar()
+        self.progress.setVisible(False)
+        lay.addWidget(self.progress)
         grid = QGridLayout()
         self.btn_preview = QPushButton(icons.tabler("route"), _("Knife path"))
         self.btn_preview.setCheckable(True)
@@ -356,10 +363,13 @@ class MainWindow(QMainWindow):
         self.btn_save.clicked.connect(lambda: self.save_cutter_file())
         self.btn_start = QPushButton(icons.tabler("player-play"), _("Start"))
         self.btn_start.setObjectName("start")
+        self.btn_start.setToolTip(_("Cut the design (with Dry run ticked: save it to a file)"))
+        self.btn_start.clicked.connect(self.start)
         self.btn_stop = QPushButton(icons.tabler("player-stop"), _("Stop"))
-        for b in (self.btn_start, self.btn_stop):
-            b.setEnabled(False)
-            b.setToolTip(_(LATER))
+        self.btn_stop.setToolTip(_("Stop sending and lift the knife. What the cutter already has "
+                                   "is stopped with Test or Reset on its panel."))
+        self.btn_stop.setEnabled(False)
+        self.btn_stop.clicked.connect(self.stop)
         for i, b in enumerate((self.btn_preview, self.btn_save, self.btn_start, self.btn_stop)):
             b.setMinimumHeight(40)
             b.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -373,12 +383,33 @@ class MainWindow(QMainWindow):
         self.profile = profiles.load_builtin(self.profile_box.itemData(index))
         self.knife.setValue(self.profile.knife_offset_mm)
         self.overcut.setValue(self.profile.overcut_mm)
+        self.fill_ports()
+        # cutters set on their panel only: speed is just for the time estimate, no force field
+        sends = self.profile.send_speed_force
+        self.speed_label.setText(_("Speed") if sends else _("Speed on the panel"))
+        self.speed.setToolTip(_("Empty: the cutter uses what is set on its panel") if sends else
+                              _("Not sent: this cutter takes its speed from its panel. "
+                                "Enter it here for the time estimate."))
+        self.force.setToolTip(_("Empty: the cutter uses what is set on its panel"))
+        self.force_label.setVisible(sends)
+        self.force.setVisible(sends)
         self.refresh()
+
+    def fill_ports(self):
+        """The profile's port first, then every cutter-like device plugged in now."""
+        self.port_box.blockSignals(True)
+        self.port_box.clear()
+        ports = [self.profile.port] if self.profile.port else []
+        ports += [p for p in transport.find_ports() if p not in ports]
+        self.port_box.addItems(ports)
+        self.port_box.setCurrentIndex(0 if ports else -1)
+        self.port_box.blockSignals(False)
 
     def job_profile(self):
         """The chosen profile with the panel's knife, overcut, speed and force
         (speed and force 0 = from the cutter's panel)."""
         return dataclasses.replace(self.profile,
+                                   port=self.port_box.currentText().strip(),
                                    knife_offset_mm=self.knife.value(),
                                    overcut_mm=self.overcut.value(),
                                    speed_cm_s=self.speed.value() or None,
@@ -575,15 +606,16 @@ class MainWindow(QMainWindow):
 
     def refresh_job(self):
         p = self.job_profile()
-        self.profile_label.setText("%s · %s · %d" % (p.name, p.language.upper(), p.baud))
+        self.profile_label.setText("%s · %s · %s" % (p.name, p.language.upper(), p.port or _("no port")))
+        busy = getattr(self, "sending", False)
         self.last_job = None
         try:
             self.last_job = self.build()
         except (JobError, ProfileError) as e:
             self.job_label.setText(str(e))
             self.job_label.setStyleSheet("color: #b91c1c")
-            self.btn_save.setEnabled(False)
-            self.act_save_cut.setEnabled(False)
+            for w in (self.btn_save, self.act_save_cut, self.btn_start):
+                w.setEnabled(False)
             self.view.show_knife(None)
             return
         self.view.show_knife(self.last_job.knife_paths if self.btn_preview.isChecked() else None)
@@ -594,8 +626,8 @@ class MainWindow(QMainWindow):
             text += "\n" + _("About %.1f min at %g cm/s") % (minutes, p.speed_cm_s)
         self.job_label.setText(text)
         self.job_label.setStyleSheet("")
-        self.btn_save.setEnabled(True)
-        self.act_save_cut.setEnabled(True)
+        for w in (self.btn_save, self.act_save_cut, self.btn_start):
+            w.setEnabled(not busy)
 
     # ---- output --------------------------------------------------------------------------
     def save_cutter_file(self, path=None):
@@ -613,6 +645,70 @@ class MainWindow(QMainWindow):
         job.save(path)
         self.statusBar().showMessage(_("Saved %s (%d bytes)") % (os.path.basename(path), len(job.text)), 8000)
         return path
+
+    # ---- sending ---------------------------------------------------------------------------
+    def start(self):
+        """Start: with Dry run only save the file; else cut, after a check list."""
+        if self.dry_run.isChecked():
+            return self.save_cutter_file()
+        try:
+            job = self.build()
+        except (JobError, ProfileError) as e:
+            QMessageBox.warning(self, _("Start"), str(e))
+            return None
+        p = self.job_profile()
+        if QMessageBox.question(
+                self, _("Cut now?"),
+                _("Send the design to %s (%s)?\n\n"
+                  "Check before you go on:\n"
+                  "• the knife is in the holder (or the pen for a test)\n"
+                  "• the material is under the pinch rollers\n"
+                  "• the origin is set (Origin key) where the design should start\n"
+                  "• speed and force are set on the cutter's panel\n\n"
+                  "To stop the cutter at once: Test (pause) or Reset on its panel.")
+                % (p.port, p.name)) != QMessageBox.Yes:
+            return None
+        from vintyl.core.protocols import encoder_for
+        self.worker = SendWorker(job.text, p, p.port, encoder_for(p).units_per_mm, self)
+        self.worker.progress.connect(self._send_progress)
+        self.worker.finished_send.connect(self._send_finished)
+        self._set_sending(True)
+        self.progress.setRange(0, len(job.text))
+        self.progress.setValue(0)
+        self.worker.start()
+        return self.worker
+
+    def stop(self):
+        w = getattr(self, "worker", None)
+        if w is not None and w.isRunning():
+            w.request_stop()
+            self.statusBar().showMessage(_("Stopping: lifting the knife…"))
+
+    def _send_progress(self, sent, total):
+        self.progress.setMaximum(total)
+        self.progress.setValue(sent)
+
+    def _send_finished(self, ok, message):
+        self._set_sending(False)
+        self.statusBar().showMessage(message, 15000)
+        if not ok:
+            QMessageBox.warning(self, _("Cutting"), message)
+
+    def _set_sending(self, on):
+        """While sending: Stop works, nothing else that would change the job."""
+        self.sending = on
+        self.progress.setVisible(on)
+        self.btn_stop.setEnabled(on)
+        for w in (self.btn_start, self.btn_save, self.act_save_cut, self.profile_box, self.port_box,
+                  self.dry_run, self.view):
+            w.setEnabled(not on)
+
+    def closeEvent(self, event):
+        w = getattr(self, "worker", None)
+        if w is not None and w.isRunning():
+            w.request_stop()
+            w.wait(15000)
+        super().closeEvent(event)
 
     def about(self):
         QMessageBox.about(self, _("About Vintyl"),

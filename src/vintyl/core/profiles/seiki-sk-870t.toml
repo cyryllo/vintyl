@@ -7,6 +7,10 @@ name = "Seiki SK-870T"
 width_mm = 780.0          # cutting width from the manual
 length_mm = 0.0           # roll: no limit
 
+connection = "serial"     # check: the manual says RS-232; it may be a USB printer like the KI-375A
+port = "/dev/ttyUSB0"     # check
+send_speed_force = false  # speed and force on the panel only (the owner, 16.11.2026)
+
 baud = 9600               # check: set in the cutter's menu
 flow = "none"             # check: a forum post used rtscts
 
@@ -19,3 +23,5 @@ invert_y = false
 
 knife_offset_mm = 0.25    # usual for a 45 degree blade
 overcut_mm = 0.5
+
+pacing = "none"           # check

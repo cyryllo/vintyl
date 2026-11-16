@@ -11,11 +11,17 @@
 #   offset small burrs at the corners; with 0.25 mm and a 0.5 mm overcut
 #   ideal; every closed shape closed cleanly. Speed and force: panel only.
 # Values marked "check" are still first guesses.
+# Sending: everything at once (the cutter keeps the job in its memory and
+#   cut the test heart perfectly that way).
 
 name = "VEVOR KI-375A"
 
 width_mm = 285.0          # check: from the seller's listing
 length_mm = 0.0           # roll: no limit
+
+connection = "usb-printer" # checked: mode "Printer" in its menu
+port = "/dev/usb/lp1"     # checked (the number may differ with other USB printers)
+send_speed_force = false  # checked: VS ignored, speed and force on the panel only
 
 baud = 9600               # only for Virtual COM mode; check
 flow = "none"             # only for Virtual COM mode; check
@@ -29,3 +35,5 @@ invert_y = false          # checked
 
 knife_offset_mm = 0.25    # checked on vinyl: ideal corners (0 leaves small burrs)
 overcut_mm = 0.5          # checked on vinyl: closes cleanly
+
+pacing = "none"           # checked: everything at once works
