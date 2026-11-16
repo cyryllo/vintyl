@@ -42,9 +42,13 @@ Układ jak w Kerfly: wstążka na górze, pasek opcji kształtu, narzędzia
 rysowania po prawej, obszar roboczy na środku, panel zadania po lewej.
 
 **Obszar roboczy:**
-- zamiast stołu lasera jest **pas folii**: szerokość cięcia z profilu
-  (SK-870T: 780 mm), a długość bez limitu, bo to rolka;
-- widać punkt zerowy (Origin z panelu plotera) i kierunek podawania folii.
+- zamiast stołu lasera jest **arkusz folii stojący pionowo, tak jak
+  widać ploter z przodu** (zmiana z 16.11 na Twoją prośbę; poziomy długi
+  pas był niewygodny): szerokość = szerokość cięcia z profilu
+  (KI-375A: 285 mm, SK-870T: 780 mm), wysokość domyślnie 500 mm, dłuższa,
+  gdy projekt sięga dalej;
+- punkt zerowy (Origin) w prawym dolnym rogu, X w górę, Y w lewo: co na
+  ekranie, to tak samo ułożone na folii.
 
 **Narzędzia rysowania (prawy pasek), jak w Kerfly:**
 - zaznaczanie i edycja węzłów;

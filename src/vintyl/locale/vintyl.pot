@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-16 20:07+0100\n"
+"POT-Creation-Date: 2026-11-16 20:13+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -81,7 +81,7 @@ msgstr ""
 msgid "Add the shapes of an SVG file to the design"
 msgstr ""
 
-msgid "Bottom edge, across the material from the origin"
+msgid "Bottom edge: how far up from the origin, along the material"
 msgstr ""
 
 #, python-format
@@ -191,9 +191,6 @@ msgstr ""
 msgid "Knife path"
 msgstr ""
 
-msgid "Left edge, along the material from the origin"
-msgstr ""
-
 msgid "Line"
 msgstr ""
 
@@ -280,6 +277,9 @@ msgid "Regular polygon"
 msgstr ""
 
 msgid "Remove everything from the material?"
+msgstr ""
+
+msgid "Right edge: how far left from the origin, across the material"
 msgstr ""
 
 msgid "SVG files (*.svg)"
@@ -420,6 +420,9 @@ msgstr ""
 msgid "X"
 msgstr ""
 
+msgid "X ↑ along the material"
+msgstr ""
+
 msgid "Y"
 msgstr ""
 
@@ -437,9 +440,6 @@ msgid "centre"
 msgstr ""
 
 msgid "corner"
-msgstr ""
-
-msgid "feed →"
 msgstr ""
 
 msgid "from the panel"
@@ -462,5 +462,8 @@ msgid "past the length of %g mm"
 msgstr ""
 
 msgid "pen (no offset)"
+msgstr ""
+
+msgid "← Y across"
 msgstr ""
 

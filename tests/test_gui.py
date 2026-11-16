@@ -72,7 +72,8 @@ def test_open_svg_places_it_near_the_origin(win, svg_file):
     xmin, xmax, ymin, ymax = e.bounds
     # visible painted shapes only: the filled square and the circle (no hidden, no unpainted)
     assert len(e.paths) == 2
-    assert xmin == pytest.approx(10.0) and ymax == pytest.approx(-10.0)   # 10 mm from the origin
+    # 10 mm from the origin (the lower right corner) both ways
+    assert xmax == pytest.approx(-10.0) and ymax == pytest.approx(-10.0)
     assert xmax - xmin == pytest.approx(43.0, abs=0.01)                   # 10..53 mm in the file
     assert win.element_list.count() == 1
     assert win.element_list.item(0).checkState() == Qt.Checked
@@ -88,10 +89,10 @@ def test_save_gives_the_same_bytes_as_the_core(win, svg_file, tmp_path):
 
 
 def test_drawn_rectangle_is_cut_where_it_was_drawn(win, tmp_path):
-    # view mm: x 20..40 along, y -50..-30 (y down) = 30..50 mm across
+    # view mm: x -50..-30 = 30..50 mm across (to the left), y -40..-20 = 20..40 mm along (up)
     win.knife.setValue(0)           # a pen: no knife offset, no overcut
     win.overcut.setValue(0)
-    win._on_drawn("rectangle", QRectF(QPointF(20, -50), QPointF(40, -30)))
+    win._on_drawn("rectangle", QRectF(QPointF(-50, -40), QPointF(-30, -20)))
     out = tmp_path / "r.hpgl"
     win.save_cutter_file(str(out))
     text = out.read_text()
@@ -112,10 +113,10 @@ def test_unticked_element_is_not_cut(win, svg_file, tmp_path):
 
 def test_options_bar_moves_and_resizes(win, svg_file):
     e = win.import_svg(svg_file)
-    win.opt_x.setValue(100.0)
-    win.opt_y.setValue(50.0)
+    win.opt_x.setValue(100.0)            # bottom edge 100 mm up from the origin
+    win.opt_y.setValue(50.0)             # right edge 50 mm to the left of it
     xmin, xmax, ymin, ymax = e.bounds
-    assert xmin == pytest.approx(100.0) and -ymax == pytest.approx(50.0)
+    assert -ymax == pytest.approx(100.0) and -xmax == pytest.approx(50.0)
     win.opt_w.setValue(86.0)
     assert e.size[0] == pytest.approx(86.0, abs=0.01)
 
@@ -194,13 +195,13 @@ def test_knife_values_reach_the_job(win, svg_file):
 
 def test_undo_and_redo(win, svg_file):
     e = win.import_svg(svg_file)
-    x0 = e.bounds[0]
-    win.opt_x.setValue(x0 + 30)
-    assert win.design.elements[0].bounds[0] == pytest.approx(x0 + 30)
+    up = -e.bounds[3]                                   # how far up the bottom edge is
+    win.opt_x.setValue(up + 30)
+    assert -win.design.elements[0].bounds[3] == pytest.approx(up + 30)
     win.undo()
-    assert win.design.elements[0].bounds[0] == pytest.approx(x0)
+    assert -win.design.elements[0].bounds[3] == pytest.approx(up)
     win.redo()
-    assert win.design.elements[0].bounds[0] == pytest.approx(x0 + 30)
+    assert -win.design.elements[0].bounds[3] == pytest.approx(up + 30)
     win.undo()
     win.undo()                                        # before the file was opened
     assert win.design.elements == []
@@ -328,3 +329,19 @@ def test_start_without_a_cutter_explains(win, svg_file, tmp_path, messages):
     QApplication.processEvents()
     assert messages and "not there" in messages[-1]
     assert win.btn_start.isEnabled()
+
+
+
+def test_what_is_on_screen_is_cut_the_same_way_round(win, tmp_path):
+    """The view is the cutter seen from the front: a shape drawn up and to the
+    left of the origin is cut further along (X) and further across (Y)."""
+    win.knife.setValue(0)
+    win.overcut.setValue(0)
+    # a 10 mm line going UP the screen, 30 mm left of the origin, from 20 to 30 mm up
+    win._on_line_drawn(QPointF(-30, -20), QPointF(-30, -30))
+    text = win.build().text
+    assert "PU800,1200;PD1200,1200;" in text          # X 20 -> 30 mm, Y 30 mm
+    # the material: 500 mm long by default, longer when the design goes further
+    assert win.view.length_mm == 500.0
+    win._on_drawn("rectangle", QRectF(-60, -700, 20, 20))
+    assert win.view.length_mm >= 700.0

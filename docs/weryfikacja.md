@@ -319,6 +319,10 @@ Każdy krok robię tylko po Twoim „tak”.
 
 | Pierwszy projekt z Vintyl | **zrobione** (16.11): serce 60 × 52 mm (`tests/a4/serce.svg`) otwarte w oknie Vintyl, profil VEVOR KI-375A (nóż 0,25 mm, nadcięcie 0,5 mm), zapisane przyciskiem „Zapisz .hpgl” (`tests/a4/serce_z_vintyl.hpgl`, 2137 bajtów) i wysłane narzędziem A4: **wycięte idealnie, ładnie się obiera** (Twoja ocena) |
 
+| Wysyłka przyciskiem Start w Vintyl | **zrobione** (16.11): serce otwarte w oknie, „Na sucho” odznaczone, Start, lista kontrolna, wysłane przez Vintyl na `/dev/usb/lp1` (commit d768f36): **wycięte** |
+
+| Pionowe pole robocze (widok z przodu plotera) | **sprawdzone** (16.11): serce z nowego widoku, wycięte przez Start, ułożone na folii tak samo jak na ekranie (Twoje potwierdzenie) |
+
 ### Rozbieżność 11: koniec danych ginie, gdy program za szybko zamyka urządzenie
 
 Głowica stanęła w punkcie `PD400,1200`. Każdy plik (82 bajty) poszedł

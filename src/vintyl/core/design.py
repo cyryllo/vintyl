@@ -2,11 +2,15 @@
 The design: elements placed on the material.
 
 Each element holds its own paths in the curves format (vintyl.core.curves),
-in VIEW coordinates: millimetres, x along the material (right), y DOWN,
-with the origin at (0, 0). The material lies at y from -width to 0, so a
-point's material y (across, up) is simply -y. Moving, scaling and turning
-an element change its nodes directly: there is no separate transform to
-keep in step, and what is drawn is what is cut.
+in VIEW coordinates: millimetres, x to the RIGHT, y DOWN, as on screen.
+The view shows the material as you see it from the front of the cutter:
+the origin (0, 0) in the lower right corner, the cutting width to the left
+(view x from -width to 0), the material running away from you upwards
+(view y negative). So a point's material coordinates are
+    along  = -view y      (the cutter's X, away from you)
+    across = -view x      (the cutter's Y, to the left)
+and what is drawn is cut the same way round, not mirrored, not turned.
+Moving, scaling and turning an element change its nodes directly.
 
 Copyright (C) 2026 Vintyl contributors
 Licensed under the GNU General Public License v3 or later. See LICENSE.
@@ -94,7 +98,7 @@ class Design:
 
     def material_polylines(self, tol=curves.FLATNESS_MM):
         """What goes to the cutter: the elements marked "cut", in list order,
-        as polylines in material coordinates (x along, y across = -view y)."""
+        as polylines in material coordinates (see view_to_material)."""
         return self.material_paths(tol)[0]
 
     def material_paths(self, tol=curves.FLATNESS_MM):
@@ -105,6 +109,15 @@ class Design:
             if not e.cut:
                 continue
             for poly in curves.flatten(e.paths, tol):
-                out.append([(x, -y) for x, y in poly])
+                out.append([view_to_material(x, y) for x, y in poly])
                 groups.append(k)
         return out, groups
+
+
+def view_to_material(x, y):
+    """(along, across) of a view point; see the module notes."""
+    return -y, -x
+
+
+def material_to_view(along, across):
+    return -across, -along

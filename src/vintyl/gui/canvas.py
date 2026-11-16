@@ -1,10 +1,12 @@
 """
 The working area: the strip of material with the design on it.
 
-Scene units are millimetres, x along the material (right), y DOWN, the
-origin (the cutter's Origin) at (0, 0) in the lower-left corner of the
-strip. The strip spans y from -width to 0 and runs on to the right with
-no end, like a roll.
+The material is shown as you see it from the front of the cutter: scene
+units are millimetres, x right, y down; the origin (the cutter's Origin)
+at (0, 0) in the lower right corner; the cutting width to the left (x from
+-width to 0); the material running away from you upwards (y negative),
+500 mm by default and longer when the design reaches further. See
+vintyl.core.design for the material coordinates.
 
 As in Kerfly: the wheel zooms about the pointer, the middle button drags
 the view; elements snap to corners, centres, middles and lines of other
@@ -21,6 +23,7 @@ from PySide6.QtWidgets import (QApplication, QGraphicsItem, QGraphicsPathItem, Q
                                QGraphicsSimpleTextItem, QGraphicsView)
 
 from vintyl.core import curves, shapes
+from vintyl.core.design import material_to_view
 from vintyl.core import snap as snapping
 from vintyl.gui import N_, _
 from vintyl.gui.node_editor import KEYS as NODE_KEYS
@@ -39,7 +42,7 @@ COLORS = {
     "off": QColor("#dc2626"),
     "snap": QColor("#c026d3"),
 }
-MIN_STRIP_LENGTH = 1000.0        # mm of strip always shown, more when the design is longer
+MIN_STRIP_LENGTH = 500.0         # mm of material always shown, more when the design reaches further
 GRID_MM = 50.0
 SNAP_PIXELS = 10                 # snap distance on screen
 SNAP_LABELS = {snapping.CORNER: N_("corner"), snapping.CENTRE: N_("centre"),
@@ -79,7 +82,7 @@ class CanvasSignals(QObject):
     nudged = Signal(object, float, float)     # element, dx, dy (view mm), arrow keys
     drawn = Signal(str, QRectF)               # tool, rectangle dragged (view mm, normalised)
     line_drawn = Signal(QPointF, QPointF)     # line tool: start, end (view mm)
-    cursor = Signal(float, float)             # pointer in material coordinates (x along, y across)
+    cursor = Signal(float, float)             # pointer in material coordinates (along, across)
     nodes_changed = Signal(object, list, bool)  # element, its new paths (view mm), unused
     node_selection = Signal(int)              # number of selected nodes in the node tool
     edit_nodes = Signal(object)               # element double-clicked with the select tool
@@ -188,11 +191,11 @@ class MaterialView(QGraphicsView):
 
     # ---- content --------------------------------------------------------------
     def material_rect(self, length):
-        return QRectF(0.0, -self.width_mm, length, self.width_mm)
+        return QRectF(-self.width_mm, -length, self.width_mm, length)
 
     def off_material(self, rect):
         tol = 0.05
-        return rect.top() < -self.width_mm - tol or rect.bottom() > tol or rect.left() < -tol
+        return rect.left() < -self.width_mm - tol or rect.right() > tol or rect.bottom() > tol
 
     def show_design(self, design, width_mm, selected=None):
         """Draw the material and every element; keep the zoom unless asked to fit."""
@@ -206,28 +209,32 @@ class MaterialView(QGraphicsView):
         self._snap_marker = None
         self._guides = None
         box = design.bounds()
-        length = max(MIN_STRIP_LENGTH, (box[1] + 200.0) if box else 0.0)
+        # 500 mm of material, longer when the design reaches further (y up is negative)
+        length = max(MIN_STRIP_LENGTH, (-box[2] + 100.0) if box else 0.0)
+        self.length_mm = length
         strip = self.material_rect(length)
+        w = self.width_mm
 
         scene.addRect(strip, QPen(Qt.NoPen), QBrush(COLORS["material"]))
         grid = cosmetic_pen(COLORS["grid"], 1)
-        x = GRID_MM
-        while x < length:
-            scene.addLine(x, -self.width_mm, x, 0, grid)
-            x += GRID_MM
+        x = -GRID_MM
+        while x > -w:
+            scene.addLine(x, -length, x, 0, grid)
+            x -= GRID_MM
         y = -GRID_MM
-        while y > -self.width_mm:
-            scene.addLine(0, y, length, y, grid)
+        while y > -length:
+            scene.addLine(-w, y, 0, y, grid)
             y -= GRID_MM
         edge = cosmetic_pen(COLORS["material_edge"], 1.5)
-        scene.addLine(0, -self.width_mm, length, -self.width_mm, edge)
-        scene.addLine(0, 0, length, 0, edge)
-        scene.addLine(0, -self.width_mm, 0, 0, edge)
-        self._label(_("Material: cutting width %g mm, no length limit") % self.width_mm,
-                    QPointF(2, -self.width_mm - 3), above=True)
-        self._label(_("feed →"), QPointF(length - 4, -self.width_mm - 3), above=True, right=True)
+        scene.addLine(-w, 0, -w, -length, edge)          # the edges the knife cannot pass
+        scene.addLine(0, 0, 0, -length, edge)
+        scene.addLine(-w, 0, 0, 0, edge)
+        self._label(_("Material: cutting width %g mm, no length limit") % w,
+                    QPointF(-w, -length - 3), above=True)
+        self._label(_("X ↑ along the material"), QPointF(0, -length - 3), above=True, right=True)
+        self._label(_("← Y across"), QPointF(-w, 3))
         self._origin_marker()
-        self._label(_("Origin"), QPointF(6, 3))
+        self._label(_("Origin"), QPointF(0, 3), right=True)
 
         chosen = None
         for e in design.elements:
@@ -289,13 +296,13 @@ class MaterialView(QGraphicsView):
         cut, travel = QPainterPath(), QPainterPath()
         pos = QPointF(0, 0)
         for poly in paths:
-            start = QPointF(poly[0][0], -poly[0][1])
+            start = QPointF(*material_to_view(*poly[0]))
             travel.moveTo(pos)
             travel.lineTo(start)
             cut.moveTo(start)
-            for x, y in poly[1:]:
-                cut.lineTo(x, -y)
-            pos = QPointF(poly[-1][0], -poly[-1][1])
+            for p in poly[1:]:
+                cut.lineTo(QPointF(*material_to_view(*p)))
+            pos = QPointF(*material_to_view(*poly[-1]))
         travel.moveTo(pos)
         travel.lineTo(0, 0)
         for path, pen in ((travel, cosmetic_pen(COLORS["selection"], 1.2, Qt.DashLine)),
@@ -307,7 +314,7 @@ class MaterialView(QGraphicsView):
             self.scene().addItem(item)
             self._knife_items.append(item)
         for k, poly in enumerate(paths, 1):
-            self._knife_items.append(self._order_dot(k, QPointF(poly[0][0], -poly[0][1])))
+            self._knife_items.append(self._order_dot(k, QPointF(*material_to_view(*poly[0]))))
 
     def _order_dot(self, number, at):
         """A small numbered dot that keeps its size on screen."""
@@ -342,12 +349,12 @@ class MaterialView(QGraphicsView):
 
     def _snap_shapes(self, exclude=()):
         shapes_ = [i.snap_shape() for i in self._items if i not in exclude]
-        # the material: its corners, edges and their middles (length: the visible strip)
-        strip = self.material_rect(max(MIN_STRIP_LENGTH, self.sceneRect().right()))
-        shapes_.append(snapping.SnapShape([[(strip.left(), strip.bottom()), (strip.left(), strip.top())],
-                                           [(strip.left(), strip.top()), (strip.right(), strip.top())],
-                                           [(strip.left(), strip.bottom()), (strip.right(), strip.bottom())]],
-                                          (0.0, -self.width_mm, 0.0, 0.0)))
+        # the material: the origin, the far edge of the width, the middle of the
+        # front edge, and the side edges and front edge as lines
+        L = getattr(self, "length_mm", MIN_STRIP_LENGTH)
+        w = self.width_mm
+        shapes_.append(snapping.SnapShape([[(-w, 0.0), (-w, -L)], [(0.0, 0.0), (0.0, -L)], [(-w, 0.0), (0.0, 0.0)]],
+                                          (-w, 0.0, 0.0, 0.0)))
         return shapes_
 
     def hide_snap_marker(self):
@@ -535,7 +542,7 @@ class MaterialView(QGraphicsView):
 
     def mouseMoveEvent(self, event):
         p = self.mapToScene(event.position().toPoint())
-        self.signals.cursor.emit(p.x(), -p.y())
+        self.signals.cursor.emit(-p.y(), -p.x())
         if self._panning is not None:
             d = event.position() - self._panning
             self._panning = event.position()

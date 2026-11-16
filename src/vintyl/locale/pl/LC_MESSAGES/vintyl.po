@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-16 20:07+0100\n"
+"POT-Creation-Date: 2026-11-16 20:13+0100\n"
 "PO-Revision-Date: 2026-11-15 17:49+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -89,8 +89,8 @@ msgstr "O programie Vintyl"
 msgid "Add the shapes of an SVG file to the design"
 msgstr "Dodaj do projektu kształty z pliku SVG"
 
-msgid "Bottom edge, across the material from the origin"
-msgstr "Dolna krawędź, w poprzek folii od punktu zerowego"
+msgid "Bottom edge: how far up from the origin, along the material"
+msgstr "Dolna krawędź: ile w górę od punktu zerowego, wzdłuż folii"
 
 #, python-format
 msgid "Cannot open %s: %s"
@@ -208,9 +208,6 @@ msgstr "Przesunięcie noża"
 msgid "Knife path"
 msgstr "Ścieżka noża"
 
-msgid "Left edge, along the material from the origin"
-msgstr "Lewa krawędź, wzdłuż folii od punktu zerowego"
-
 msgid "Line"
 msgstr "Linia"
 
@@ -306,6 +303,9 @@ msgstr "Wielokąt foremny"
 
 msgid "Remove everything from the material?"
 msgstr "Usunąć wszystko z folii?"
+
+msgid "Right edge: how far left from the origin, across the material"
+msgstr "Prawa krawędź: ile w lewo od punktu zerowego, w poprzek folii"
 
 msgid "SVG files (*.svg)"
 msgstr "Pliki SVG (*.svg)"
@@ -471,6 +471,9 @@ msgstr "Zapis do %s nie powiódł się: %s"
 msgid "X"
 msgstr "X"
 
+msgid "X ↑ along the material"
+msgstr "X ↑ wzdłuż folii"
+
 msgid "Y"
 msgstr "Y"
 
@@ -489,9 +492,6 @@ msgstr "środek"
 
 msgid "corner"
 msgstr "narożnik"
-
-msgid "feed →"
-msgstr "podawanie →"
 
 msgid "from the panel"
 msgstr "z panelu"
@@ -515,9 +515,21 @@ msgstr "poza długość %g mm"
 msgid "pen (no offset)"
 msgstr "pisak (bez przesunięcia)"
 
+msgid "← Y across"
+msgstr "← Y w poprzek"
+
 #~ msgid "Sending to the cutter comes in a later step"
 #~ msgstr "Wysyłanie do plotera będzie w kolejnym kroku"
 
 #~ msgid "not connected (sending comes later)"
 #~ msgstr "brak połączenia (wysyłanie będzie później)"
+
+#~ msgid "Bottom edge, across the material from the origin"
+#~ msgstr "Dolna krawędź, w poprzek folii od punktu zerowego"
+
+#~ msgid "Left edge, along the material from the origin"
+#~ msgstr "Lewa krawędź, wzdłuż folii od punktu zerowego"
+
+#~ msgid "feed →"
+#~ msgstr "podawanie →"
 

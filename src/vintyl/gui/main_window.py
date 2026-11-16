@@ -203,8 +203,8 @@ class MainWindow(QMainWindow):
         row.setContentsMargins(10, 4, 10, 4)
         self.opt_x, self.opt_y = _spin(), _spin()
         self.opt_w, self.opt_h = _spin(minimum=0.0), _spin(minimum=0.0)
-        for label, spin, tip in ((_("X"), self.opt_x, _("Left edge, along the material from the origin")),
-                                 (_("Y"), self.opt_y, _("Bottom edge, across the material from the origin")),
+        for label, spin, tip in ((_("X"), self.opt_x, _("Bottom edge: how far up from the origin, along the material")),
+                                 (_("Y"), self.opt_y, _("Right edge: how far left from the origin, across the material")),
                                  (_("Width"), self.opt_w, None), (_("Height"), self.opt_h, None)):
             lab = QLabel(label)
             lab.setBuddy(spin)
@@ -246,8 +246,8 @@ class MainWindow(QMainWindow):
             w.setEnabled(e is not None)
         if e is not None:
             xmin, xmax, ymin, ymax = e.bounds
-            self.opt_x.setValue(xmin)
-            self.opt_y.setValue(-ymax)            # bottom edge, material y (up)
+            self.opt_x.setValue(-ymax)            # bottom edge: along the material from the origin
+            self.opt_y.setValue(-xmax)            # right edge: across the material from the origin
             self.opt_w.setValue(xmax - xmin)
             self.opt_h.setValue(ymax - ymin)
             self.opt_cut.setChecked(e.cut)
@@ -261,8 +261,8 @@ class MainWindow(QMainWindow):
         w, h = self.opt_w.value(), self.opt_h.value()
         if (w, h) != tuple(round(v, 2) for v in e.size) and w > 0 and h > 0:
             e.set_size(w, h)
-        _xmin, _xmax, _ymin, ymax = e.bounds
-        e.move_by(self.opt_x.value() - e.bounds[0], -self.opt_y.value() - ymax)
+        _xmin, xmax, _ymin, ymax = e.bounds
+        e.move_by(-self.opt_y.value() - xmax, -self.opt_x.value() - ymax)
         e.cut = self.opt_cut.isChecked()
         self.refresh()
 
@@ -460,9 +460,9 @@ class MainWindow(QMainWindow):
         except LoadError as err:
             QMessageBox.warning(self, _("Open SVG"), str(err))
             return None
-        # place it on the material, PLACE_MARGIN_MM from the origin in both directions
-        _w, h = e.size
-        e.move_to(PLACE_MARGIN_MM, -PLACE_MARGIN_MM - h)
+        # place it on the material, PLACE_MARGIN_MM from the origin (lower right) both ways
+        w, h = e.size
+        e.move_to(-PLACE_MARGIN_MM - w, -PLACE_MARGIN_MM - h)
         self.add_element(e)
         self.statusBar().showMessage(_("Opened %s") % os.path.basename(path), 5000)
         return e
