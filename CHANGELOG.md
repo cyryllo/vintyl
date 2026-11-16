@@ -30,5 +30,12 @@ report what goes wrong in the [issues](https://github.com/cyryllo/vintyl/issues)
   grid, snapping, undo, shortcuts.
 - Projects (.vintyl). Polish and English.
 
-Profiles: VEVOR KI-375A (checked on the machine) and Seiki SK-870T (to be
-checked).
+**Cutters**
+- Choose the machine in the window; its port, connection, command language,
+  axes, knife offset, overcut and speed are in its settings window (the
+  button beside it). A built-in profile you change is kept as your copy
+  ("Restore factory settings" brings the original back); add cutters of
+  your own (~/.config/vintyl/profiles).
+- Built-in profiles: VEVOR KI-375A (checked on the machine), VEVOR 870 mm
+  (34 in, cuts 780 mm; said to have the KI-375A's control board, to be
+  checked) and Seiki SK-870T (to be checked).

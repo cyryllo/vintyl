@@ -1073,13 +1073,6 @@ class MainWindow(QMainWindow):
             return
         self.profile = entry["profile"]
         self.settings.setValue("cutter/profile", pid)
-        p = self.profile
-        conn = _("USB printer") if p.connection == "usb-printer" else _("serial port")
-        self.cutter_info.setText("%s · %s · %s" % (conn, p.port or _("no port"),
-                                                    _("cuts %g mm") % p.width_mm))
-        self.cutter_info.setToolTip(_("Knife offset %(k).2f mm, overcut %(o).2f mm, %(lang)s. "
-                                      "Change them in the cutter's settings (the button beside it).")
-                                    % {"k": p.knife_offset_mm, "o": p.overcut_mm, "lang": p.language.upper()})
         # the tool last used in this cutter (a pen stays a pen until changed)
         self._loading_tool = True
         tool = self.settings.value("cutter/tool/" + pid, "knife")
@@ -2191,9 +2184,19 @@ class MainWindow(QMainWindow):
         self._update_title()
         self.refresh_job()
 
+    def _show_machine(self):
+        """The machine's line under its name: connection, port, width."""
+        p = self.profile
+        conn = _("USB printer") if p.connection == "usb-printer" else _("serial port")
+        self.cutter_info.setText("%s · %s · %s" % (conn, p.port or _("no port"), _("cuts %g mm") % p.width_mm))
+        self.cutter_info.setToolTip(_("Knife offset %(k).2f mm, overcut %(o).2f mm, %(lang)s. "
+                                      "Change them in the cutter's settings (the button beside it).")
+                                    % {"k": p.knife_offset_mm, "o": p.overcut_mm, "lang": p.language.upper()})
+
     def check_port_access(self):
         """Show under the machine what to do when this user may not use its
         port, or that it is not plugged in. Returns the problem (or None)."""
+        self._show_machine()
         port = self.profile.port
         problem = transport.access_problem(port)
         if problem:
