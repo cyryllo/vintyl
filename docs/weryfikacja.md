@@ -317,6 +317,8 @@ Każdy krok robię tylko po Twoim „tak”.
 
 | 10. `FS` (nacisk) i nóż na folii | `FS` **nie testujemy**: według Ciebie (16.11) **oba plotery** (KI-375A i SK-870T) mają prędkość i nacisk ustawiane tylko ręcznie na panelu. Nóż na folii (16.11, pliki `tests/a4/noz_A_bez.hpgl` i `noz_B_z.hpgl`, z `tools/a4_noz.py`): **A bez kompensacji: na narożnikach małe zadziorki**; **B z kompensacją 0,25 mm + nadcięcie 0,5 mm: idealnie** (Twoja ocena po sprostowaniu, 16.11). Nóż: standardowy, około 45°. Wniosek: **kompensacja 0,25 mm działa tak, jak ją wysłaliśmy**. (Po drodze, przez pomyłkę w odczytaniu, który zestaw jest który, zrobiłem i cofnąłem zmianę łuku obrotu; zostaje wersja sprawdzona na folii.) Wszystkie kształty (kółka, otwory) **domknięte czysto** w A i w B. Profil KI-375A: przesunięcie noża **0,25 mm**, nadcięcie **0,5 mm** (oba sprawdzone na folii). [POTW dla wyniku, POSR dla przyczyny] |
 
+| Pierwszy projekt z Vintyl | **zrobione** (16.11): serce 60 × 52 mm (`tests/a4/serce.svg`) otwarte w oknie Vintyl, profil VEVOR KI-375A (nóż 0,25 mm, nadcięcie 0,5 mm), zapisane przyciskiem „Zapisz .hpgl” (`tests/a4/serce_z_vintyl.hpgl`, 2137 bajtów) i wysłane narzędziem A4: **wycięte idealnie, ładnie się obiera** (Twoja ocena) |
+
 ### Rozbieżność 11: koniec danych ginie, gdy program za szybko zamyka urządzenie
 
 Głowica stanęła w punkcie `PD400,1200`. Każdy plik (82 bajty) poszedł

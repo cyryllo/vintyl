@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Serce 60 x 52 mm do testu cięcia z Vintyl: jeden zamknięty kontur z krzywych Béziera,
+     z ostrym czubkiem na dole i wcięciem u góry (dobry test kompensacji noża). -->
+<svg xmlns="http://www.w3.org/2000/svg" width="60mm" height="52mm" viewBox="0 0 60 52">
+  <path d="M30 52 C 12 38, 0 28, 0 15 C 0 6, 7 0, 15 0 C 22 0, 27 4, 30 10
+           C 33 4, 38 0, 45 0 C 53 0, 60 6, 60 15 C 60 28, 48 38, 30 52 Z"
+        fill="#d32f2f"/>
+</svg>
