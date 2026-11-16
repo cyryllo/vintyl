@@ -17,10 +17,17 @@ Licensed under the GNU General Public License v3 or later. See LICENSE.
 import math
 
 CLOSED_TOLERANCE_MM = 0.01       # first and last point this close: a closed shape
-# The swivel arc is drawn with steps this small. Checked on the cutter
-# (VEVOR KI-375A, 16.11.2026): a 0.25 mm offset cut this way gave ideal
-# corners on vinyl, without it the corners had small burrs.
+# The swivel arc is drawn in steps of at most ARC_STEP_DEG, but no piece
+# shorter than ARC_MIN_PIECE_MM. On the cutter (VEVOR KI-375A, 16.11.2026)
+# 10 degree steps gave ideal corners on vinyl, but each 0.04 mm piece is a
+# move the cutter stops and starts on, and with many of them (corners, and
+# every bend of a curve with the old 5 degree threshold) the cut went in
+# jerks; without the compensation it was smooth.
 ARC_STEP_DEG = 10.0
+ARC_MIN_PIECE_MM = 0.1
+# Turns of the path up to this are not corners: no swivel arc, the points
+# are only pushed forward (the bends between the pieces of a curve).
+CORNER_DEG = 30.0
 
 
 def is_closed(poly):
@@ -150,22 +157,35 @@ def _swivel(centre, r, u_from, u_to):
     u_from to u_to, the short way, the last point excluded."""
     a0 = math.atan2(u_from[1], u_from[0])
     turn = math.atan2(u_from[0] * u_to[1] - u_from[1] * u_to[0], u_from[0] * u_to[0] + u_from[1] * u_to[1])
-    steps = max(1, int(math.ceil(abs(math.degrees(turn)) / ARC_STEP_DEG)))
+    by_angle = int(math.ceil(abs(math.degrees(turn)) / ARC_STEP_DEG))
+    by_length = int(r * abs(turn) / ARC_MIN_PIECE_MM)
+    steps = max(1, min(by_angle, by_length))
     return [(centre[0] + r * math.cos(a0 + turn * k / steps), centre[1] + r * math.sin(a0 + turn * k / steps))
             for k in range(steps)]
 
 
-def compensate(polys, offset_mm, corner_deg=5.0, heading=(1.0, 0.0)):
-    """The path for the knife holder's axis, so the blade tip, which trails
-    the axis by offset_mm, follows the drawn path.
+def _turn(u, v):
+    """Signed angle (radians) from heading u to heading v."""
+    return math.atan2(u[0] * v[1] - u[1] * v[0], u[0] * v[0] + u[1] * v[1])
 
-    - every point is pushed forward by the offset, in the direction the
-      knife is moving there (the tip lags behind, so the axis leads);
-    - where the direction turns by more than corner_deg, the axis swings
-      round the corner point on an arc: the blade turns on the spot;
-    - the blade keeps its last heading from one path to the next; before
-      the very first cut it is assumed to point along +x (heading).
-    Offset 0 (a pen) returns the paths unchanged."""
+
+def compensate(polys, offset_mm, corner_deg=CORNER_DEG, heading=(1.0, 0.0)):
+    """The path for the knife holder's axis, so the blade tip, which trails
+    the axis by offset_mm, cuts sharp corners.
+
+    Only CORNERS are changed (turns of more than corner_deg), as the owner
+    asked on 16.11.2026: on circles and arcs a drag knife follows the path
+    by itself, and changing every point there made the cut jerky.
+    - at a corner the axis goes on past it by the offset (so the tip reaches
+      the corner), swings round the corner point on a short arc (the blade
+      turns on the spot) and goes on in the new direction;
+    - at the start of a path the axis stands the offset ahead of the start,
+      in the blade's last heading (carried from the path before; before the
+      first cut: `heading`), and turns there if the path starts another way;
+    - at the end of an open path the axis goes on by the offset, so the tip
+      cuts to the very end.
+    Every other point stays where it is. Offset 0 (a pen) returns the paths
+    unchanged."""
     if offset_mm <= 0:
         return [list(p) for p in polys]
     r = offset_mm
@@ -176,16 +196,31 @@ def compensate(polys, offset_mm, corner_deg=5.0, heading=(1.0, 0.0)):
         pts = [p for k, p in enumerate(poly) if k == 0 or math.dist(p, poly[k - 1]) > 1e-9]
         if len(pts) < 2:
             continue
-        res = [(pts[0][0] + r * last[0], pts[0][1] + r * last[1])]
-        for a, b in zip(pts, pts[1:]):
-            u = _unit(a, b)
-            if u is None:
-                continue
-            turn = math.atan2(last[0] * u[1] - last[1] * u[0], last[0] * u[0] + last[1] * u[1])
-            if abs(turn) > limit:
-                res.extend(_swivel(a, r, last, u)[1:])
-                res.append((a[0] + r * u[0], a[1] + r * u[1]))
-            res.append((b[0] + r * u[0], b[1] + r * u[1]))
-            last = u
+        closed = is_closed(pts)
+        dirs = [_unit(a, b) for a, b in zip(pts, pts[1:])]
+        p0, u0 = pts[0], dirs[0]
+        res = [(p0[0] + r * last[0], p0[1] + r * last[1])]
+        if abs(_turn(last, u0)) > limit:
+            res.extend(_swivel(p0, r, last, u0)[1:])
+            res.append((p0[0] + r * u0[0], p0[1] + r * u0[1]))
+        for i in range(1, len(pts)):
+            b, u = pts[i], dirs[i - 1]
+            if i < len(pts) - 1:
+                nxt = dirs[i]
+            elif closed:
+                nxt = None                       # back at the start: the path ends here
+            else:
+                nxt = "end"
+            if nxt == "end":
+                res.append((b[0] + r * u[0], b[1] + r * u[1]))       # the tip cuts to the end
+            elif nxt is not None and abs(_turn(u, nxt)) > limit:
+                res.append((b[0] + r * u[0], b[1] + r * u[1]))       # past the corner by the offset
+                res.extend(_swivel(b, r, u, nxt)[1:])                 # turn on the spot
+                res.append((b[0] + r * nxt[0], b[1] + r * nxt[1]))
+            elif nxt is None and abs(_turn(u, u0)) > limit:
+                res.append((b[0] + r * u[0], b[1] + r * u[1]))       # the closing corner
+            else:
+                res.append(b)                                         # a bend of a curve: as drawn
+        last = dirs[-1]
         out.append(res)
     return out

@@ -114,8 +114,20 @@ def test_square_corners_get_a_swivel_arc_round_the_corner_point():
         assert abs(near - r) < 1e-6 or on_side
     # the arc at (20, 0) goes from heading +x to heading +y: from (20.25, 0) to (20, 0.25)
     i = out.index((20.25, 0.0))
-    assert out[i + 1:i + 10][-1] == pytest.approx((20.0, 0.25))
-    assert all(abs(math.dist(p, (20, 0)) - r) < 1e-9 for p in out[i:i + 10])
+    j = next(k for k in range(i, len(out)) if out[k] == pytest.approx((20.0, 0.25)))
+    assert all(abs(math.dist(p, (20, 0)) - r) < 1e-9 for p in out[i:j + 1])
+    # in 3 pieces of 0.13 mm, not 9 of 0.04 (each piece is a stop and start: the cut went in jerks)
+    assert j - i == 3
+    assert all(math.dist(a, b) >= knife.ARC_MIN_PIECE_MM - 1e-9 for a, b in zip(out[i:j], out[i + 1:j + 1]))
+
+
+def test_bends_of_a_curve_get_no_arcs_by_default():
+    """A small ring flattened into pieces bends a few degrees at every point:
+    no swivel arcs there (they made the cut jerky), only at real corners."""
+    n = 60
+    ring = [(12.5 * math.cos(2 * math.pi * k / n), 12.5 * math.sin(2 * math.pi * k / n)) for k in range(n + 1)]
+    out = knife.compensate([ring], 0.25, heading=(0.0, 1.0))[0]
+    assert len(out) == len(ring)
 
 
 def test_gentle_curves_get_no_arcs():
@@ -167,3 +179,20 @@ def test_inside_first_in_the_job():
     assert set(job.knife_paths[0]) == set(hole)
     job = build_job([outer, hole], Profile(width_mm=200), inside_first=False)
     assert set(job.knife_paths[0]) == set(outer)
+
+
+def test_only_corners_are_compensated_curves_stay_as_drawn():
+    """On circles and arcs every point stays as drawn (the owner, 16.11.2026);
+    only the start (the blade's heading) and the corners change."""
+    n = 60
+    ring = [(12.5 * math.cos(2 * math.pi * k / n), 12.5 * math.sin(2 * math.pi * k / n)) for k in range(n + 1)]
+    out = knife.compensate([ring], 0.25, heading=(0.0, 1.0))[0]
+    assert out[1:] == ring[1:]
+    # a D shape: a half circle closed by a straight side has two corners; only they change
+    half = [(10 * math.cos(math.pi * k / 30 - math.pi / 2), 10 * math.sin(math.pi * k / 30 - math.pi / 2))
+            for k in range(31)]
+    d = half + [half[0]]
+    out = knife.compensate([d], 0.25, heading=(1.0, 0.0))[0]
+    moved = [p for p in out if p not in d]
+    near_corners = [p for p in moved if min(math.dist(p, half[0]), math.dist(p, half[-1])) <= 0.25 + 1e-9]
+    assert moved and len(moved) == len(near_corners)

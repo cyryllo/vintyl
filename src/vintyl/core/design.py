@@ -27,9 +27,15 @@ class Element:
     paths: list                       # curves subpaths, view mm (y down)
     cut: bool = True                  # False: shown, but not sent to the cutter
     source: str = ""                  # file it came from, if any
+    # how a drawn element was made, so it can be changed later, e.g. a text:
+    # {"kind": "text", "text": ..., "family": ..., "size": ..., ...}; None for
+    # shapes, files and anything turned or edited by its nodes
+    spec: dict = None
+    group: str = ""                   # elements with the same group are selected and moved together
 
     def copy(self):
-        return Element(self.name, curves.copy_path(self.paths), self.cut, self.source)
+        return Element(self.name, curves.copy_path(self.paths), self.cut, self.source,
+                       dict(self.spec) if self.spec else None, self.group)
 
     @property
     def bounds(self):
@@ -72,6 +78,14 @@ class Element:
         sx = width / w0 if w0 > 1e-9 else 1.0
         sy = height / h0 if h0 > 1e-9 else 1.0
         self.transform(lambda x, y: (xmin + (x - xmin) * sx, ymin + (y - ymin) * sy))
+
+    def mirror(self, horizontal=True):
+        """Mirror in place (the bounding box stays): horizontal = left-right."""
+        xmin, xmax, ymin, ymax = self.bounds
+        if horizontal:
+            self.transform(lambda x, y: (xmin + xmax - x, y))
+        else:
+            self.transform(lambda x, y: (x, ymin + ymax - y))
 
     def rotate(self, degrees):
         """Turn counter-clockwise (as seen on screen) about the bounding-box centre."""

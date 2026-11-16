@@ -323,6 +323,8 @@ Każdy krok robię tylko po Twoim „tak”.
 
 | Pionowe pole robocze (widok z przodu plotera) | **sprawdzone** (16.11): serce z nowego widoku, wycięte przez Start, ułożone na folii tak samo jak na ekranie (Twoje potwierdzenie) |
 
+| Płynność cięcia z kompensacją | **obserwacja** (16.11): z kompensacją ploter ciął „kawałkami”, bez niej płynnie. Przyczyna: mikroruchy (łuk obrotu ostrza co 10°, po 0,04 mm, także na każdym zgięciu krzywej przy progu 5°; pierścień: 102 ruchy < 0,1 mm). Poprawka (na Twoją uwagę „kompensacja tylko na rogach, nie na okręgach i łukach”): kompensacja **tylko na narożnikach** (zakręt > 30°), okręgi i łuki zostają jak w projekcie; łuk obrotu z odcinków ≥ 0,1 mm. Teraz 0 ruchów < 0,09 mm, a z kompensacją tyle ruchów co prawie bez niej (pierścień 165 zamiast 162). **Do sprawdzenia na folii** |
+
 ### Rozbieżność 11: koniec danych ginie, gdy program za szybko zamyka urządzenie
 
 Głowica stanęła w punkcie `PD400,1200`. Każdy plik (82 bajty) poszedł

@@ -14,7 +14,7 @@ PySide6 = pytest.importorskip("PySide6")
 pytest.importorskip("svgelements")
 
 from PySide6.QtCore import QPointF, QRectF, Qt
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication, QToolButton
 
 from vintyl.core.job import build_job
 from vintyl.gui.main_window import MainWindow
@@ -167,8 +167,7 @@ def test_delete_and_reorder(win, svg_file):
 def test_knife_path_preview_follows_the_job(win, svg_file):
     win.import_svg(svg_file)
     assert win.view._knife_items == []
-    win.btn_preview.setChecked(True)
-    assert win.act_knife.isChecked()
+    win.act_knife.setChecked(True)
     n_paths = len(win.last_job.knife_paths)
     # one item for the cuts, one for the travels, one numbered dot per path
     assert len(win.view._knife_items) == 2 + n_paths
@@ -177,7 +176,7 @@ def test_knife_path_preview_follows_the_job(win, svg_file):
     win.opt_x.setValue(50)                        # so does a move (the scene is rebuilt)
     assert len(win.view._knife_items) == 2 + len(win.last_job.knife_paths)
     win.act_knife.setChecked(False)
-    assert win.view._knife_items == [] and not win.btn_preview.isChecked()
+    assert win.view._knife_items == []
 
 
 def test_knife_values_reach_the_job(win, svg_file):
@@ -280,18 +279,7 @@ def _cut_to_fifo(win, svg_file, tmp_path):
     win.profile_box.setCurrentIndex(win.profile_names.index("vevor-ki-375a"))
     win.import_svg(svg_file)
     win.port_box.setEditText(fifo)
-    win.dry_run.setChecked(False)
     return FifoReader(fifo)
-
-
-def test_start_with_dry_run_only_saves(win, svg_file, tmp_path, monkeypatch):
-    from PySide6.QtWidgets import QFileDialog
-    out = tmp_path / "dry.hpgl"
-    monkeypatch.setattr(QFileDialog, "getSaveFileName", lambda *a, **k: (str(out), ""))
-    win.import_svg(svg_file)
-    assert win.dry_run.isChecked()                      # the default
-    assert win.start() == str(out)
-    assert out.read_text() == win.build().text
 
 
 def test_start_cuts_exactly_the_job(win, svg_file, tmp_path, messages):
@@ -323,7 +311,6 @@ def test_start_without_a_cutter_explains(win, svg_file, tmp_path, messages):
     win.profile_box.setCurrentIndex(win.profile_names.index("vevor-ki-375a"))
     win.import_svg(svg_file)
     win.port_box.setEditText(str(tmp_path / "lp9"))
-    win.dry_run.setChecked(False)
     w = win.start()
     assert w.wait(5000)
     QApplication.processEvents()
@@ -341,7 +328,424 @@ def test_what_is_on_screen_is_cut_the_same_way_round(win, tmp_path):
     win._on_line_drawn(QPointF(-30, -20), QPointF(-30, -30))
     text = win.build().text
     assert "PU800,1200;PD1200,1200;" in text          # X 20 -> 30 mm, Y 30 mm
-    # the material: 500 mm long by default, longer when the design goes further
-    assert win.view.length_mm == 500.0
-    win._on_drawn("rectangle", QRectF(-60, -700, 20, 20))
-    assert win.view.length_mm >= 700.0
+    # the material: an upright sheet (at least 500 mm and 1.414 x the width), longer when needed
+    assert win.view.length_mm == pytest.approx(max(500.0, 1.414 * win.profile.width_mm))
+    win._on_drawn("rectangle", QRectF(-60, -1300, 20, 20))
+    assert win.view.length_mm >= 1300.0
+
+
+# ---- transforms, align, duplicate, polyline -----------------------------------------------
+
+def test_rotate_keeps_the_lower_right_corner(win):
+    win._on_drawn("rectangle", QRectF(-60, -40, 40, 20))          # 40 wide, 20 high
+    e = win.design.elements[-1]
+    win.transform_selected("rot", 90)
+    e = win.design.elements[-1]
+    w, h = e.size
+    assert (round(w, 6), round(h, 6)) == (20.0, 40.0)
+    assert e.bounds[1] == pytest.approx(-20.0) and e.bounds[3] == pytest.approx(-20.0)
+    win.undo()
+    assert tuple(round(v, 6) for v in win.design.elements[-1].size) == (40.0, 20.0)
+
+
+def test_mirror_turns_a_shape_over(win, svg_file):
+    e = win.import_svg(svg_file)
+    before = [n[0] for n in e.paths[0]["nodes"]]
+    win.transform_selected("mirror", True)
+    after = [n[0] for n in win.design.elements[-1].paths[0]["nodes"]]
+    xmin, xmax = e.bounds[0], e.bounds[1]
+    assert after == pytest.approx([xmin + xmax - x for x in before])
+
+
+def test_align_shapes_to_each_other(win, messages):
+    win._on_drawn("rectangle", QRectF(-100, -60, 20, 20))
+    win._on_drawn("ellipse", QRectF(-60, -100, 30, 30))
+    a, b = win.design.elements
+    win.view.select(a)
+    win.align_selected("left")                                  # one shape: nothing to align with
+    assert win.design.elements[0].bounds[0] == pytest.approx(-100)
+    win.view.select_many([a, b])
+    win.align_selected("left")
+    a, b = win.design.elements
+    assert a.bounds[0] == pytest.approx(-100) and b.bounds[0] == pytest.approx(-100)
+    win.view.select_many([a, b])
+    win.align_selected("bottom")
+    a, b = win.design.elements
+    assert a.bounds[3] == pytest.approx(b.bounds[3]) == pytest.approx(-40)
+    win.view.select_many([a, b])
+    win.align_selected("centre")
+    a, b = win.design.elements
+    assert (a.bounds[0] + a.bounds[1]) / 2 == pytest.approx((b.bounds[0] + b.bounds[1]) / 2)
+    win.view.select_many([a, b])
+    win.align_selected("middle")
+    a, b = win.design.elements
+    assert (a.bounds[2] + a.bounds[3]) / 2 == pytest.approx((b.bounds[2] + b.bounds[3]) / 2)
+
+
+def test_duplicate_goes_beside_it(win, svg_file):
+    e = win.import_svg(svg_file)
+    win.duplicate()
+    a, b = win.design.elements
+    assert b is win.selected and b.paths is not a.paths
+    assert b.bounds[1] == pytest.approx(a.bounds[0] - 5.0)       # 5 mm to the left of it
+    assert b.size == pytest.approx(a.size)
+
+
+def test_polyline_clicks_close_on_the_first_corner(win):
+    from PySide6.QtTest import QTest
+    v = win.view
+    win.set_tool("polyline")
+    v.snap_objects = False
+    pts = [QPointF(-80, -20), QPointF(-30, -20), QPointF(-30, -60)]
+    for p in pts + [pts[0]]:                                        # back to the start closes it
+        QTest.mouseClick(v.viewport(), Qt.LeftButton, Qt.NoModifier, v.mapFromScene(p))
+    e = win.design.elements[-1]
+    assert e.paths[0]["closed"] and len(e.paths[0]["nodes"]) == 3
+    assert win.view.tool == "select"
+
+
+def test_polyline_enter_leaves_it_open_backspace_drops_a_corner(win):
+    from PySide6.QtTest import QTest
+    v = win.view
+    win.set_tool("polyline")
+    v.snap_objects = False
+    for p in (QPointF(-80, -20), QPointF(-30, -20), QPointF(-30, -60), QPointF(-90, -90)):
+        QTest.mouseClick(v.viewport(), Qt.LeftButton, Qt.NoModifier, v.mapFromScene(p))
+    QTest.keyClick(v.viewport(), Qt.Key_Backspace)
+    QTest.keyClick(v.viewport(), Qt.Key_Return)
+    e = win.design.elements[-1]
+    assert not e.paths[0]["closed"] and len(e.paths[0]["nodes"]) == 3
+
+
+def test_selection_actions_need_a_selection(win):
+    assert not win.act_rot_left.isEnabled() and not win.act_duplicate.isEnabled()
+    win._on_drawn("ellipse", QRectF(-60, -40, 20, 20))
+    assert win.act_rot_left.isEnabled() and win.act_align["left"].isEnabled()
+
+
+def test_right_bar_category_opens_a_square_of_icons(win):
+    """As in SignMaster: a category opens a square of icons; a choice takes the tool."""
+    popup = win.show_category("shapes")
+    buttons = popup.findChildren(QToolButton)
+    assert [b.text() for b in buttons] == ["Rectangle", "Ellipse", "Polygon"]
+    assert win.view.tool == "select"                       # looking is not choosing
+    buttons[2].click()
+    assert win.view.tool == "polygon" and win.category_buttons["shapes"].isChecked()
+    assert not popup.isVisible()
+    # a category with one tool takes it at once
+    assert win.show_category("text") is None and win.view.tool == "text"
+    win.set_tool("select")
+    assert win.category_buttons["pick"].isChecked()
+
+
+def test_ready_shapes_are_offered_and_inserted(win):
+    from vintyl.core import ready
+    popup = win.show_category("ready")
+    assert len(popup.findChildren(QToolButton)) == len(ready.READY) == 8
+    popup.close()
+    e = win.insert_ready("star", {"points": 6, "size": 40.0, "inner": 50.0})
+    assert e is win.selected and e.spec["shape"] == "star" and e.spec["points"] == 6
+    assert len(e.paths[0]["nodes"]) == 12 and e.paths[0]["closed"]
+    assert max(e.size) == pytest.approx(40.0)
+    assert e.bounds[1] == pytest.approx(-10.0) and e.bounds[3] == pytest.approx(-10.0)   # 10 mm from the origin
+    g = win.insert_ready("gear", {"teeth": 12, "module": 2.0, "bore": 6.0})
+    assert len(g.paths) == 2                              # the gear and its axle hole
+    job = win.build()                                     # the hole is cut before the gear
+    assert max(p[0] for p in job.knife_paths[0]) - min(p[0] for p in job.knife_paths[0]) < 7
+
+
+# ---- text --------------------------------------------------------------------------------
+
+def test_text_tool_places_an_editable_text(win):
+    win.set_tool("text")
+    assert win.opt_text.isVisibleTo(win) and win.opt_font.isVisibleTo(win)
+    win.opt_text.setText("OKO")
+    win._on_text_clicked(QPointF(-150, -80))
+    e = win.design.elements[-1]
+    assert e.spec["kind"] == "text" and e.spec["text"] == "OKO" and e.name == "OKO"
+    assert all(s["closed"] for s in e.paths)
+    assert len(e.paths) == 5                       # O and O with their counters, and K
+    assert e.bounds[0] == pytest.approx(-150, abs=3) and e.bounds[2] == pytest.approx(-80, abs=10)
+    assert win.view.tool == "select"
+
+
+def test_editing_the_text_keeps_its_lower_left_corner(win):
+    win.opt_text.setText("A")
+    win._on_text_clicked(QPointF(-150, -80))
+    e = win.design.elements[-1]
+    x0, y1 = e.bounds[0], e.bounds[3]
+    win.opt_text.setText("ABC")
+    win._text_changed()
+    e = win.design.elements[-1]
+    assert e.spec["text"] == "ABC" and e.name == "ABC"
+    assert e.bounds[0] == pytest.approx(x0) and e.bounds[3] == pytest.approx(y1)
+    win.opt_size.setValue(60)
+    assert win.design.elements[-1].size[1] > 35
+    win.undo()
+    assert win.design.elements[-1].spec["size"] == 30.0
+
+
+def test_turned_text_is_a_shape_and_cuts_counters_first(win):
+    win.opt_text.setText("O")
+    win._on_text_clicked(QPointF(-150, -80))
+    job = win.build()
+    # the counter (the smaller ring) is cut before the outside of the O
+    first, second = job.knife_paths[0], job.knife_paths[1]
+    span = lambda poly: max(p[0] for p in poly) - min(p[0] for p in poly)
+    assert span(first) < span(second)
+    win.transform_selected("rot", 90)
+    assert win.design.elements[-1].spec is None and not win.opt_text.isVisibleTo(win)
+
+
+def test_weed_frame_round_the_design_is_cut_last(win, svg_file):
+    e = win.import_svg(svg_file)
+    win.opt_x.setValue(30)
+    win.opt_y.setValue(30)
+    plain = win.build()
+    win.weed_frame.setChecked(True)
+    win.weed_margin.setValue(5.0)
+    job = win.build()
+    assert job.paths == plain.paths + 1
+    frame = job.knife_paths[-1]                        # cut last
+    xs = [p[0] for p in frame]
+    ys = [p[1] for p in frame]
+    along = [p[0] for poly in plain.knife_paths for p in poly]
+    across = [p[1] for poly in plain.knife_paths for p in poly]
+    assert min(xs) == pytest.approx(min(along) - 5.0, abs=0.6)
+    assert max(ys) == pytest.approx(max(across) + 5.0, abs=0.6)
+    # no room for the frame at the origin: a clear message
+    win.opt_x.setValue(2)
+    assert "does not fit" in win.job_label.text()
+    win.weed_frame.setChecked(False)
+    assert "does not fit" not in win.job_label.text()
+
+
+
+def test_select_and_nodes_are_buttons_of_their_own(win):
+    assert win.show_category("nodes") is None and win.view.tool == "nodes"
+    assert win.category_buttons["nodes"].isChecked()
+    assert win.show_category("pick") is None and win.view.tool == "select"
+    assert win.category_buttons["pick"].isChecked()
+
+
+
+def test_a_drawn_polygon_keeps_its_number_of_sides_to_change(win):
+    win.set_tool("polygon")
+    win.opt_sides.setValue(5)
+    win._on_drawn("polygon", QRectF(-80, -80, 40, 40))
+    e = win.selected
+    assert e.spec["sides"] == 5 and len(e.paths[0]["nodes"]) == 5
+    assert win.opt_sides.isVisibleTo(win) and win.opt_sides.value() == 5      # shown when selected
+    win.opt_sides.setValue(8)
+    e = win.selected
+    assert len(e.paths[0]["nodes"]) == 8 and e.spec["sides"] == 8
+    # still in the rectangle it was drawn in
+    assert e.bounds[0] >= -80 - 1e-6 and e.bounds[1] <= -40 + 1e-6
+    win.undo()
+    assert len(win.selected.paths[0]["nodes"]) == 5
+    win.transform_selected("rot", 90)              # turned: a shape now, no sides field
+    assert win.selected.spec is None and not win.opt_sides.isVisibleTo(win)
+
+
+def test_the_last_cutter_and_its_port_are_remembered(app, tmp_path, monkeypatch):
+    monkeypatch.setenv("VINTYL_SETTINGS", str(tmp_path / "remember.ini"))
+    w = MainWindow()
+    assert w.profile.name == "Seiki SK-870T"              # nothing remembered yet: the first
+    w.profile_box.setCurrentIndex(w.profile_names.index("vevor-ki-375a"))
+    w.port_box.setEditText("/dev/usb/lp3")
+    w.settings.sync()
+    w.close()
+    w2 = MainWindow()                                     # the next start
+    assert w2.profile.name == "VEVOR KI-375A"
+    assert w2.port_box.currentText() == "/dev/usb/lp3"
+    w2.close()
+
+
+def test_the_sheet_stands_upright_for_every_cutter_and_grows(win):
+    for name in win.profile_names:
+        win.profile_box.setCurrentIndex(win.profile_names.index(name))
+        w = win.profile.width_mm
+        assert win.view.length_mm >= max(500.0, 1.4 * w)        # taller than wide
+    win._on_drawn("rectangle", QRectF(-60, -1500, 20, 20))      # something higher up
+    assert win.view.length_mm >= 1500.0
+
+
+# ---- several elements: group, ungroup, union / difference ... ------------------------
+
+def _two_rects(win):
+    win._on_drawn("rectangle", QRectF(-100, -100, 40, 40))
+    win._on_drawn("rectangle", QRectF(-80, -80, 40, 40))     # overlaps the first
+    a, b = win.design.elements[-2:]
+    win.view.select_many([a, b])
+    return a, b
+
+
+def test_group_is_selected_and_moved_as_one(win):
+    a, b = _two_rects(win)
+    assert len(win.selection) == 2
+    win.group_selected()
+    a, b = win.design.elements[-2:]
+    assert a.group and a.group == b.group
+    win.view.select(a)                                      # a click on one member ...
+    assert len(win.selection) == 2                           # ... selects the whole group
+    xa, xb = a.bounds[0], b.bounds[0]
+    win._on_moved(win.selection, -10.0, 0.0)
+    a, b = win.design.elements[-2:]
+    assert a.bounds[0] == pytest.approx(xa - 10) and b.bounds[0] == pytest.approx(xb - 10)
+    win.ungroup_selected()
+    assert not any(e.group for e in win.design.elements)
+
+
+def test_ungroup_splits_an_element_into_its_outlines(win):
+    ring = win.insert_ready("ring", {"outer": 40.0, "hole": 20.0})
+    n = len(win.design.elements)
+    win.ungroup_selected()
+    assert len(win.design.elements) == n + 1
+    assert all(len(e.paths) == 1 for e in win.design.elements[-2:])
+
+
+def test_union_and_difference_stay_smooth(win):
+    _two_rects(win)
+    win.boolean_selected("union")
+    u = win.design.elements[-1]
+    assert len(win.design.elements) == 1 and len(u.paths) == 1 and u.paths[0]["closed"]
+    assert u.bounds[0] == pytest.approx(-100, abs=0.01) and u.bounds[1] == pytest.approx(-40, abs=0.01)
+    # a round hole well inside the shape: it stays round
+    win._on_drawn("ellipse", QRectF(-95, -95, 20, 20))           # centre (-85, -85), radius 10
+    disc = win.design.elements[-1]
+    win.view.select_many([u, disc])
+    win.boolean_selected("difference")
+    d = win.design.elements[-1]
+    assert len(d.paths) == 2                                      # the outline and the round hole
+    import math
+    hole = min(d.paths, key=lambda sp: max(n[0] for n in sp["nodes"]))
+    ns = hole["nodes"]
+    assert len(ns) > 30
+    worst = max(abs(10 - math.hypot((ns[i][0] + ns[i - 1][0]) / 2 + 85, (ns[i][1] + ns[i - 1][1]) / 2 + 85))
+                for i in range(len(ns)))
+    assert worst < 0.01                                            # round to a hundredth of a mm
+    win.undo()
+    assert len(win.design.elements) == 2
+
+
+def test_delete_removes_every_selected_element(win):
+    _two_rects(win)
+    win.delete_selected()
+    assert win.design.elements == []
+
+
+# ---- size handles and the proportion lock ---------------------------------------------
+
+def test_size_handles_round_the_selection(win):
+    win._on_drawn("rectangle", QRectF(-100, -80, 40, 20))
+    assert len(win.view._handles) == 8
+    win.set_tool("nodes")
+    assert win.view._handles == []                         # not in the node tool
+    win.set_tool("select")
+    assert len(win.view._handles) == 8
+
+
+def _drag_handle(win, place, to):
+    from PySide6.QtCore import QPointF
+    h = [h for h in win.view._handles if h.place == place][0]
+    h._box = QRectF(win.view.selection_box())
+    h._items = win.view._selected_items()
+    new = h.new_box(to, win.view.keep_ratio)
+    for item in h._items:
+        item.setTransform(__import__("PySide6.QtGui", fromlist=["QTransform"]).QTransform())
+    win.view.signals.resized.emit([i.element for i in h._items], h._box, new)
+
+
+def test_corner_handle_with_the_lock_keeps_proportions(win):
+    win.opt_lock.setChecked(True)
+    win._on_drawn("rectangle", QRectF(-100, -80, 40, 20))   # 40 x 20, lower right at (-60, -60)
+    _drag_handle(win, (0, 0), QPointF(-140, -90))             # top left corner pulled out
+    e = win.design.elements[-1]
+    w, h = e.size
+    assert w / h == pytest.approx(2.0) and w == pytest.approx(80.0)
+    assert e.bounds[1] == pytest.approx(-60) and e.bounds[3] == pytest.approx(-60)   # the anchor stayed
+
+
+def test_side_handle_without_the_lock_changes_one_side(win):
+    win.opt_lock.setChecked(False)
+    win._on_drawn("rectangle", QRectF(-100, -80, 40, 20))
+    _drag_handle(win, (1, 0.5), QPointF(-30, -70))            # the right side pulled right
+    w, h = win.design.elements[-1].size
+    assert (round(w, 6), round(h, 6)) == (70.0, 20.0)
+    win.undo()
+    assert tuple(round(v, 6) for v in win.design.elements[-1].size) == (40.0, 20.0)
+
+
+def test_lock_in_the_fields(win):
+    win.opt_lock.setChecked(True)
+    win._on_drawn("rectangle", QRectF(-100, -80, 40, 20))
+    win.opt_w.setValue(60.0)
+    assert tuple(round(v, 4) for v in win.design.elements[-1].size) == (60.0, 30.0)
+    win.opt_lock.setChecked(False)
+    win.opt_h.setValue(50.0)
+    assert tuple(round(v, 4) for v in win.design.elements[-1].size) == (60.0, 50.0)
+
+
+# ---- keyboard shortcuts ----------------------------------------------------------------
+
+def test_no_two_actions_share_a_key(win):
+    from PySide6.QtGui import QAction
+    seen = {}
+    for a in win.findChildren(QAction):
+        for k in a.shortcuts():
+            if k.isEmpty():
+                continue
+            key = k.toString()
+            assert key not in seen or seen[key] is a, "%s: %s and %s" % (key, seen[key].text(), a.text())
+            seen[key] = a
+    for key in ("Ctrl+Z", "Ctrl+Shift+Z", "Ctrl+Y", "Ctrl+A", "Ctrl+C", "Ctrl+X", "Ctrl+V", "Ctrl+S", "V", "T"):
+        assert key in seen, key
+
+
+def test_select_all_copy_paste_cut(win):
+    win._on_drawn("rectangle", QRectF(-100, -80, 20, 20))
+    win._on_drawn("ellipse", QRectF(-60, -80, 20, 20))
+    win.select_all()
+    assert len(win.selection) == 2
+    win.copy_selected()
+    win.paste()
+    assert len(win.design.elements) == 4
+    assert win.design.elements[2].bounds[0] == pytest.approx(win.design.elements[0].bounds[0] - 5.0)
+    win.paste()                                            # again: 5 mm further
+    assert win.design.elements[4].bounds[0] == pytest.approx(win.design.elements[0].bounds[0] - 10.0)
+    win.view.select(win.design.elements[0])
+    win.cut_selected()
+    assert len(win.design.elements) == 5
+    win.undo()
+    assert len(win.design.elements) == 6
+
+
+def test_tool_letters_and_the_list_of_shortcuts(win):
+    # (offscreen the window is never "active", so Qt does not deliver shortcuts:
+    # check the key on the action and what the action does)
+    from PySide6.QtGui import QKeySequence
+    r = win.tool_actions["rectangle"]
+    assert r.shortcut() == QKeySequence("R") and r in win.actions()
+    r.trigger()
+    assert win.view.tool == "rectangle"
+    win.tool_actions["select"].trigger()
+    assert win.view.tool == "select"
+    rows = win.shortcut_list()
+    assert ("Ctrl+A", "Select all", "Select every element") in rows
+    keys = {r[0]: r for r in rows}
+    assert keys["T"][1] == "Text" and keys["T"][2].startswith("Click where it should start")
+
+
+def test_weed_frame_is_shown_dashed_while_ticked(win, svg_file):
+    win.import_svg(svg_file)
+    assert win.view._frame_item is None
+    win.weed_frame.setChecked(True)
+    item = win.view._frame_item
+    assert item is not None and item.pen().style() == Qt.DashLine
+    r = item.path().boundingRect()
+    xmin, xmax, ymin, ymax = win.design.elements[0].bounds
+    assert r.left() < xmin and r.right() > xmax and r.top() < ymin and r.bottom() > ymax
+    win.weed_margin.setValue(10.0)                    # follows the margin
+    assert win.view._frame_item.path().boundingRect().width() > r.width()
+    win.weed_frame.setChecked(False)
+    assert win.view._frame_item is None

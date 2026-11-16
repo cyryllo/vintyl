@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-16 20:13+0100\n"
+"POT-Creation-Date: 2026-11-16 20:49+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -59,7 +59,13 @@ msgstr ""
 msgid "&Help"
 msgstr ""
 
+msgid "&Object"
+msgstr ""
+
 msgid "&View"
+msgstr ""
+
+msgid "A copy of the selected element, a little to the side"
 msgstr ""
 
 msgid "A path has a point that is not a number."
@@ -69,6 +75,11 @@ msgstr ""
 msgid ""
 "A point would go to the cutter at %d,%d (below zero). Check the axis "
 "settings of the profile."
+msgstr ""
+
+msgid ""
+"A rectangle round everything that is cut, cut last: the waste vinyl "
+"inside it peels off in one piece"
 msgstr ""
 
 #, python-format
@@ -81,7 +92,33 @@ msgstr ""
 msgid "Add the shapes of an SVG file to the design"
 msgstr ""
 
+msgid "Align"
+msgstr ""
+
+#, python-format
+msgid "Align the selected shapes to each other: %s"
+msgstr ""
+
+msgid "Arms"
+msgstr ""
+
+msgid "Arrow"
+msgstr ""
+
+msgid "Axle hole (mm)"
+msgstr ""
+
+#, python-format
+msgid "Bars (% of size)"
+msgstr ""
+
+msgid "Bold"
+msgstr ""
+
 msgid "Bottom edge: how far up from the origin, along the material"
+msgstr ""
+
+msgid "Bottom edges"
 msgstr ""
 
 #, python-format
@@ -92,13 +129,40 @@ msgstr ""
 msgid "Cannot read %s: %s"
 msgstr ""
 
+msgid "Centres across"
+msgstr ""
+
+msgid "Centres up and down"
+msgstr ""
+
 msgid "Closed shapes are cut this far past their start, so the cut closes cleanly"
 msgstr ""
 
 msgid "Comes in a later step of Vintyl"
 msgstr ""
 
+msgid "Command"
+msgstr ""
+
 msgid "Connect"
+msgstr ""
+
+#, python-format
+msgid "Copied %d element."
+msgid_plural "Copied %d elements."
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Copy"
+msgstr ""
+
+msgid "Corner radius (mm)"
+msgstr ""
+
+msgid "Cross"
+msgstr ""
+
+msgid "Cut"
 msgstr ""
 
 msgid "Cut earlier"
@@ -114,7 +178,7 @@ msgstr ""
 msgid "Cut now?"
 msgstr ""
 
-msgid "Cut the design (with Dry run ticked: save it to a file)"
+msgid "Cut the design (after a short check list)"
 msgstr ""
 
 msgid "Cut this element"
@@ -130,10 +194,20 @@ msgstr ""
 msgid "Cutting"
 msgstr ""
 
+#, python-format
+msgid "Cutting width %g mm"
+msgstr ""
+
 msgid "Delete"
 msgstr ""
 
 msgid "Delete the selected element"
+msgstr ""
+
+msgid "Difference"
+msgstr ""
+
+msgid "Difference: cut the other selected shapes out of the first one"
 msgstr ""
 
 msgid "Do again what was taken back"
@@ -144,13 +218,25 @@ msgid ""
 "line · C curve · O smooth · Z close/open · B break"
 msgstr ""
 
-msgid "Dry run: only save to a file"
+msgid "Drop"
+msgstr ""
+
+msgid "Duplicate"
+msgstr ""
+
+msgid "Edit"
 msgstr ""
 
 msgid "Edit nodes (or double-click an element)"
 msgstr ""
 
+msgid "Element"
+msgstr ""
+
 msgid "Ellipse"
+msgstr ""
+
+msgid "Ellipse: drag the box it fits in"
 msgstr ""
 
 msgid "Empty. Open an SVG file or draw a shape."
@@ -159,13 +245,68 @@ msgstr ""
 msgid "Empty: the cutter uses what is set on its panel"
 msgstr ""
 
+msgid "Every key in one window"
+msgstr ""
+
+msgid "Exclusion"
+msgstr ""
+
+msgid "Exclusion: keep where the shapes do not overlap"
+msgstr ""
+
+msgid "Extra space between letters, mm"
+msgstr ""
+
+msgid "File"
+msgstr ""
+
 msgid "Fit"
+msgstr ""
+
+msgid "Flip"
+msgstr ""
+
+msgid "Flip top to bottom"
+msgstr ""
+
+msgid "Font"
+msgstr ""
+
+msgid "Font size: the height of the font's em in mm"
 msgstr ""
 
 msgid "Force"
 msgstr ""
 
+msgid "Frame round the design"
+msgstr ""
+
+msgid "Gear"
+msgstr ""
+
+msgid "Group"
+msgstr ""
+
+#, python-format
+msgid "Grouped %d element."
+msgid_plural "Grouped %d elements."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "Head (% of length)"
+msgstr ""
+
+msgid "Heart"
+msgstr ""
+
 msgid "Height"
+msgstr ""
+
+msgid "Height (mm)"
+msgstr ""
+
+msgid "Hole (mm)"
 msgstr ""
 
 msgid ""
@@ -179,10 +320,43 @@ msgid ""
 "0.20–0.30 mm. 0 = pen."
 msgstr ""
 
+msgid "Inner corners (%)"
+msgstr ""
+
+#, python-format
+msgid "Insert: %s"
+msgstr ""
+
 msgid "Inside shapes first"
 msgstr ""
 
+msgid "Intersection"
+msgstr ""
+
+msgid "Intersection: keep only where the selected shapes overlap"
+msgstr ""
+
+msgid "Italic"
+msgstr ""
+
 msgid "Job"
+msgstr ""
+
+msgid "Join the selected elements into a group that is selected and moved as one"
+msgstr ""
+
+msgid "Keep the proportions"
+msgstr ""
+
+msgid ""
+"Keep the proportions: width and height change together, in the fields and"
+" with the small squares round the selection"
+msgstr ""
+
+msgid "Key"
+msgstr ""
+
+msgid "Keyboard shortcuts"
 msgstr ""
 
 msgid "Knife offset"
@@ -191,14 +365,42 @@ msgstr ""
 msgid "Knife path"
 msgstr ""
 
+msgid "Left edges"
+msgstr ""
+
+msgid "Length (mm)"
+msgstr ""
+
 msgid "Line"
+msgstr ""
+
+msgid "Line: drag from end to end"
+msgstr ""
+
+msgid "Lines"
+msgstr ""
+
+msgid "Look closer (the mouse wheel does the same)"
+msgstr ""
+
+msgid "Look from further away"
 msgstr ""
 
 msgid "Main"
 msgstr ""
 
-#, python-format
-msgid "Material: cutting width %g mm, no length limit"
+msgid "Mirror"
+msgstr ""
+
+msgid "Mirror left to right"
+msgstr ""
+
+msgid "Module (mm)"
+msgstr ""
+
+msgid ""
+"Mouse: the wheel zooms, the middle button moves the view, Alt turns "
+"snapping off, Shift draws lines in 45° steps, Escape leaves a tool."
 msgstr ""
 
 msgid "Move down"
@@ -230,9 +432,18 @@ msgstr ""
 msgid "No port is set. Choose the cutter's port in the panel."
 msgstr ""
 
+msgid "Nodes"
+msgstr ""
+
 msgid ""
 "Not sent: this cutter takes its speed from its panel. Enter it here for "
 "the time estimate."
+msgstr ""
+
+msgid "Nothing is left of the shapes after this operation."
+msgstr ""
+
+msgid "Nothing to split: one outline, no group."
 msgstr ""
 
 msgid "Open SVG"
@@ -245,7 +456,13 @@ msgstr ""
 msgid "Origin"
 msgstr ""
 
+msgid "Outer size (mm)"
+msgstr ""
+
 msgid "Overcut"
+msgstr ""
+
+msgid "Paste"
 msgstr ""
 
 #, python-format
@@ -253,6 +470,14 @@ msgid "Pointer: %.1f / %.1f mm"
 msgstr ""
 
 msgid "Polygon"
+msgstr ""
+
+msgid "Polyline"
+msgstr ""
+
+msgid ""
+"Polyline: click the corners; the first corner closes it, double-click or "
+"Enter leaves it open"
 msgstr ""
 
 msgid "Port"
@@ -264,22 +489,57 @@ msgstr ""
 msgid "Project"
 msgstr ""
 
+msgid "Put the copied elements back, 5 mm beside where they were"
+msgstr ""
+
 msgid "Quit"
+msgstr ""
+
+msgid "Ready"
 msgstr ""
 
 msgid "Rectangle"
 msgstr ""
 
+msgid "Rectangle: drag from corner to corner"
+msgstr ""
+
 msgid "Redo"
 msgstr ""
 
-msgid "Regular polygon"
+msgid ""
+"Regular polygon: drag the box it fits in; the number of sides is in the "
+"options bar"
+msgstr ""
+
+msgid "Remember the selected elements, to paste them"
 msgstr ""
 
 msgid "Remove everything from the material?"
 msgstr ""
 
 msgid "Right edge: how far left from the origin, across the material"
+msgstr ""
+
+msgid "Right edges"
+msgstr ""
+
+msgid "Ring"
+msgstr ""
+
+msgid "Rotate 90° clockwise"
+msgstr ""
+
+msgid "Rotate 90° counter-clockwise"
+msgstr ""
+
+msgid "Rotate left"
+msgstr ""
+
+msgid "Rotate right"
+msgstr ""
+
+msgid "Rounded rectangle"
 msgstr ""
 
 msgid "SVG files (*.svg)"
@@ -298,7 +558,25 @@ msgstr ""
 msgid "Saved %s (%d bytes)"
 msgstr ""
 
+msgid "Select"
+msgstr ""
+
+msgid "Select all"
+msgstr ""
+
 msgid "Select and move"
+msgstr ""
+
+msgid "Select every element"
+msgstr ""
+
+msgid "Select two or more elements to group them."
+msgstr ""
+
+msgid "Select two or more shapes to align them to each other."
+msgstr ""
+
+msgid "Select two or more shapes with closed outlines."
 msgstr ""
 
 #, python-format
@@ -324,6 +602,16 @@ msgid ""
 " on its panel."
 msgstr ""
 
+#, python-format
+msgid "Shaft (% of width)"
+msgstr ""
+
+msgid "Shape"
+msgstr ""
+
+msgid "Shapes"
+msgstr ""
+
 msgid "Show exactly where the knife goes: cuts, travels and their order"
 msgstr ""
 
@@ -333,10 +621,30 @@ msgstr ""
 msgid "Sides"
 msgstr ""
 
+msgid "Size"
+msgstr ""
+
+msgid "Size (mm)"
+msgstr ""
+
+msgid "Space between the design and the frame"
+msgstr ""
+
+msgid "Spacing"
+msgstr ""
+
 msgid "Speed"
 msgstr ""
 
 msgid "Speed on the panel"
+msgstr ""
+
+msgid ""
+"Split the selected group into separate elements; a single element with "
+"several outlines is split into one element per outline"
+msgstr ""
+
+msgid "Star"
 msgstr ""
 
 msgid "Start"
@@ -366,6 +674,18 @@ msgstr ""
 msgid "Take back the last change"
 msgstr ""
 
+msgid "Take the selected elements away, to paste them elsewhere"
+msgstr ""
+
+msgid "Teeth"
+msgstr ""
+
+msgid "Text"
+msgstr ""
+
+msgid "Text: click where it should start"
+msgstr ""
+
 #, python-format
 msgid ""
 "The cutter has taken no data for %d s. Is it online (not Leave) and is "
@@ -382,25 +702,43 @@ msgstr ""
 msgid "The design does not fit on the material: it sticks out %s by %.1f mm."
 msgstr ""
 
+msgid "The text; Enter applies it"
+msgstr ""
+
 msgid "There is nothing to cut."
 msgstr ""
 
 msgid "There is nothing to cut: every path is shorter than one cutter step."
 msgstr ""
 
-msgid "Ticked: Start only saves the cutter file. Untick it to cut."
-msgstr ""
-
 msgid "Ticked: cut. Not ticked: shown only."
 msgstr ""
 
-msgid "Tools"
+msgid "Top edges"
+msgstr ""
+
+msgid "Transform"
+msgstr ""
+
+msgid "Type the text in the options bar first."
 msgstr ""
 
 msgid "USB printer (/dev/usb/lp…) or serial port (/dev/ttyUSB…, /dev/ttyACM…)"
 msgstr ""
 
 msgid "Undo"
+msgstr ""
+
+msgid "Ungroup"
+msgstr ""
+
+msgid "Union"
+msgstr ""
+
+msgid "Union: join the selected shapes into one outline"
+msgstr ""
+
+msgid "View"
 msgstr ""
 
 #, python-format
@@ -410,7 +748,13 @@ msgid ""
 "GPL-3.0-or-later."
 msgstr ""
 
+msgid "What it does"
+msgstr ""
+
 msgid "Width"
+msgstr ""
+
+msgid "Width (mm)"
 msgstr ""
 
 #, python-format
@@ -424,6 +768,12 @@ msgid "X ↑ along the material"
 msgstr ""
 
 msgid "Y"
+msgstr ""
+
+msgid "Zoom in"
+msgstr ""
+
+msgid "Zoom out"
 msgstr ""
 
 msgid "across the material, below 0"

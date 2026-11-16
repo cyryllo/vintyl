@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-16 20:13+0100\n"
+"POT-Creation-Date: 2026-11-16 20:49+0100\n"
 "PO-Revision-Date: 2026-11-15 17:49+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -65,8 +65,14 @@ msgstr "&Plik"
 msgid "&Help"
 msgstr "Pomo&c"
 
+msgid "&Object"
+msgstr "&Obiekt"
+
 msgid "&View"
 msgstr "&Widok"
+
+msgid "A copy of the selected element, a little to the side"
+msgstr "Kopia zaznaczonego elementu, obok niego"
 
 msgid "A path has a point that is not a number."
 msgstr "Ścieżka ma punkt, który nie jest liczbą."
@@ -79,6 +85,13 @@ msgstr ""
 "Punkt trafiłby do plotera jako %d,%d (poniżej zera). Sprawdź ustawienia "
 "osi w profilu."
 
+msgid ""
+"A rectangle round everything that is cut, cut last: the waste vinyl "
+"inside it peels off in one piece"
+msgstr ""
+"Prostokąt dookoła wszystkiego, co jest cięte, wycinany na końcu: "
+"niepotrzebną folię w środku zdejmiesz w jednym kawałku"
+
 #, python-format
 msgid "About %.1f min at %g cm/s"
 msgstr "Około %.1f min przy %g cm/s"
@@ -89,8 +102,34 @@ msgstr "O programie Vintyl"
 msgid "Add the shapes of an SVG file to the design"
 msgstr "Dodaj do projektu kształty z pliku SVG"
 
+msgid "Align"
+msgstr "Wyrównaj"
+
+#, python-format
+msgid "Align the selected shapes to each other: %s"
+msgstr "Wyrównaj zaznaczone kształty do siebie: %s"
+
+msgid "Arms"
+msgstr "Ramiona"
+
+msgid "Arrow"
+msgstr "Strzałka"
+
+msgid "Axle hole (mm)"
+msgstr "Otwór na oś (mm)"
+
+#, python-format
+msgid "Bars (% of size)"
+msgstr "Ramiona (procent rozmiaru)"
+
+msgid "Bold"
+msgstr "Pogrubienie"
+
 msgid "Bottom edge: how far up from the origin, along the material"
 msgstr "Dolna krawędź: ile w górę od punktu zerowego, wzdłuż folii"
+
+msgid "Bottom edges"
+msgstr "Dolne krawędzie"
 
 #, python-format
 msgid "Cannot open %s: %s"
@@ -100,6 +139,12 @@ msgstr "Nie można otworzyć %s: %s"
 msgid "Cannot read %s: %s"
 msgstr "Nie można odczytać %s: %s"
 
+msgid "Centres across"
+msgstr "Środki w poziomie"
+
+msgid "Centres up and down"
+msgstr "Środki w pionie"
+
 msgid "Closed shapes are cut this far past their start, so the cut closes cleanly"
 msgstr ""
 "Kształty zamknięte są cięte o tyle dalej za punkt startu, żeby cięcie "
@@ -108,8 +153,30 @@ msgstr ""
 msgid "Comes in a later step of Vintyl"
 msgstr "Będzie w kolejnym kroku Vintyl"
 
+msgid "Command"
+msgstr "Polecenie"
+
 msgid "Connect"
 msgstr "Połącz"
+
+#, python-format
+msgid "Copied %d element."
+msgid_plural "Copied %d elements."
+msgstr[0] "Skopiowano %d element."
+msgstr[1] "Skopiowano %d elementy."
+msgstr[2] "Skopiowano %d elementów."
+
+msgid "Copy"
+msgstr "Kopiuj"
+
+msgid "Corner radius (mm)"
+msgstr "Promień narożników (mm)"
+
+msgid "Cross"
+msgstr "Krzyżyk"
+
+msgid "Cut"
+msgstr "Wytnij"
 
 msgid "Cut earlier"
 msgstr "Tnij wcześniej"
@@ -124,8 +191,8 @@ msgstr "Długość cięcia: %.2f m · przejazdy: %.2f m"
 msgid "Cut now?"
 msgstr "Ciąć teraz?"
 
-msgid "Cut the design (with Dry run ticked: save it to a file)"
-msgstr "Wytnij projekt (z zaznaczonym „Na sucho”: zapisz go do pliku)"
+msgid "Cut the design (after a short check list)"
+msgstr "Wytnij projekt (po krótkiej liście kontrolnej)"
 
 msgid "Cut this element"
 msgstr "Tnij ten element"
@@ -140,11 +207,21 @@ msgstr "Pliki plotera (*%s)"
 msgid "Cutting"
 msgstr "Cięcie"
 
+#, python-format
+msgid "Cutting width %g mm"
+msgstr "Szerokość cięcia %g mm"
+
 msgid "Delete"
 msgstr "Usuń"
 
 msgid "Delete the selected element"
 msgstr "Usuń zaznaczony element"
+
+msgid "Difference"
+msgstr "Różnica"
+
+msgid "Difference: cut the other selected shapes out of the first one"
+msgstr "Różnica: wytnij pozostałe zaznaczone kształty z pierwszego"
 
 msgid "Do again what was taken back"
 msgstr "Zrób ponownie to, co zostało cofnięte"
@@ -156,14 +233,26 @@ msgstr ""
 "Przeciągaj węzły i uchwyty · dwuklik na boku: nowy węzeł · D usuń · L "
 "linia · C krzywa · O gładki · Z zamknij/otwórz · B rozetnij"
 
-msgid "Dry run: only save to a file"
-msgstr "Na sucho: tylko zapis do pliku"
+msgid "Drop"
+msgstr "Kropla"
+
+msgid "Duplicate"
+msgstr "Duplikuj"
+
+msgid "Edit"
+msgstr "Edycja"
 
 msgid "Edit nodes (or double-click an element)"
 msgstr "Edycja węzłów (albo dwuklik na elemencie)"
 
+msgid "Element"
+msgstr "Element"
+
 msgid "Ellipse"
 msgstr "Elipsa"
+
+msgid "Ellipse: drag the box it fits in"
+msgstr "Elipsa: przeciągnij prostokąt, w który ma się wpisać"
 
 msgid "Empty. Open an SVG file or draw a shape."
 msgstr "Pusto. Otwórz plik SVG albo narysuj kształt."
@@ -171,14 +260,70 @@ msgstr "Pusto. Otwórz plik SVG albo narysuj kształt."
 msgid "Empty: the cutter uses what is set on its panel"
 msgstr "Puste: ploter użyje ustawienia ze swojego panelu"
 
+msgid "Every key in one window"
+msgstr "Wszystkie skróty w jednym oknie"
+
+msgid "Exclusion"
+msgstr "Wykluczenie"
+
+msgid "Exclusion: keep where the shapes do not overlap"
+msgstr "Wykluczenie: zostaw to, gdzie kształty się nie nakładają"
+
+msgid "Extra space between letters, mm"
+msgstr "Dodatkowy odstęp między literami, mm"
+
+msgid "File"
+msgstr "Plik"
+
 msgid "Fit"
 msgstr "Dopasuj"
+
+msgid "Flip"
+msgstr "Odwróć"
+
+msgid "Flip top to bottom"
+msgstr "Odbij w pionie (góra–dół)"
+
+msgid "Font"
+msgstr "Czcionka"
+
+msgid "Font size: the height of the font's em in mm"
+msgstr "Wielkość czcionki: wysokość kroju (em) w mm"
 
 msgid "Force"
 msgstr "Nacisk"
 
+msgid "Frame round the design"
+msgstr "Ramka dookoła projektu"
+
+msgid "Gear"
+msgstr "Koło zębate"
+
+msgid "Group"
+msgstr "Grupuj"
+
+#, python-format
+msgid "Grouped %d element."
+msgid_plural "Grouped %d elements."
+msgstr[0] "Zgrupowano %d element."
+msgstr[1] "Zgrupowano %d elementy."
+msgstr[2] "Zgrupowano %d elementów."
+
+#, python-format
+msgid "Head (% of length)"
+msgstr "Grot (procent długości)"
+
+msgid "Heart"
+msgstr "Serce"
+
 msgid "Height"
 msgstr "Wysokość"
+
+msgid "Height (mm)"
+msgstr "Wysokość (mm)"
+
+msgid "Hole (mm)"
+msgstr "Otwór (mm)"
 
 msgid ""
 "Holes and shapes inside others are cut before them, so a piece is never "
@@ -196,11 +341,46 @@ msgstr ""
 "O ile czubek ostrza jest za osią oprawki. Ostrze 45°: zwykle 0,20–0,30 "
 "mm. 0 = pisak."
 
+msgid "Inner corners (%)"
+msgstr "Wcięcie (%)"
+
+#, python-format
+msgid "Insert: %s"
+msgstr "Wstaw: %s"
+
 msgid "Inside shapes first"
 msgstr "Najpierw kształty wewnętrzne"
 
+msgid "Intersection"
+msgstr "Część wspólna"
+
+msgid "Intersection: keep only where the selected shapes overlap"
+msgstr "Część wspólna: zostaw tylko to, gdzie kształty się nakładają"
+
+msgid "Italic"
+msgstr "Kursywa"
+
 msgid "Job"
 msgstr "Zadanie"
+
+msgid "Join the selected elements into a group that is selected and moved as one"
+msgstr "Połącz zaznaczone elementy w grupę, zaznaczaną i przesuwaną razem"
+
+msgid "Keep the proportions"
+msgstr "Zachowaj proporcje"
+
+msgid ""
+"Keep the proportions: width and height change together, in the fields and"
+" with the small squares round the selection"
+msgstr ""
+"Zachowaj proporcje: szerokość i wysokość zmieniają się razem, w polach i "
+"przy przeciąganiu kwadracików wokół zaznaczenia"
+
+msgid "Key"
+msgstr "Klawisz"
+
+msgid "Keyboard shortcuts"
+msgstr "Skróty klawiszowe"
 
 msgid "Knife offset"
 msgstr "Przesunięcie noża"
@@ -208,15 +388,45 @@ msgstr "Przesunięcie noża"
 msgid "Knife path"
 msgstr "Ścieżka noża"
 
+msgid "Left edges"
+msgstr "Lewe krawędzie"
+
+msgid "Length (mm)"
+msgstr "Długość (mm)"
+
 msgid "Line"
 msgstr "Linia"
+
+msgid "Line: drag from end to end"
+msgstr "Linia: przeciągnij od końca do końca"
+
+msgid "Lines"
+msgstr "Linie"
+
+msgid "Look closer (the mouse wheel does the same)"
+msgstr "Przybliż widok (to samo robi kółko myszy)"
+
+msgid "Look from further away"
+msgstr "Oddal widok"
 
 msgid "Main"
 msgstr "Główny"
 
-#, python-format
-msgid "Material: cutting width %g mm, no length limit"
-msgstr "Folia: szerokość cięcia %g mm, długość bez limitu"
+msgid "Mirror"
+msgstr "Lustro"
+
+msgid "Mirror left to right"
+msgstr "Odbij w poziomie (lewo–prawo)"
+
+msgid "Module (mm)"
+msgstr "Moduł (mm)"
+
+msgid ""
+"Mouse: the wheel zooms, the middle button moves the view, Alt turns "
+"snapping off, Shift draws lines in 45° steps, Escape leaves a tool."
+msgstr ""
+"Mysz: kółko przybliża, środkowy przycisk przesuwa widok, Alt wyłącza "
+"przyciąganie, Shift rysuje linie co 45°, Esc wychodzi z narzędzia."
 
 msgid "Move down"
 msgstr "Przesuń w dół"
@@ -253,12 +463,21 @@ msgstr ""
 msgid "No port is set. Choose the cutter's port in the panel."
 msgstr "Nie ustawiono portu. Wybierz port plotera w panelu."
 
+msgid "Nodes"
+msgstr "Węzły"
+
 msgid ""
 "Not sent: this cutter takes its speed from its panel. Enter it here for "
 "the time estimate."
 msgstr ""
 "Nie jest wysyłana: ten ploter bierze prędkość ze swojego panelu. Wpisz ją"
 " tu, żeby oszacować czas."
+
+msgid "Nothing is left of the shapes after this operation."
+msgstr "Po tej operacji z kształtów nic nie zostaje."
+
+msgid "Nothing to split: one outline, no group."
+msgstr "Nie ma czego rozdzielać: jeden kontur, bez grupy."
 
 msgid "Open SVG"
 msgstr "Otwórz SVG"
@@ -270,8 +489,14 @@ msgstr "Otwarto %s"
 msgid "Origin"
 msgstr "Punkt zerowy"
 
+msgid "Outer size (mm)"
+msgstr "Średnica (mm)"
+
 msgid "Overcut"
 msgstr "Nadcięcie"
+
+msgid "Paste"
+msgstr "Wklej"
 
 #, python-format
 msgid "Pointer: %.1f / %.1f mm"
@@ -279,6 +504,16 @@ msgstr "Kursor: %.1f / %.1f mm"
 
 msgid "Polygon"
 msgstr "Wielokąt"
+
+msgid "Polyline"
+msgstr "Linia łamana"
+
+msgid ""
+"Polyline: click the corners; the first corner closes it, double-click or "
+"Enter leaves it open"
+msgstr ""
+"Linia łamana: klikaj narożniki; kliknięcie pierwszego zamyka kształt, "
+"dwuklik albo Enter zostawia go otwartym"
 
 msgid "Port"
 msgstr "Port"
@@ -289,23 +524,60 @@ msgstr "Profil"
 msgid "Project"
 msgstr "Projekt"
 
+msgid "Put the copied elements back, 5 mm beside where they were"
+msgstr "Wstaw skopiowane elementy z powrotem, 5 mm obok miejsca, w którym były"
+
 msgid "Quit"
 msgstr "Zakończ"
+
+msgid "Ready"
+msgstr "Gotowe"
 
 msgid "Rectangle"
 msgstr "Prostokąt"
 
+msgid "Rectangle: drag from corner to corner"
+msgstr "Prostokąt: przeciągnij od narożnika do narożnika"
+
 msgid "Redo"
 msgstr "Ponów"
 
-msgid "Regular polygon"
-msgstr "Wielokąt foremny"
+msgid ""
+"Regular polygon: drag the box it fits in; the number of sides is in the "
+"options bar"
+msgstr ""
+"Wielokąt foremny: przeciągnij prostokąt, w który ma się wpisać; liczba "
+"boków jest w pasku opcji"
+
+msgid "Remember the selected elements, to paste them"
+msgstr "Zapamiętaj zaznaczone elementy, żeby je wkleić"
 
 msgid "Remove everything from the material?"
 msgstr "Usunąć wszystko z folii?"
 
 msgid "Right edge: how far left from the origin, across the material"
 msgstr "Prawa krawędź: ile w lewo od punktu zerowego, w poprzek folii"
+
+msgid "Right edges"
+msgstr "Prawe krawędzie"
+
+msgid "Ring"
+msgstr "Pierścień"
+
+msgid "Rotate 90° clockwise"
+msgstr "Obróć o 90° w prawo"
+
+msgid "Rotate 90° counter-clockwise"
+msgstr "Obróć o 90° w lewo"
+
+msgid "Rotate left"
+msgstr "Obróć w lewo"
+
+msgid "Rotate right"
+msgstr "Obróć w prawo"
+
+msgid "Rounded rectangle"
+msgstr "Zaokrąglony prostokąt"
 
 msgid "SVG files (*.svg)"
 msgstr "Pliki SVG (*.svg)"
@@ -323,8 +595,26 @@ msgstr "Zapisz do pliku dokładnie to, co poszłoby do plotera"
 msgid "Saved %s (%d bytes)"
 msgstr "Zapisano %s (%d bajtów)"
 
+msgid "Select"
+msgstr "Zaznacz"
+
+msgid "Select all"
+msgstr "Zaznacz wszystko"
+
 msgid "Select and move"
 msgstr "Zaznaczanie i przesuwanie"
+
+msgid "Select every element"
+msgstr "Zaznacz wszystkie elementy"
+
+msgid "Select two or more elements to group them."
+msgstr "Zaznacz dwa lub więcej elementów, żeby je zgrupować."
+
+msgid "Select two or more shapes to align them to each other."
+msgstr "Zaznacz dwa lub więcej kształtów, żeby wyrównać je do siebie."
+
+msgid "Select two or more shapes with closed outlines."
+msgstr "Zaznacz dwa lub więcej kształtów z zamkniętymi konturami."
 
 #, python-format
 msgid ""
@@ -361,6 +651,16 @@ msgstr ""
 "Wysłano %d bajtów do %s. Ploter tnie ze swojej pamięci z prędkością "
 "ustawioną na panelu."
 
+#, python-format
+msgid "Shaft (% of width)"
+msgstr "Trzon (procent szerokości)"
+
+msgid "Shape"
+msgstr "Kształt"
+
+msgid "Shapes"
+msgstr "Kształty"
+
 msgid "Show exactly where the knife goes: cuts, travels and their order"
 msgstr "Pokaż dokładnie, gdzie pojedzie nóż: cięcia, przejazdy i ich kolejność"
 
@@ -370,11 +670,33 @@ msgstr "Pokaż całą folię i projekt"
 msgid "Sides"
 msgstr "Boki"
 
+msgid "Size"
+msgstr "Wielkość"
+
+msgid "Size (mm)"
+msgstr "Rozmiar (mm)"
+
+msgid "Space between the design and the frame"
+msgstr "Odstęp między projektem a ramką"
+
+msgid "Spacing"
+msgstr "Odstęp"
+
 msgid "Speed"
 msgstr "Prędkość"
 
 msgid "Speed on the panel"
 msgstr "Prędkość na panelu"
+
+msgid ""
+"Split the selected group into separate elements; a single element with "
+"several outlines is split into one element per outline"
+msgstr ""
+"Rozdziel zaznaczoną grupę na osobne elementy; pojedynczy element z "
+"kilkoma konturami rozdziel na osobny element na każdy kontur"
+
+msgid "Star"
+msgstr "Gwiazda"
 
 msgid "Start"
 msgstr "Start"
@@ -408,6 +730,18 @@ msgstr "Zatrzymywanie: podnoszę nóż…"
 msgid "Take back the last change"
 msgstr "Cofnij ostatnią zmianę"
 
+msgid "Take the selected elements away, to paste them elsewhere"
+msgstr "Zabierz zaznaczone elementy, żeby wkleić je gdzie indziej"
+
+msgid "Teeth"
+msgstr "Zęby"
+
+msgid "Text"
+msgstr "Tekst"
+
+msgid "Text: click where it should start"
+msgstr "Tekst: kliknij, gdzie ma się zaczynać"
+
 #, python-format
 msgid ""
 "The cutter has taken no data for %d s. Is it online (not Leave) and is "
@@ -428,20 +762,26 @@ msgstr ""
 msgid "The design does not fit on the material: it sticks out %s by %.1f mm."
 msgstr "Projekt nie mieści się na folii: wystaje %s o %.1f mm."
 
+msgid "The text; Enter applies it"
+msgstr "Treść napisu; Enter zatwierdza"
+
 msgid "There is nothing to cut."
 msgstr "Nie ma nic do cięcia."
 
 msgid "There is nothing to cut: every path is shorter than one cutter step."
 msgstr "Nie ma nic do cięcia: każda ścieżka jest krótsza niż jeden krok plotera."
 
-msgid "Ticked: Start only saves the cutter file. Untick it to cut."
-msgstr "Zaznaczone: Start tylko zapisuje plik plotera. Odznacz, żeby ciąć."
-
 msgid "Ticked: cut. Not ticked: shown only."
 msgstr "Zaznaczone: tnij. Niezaznaczone: tylko widoczne."
 
-msgid "Tools"
-msgstr "Narzędzia"
+msgid "Top edges"
+msgstr "Górne krawędzie"
+
+msgid "Transform"
+msgstr "Przekształć"
+
+msgid "Type the text in the options bar first."
+msgstr "Najpierw wpisz napis w pasku opcji."
 
 msgid "USB printer (/dev/usb/lp…) or serial port (/dev/ttyUSB…, /dev/ttyACM…)"
 msgstr ""
@@ -450,6 +790,18 @@ msgstr ""
 
 msgid "Undo"
 msgstr "Cofnij"
+
+msgid "Ungroup"
+msgstr "Rozgrupuj"
+
+msgid "Union"
+msgstr "Suma"
+
+msgid "Union: join the selected shapes into one outline"
+msgstr "Suma: połącz zaznaczone kształty w jeden kontur"
+
+msgid "View"
+msgstr "Widok"
 
 #, python-format
 msgid ""
@@ -461,8 +813,14 @@ msgstr ""
 "Program do ploterów tnących folię.\n"
 "GPL-3.0-or-later."
 
+msgid "What it does"
+msgstr "Co robi"
+
 msgid "Width"
 msgstr "Szerokość"
+
+msgid "Width (mm)"
+msgstr "Szerokość (mm)"
 
 #, python-format
 msgid "Writing to %s failed: %s"
@@ -476,6 +834,12 @@ msgstr "X ↑ wzdłuż folii"
 
 msgid "Y"
 msgstr "Y"
+
+msgid "Zoom in"
+msgstr "Przybliż"
+
+msgid "Zoom out"
+msgstr "Oddal"
 
 msgid "across the material, below 0"
 msgstr "w poprzek folii, poniżej 0"
@@ -532,4 +896,61 @@ msgstr "← Y w poprzek"
 
 #~ msgid "feed →"
 #~ msgstr "podawanie →"
+
+#~ msgid "Material: cutting width %g mm, no length limit"
+#~ msgstr "Folia: szerokość cięcia %g mm, długość bez limitu"
+
+#~ msgid "Cut the design (with Dry run ticked: save it to a file)"
+#~ msgstr "Wytnij projekt (z zaznaczonym „Na sucho”: zapisz go do pliku)"
+
+#~ msgid "Dry run: only save to a file"
+#~ msgstr "Na sucho: tylko zapis do pliku"
+
+#~ msgid "Ticked: Start only saves the cutter file. Untick it to cut."
+#~ msgstr "Zaznaczone: Start tylko zapisuje plik plotera. Odznacz, żeby ciąć."
+
+#~ msgid "Tools"
+#~ msgstr "Narzędzia"
+
+#~ msgid "Centre"
+#~ msgstr "Środek"
+
+#~ msgid "Front"
+#~ msgstr "Do przodu"
+
+#~ msgid "Left edge"
+#~ msgstr "Lewa krawędź"
+
+#~ msgid "Origin side"
+#~ msgstr "Strona zera"
+
+#~ msgid "Click to show its tools"
+#~ msgstr "Kliknij, żeby pokazać narzędzia"
+
+#~ msgid "Against the edge where the origin is"
+#~ msgstr "Do krawędzi, przy której jest punkt zerowy"
+
+#~ msgid "Against the far edge of the cutting width"
+#~ msgstr "Do dalszej krawędzi szerokości cięcia"
+
+#~ msgid "Down to the origin's line, the front of the material"
+#~ msgstr "W dół do linii punktu zerowego, do przodu folii"
+
+#~ msgid "In the middle of the cutting width"
+#~ msgstr "Na środek szerokości cięcia"
+
+#~ msgid "To the centre"
+#~ msgstr "Na środek"
+
+#~ msgid "To the front"
+#~ msgstr "Do przodu"
+
+#~ msgid "To the left edge"
+#~ msgstr "Do lewej krawędzi"
+
+#~ msgid "To the origin side"
+#~ msgstr "Do strony zera"
+
+#~ msgid "Regular polygon"
+#~ msgstr "Wielokąt foremny"
 

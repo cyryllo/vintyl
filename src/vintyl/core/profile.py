@@ -52,7 +52,7 @@ class Profile:
     # knife (used from step 3 of the plan on)
     knife_offset_mm: float = 0.0     # 0 = pen, no compensation
     overcut_mm: float = 0.0          # closed shapes are cut this far past their start
-    corner_deg: float = 5.0          # smaller turns count as straight
+    corner_deg: float = 30.0         # smaller turns count as straight (no swivel arc), see knife.CORNER_DEG
     lift_below_deg: float = 0.0      # 0 = off; lift the knife at corners sharper than this
 
     # speed and force: sent (HPGL VS / FS, DMPL V / BP) only when set and when
