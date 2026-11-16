@@ -1,23 +1,31 @@
-# VEVOR KI-375A, the 14 inch cutter.
+# VEVOR KI-375A, the 14 inch cutter ("Cutting Plotter Model KI-375A").
 # Seller: feeds 375 mm, cuts about 285 mm, force up to 500 g.
-# Cut with the same driver as the Seiki SK-870T, so probably the same
-# language and port settings. Values marked "check" are first guesses
-# until tested on the cutter.
+# Connects over USB in one of two modes set in its menu: "Printer"
+# (Linux: /dev/usb/lpN, group lp) or "Virtual COM".
+#
+# Checked on the cutter on 16.11.2026 with a pen (mode Printer):
+#   HPGL works; 40 units per mm (a 20 mm square came out 20 mm);
+#   origin at the front right, X runs back along the feed, Y to the left:
+#   the same as Vintyl's material coordinates, no swap, no mirror.
+# Knife on vinyl (16.11.2026), a standard ~45 degree blade: without knife
+#   offset small burrs at the corners; with 0.25 mm and a 0.5 mm overcut
+#   ideal; every closed shape closed cleanly. Speed and force: panel only.
+# Values marked "check" are still first guesses.
 
 name = "VEVOR KI-375A"
 
 width_mm = 285.0          # check: from the seller's listing
 length_mm = 0.0           # roll: no limit
 
-baud = 9600               # check: set in the cutter's menu
-flow = "none"             # check
+baud = 9600               # only for Virtual COM mode; check
+flow = "none"             # only for Virtual COM mode; check
 
-language = "hpgl"         # check
-units_per_mm = 40.0       # check
+language = "hpgl"         # checked
+units_per_mm = 40.0       # checked
 
-swap_xy = false           # check with the 20 mm test square and its X mark
-invert_x = false
-invert_y = false
+swap_xy = false           # checked
+invert_x = false          # checked
+invert_y = false          # checked
 
-knife_offset_mm = 0.25    # usual for a 45 degree blade
-overcut_mm = 0.5
+knife_offset_mm = 0.25    # checked on vinyl: ideal corners (0 leaves small burrs)
+overcut_mm = 0.5          # checked on vinyl: closes cleanly

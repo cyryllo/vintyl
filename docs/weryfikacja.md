@@ -299,17 +299,82 @@ Sprawdzimy to testami we własnym kodzie w etapie C.
 
 ---
 
-## A4. Sprzęt: czeka na Twoje „tak” przy każdym kroku
+## A4. Sprzęt (16.11.2026, VEVOR KI-375A)
 
-Na dziś niczego nie uruchamiałem. Nawet `groups` (krok 2) czeka na Twoją zgodę.
+Każdy krok robię tylko po Twoim „tak”.
 
 | Krok | Stan |
 |---|---|
-| 1. `lsusb` i `dmesg` przed podłączeniem i po nim | czeka |
-| 2. `groups` (dialout) | czeka |
-| 3. Prędkość portu z panelu | czeka na Twój odczyt |
-| 4. Tabliczki obu ploterów | czeka na Twój odczyt |
-| 5–10. Ruch plotera (pisak, papier) | czeka. Dokładna treść każdego kroku jest w [poniedzialek-A4.md](poniedzialek-A4.md), w tym DMPL tryb 3 i sprawdzenie kierunku osi (rozbieżność 3) |
+| 1. `lsusb` i dziennik jądra przed podłączeniem i po nim | **zrobione**, wynik niżej |
+| 2. `groups` | **zrobione**: brak grup `dialout` i `lp` (wynik niżej) |
+| 3. Prędkość portu z panelu | KI-375A w trybie Printer: nie dotyczy (USB). Do sprawdzenia przy trybie Virtual COM i przy SK-870T |
+| 4. Tabliczki obu ploterów | mniejszy: **„Cutting Plotter Model KI-375A”** (16.11, POTW). SK-870T: czeka |
+| 5. Otwarcie portu i `IN;` | **zrobione** (16.11, KI-375A, tryb Printer, `/dev/usb/lp1`): urządzenie się otworzyło, 3 bajty przyjęte od razu, ploter nic nie zrobił, jak trzeba |
+| 6. Kwadrat 20×20 mm w HPGL (bez kontroli przepływu, tryb Printer) | **zrobione** (16.11): narysował kwadrat **20 mm** i kreskę **10 mm**. Wniosek: **KI-375A rozumie HPGL**, a skala **40 jednostek na mm jest właściwa** (skala Inkcuta 40,2 dałaby 20,1 mm). Przyjął 110 bajtów od razu. **Osie:** patrząc z przodu, Origin jest z przodu po prawej, kwadrat przy prawej, kreska (oś X) stoi pionowo po lewej. Czyli X biegnie do tyłu (wzdłuż podawania), Y w lewo (w poprzek). Bez lustra: profil bez zamiany i odwracania osi. Na koniec pisak wrócił w górze do Origin (prawy dolny róg folii, patrząc z przodu) |
+| 7. RTS/CTS | nie dotyczy trybu Printer (USB nie ma tych linii); wrócimy przy Virtual COM / SK-870T |
+| 8. `OH;` i `OI;` z odczytem 2 s | **zrobione** (16.11): w trybie Printer **brak odpowiedzi** na oba. Pola roboczego nie odczytamy z plotera, musi być w profilu. Do sprawdzenia w trybie Virtual COM |
+| 9. Kwadrat z `VS10`, potem z `VS40` | **zrobione** (16.11): kwadraty pokryły się, **prędkość ta sama**: KI-375A **ignoruje `VS`**, prędkość i nacisk ustawia się tylko na panelu. **Ale: drugi kwadrat nie skończył się**, głowica stanęła w lewym dolnym rogu kwadratu (rozbieżność 11, niżej) |
+
+| 10. `FS` (nacisk) i nóż na folii | `FS` **nie testujemy**: według Ciebie (16.11) **oba plotery** (KI-375A i SK-870T) mają prędkość i nacisk ustawiane tylko ręcznie na panelu. Nóż na folii (16.11, pliki `tests/a4/noz_A_bez.hpgl` i `noz_B_z.hpgl`, z `tools/a4_noz.py`): **A bez kompensacji: na narożnikach małe zadziorki**; **B z kompensacją 0,25 mm + nadcięcie 0,5 mm: idealnie** (Twoja ocena po sprostowaniu, 16.11). Nóż: standardowy, około 45°. Wniosek: **kompensacja 0,25 mm działa tak, jak ją wysłaliśmy**. (Po drodze, przez pomyłkę w odczytaniu, który zestaw jest który, zrobiłem i cofnąłem zmianę łuku obrotu; zostaje wersja sprawdzona na folii.) Wszystkie kształty (kółka, otwory) **domknięte czysto** w A i w B. Profil KI-375A: przesunięcie noża **0,25 mm**, nadcięcie **0,5 mm** (oba sprawdzone na folii). [POTW dla wyniku, POSR dla przyczyny] |
+
+### Rozbieżność 11: koniec danych ginie, gdy program za szybko zamyka urządzenie
+
+Głowica stanęła w punkcie `PD400,1200`. Każdy plik (82 bajty) poszedł
+dwiema porcjami: 64 bajty, które kończą się w połowie polecenia
+(`…PD400,1200;PD400,4`), i ostatnie 18 bajtów (`00;PU400,400;PU0,0;`).
+Ploter wykonał wszystko z pierwszej porcji, a druga do niego nie dotarła.
+
+Najbardziej prawdopodobna przyczyna [POSR, z działania sterownika Linuksa
+`usblp`]: narzędzie wysyła bez czekania, a zaraz potem zamyka urządzenie.
+Przy zamknięciu sterownik anuluje transfery USB, które jeszcze nie doszły,
+więc ostatnia porcja przepada. W kroku 6 zdążyła przypadkiem.
+
+Poprawka: przed zamknięciem czekać, aż ploter przyjmie ostatnią porcję.
+**To samo musi robić wysyłka w Vintyl.**
+
+**Sprawdzone (16.11, po restarcie plotera):** ten sam plik z poprawionym
+narzędziem: kwadrat ma wszystkie 4 boki, pisak podniósł się i wrócił do
+Origin. Przyczyna potwierdzona, poprawka działa. [POTW]
+Po restarcie ploter znów zgłosił się jako `/dev/usb/lp1`.
+| 7–10. Ruch plotera (pisak, papier) | czeka. Dokładna treść każdego kroku jest w [poniedzialek-A4.md](poniedzialek-A4.md), w tym DMPL tryb 3 i sprawdzenie kierunku osi (rozbieżność 3) |
+
+### Wynik kroków 1 i 2: KI-375A to drukarka USB, nie port szeregowy
+
+**Rozbieżność 10 (najważniejsza z A4).** Plan zakładał przejściówkę USB
+na port szeregowy (CH340 albo FTDI) i port `/dev/ttyUSB0`. KI-375A
+zgłasza się inaczej. [POTW, `lsusb -v` i dziennik jądra]
+
+- Urządzenie USB `0483:5750`, producent „XILI”, produkt „STM32 USB
+  DEVICE”, numer seryjny „STM3210”. Opis „LED badge” w `lsusb` to tylko
+  pomyłka bazy nazw: ten sam identyfikator ma inny sprzęt na STM32.
+- Klasa USB: **drukarka** (Printer, podklasa 1, protokół 2 =
+  dwukierunkowy). Ma punkty końcowe wyjścia (EP 2 OUT) i wejścia (EP 2 IN),
+  po 64 bajty.
+- Linux od razu obsłużył je sterownikiem `usblp`. Port to
+  **`/dev/usb/lp1`**, nie `/dev/ttyUSB0`. Nie powstał żaden `/dev/ttyUSB*`
+  ani `/dev/ttyACM*`.
+- Uprawnienia: `/dev/usb/lp1` należy do `root:lp` (rw-rw----). Potrzebna
+  jest więc grupa **`lp`**, a nie `dialout`. Nie jesteś w żadnej z nich.
+
+**Co z tego wynika:**
+1. Prędkość portu, bity i kontrola przepływu nie mają znaczenia dla tego
+   plotera: USB samo pilnuje tempa, a zapis czeka, aż ploter przyjmie dane.
+2. Wysyłka to zapis bajtów do pliku urządzenia `/dev/usb/lp1`. Tak samo
+   robi transport „device” w CutScape. Profil potrzebuje rodzaju połączenia
+   („USB jako drukarka” albo „port szeregowy”).
+3. Połączenie jest dwukierunkowe, więc odpowiedź na `OH;` i `OI;` można
+   odczytać z tego samego urządzenia.
+4. **Ploter ma w menu dwa tryby połączenia: „Virtual COM” i „Printer”**
+   (informacja od Ciebie, 16.11). Odczyt był w trybie Printer. W trybie
+   Virtual COM ploter najpewniej zgłosi się jako port szeregowy USB (CDC):
+   `/dev/ttyACM0`, grupa `dialout`. [POSR: do sprawdzenia po przełączeniu]
+   Vintyl obsłuży oba tryby; w profilu będzie to rodzaj połączenia. **Zmiana trybu w menu wymaga 2-cyfrowego hasła** (16.11), którego nie ma w znalezionych opisach VEVOR; nie zgadujemy go. **Virtual COM nie testowany**, zostajemy przy trybie Printer, który działa w pełni. Instrukcja VEVOR (ploter 34", ten sam panel) pokazuje przełącznik „Virtual COM / Printer” w menu SETUP, ale na KI-375A w trybie offline menu się nie otwiera (strzałki tylko przesuwają głowicę). SETUP + TEST pokazuje płytę: **„Board 20210101 HWN3.2 642”** (16.11). [POTW] Instrukcja z Twojego dysku („刻字机说明书1.11”, VEVOR KI/SK/EH/KH, 26 stron): SETUP na ekranie głównym (online) pokazuje **prędkość portu (Baud 9600) i stopień prędkości**; w offline SETUP „nie ma funkcji”. O przełączniku Virtual COM/Printer i haśle instrukcja **nic nie mówi**. Według niej z SignMasterem ploter łączy się jako **USB-SERIAL CH340 (COM)** („Direct COM Port”), czyli w trybie COM inny układ niż STM32 w trybie Printer. [POTW dla treści instrukcji]
+5. SK-870T według instrukcji ma RS-232. Może więc mieć inny układ (wtedy
+   `/dev/ttyUSB0` i grupa `dialout`) albo też być drukarką USB. Sprawdzimy
+   przy nim.
+6. CUPS (system drukarek) może zauważyć nową drukarkę USB. Ważne, żeby nie
+   dodał jej jako zwykłej drukarki, bo wtedy wysyłka może iść przez kolejkę
+   CUPS.
 
 ## A5. Test odniesienia z Inkcutem (część bez plotera: zrobiona)
 

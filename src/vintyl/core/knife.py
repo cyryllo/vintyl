@@ -17,7 +17,10 @@ Licensed under the GNU General Public License v3 or later. See LICENSE.
 import math
 
 CLOSED_TOLERANCE_MM = 0.01       # first and last point this close: a closed shape
-ARC_STEP_DEG = 10.0              # the swivel arc is drawn with steps this small
+# The swivel arc is drawn with steps this small. Checked on the cutter
+# (VEVOR KI-375A, 16.11.2026): a 0.25 mm offset cut this way gave ideal
+# corners on vinyl, without it the corners had small burrs.
+ARC_STEP_DEG = 10.0
 
 
 def is_closed(poly):

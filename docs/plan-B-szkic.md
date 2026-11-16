@@ -266,6 +266,7 @@ GPL-3.0, a ustaliliśmy GPL-3.0-or-later.
 - język: HPGL czy DMPL (i który tryb);
 - kierunek osi i położenie punktu zerowego;
 - kontrola przepływu i prędkość portu;
-- czy ploter reaguje na `VS` i `FS`, czy odpowiada na `OH;` i `OI;`;
+- ~~czy ploter reaguje na `VS` i `FS`~~: **nie**, oba plotery mają prędkość i nacisk tylko na panelu (16.11); pola prędkości i nacisku w oknie można więc ukryć dla tych profili;
+- KI-375A: **HPGL, 40 jednostek/mm, osie bez zmian, drukarka USB `/dev/usb/lpN`, brak odpowiedzi na `OH;`/`OI;`** (16.11);
 - układ USB (CH340 czy FTDI) i nazwa portu;
 - napis z tabliczki KI-375A i jego szerokość cięcia.
