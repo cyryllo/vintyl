@@ -9,8 +9,10 @@ millimetres, y down); no optional library is needed. The result is a list of
 polylines; in Vintyl they are drawn with a pen on the cutter.
 
 Source: copied from Kerfly (https://github.com/cyryllo/Kerfly),
-kerfly/core/patterns.py at commit cf48565: the fill patterns unchanged; the
-living hinges (cuts for a laser) are left out.
+kerfly/core/patterns.py at commit cf48565: the fill patterns, with the
+waves and circles sampled less densely (enough for a pen, SAMPLE_TOL_MM;
+Kerfly samples finely for the laser); the living hinges (cuts for a laser)
+are left out.
 
 Copyright (C) 2026 Kerfly contributors
 Licensed under the GNU General Public License v3 or later. See LICENSE.
@@ -18,6 +20,8 @@ Licensed under the GNU General Public License v3 or later. See LICENSE.
 import math
 
 from .hatch import hatch_lines
+
+SAMPLE_TOL_MM = 0.02             # how far a sampled wave or circle may stray from the true curve
 
 # pattern code -> English name (translated in the GUI); the order of the pattern list
 PATTERNS = (("lines", "Lines"), ("cross", "Cross-hatch"), ("waves", "Waves"), ("zigzag", "Zigzag"),
@@ -236,7 +240,8 @@ def _rows(half, spacing):
 
 def _wave_rows(half, spacing, wave):
     """Rows across the frame shaped by wave(u, row) -> v offset."""
-    step = spacing / 12.0
+    # 8 points per spacing: a wave 0.35 x spacing high strays about 0.03 x spacing at most
+    step = spacing / 8.0
     n_u = int(2 * half / step) + 2
     lines = []
     for r, v0 in enumerate(_rows(half, spacing)):
@@ -307,7 +312,8 @@ def pattern_lines(pattern, polygons, spacing, angle_deg=0.0, margin=0.0):
         k = 1
         while k * s <= half * 1.05:
             r = k * s
-            n = max(24, int(2 * math.pi * r / (s / 6.0)))
+            # as many points as keep the chords within SAMPLE_TOL_MM of the circle
+            n = max(24, int(math.ceil(math.pi / math.acos(max(-1.0, 1.0 - SAMPLE_TOL_MM / r)))))
             local.append([(r * math.cos(2 * math.pi * i / n), r * math.sin(2 * math.pi * i / n))
                           for i in range(n + 1)])
             k += 1

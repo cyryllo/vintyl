@@ -16,6 +16,8 @@ Copyright (C) 2026 Vintyl contributors
 Licensed under the GNU General Public License v3 or later. See LICENSE.
 """
 import math
+import threading
+from collections import OrderedDict
 from dataclasses import dataclass, field
 
 from . import curves
@@ -42,16 +44,29 @@ class Element:
                        dict(self.fill) if self.fill else None)
 
     def fill_lines(self, tol=curves.FLATNESS_MM):
-        """The fill pattern's lines (view mm), [] without a fill or closed outlines."""
+        """The fill pattern's lines (view mm), [] without a fill or closed outlines.
+        Remembered (see _FILL_CACHE): a big honeycomb takes seconds to work out,
+        and the window asks for it at every change of the design."""
         if not self.fill:
             return []
-        from .patterns import pattern_lines
-        rings = curves.flatten([sub for sub in self.paths if sub["closed"]], tol)
-        if not rings:
+        closed = [sub for sub in self.paths if sub["closed"]]
+        if not closed:
             return []
+        # worked out with the shape's first node at (0, 0) and moved back, so
+        # moving the shape does not work it out again (the pattern goes with it)
+        ax, ay = closed[0]["nodes"][0][0], closed[0]["nodes"][0][1]
+        rel = curves.translate(closed, -ax, -ay)
         f = self.fill
-        return pattern_lines(f.get("pattern", "lines"), rings, float(f.get("spacing", 1.0)),
-                             float(f.get("angle", 0.0)), float(f.get("margin", 0.0)))
+        key = (f.get("pattern", "lines"), float(f.get("spacing", 1.0)), float(f.get("angle", 0.0)),
+               float(f.get("margin", 0.0)), tol,
+               tuple((sub["closed"], tuple(tuple(None if v is None else round(v, 6) for v in n)
+                                           for n in sub["nodes"])) for sub in rel))
+        lines = _fill_cache_get(key)
+        if lines is None:
+            from .patterns import pattern_lines
+            lines = pattern_lines(key[0], curves.flatten(rel, tol), key[1], key[2], key[3])
+            _fill_cache_put(key, lines)
+        return [[(x + ax, y + ay) for x, y in line] for line in lines]
 
     @property
     def bounds(self):
@@ -154,6 +169,29 @@ class Design:
                 out.append([view_to_material(x, y) for x, y in line])
                 groups.append(k)
         return out, groups
+
+
+# worked-out fill patterns: the last few, by shape and settings (the preview
+# works them out in a thread, hence the lock)
+_FILL_CACHE = OrderedDict()
+_FILL_CACHE_SIZE = 64
+_FILL_LOCK = threading.Lock()
+
+
+def _fill_cache_get(key):
+    with _FILL_LOCK:
+        lines = _FILL_CACHE.get(key)
+        if lines is not None:
+            _FILL_CACHE.move_to_end(key)
+        return lines
+
+
+def _fill_cache_put(key, lines):
+    with _FILL_LOCK:
+        _FILL_CACHE[key] = lines
+        _FILL_CACHE.move_to_end(key)
+        while len(_FILL_CACHE) > _FILL_CACHE_SIZE:
+            _FILL_CACHE.popitem(last=False)
 
 
 def view_to_material(x, y):

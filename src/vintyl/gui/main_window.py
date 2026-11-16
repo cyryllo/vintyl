@@ -60,6 +60,38 @@ def outermost(rings):
             if not any(j != i and point_in_polygon(r[0], other) for j, other in enumerate(rings))]
 
 
+class _SideScroll(QScrollArea):
+    """The left panel's scroll area. It gives the panel the window's height
+    (the project list gives way first) and scrolls only when even the panel's
+    minimum does not fit. Done here because QScrollArea's own resizing sized
+    the panel by its wrapped labels at its full preferred height, so it
+    scrolled at once and hid Start below the edge."""
+
+    def __init__(self, panel):
+        super().__init__()
+        self.setWidget(panel)
+        self.setWidgetResizable(False)
+        self.setFrameShape(QFrame.NoFrame)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setFixedWidth(panel.width() + self.verticalScrollBar().sizeHint().width())
+        panel.installEventFilter(self)
+
+    def fit(self):
+        panel = self.widget()
+        if panel is not None:
+            panel.resize(panel.width(), max(self.viewport().height(), panel.minimumSizeHint().height()))
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.fit()
+
+    def eventFilter(self, obj, event):
+        from PySide6.QtCore import QEvent, QTimer
+        if obj is self.widget() and event.type() == QEvent.LayoutRequest:
+            QTimer.singleShot(0, self.fit)            # rows came or went: fit again
+        return super().eventFilter(obj, event)
+
+
 def open_settings():
     """The user's settings (QSettings). VINTYL_SETTINGS names another file
     (the tests use their own, so they never touch the user's)."""
@@ -114,7 +146,10 @@ class MainWindow(QMainWindow):
         middle = QHBoxLayout()
         middle.setContentsMargins(0, 0, 0, 0)
         middle.setSpacing(0)
-        middle.addWidget(self._make_left_panel())
+        # the left panel scrolls when the window is too low for it, instead of
+        # squeezing its rows into each other
+        self.left_scroll = _SideScroll(self._make_left_panel())
+        middle.addWidget(self.left_scroll)
         middle.addWidget(self.view, 1)
         middle.addWidget(self.tool_panel)
         outer.addLayout(middle, 1)
@@ -795,7 +830,10 @@ class MainWindow(QMainWindow):
         box = QGroupBox(_("Project"))
         lay = QVBoxLayout(box)
         self.summary = QLabel()
-        self.summary.setWordWrap(True)
+        # one line, not wrapped: a wrapped label makes Qt treat the whole box as
+        # rigid (height for width), and the column then squeezed the Cutter box
+        # until its rows ran into the Job box
+        self.summary.setWordWrap(False)
         lay.addWidget(self.summary)
         self.element_list = QListWidget()
         self.element_list.itemChanged.connect(self._list_item_changed)
@@ -1005,17 +1043,8 @@ class MainWindow(QMainWindow):
             self.settings.setValue("cutter/tool/" + name, self.tool_box.currentData())
             self.settings.setValue("cutter/pen_width/" + name, self.pen_width.value())
             self.settings.setValue("cutter/pen_place/" + name, self.pen_place.currentData())
-        self._fit_side_boxes()
         if refresh and not getattr(self, "_loading_tool", False):
             self.refresh()
-
-    def _fit_side_boxes(self):
-        """The Cutter and Job boxes keep the height of what they show (rows
-        come and go with the tool); only the project list gives way. Without
-        it the column squeezed their rows into each other on a low window."""
-        for b in (self.cutter_box, self.job_box):
-            b.setMinimumHeight(0)
-            b.setMinimumHeight(b.sizeHint().height() + 8)
 
     def _port_changed(self, text):
         """Remember the port chosen for this cutter."""
@@ -1444,16 +1473,32 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage(_("Select a closed shape to fill."), 6000)
             return []
         if values is None:
-            values = self._ask_fill(chosen[0].fill)
+            before = [e.fill for e in chosen]
+            values = self._ask_fill(chosen)
+            for e, f in zip(chosen, before):        # the preview's changes undone; done properly below
+                e.fill = f
             if values is None:
+                self.refresh()
                 return []
         self._checkpoint()
         for e in chosen:
-            e.fill = None if not values.get("pattern") else {
-                "pattern": values["pattern"], "spacing": float(values["spacing"]),
-                "angle": float(values.get("angle", 0.0)), "margin": float(values.get("margin", 0.0))}
+            e.fill = self._fill_spec(values)
         self.refresh()
         return chosen
+
+    @staticmethod
+    def _fill_spec(values):
+        if not values.get("pattern"):
+            return None
+        return {"pattern": values["pattern"], "spacing": float(values["spacing"]),
+                "angle": float(values.get("angle", 0.0)), "margin": float(values.get("margin", 0.0))}
+
+    def _place_beside(self, dlg):
+        """A dialog with a live preview goes to the right, over the tool bar,
+        so it does not hide the middle of the sheet."""
+        from PySide6.QtCore import QPoint
+        dlg.adjustSize()
+        dlg.move(self.mapToGlobal(QPoint(max(0, self.width() - dlg.width() - 100), 110)))
 
     # ---- a pattern of shapes (for the knife and the pen) ------------------------------------------
     def tile_selected(self, values=None):
@@ -1465,7 +1510,7 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage(_("Select a closed shape to fill with a pattern of shapes."), 6000)
             return None
         if values is None:
-            values = self._ask_tile()
+            values = self._ask_tile(chosen)
             if values is None:
                 return None
         outline = [sub for e in chosen for sub in e.paths]
@@ -1489,9 +1534,10 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage(ngettext("%d shape placed.", "%d shapes placed.", count) % count, 6000)
         return new
 
-    def _ask_tile(self):
+    def _ask_tile(self, chosen):
         from PySide6.QtWidgets import QDialog, QDialogButtonBox
         from vintyl.core import tile
+        from vintyl.gui.previewer import Previewer
         dlg = QDialog(self)
         dlg.setWindowTitle(_("Pattern of shapes"))
         form = QFormLayout(dlg)
@@ -1521,20 +1567,57 @@ class MainWindow(QMainWindow):
         note = QLabel(_("Only shapes that fit whole are placed; they are cut before the outline."))
         note.setWordWrap(True)
         form.addRow(note)
+        status = QLabel()
+        form.addRow(status)
         buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         buttons.accepted.connect(dlg.accept)
         buttons.rejected.connect(dlg.reject)
         form.addRow(buttons)
-        if dlg.exec() != QDialog.Accepted:
+
+        def values_now():
+            return {"motif": motif.currentData(), "size": size.value(), "gap": gap.value(),
+                    "margin": margin.value(), "stagger": stagger.isChecked()}
+
+        # the live preview: dashed on the sheet, worked out in the background
+        outline = [sub for e in chosen for sub in e.paths]
+        prev = Previewer(dlg)
+
+        def ask_preview(*_a):
+            v = values_now()
+            m = tile.motif(v["motif"])
+            prev.request(lambda: tile.tile(outline, m, v["size"], v["gap"], v["stagger"], v["margin"]))
+
+        def show(result):
+            if isinstance(result, Exception):
+                self.view.show_preview(None)
+                status.setText(_("Cannot work it out: %s") % result)
+                return
+            paths, count = result
+            self.view.show_preview(paths)
+            status.setText(ngettext("%d shape fits.", "%d shapes fit.", count) % count if count else
+                           _("No shape fits inside: make them smaller or the margin narrower."))
+        prev.ready.connect(show)
+        prev.busy.connect(lambda b: b and status.setText(_("Working it out…")))
+        motif.currentIndexChanged.connect(ask_preview)
+        for w in (size, gap, margin):
+            w.valueChanged.connect(ask_preview)
+        stagger.toggled.connect(ask_preview)
+        ask_preview()
+        self._place_beside(dlg)
+        accepted = dlg.exec() == QDialog.Accepted
+        prev.wait()
+        self.view.show_preview(None)
+        if not accepted:
             return None
-        values = {"motif": motif.currentData(), "size": size.value(), "gap": gap.value(),
-                  "margin": margin.value(), "stagger": stagger.isChecked()}
+        values = values_now()
         for k, v in values.items():
             st.setValue("tile/" + k, str(v).lower() if isinstance(v, bool) else v)
         return values
 
-    def _ask_fill(self, current=None):
+    def _ask_fill(self, chosen):
         from PySide6.QtWidgets import QDialog, QDialogButtonBox
+        from vintyl.gui.previewer import Previewer
+        current = chosen[0].fill
         dlg = QDialog(self)
         dlg.setWindowTitle(_("Fill"))
         form = QFormLayout(dlg)
@@ -1560,6 +1643,8 @@ class MainWindow(QMainWindow):
         form.addRow(_("Spacing"), spacing)
         form.addRow(_("Angle"), angle)
         form.addRow(_("Margin"), margin)
+        status = QLabel()
+        form.addRow(status)
         buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         remove = buttons.addButton(_("Remove the fill"), QDialogButtonBox.DestructiveRole)
         removed = []
@@ -1568,12 +1653,48 @@ class MainWindow(QMainWindow):
         buttons.accepted.connect(dlg.accept)
         buttons.rejected.connect(dlg.reject)
         form.addRow(buttons)
-        if dlg.exec() != QDialog.Accepted:
+
+        def values_now():
+            return {"pattern": pattern.currentData(), "spacing": spacing.value(), "angle": angle.value(),
+                    "margin": margin.value()}
+
+        # the live preview: the shapes show the fill as it would be; worked out in
+        # the background (into the fill cache), then drawn
+        prev = Previewer(dlg)
+
+        def ask_preview(*_a):
+            spec = self._fill_spec(values_now())
+            copies = [e.copy() for e in chosen]
+
+            def work():
+                for c in copies:
+                    c.fill = spec
+                    c.fill_lines()
+                return spec
+            prev.request(work)
+
+        def show(result):
+            if isinstance(result, Exception):
+                status.setText(_("Cannot work it out: %s") % result)
+                return
+            status.setText("")
+            for e in chosen:
+                e.fill = dict(result)
+            self.refresh()
+        prev.ready.connect(show)
+        prev.busy.connect(lambda b: b and status.setText(_("Working it out…")))
+        pattern.currentIndexChanged.connect(ask_preview)
+        for w in (spacing, angle, margin):
+            w.valueChanged.connect(ask_preview)
+        ask_preview()
+        self._place_beside(dlg)
+        accepted = dlg.exec() == QDialog.Accepted
+        prev.wait()
+        if not accepted:
             return None
         if removed:
             return {"pattern": None}
-        values = {"pattern": pattern.currentData(), "spacing": spacing.value(), "angle": angle.value(),
-                  "margin": margin.value()}
+        values = values_now()
         for k, v in values.items():
             st.setValue("fill/" + k, v)
         return values

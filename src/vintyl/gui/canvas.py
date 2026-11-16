@@ -122,7 +122,7 @@ class ElementItem(QGraphicsPathItem):
         self.polys = curves.flatten(element.paths, tol=0.1)
         # the fill pattern (drawn by a pen; with the knife it is not shown)
         self.fill_path = QPainterPath()
-        for line in element.fill_lines(tol=0.1):
+        for line in element.fill_lines():           # the same as the job's: worked out once (cached)
             self.fill_path.moveTo(QPointF(*line[0]))
             for q in line[1:]:
                 self.fill_path.lineTo(QPointF(*q))
@@ -331,6 +331,7 @@ class MaterialView(QGraphicsView):
         self._user_zoomed = False
         self._design_box = None
         self.pen_mode = False            # the cutter holds a pen: fills are drawn, not skipped
+        self._preview_item = None        # a dashed preview of shapes about to be added
         from PySide6.QtCore import QTimer
         self._sheet_timer = QTimer(self)
         self._sheet_timer.setSingleShot(True)
@@ -357,6 +358,7 @@ class MaterialView(QGraphicsView):
         self._items = []
         self._knife_items = []          # cleared with the scene; the window draws them again
         self._frame_item = None
+        self._preview_item = None       # cleared with the scene
         self._snap_marker = None
         self._guides = None
         box = design.bounds()
@@ -1160,6 +1162,18 @@ class MaterialView(QGraphicsView):
             self.setTransformationAnchor(QGraphicsView.AnchorViewCenter)
             self.scale(factor, factor)
             self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
+
+    def show_preview(self, paths):
+        """A dashed preview of shapes about to be added (curves subpaths, view
+        mm); None removes it."""
+        item = self._preview_item
+        if item is not None and item.scene() is self.scene():
+            self.scene().removeItem(item)
+        self._preview_item = None
+        if paths:
+            self._preview_item = self.scene().addPath(painter_path(paths),
+                                                      cosmetic_pen(COLORS["selection"], 1.2, Qt.DashLine))
+            self._preview_item.setZValue(45)
 
     def window_length(self):
         """The sheet length that, with the sheet fitted to the window by its

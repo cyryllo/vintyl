@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-16 21:26+0100\n"
+"POT-Creation-Date: 2026-11-16 21:45+0100\n"
 "PO-Revision-Date: 2026-11-15 17:49+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -36,6 +36,13 @@ msgid_plural "%d nodes selected"
 msgstr[0] "Zaznaczono %d węzeł"
 msgstr[1] "Zaznaczono %d węzły"
 msgstr[2] "Zaznaczono %d węzłów"
+
+#, python-format
+msgid "%d shape fits."
+msgid_plural "%d shapes fit."
+msgstr[0] "Mieści się %d kształt."
+msgstr[1] "Mieszczą się %d kształty."
+msgstr[2] "Mieści się %d kształtów."
 
 #, python-format
 msgid "%d shape placed."
@@ -182,6 +189,10 @@ msgstr "Nie można odczytać %s: %s"
 #, python-format
 msgid "Cannot save %s: %s"
 msgstr "Nie można zapisać %s: %s"
+
+#, python-format
+msgid "Cannot work it out: %s"
+msgstr "Nie da się tego policzyć: %s"
 
 msgid "Centres across"
 msgstr "Środki w poziomie"
@@ -1205,6 +1216,9 @@ msgstr "Szerokość"
 
 msgid "Width (mm)"
 msgstr "Szerokość (mm)"
+
+msgid "Working it out…"
+msgstr "Liczę…"
 
 #, python-format
 msgid "Writing to %s failed: %s"

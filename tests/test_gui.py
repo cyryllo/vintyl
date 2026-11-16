@@ -1043,7 +1043,7 @@ def test_a_pattern_of_shapes_is_cut_with_the_knife_before_its_outline(win):
     box = win.selected
     # with the knife the Fill category offers only the pattern of shapes (no popup, it asks at once)
     asked = []
-    win._ask_tile = lambda: asked.append(True) or None
+    win._ask_tile = lambda *a: asked.append(True) or None
     assert win.show_category("fill") is None and asked
     new = win.tile_selected({"motif": "star", "size": 8.0, "gap": 3.0, "margin": 2.0, "stagger": True})
     assert new is not None and new.group and new.group == box.group
@@ -1066,3 +1066,108 @@ def test_a_pattern_needs_room(win, messages):
     assert win.tile_selected({"motif": "circle", "size": 20.0, "gap": 2.0, "margin": 1.0,
                               "stagger": False}) is None
     assert len(win.design.elements) == 1
+
+
+def _in_dialog(app, steps):
+    """Run steps(dialog) once the dialog opened by the next exec() is shown."""
+    from PySide6.QtCore import QTimer
+    from PySide6.QtWidgets import QDialog
+
+    def go():
+        dlg = [w for w in app.topLevelWidgets() if isinstance(w, QDialog) and w.isVisible()]
+        if not dlg:
+            QTimer.singleShot(20, go)
+            return
+        try:
+            steps(dlg[0])
+        except BaseException as e:                     # reported after the dialog is closed
+            failed.append(e)
+        finally:
+            if dlg[0].isVisible():
+                dlg[0].reject()
+    failed = []
+    _in_dialog.failed = failed
+    QTimer.singleShot(20, go)
+
+
+def _wait_for(cond, ms=5000):
+    from PySide6.QtTest import QTest
+    for _i in range(ms // 20):
+        if cond():
+            return True
+        QTest.qWait(20)
+    return False
+
+
+def test_the_pattern_of_shapes_is_previewed_and_cancel_leaves_nothing(win, app):
+    from PySide6.QtWidgets import QDoubleSpinBox
+    win._on_drawn("rectangle", QRectF(-120, -80, 100, 60))
+    seen = {}
+
+    def steps(dlg):
+        assert _wait_for(lambda: win.view._preview_item is not None)
+        first = win.view._preview_item.path().elementCount()
+        dlg.findChildren(QDoubleSpinBox)[0].setValue(12.0)                    # bigger shapes: fewer
+        assert _wait_for(lambda: win.view._preview_item is not None
+                         and win.view._preview_item.path().elementCount() < first)
+        seen["ok"] = True
+        dlg.reject()
+    _in_dialog(app, steps)
+    result = win.tile_selected()
+    if _in_dialog.failed:
+        raise _in_dialog.failed[0]
+    assert result is None
+    assert seen.get("ok") and len(win.design.elements) == 1 and win.view._preview_item is None
+
+
+def test_the_fill_is_previewed_and_cancel_puts_it_back(win, app):
+    from PySide6.QtWidgets import QComboBox
+    win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
+    win._on_drawn("rectangle", QRectF(-120, -80, 100, 60))
+    box = win.selected
+    seen = {}
+
+    def steps(dlg):
+        combo = dlg.findChildren(QComboBox)[0]
+        combo.setCurrentIndex(combo.findData("honeycomb"))
+        assert _wait_for(lambda: box.fill is not None and box.fill["pattern"] == "honeycomb")
+        seen["ok"] = True
+        dlg.reject()
+    undo_before = len(win._undo)
+    _in_dialog(app, steps)
+    result = win.fill_selected()
+    if _in_dialog.failed:
+        raise _in_dialog.failed[0]
+    assert result == []
+    assert seen.get("ok") and box.fill is None                    # cancelled: no fill, as before
+    assert len(win._undo) == undo_before                         # and nothing to undo
+
+
+def test_a_moved_fill_is_not_worked_out_again():
+    from vintyl.core import design, shapes
+    e = design.Element("x", shapes.ellipse(0, 0, 100, 100),
+                       fill={"pattern": "honeycomb", "spacing": 2.0, "angle": 10.0, "margin": 0.0})
+    a = e.fill_lines()
+    n = len(design._FILL_CACHE)
+    e.move_by(12.5, -7.25)
+    b = e.fill_lines()
+    assert len(design._FILL_CACHE) == n                           # found, not worked out
+    assert b[0][0][0] == pytest.approx(a[0][0][0] + 12.5) and b[0][0][1] == pytest.approx(a[0][0][1] - 7.25)
+
+
+def test_the_left_panel_never_squeezes_its_boxes_into_each_other(win):
+    """A low window: the project list gives way, the Cutter and Job boxes keep
+    their rows; lower still, the panel scrolls (it once overlapped)."""
+    from PySide6.QtTest import QTest
+    from PySide6.QtWidgets import QGroupBox
+    win.show()
+    win._on_drawn("rectangle", QRectF(-60, -40, 20, 20))
+    boxes = win.left_scroll.widget().findChildren(QGroupBox)
+    for tool in ("knife", "pen"):
+        win.tool_box.setCurrentIndex(win.tool_box.findData(tool))
+        for h in (1000, 900, 700):
+            win.resize(1400, h)
+            QTest.qWait(60)
+            r = [b.geometry() for b in boxes]
+            assert all(r[i].bottom() < r[i + 1].top() for i in range(len(r) - 1)), (tool, h, r)
+            assert all(b.height() >= b.minimumSizeHint().height() for b in boxes), (tool, h)

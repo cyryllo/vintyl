@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-16 21:26+0100\n"
+"POT-Creation-Date: 2026-11-16 21:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,6 +30,12 @@ msgstr[1] ""
 #, python-format
 msgid "%d node selected"
 msgid_plural "%d nodes selected"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "%d shape fits."
+msgid_plural "%d shapes fit."
 msgstr[0] ""
 msgstr[1] ""
 
@@ -166,6 +172,10 @@ msgstr ""
 
 #, python-format
 msgid "Cannot save %s: %s"
+msgstr ""
+
+#, python-format
+msgid "Cannot work it out: %s"
 msgstr ""
 
 msgid "Centres across"
@@ -1093,6 +1103,9 @@ msgid "Width"
 msgstr ""
 
 msgid "Width (mm)"
+msgstr ""
+
+msgid "Working it out…"
 msgstr ""
 
 #, python-format
