@@ -12,10 +12,10 @@ license-files = ["LICENSE"]
 requires-python = ">=3.11"
 authors = [{ name = "Vintyl contributors" }]
 # The core needs no GUI toolkit; pyserial is only imported when sending to a port.
-dependencies = ["pyserial>=3.5"]
+dependencies = ["pyserial>=3.5", "pyclipper>=1.3"]
 
 [project.optional-dependencies]
-gui = ["PySide6-Essentials>=6.6", "svgelements>=1.9"]
+gui = ["PySide6-Essentials>=6.6", "svgelements>=1.9", "segno>=1.5"]
 dev = ["pytest>=8", "babel>=2.14"]
 
 [project.gui-scripts]

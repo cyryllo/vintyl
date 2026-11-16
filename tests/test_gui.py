@@ -328,8 +328,8 @@ def test_what_is_on_screen_is_cut_the_same_way_round(win, tmp_path):
     win._on_line_drawn(QPointF(-30, -20), QPointF(-30, -30))
     text = win.build().text
     assert "PU800,1200;PD1200,1200;" in text          # X 20 -> 30 mm, Y 30 mm
-    # the material: an upright sheet (at least 500 mm and 1.414 x the width), longer when needed
-    assert win.view.length_mm == pytest.approx(max(500.0, 1.414 * win.profile.width_mm))
+    # the material: as long as fills the window, longer when needed
+    assert win.view.length_mm == pytest.approx(win.view.window_length())
     win._on_drawn("rectangle", QRectF(-60, -1300, 20, 20))
     assert win.view.length_mm >= 1300.0
 
@@ -417,6 +417,94 @@ def test_polyline_enter_leaves_it_open_backspace_drops_a_corner(win):
     assert not e.paths[0]["closed"] and len(e.paths[0]["nodes"]) == 3
 
 
+def test_pen_click_corner_drag_curve_and_close(win):
+    """Pen (from Kerfly): a click is a corner, press and drag makes a smooth node; the first node closes it."""
+    from PySide6.QtTest import QTest
+    v = win.view
+    win.set_tool("pen")
+    v.snap_objects = False
+    at = v.mapFromScene
+    QTest.mouseClick(v.viewport(), Qt.LeftButton, Qt.NoModifier, at(QPointF(-80, -20)))
+    # press, drag, release: a smooth node with mirrored handles
+    QTest.mousePress(v.viewport(), Qt.LeftButton, Qt.NoModifier, at(QPointF(-30, -20)))
+    from PySide6.QtGui import QMouseEvent
+    pos = at(QPointF(-30, -50))
+    v.mouseMoveEvent(QMouseEvent(QMouseEvent.MouseMove, QPointF(pos), QPointF(v.viewport().mapToGlobal(pos)),
+                                 Qt.NoButton, Qt.LeftButton, Qt.NoModifier))
+    QTest.mouseRelease(v.viewport(), Qt.LeftButton, Qt.NoModifier, at(QPointF(-30, -50)))
+    QTest.mouseClick(v.viewport(), Qt.LeftButton, Qt.NoModifier, at(QPointF(-55, -70)))
+    QTest.mouseClick(v.viewport(), Qt.LeftButton, Qt.NoModifier, at(QPointF(-80, -20)))      # the first node
+    e = win.design.elements[-1]
+    sub = e.paths[0]
+    assert sub["closed"] and len(sub["nodes"]) == 3
+    smooth = sub["nodes"][1]
+    assert smooth[4] == pytest.approx(-30, abs=1) and smooth[5] == pytest.approx(-50, abs=1)
+    assert smooth[3] == pytest.approx(10, abs=1)                     # the in handle mirrored
+    assert sub["nodes"][0][4] is None                                  # a click: a corner
+    assert win.view.tool == "select"
+
+
+def test_pen_enter_leaves_it_open(win):
+    from PySide6.QtTest import QTest
+    v = win.view
+    win.set_tool("pen")
+    v.snap_objects = False
+    for p in (QPointF(-80, -20), QPointF(-30, -20), QPointF(-30, -60)):
+        QTest.mouseClick(v.viewport(), Qt.LeftButton, Qt.NoModifier, v.mapFromScene(p))
+    QTest.keyClick(v.viewport(), Qt.Key_Backspace)
+    QTest.keyClick(v.viewport(), Qt.Key_Return)
+    sub = win.design.elements[-1].paths[0]
+    assert not sub["closed"] and len(sub["nodes"]) == 2
+
+
+def test_freehand_simplifies_and_closes_at_the_start(win):
+    import math
+    from PySide6.QtGui import QMouseEvent
+    from PySide6.QtTest import QTest
+    v = win.view
+    win.set_tool("freehand")
+    centre, r = QPointF(-60, -60), 25.0
+    pts = [centre + QPointF(r * math.cos(a / 40.0 * 2 * math.pi), r * math.sin(a / 40.0 * 2 * math.pi))
+           for a in range(41)]
+    QTest.mousePress(v.viewport(), Qt.LeftButton, Qt.NoModifier, v.mapFromScene(pts[0]))
+    for p in pts[1:]:
+        pos = v.mapFromScene(p)
+        v.mouseMoveEvent(QMouseEvent(QMouseEvent.MouseMove, QPointF(pos), QPointF(v.viewport().mapToGlobal(pos)),
+                                     Qt.NoButton, Qt.LeftButton, Qt.NoModifier))
+    QTest.mouseRelease(v.viewport(), Qt.LeftButton, Qt.NoModifier, v.mapFromScene(pts[-1]))
+    e = win.design.elements[-1]
+    assert e.paths[0]["closed"]
+    assert len(e.paths[0]["nodes"]) < 40                      # simplified
+    assert any(n[4] is not None for n in e.paths[0]["nodes"])   # and smooth
+    w, h = e.size
+    assert w == pytest.approx(50, abs=3) and h == pytest.approx(50, abs=3)
+
+
+def test_ruler_measures_a_drag(win):
+    from PySide6.QtGui import QMouseEvent
+    from PySide6.QtTest import QTest
+    v = win.view
+    win.set_tool("measure")
+    v.snap_objects = False
+    got = []
+    v.signals.measured.connect(lambda dx, dy: got.append((dx, dy)))
+    a, b = v.mapFromScene(QPointF(-100, -20)), v.mapFromScene(QPointF(-70, -60))
+    QTest.mousePress(v.viewport(), Qt.LeftButton, Qt.NoModifier, a)
+    v.mouseMoveEvent(QMouseEvent(QMouseEvent.MouseMove, QPointF(b), QPointF(v.viewport().mapToGlobal(b)),
+                                 Qt.NoButton, Qt.LeftButton, Qt.NoModifier))
+    QTest.mouseRelease(v.viewport(), Qt.LeftButton, Qt.NoModifier, b)
+    assert len(got) == 1 and math_hypot(*got[0]) == pytest.approx(50, abs=1)
+    assert ("%.2f mm" % math_hypot(*got[0])) in win.statusBar().currentMessage()
+    assert not win.design.elements                                   # measuring adds nothing
+    win.set_tool("select")
+    assert v._measure_item is None                                   # the line goes with the tool
+
+
+def math_hypot(dx, dy):
+    import math
+    return math.hypot(dx, dy)
+
+
 def test_selection_actions_need_a_selection(win):
     assert not win.act_rot_left.isEnabled() and not win.act_duplicate.isEnabled()
     win._on_drawn("ellipse", QRectF(-60, -40, 20, 20))
@@ -441,7 +529,7 @@ def test_right_bar_category_opens_a_square_of_icons(win):
 def test_ready_shapes_are_offered_and_inserted(win):
     from vintyl.core import ready
     popup = win.show_category("ready")
-    assert len(popup.findChildren(QToolButton)) == len(ready.READY) == 8
+    assert len(popup.findChildren(QToolButton)) == len(ready.READY) + 1 == 9      # and the QR code
     popup.close()
     e = win.insert_ready("star", {"points": 6, "size": 40.0, "inner": 50.0})
     assert e is win.selected and e.spec["shape"] == "star" and e.spec["points"] == 6
@@ -561,13 +649,33 @@ def test_the_last_cutter_and_its_port_are_remembered(app, tmp_path, monkeypatch)
     w2.close()
 
 
-def test_the_sheet_stands_upright_for_every_cutter_and_grows(win):
+def test_the_sheet_fills_the_window_for_every_cutter_and_grows_upwards(win, app):
+    """The sheet is the cutting width across and reaches the window's top and
+    bottom when fitted; something drawn higher up makes it longer, upwards."""
+    from PySide6.QtTest import QTest
+    win.resize(1400, 900)
+    win.show()
+    QTest.qWait(200)                      # the sheet follows the window after a short pause
+    v = win.view
     for name in win.profile_names:
         win.profile_box.setCurrentIndex(win.profile_names.index(name))
-        w = win.profile.width_mm
-        assert win.view.length_mm >= max(500.0, 1.4 * w)        # taller than wide
+        app.processEvents()
+        v.fit_requested()
+        sheet = v.mapFromScene(v.material_rect(v.length_mm)).boundingRect()
+        vp = v.viewport().rect()
+        assert abs(sheet.top() - vp.top()) <= 30          # no grey band above
+        assert abs(vp.bottom() - sheet.bottom()) <= 30    # nor below
+        assert abs(sheet.left() - vp.left()) <= 30         # nor beside it
+    before = v.length_mm
     win._on_drawn("rectangle", QRectF(-60, -1500, 20, 20))      # something higher up
-    assert win.view.length_mm >= 1500.0
+    assert v.length_mm >= 1500.0 > before
+    # a taller window: a longer sheet, without touching the design
+    win.design.elements.clear()
+    win.refresh()
+    flat = v.length_mm
+    win.resize(900, 1100)
+    QTest.qWait(200)
+    assert v.length_mm == pytest.approx(v.window_length()) and v.length_mm > flat
 
 
 # ---- several elements: group, ungroup, union / difference ... ------------------------
@@ -749,3 +857,180 @@ def test_weed_frame_is_shown_dashed_while_ticked(win, svg_file):
     assert win.view._frame_item.path().boundingRect().width() > r.width()
     win.weed_frame.setChecked(False)
     assert win.view._frame_item is None
+
+
+# ---- offset ------------------------------------------------------------------------------
+
+def test_offset_outwards_keeps_the_original(win):
+    win._on_drawn("rectangle", QRectF(-100, -80, 40, 20))
+    made = win.offset_selected({"distance": 3.0, "outward": True, "round": False, "keep": True})
+    assert len(win.design.elements) == 2 and made[0] is win.selected
+    o = win.design.elements[1]
+    assert o.size == pytest.approx((46.0, 26.0), abs=0.01)          # sharp corners: 3 mm all round
+    assert o.name.startswith("Offset")
+
+
+def test_offset_inwards_of_a_ring_and_replace(win):
+    win.insert_ready("ring", {"outer": 40.0, "hole": 20.0})
+    win.offset_selected({"distance": 2.0, "outward": False, "round": True, "keep": False})
+    assert len(win.design.elements) == 1
+    o = win.design.elements[0]
+    w, _h = o.size
+    assert w == pytest.approx(36.0, abs=0.05)                         # the outside 2 mm in ...
+    assert len(o.paths) == 2                                          # ... and the hole 2 mm bigger
+    win.undo()
+    assert win.design.elements[0].size[0] == pytest.approx(40.0, abs=0.01)
+
+
+def test_offset_needs_a_closed_shape(win):
+    win._on_line_drawn(QPointF(-80, -20), QPointF(-30, -20))
+    assert win.offset_selected({"distance": 2.0}) == []
+
+
+# ---- project files ------------------------------------------------------------------------
+
+def test_save_and_open_a_project_with_its_settings(win, tmp_path, app):
+    win.profile_box.setCurrentIndex(win.profile_names.index("vevor-ki-375a"))
+    win.opt_text.setText("AB")
+    win._on_text_clicked(QPointF(-150, -80))
+    win.knife.setValue(0.3)
+    win.weed_frame.setChecked(True)
+    assert win.modified and win.windowTitle().startswith("new project *")
+    path = win.save_project(str(tmp_path / "test.vintyl"))
+    assert path and not win.modified and win.windowTitle().startswith("test.vintyl –")
+    w2 = MainWindow()
+    assert w2.open_file(path) is not None
+    assert w2.profile.name == "VEVOR KI-375A" and w2.knife.value() == pytest.approx(0.3)
+    assert w2.weed_frame.isChecked()
+    e = w2.design.elements[0]
+    assert e.spec["text"] == "AB" and w2.build().text == win.build().text
+    w2.close()
+
+
+def test_a_damaged_project_is_refused_with_a_message(win, tmp_path, messages):
+    bad = tmp_path / "bad.vintyl"
+    bad.write_text("{")
+    assert win.open_file(str(bad)) is None
+    assert messages and "damaged" in messages[-1]
+
+
+# ---- grid and settings ---------------------------------------------------------------------
+
+def test_grid_step_in_the_settings_and_snapping_to_it(win):
+    win.show_settings({"grid_step": 5.0, "snap_objects": False})
+    win.act_grid.setChecked(True)
+    assert win.view.grid_mm == 5.0
+    p = win.view.snap_point(QPointF(-12.4, -21.6))
+    assert (p.x(), p.y()) == (-10.0, -20.0)
+    win.act_grid.setChecked(False)
+    assert win.view.grid_mm == 0.0
+    p = win.view.snap_point(QPointF(-12.4, -21.6))
+    assert (round(p.x(), 3), round(p.y(), 3)) == (-12.4, -21.6)
+
+
+def test_grid_and_settings_are_remembered(app, tmp_path, monkeypatch):
+    monkeypatch.setenv("VINTYL_SETTINGS", str(tmp_path / "grid.ini"))
+    w = MainWindow()
+    w.show_settings({"grid_step": 2.5, "snap_objects": False})
+    w.act_grid.setChecked(True)
+    w.settings.sync()
+    w.close()
+    w2 = MainWindow()
+    assert w2.grid_step == 2.5 and w2.act_grid.isChecked() and w2.view.grid_mm == 2.5
+    assert not w2.view.snap_objects
+    w2.close()
+
+
+def test_offset_without_the_holes_inside(win):
+    win.opt_text.setText("O")
+    win._on_text_clicked(QPointF(-150, -80))
+    with_holes = win.offset_selected({"distance": 1.0, "outward": True, "round": True, "keep": True})[0]
+    assert len(with_holes.paths) == 2                          # the O's outline and its counter
+    win.view.select(win.design.elements[0])
+    solid = win.offset_selected({"distance": 1.0, "outward": True, "round": True, "keep": True,
+                                 "no_holes": True})[0]
+    assert len(solid.paths) == 1                               # only the outside: a solid backing
+
+
+def test_spread_three_shapes_evenly(win):
+    for x in (-150, -120, -50):
+        win._on_drawn("rectangle", QRectF(x, -60, 10, 10))
+    win.view.select_many(win.design.elements)
+    win.distribute_selected(True)
+    xs = sorted(e.bounds[0] for e in win.design.elements)
+    assert xs == pytest.approx([-150, -100, -50])                  # equal gaps, the outer two stayed
+
+
+def test_qr_code_is_inserted_as_cut_outlines(win):
+    e = win.insert_qr("https://github.com/cyryllo/vintyl", 25.0, "m")
+    assert e is win.selected and e.spec["shape"] == "qr"
+    assert max(e.size) == pytest.approx(25.0)
+    assert len(e.paths) > 10 and all(sp["closed"] for sp in e.paths)
+
+
+# ---- knife or pen ------------------------------------------------------------------------------------
+def test_the_pen_switch_shows_its_own_settings_and_hides_the_knifes(win):
+    form = win.cutter_form
+    assert form.isRowVisible(win.knife) and not form.isRowVisible(win.pen_width)
+    win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
+    assert win.is_pen()
+    for w in (win.knife, win.overcut, win.inside_first):
+        assert not form.isRowVisible(w)
+    assert form.isRowVisible(win.pen_width) and form.isRowVisible(win.pen_place)
+    assert win.frame_row.isHidden()
+    win.tool_box.setCurrentIndex(win.tool_box.findData("knife"))
+    assert form.isRowVisible(win.knife) and not win.frame_row.isHidden()
+    assert win.knife.value() == pytest.approx(win.profile.knife_offset_mm)       # kept meanwhile
+
+
+def test_a_pen_job_has_no_offset_no_overcut_no_frame(win):
+    win._on_drawn("rectangle", QRectF(-60, -40, 20, 20))
+    win.weed_frame.setChecked(True)
+    knife_job = win.build()
+    win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
+    win.pen_place.setCurrentIndex(win.pen_place.findData("on"))
+    job = win.build()
+    # just the square: 4 sides, no overcut, no swivel arcs, no frame
+    assert job.cut_mm == pytest.approx(80.0, abs=0.01)
+    assert knife_job.cut_mm > 160.0                                   # the knife: the frame too
+    win.pen_width.setValue(1.0)
+    win.pen_place.setCurrentIndex(win.pen_place.findData("outside"))
+    import math                                                     # half the pen width out,
+    assert win.build().cut_mm == pytest.approx(80.0 + math.pi * 1.0, abs=0.1)   # round corners
+    assert "Drawn length" in win.job_label.text() or "rysowania" in win.job_label.text()
+
+
+def test_the_tool_is_remembered_for_each_cutter(win):
+    names = win.profile_names
+    win.profile_box.setCurrentIndex(0)
+    win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
+    win.pen_width.setValue(0.8)
+    win.profile_box.setCurrentIndex(1)
+    assert not win.is_pen()                                            # the other cutter keeps its knife
+    win.profile_box.setCurrentIndex(0)
+    assert win.is_pen() and win.pen_width.value() == pytest.approx(0.8)
+    assert len(names) >= 2
+
+
+def test_a_fill_is_offered_and_drawn_only_with_the_pen(win):
+    win._on_drawn("rectangle", QRectF(-60, -40, 20, 10))
+    lines = {"pattern": "lines", "spacing": 1.0, "angle": 0.0, "margin": 0.0}
+    # the knife: no fill tool (it would cut the vinyl into strips)
+    assert not win.act_fill.isVisible() and win.category_buttons["fill"].isHidden()
+    assert win.fill_selected(lines) == [] and win.design.elements[0].fill is None
+    win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
+    assert win.act_fill.isVisible() and not win.category_buttons["fill"].isHidden()
+    assert win.cutter_form.isRowVisible(win.pen_note)
+    filled = win.fill_selected(lines)
+    assert filled and filled[0].fill["pattern"] == "lines"
+    win.tool_box.setCurrentIndex(win.tool_box.findData("knife"))
+    knife_len = win.build().cut_mm                                    # the knife skips a fill
+    win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
+    win.pen_place.setCurrentIndex(win.pen_place.findData("on"))
+    job = win.build()
+    assert job.cut_mm == pytest.approx(60.0 + 10 * 20.0, abs=0.5)     # the outline and 10 lines
+    assert knife_len < job.cut_mm
+    win.undo()
+    assert win.design.elements[0].fill is None
+    win.fill_selected({"pattern": None})
+    assert win.design.elements[0].fill is None

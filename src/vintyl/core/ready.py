@@ -1,6 +1,6 @@
 """
 Ready-made shapes: star, heart, ring, rounded rectangle, arrow, gear, cross,
-drop. Each returns curves subpaths (vintyl.core.curves) in view mm, x right,
+drop; and a QR code (qr_code, it takes a text). Each returns curves subpaths (vintyl.core.curves) in view mm, x right,
 y down, the top left of the shape at (0, 0). No GUI toolkit.
 
 READY lists them with their parameters (key, label, default, minimum,
@@ -16,7 +16,7 @@ import math
 
 from . import curves
 from .curves import KAPPA, node
-from ..i18n import N_
+from ..i18n import N_, _
 
 
 def _to_origin(subpaths):
@@ -169,6 +169,61 @@ def gear(teeth=20, module=2.0, bore=5.0, pressure_angle=20.0, points_per_flank=8
     return _to_origin(paths)
 
 
+# ---- QR code: the dark modules' outlines, to cut ------------------------------------------
+# _cell_outlines is copied from Kerfly (kerfly/core/generators.py, commit cf48565).
+def _cell_outlines(cells):
+    """Outlines (with holes) of the filled cells of a grid (rows of booleans), in cell
+    units: the dark parts become whole shapes, with no seams between touching cells."""
+    rows, cols = len(cells), len(cells[0]) if cells else 0
+
+    def filled(i, j):
+        return 0 <= j < rows and 0 <= i < cols and cells[j][i]
+    edges = {}
+    for j in range(rows):
+        for i in range(cols):
+            if not filled(i, j):
+                continue
+            if not filled(i, j - 1):
+                edges.setdefault((i, j), []).append((i + 1, j))
+            if not filled(i + 1, j):
+                edges.setdefault((i + 1, j), []).append((i + 1, j + 1))
+            if not filled(i, j + 1):
+                edges.setdefault((i + 1, j + 1), []).append((i, j + 1))
+            if not filled(i - 1, j):
+                edges.setdefault((i, j + 1), []).append((i, j))
+    loops = []
+    while edges:
+        start = min(edges)
+        loop, p = [start], edges[start].pop()
+        if not edges[start]:
+            del edges[start]
+        while p != start:
+            loop.append(p)
+            nxt = edges[p].pop()
+            if not edges[p]:
+                del edges[p]
+            p = nxt
+        clean = [q for k, q in enumerate(loop)
+                 if not ((loop[k - 1][0] == q[0] == loop[(k + 1) % len(loop)][0]) or
+                         (loop[k - 1][1] == q[1] == loop[(k + 1) % len(loop)][1]))]
+        loops.append(clean)
+    return loops
+
+
+def qr_code(text, size=30.0, error="m"):
+    """A QR code to cut: the outlines of its dark modules (joined, with holes),
+    size mm across (without a border: the vinyl round it is the border).
+    error: l, m, q or h (more can be scratched off and still read)."""
+    if not text:
+        raise ValueError(_("Type the text or address the QR code should hold."))
+    import segno
+    matrix = segno.make(text, error=error, micro=False).matrix
+    n = len(matrix)
+    cell = float(size) / n
+    loops = _cell_outlines([[bool(v) for v in row] for row in matrix])
+    return [_poly([(x * cell, y * cell) for x, y in loop]) for loop in loops]
+
+
 # key -> (name, function, [(parameter, label, default, minimum, maximum, step)])
 READY = {
     "star": (N_("Star"), star, [("points", N_("Arms"), 5, 3, 50, 1), ("size", N_("Size (mm)"), 50.0, 1, 2000, 1),
@@ -182,10 +237,10 @@ READY = {
                  ("radius", N_("Corner radius (mm)"), 8.0, 0, 1000, 0.5)]),
     "arrow": (N_("Arrow"), arrow, [("length", N_("Length (mm)"), 80.0, 1, 2000, 1),
                                    ("width", N_("Width (mm)"), 40.0, 1, 2000, 1),
-                                   ("head", N_("Head (% of length)"), 40.0, 5, 95, 1),
-                                   ("shaft", N_("Shaft (% of width)"), 40.0, 5, 95, 1)]),
+                                   ("head", N_("Head length (%)"), 40.0, 5, 95, 1),
+                                   ("shaft", N_("Shaft width (%)"), 40.0, 5, 95, 1)]),
     "cross": (N_("Cross"), cross, [("size", N_("Size (mm)"), 40.0, 1, 2000, 1),
-                                   ("thickness", N_("Bars (% of size)"), 33.0, 5, 95, 1)]),
+                                   ("thickness", N_("Bar width (%)"), 33.0, 5, 95, 1)]),
     "drop": (N_("Drop"), drop, [("width", N_("Width (mm)"), 30.0, 1, 2000, 1),
                                 ("height", N_("Height (mm)"), 45.0, 1, 2000, 1)]),
     "gear": (N_("Gear"), gear, [("teeth", N_("Teeth"), 20, 6, 200, 1), ("module", N_("Module (mm)"), 2.0, 0.2, 50, 0.1),

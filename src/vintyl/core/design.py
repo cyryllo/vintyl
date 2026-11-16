@@ -32,10 +32,26 @@ class Element:
     # shapes, files and anything turned or edited by its nodes
     spec: dict = None
     group: str = ""                   # elements with the same group are selected and moved together
+    # a fill pattern inside the closed outlines, drawn with a pen (a knife skips it):
+    # {"pattern": "lines", "spacing": mm, "angle": degrees, "margin": mm}; None = no fill
+    fill: dict = None
 
     def copy(self):
         return Element(self.name, curves.copy_path(self.paths), self.cut, self.source,
-                       dict(self.spec) if self.spec else None, self.group)
+                       dict(self.spec) if self.spec else None, self.group,
+                       dict(self.fill) if self.fill else None)
+
+    def fill_lines(self, tol=curves.FLATNESS_MM):
+        """The fill pattern's lines (view mm), [] without a fill or closed outlines."""
+        if not self.fill:
+            return []
+        from .patterns import pattern_lines
+        rings = curves.flatten([sub for sub in self.paths if sub["closed"]], tol)
+        if not rings:
+            return []
+        f = self.fill
+        return pattern_lines(f.get("pattern", "lines"), rings, float(f.get("spacing", 1.0)),
+                             float(f.get("angle", 0.0)), float(f.get("margin", 0.0)))
 
     @property
     def bounds(self):
@@ -127,6 +143,18 @@ class Design:
                 groups.append(k)
         return out, groups
 
+    def material_fills(self, tol=curves.FLATNESS_MM):
+        """(polylines, groups) of the fill patterns of the elements marked
+        "cut" (for the pen; material coordinates, as material_paths)."""
+        out, groups = [], []
+        for k, e in enumerate(self.elements):
+            if not e.cut or not e.fill:
+                continue
+            for line in e.fill_lines(tol):
+                out.append([view_to_material(x, y) for x, y in line])
+                groups.append(k)
+        return out, groups
+
 
 def view_to_material(x, y):
     """(along, across) of a view point; see the module notes."""
@@ -135,3 +163,41 @@ def view_to_material(x, y):
 
 def material_to_view(along, across):
     return -across, -along
+
+
+def distribute(elements, across=True):
+    """Spread three or more elements evenly: across = left to right on the
+    screen (view x), else up and down (view y). The two outermost stay where
+    they are; the others get equal gaps between their boxes; when they are too
+    big for gaps, their centres are spaced evenly instead. Returns how they
+    were spread ("gap" or "centres", mm) or None for fewer than three.
+    After Kerfly's distribute (kerfly/core/layout.py, commit cf48565)."""
+    if len(elements) < 3:
+        return None
+    lo_i, hi_i = (0, 1) if across else (2, 3)
+
+    def lo(e):
+        return e.bounds[lo_i]
+
+    def hi(e):
+        return e.bounds[hi_i]
+
+    def shift(e, d):
+        e.move_by(d, 0.0) if across else e.move_by(0.0, d)
+
+    order = sorted(elements, key=lambda e: (lo(e) + hi(e)) / 2.0)
+    first, last = order[0], order[-1]
+    span = hi(last) - lo(first)
+    sizes = sum(hi(e) - lo(e) for e in order)
+    gap = (span - sizes) / (len(order) - 1)
+    if gap >= 0:
+        pos = hi(first) + gap
+        for e in order[1:-1]:
+            shift(e, pos - lo(e))
+            pos = hi(e) + gap
+        return ("gap", gap)
+    c0 = (lo(first) + hi(first)) / 2.0
+    step = ((lo(last) + hi(last)) / 2.0 - c0) / (len(order) - 1)
+    for n, e in enumerate(order[1:-1], 1):
+        shift(e, c0 + n * step - (lo(e) + hi(e)) / 2.0)
+    return ("centres", step)

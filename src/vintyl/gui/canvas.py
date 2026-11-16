@@ -5,7 +5,8 @@ The material is shown as you see it from the front of the cutter: scene
 units are millimetres, x right, y down; the origin (the cutter's Origin)
 at (0, 0) in the lower right corner; the cutting width to the left (x from
 -width to 0); the material running away from you upwards (y negative),
-500 mm by default and longer when the design reaches further. See
+as long as fills the window when the sheet is fitted to it, and longer
+when the design reaches further. See
 vintyl.core.design for the material coordinates.
 
 As in Kerfly: the wheel zooms about the pointer, the middle button drags
@@ -37,6 +38,7 @@ COLORS = {
     "material": QColor("#f4f5f7"),
     "material_edge": QColor("#9ca3af"),
     "grid": QColor("#e3e6ea"),
+    "grid_on": QColor("#cfd5dd"),
     "label": QColor("#e5e7eb"),
     "cut": QColor("#be185d"),
     "skip": QColor("#9ca3af"),
@@ -45,8 +47,9 @@ COLORS = {
     "off": QColor("#dc2626"),
     "snap": QColor("#c026d3"),
 }
-MIN_STRIP_LENGTH = 500.0         # mm of material always shown, more when the design reaches further
-SHEET_RATIO = 1.414              # the sheet stands upright at least like A4 (height = 1.414 x width)
+MIN_STRIP_LENGTH = 100.0         # mm of material shown at the least (a very flat window)
+FIT_MARGIN_PX = 26               # room round the sheet (for its labels) when it is fitted to the window
+DESIGN_ROOM_MM = 100.0           # material shown above the highest element
 GRID_MM = 50.0
 SNAP_PIXELS = 10                 # snap distance on screen
 SNAP_LABELS = {snapping.CORNER: N_("corner"), snapping.CENTRE: N_("centre"),
@@ -89,6 +92,9 @@ class CanvasSignals(QObject):
     line_drawn = Signal(QPointF, QPointF)     # line tool: start, end (view mm)
     polyline_drawn = Signal(list, bool)       # polyline tool: corner points (view mm), closed
     text_clicked = Signal(QPointF)            # text tool: where the text starts (top left, view mm)
+    pen_drawn = Signal(list)                  # pen or freehand: the drawn path (curves subpaths, view mm)
+    measured = Signal(float, float)
+    sheet_changed = Signal()                  # the window changed shape: draw the sheet again           # the ruler: dx, dy in mm (screen right / down)
     cursor = Signal(float, float)             # pointer in material coordinates (along, across)
     nodes_changed = Signal(object, list, bool)  # element, its new paths (view mm), unused
     node_selection = Signal(int)              # number of selected nodes in the node tool
@@ -114,6 +120,15 @@ class ElementItem(QGraphicsPathItem):
         self._dragging = False
         self._snap_cache = None
         self.polys = curves.flatten(element.paths, tol=0.1)
+        # the fill pattern (drawn by a pen; with the knife it is not shown)
+        self.fill_path = QPainterPath()
+        for line in element.fill_lines(tol=0.1):
+            self.fill_path.moveTo(QPointF(*line[0]))
+            for q in line[1:]:
+                self.fill_path.lineTo(QPointF(*q))
+
+    def boundingRect(self):
+        return super().boundingRect().united(self.fill_path.boundingRect())
 
     def shape(self):
         # pick by the whole bounding box: thin outlines are hard to hit
@@ -122,8 +137,13 @@ class ElementItem(QGraphicsPathItem):
         return p
 
     def paint(self, painter, option, widget=None):
-        painter.setPen(self.pen())
         painter.setBrush(Qt.NoBrush)
+        if not self.fill_path.isEmpty() and self.view.pen_mode:      # a knife has no fill: not shown
+            color = QColor(COLORS["cut"] if self.element.cut else COLORS["skip"])
+            color.setAlpha(170)
+            painter.setPen(cosmetic_pen(color, 1.0))
+            painter.drawPath(self.fill_path)
+        painter.setPen(self.pen())
         painter.drawPath(self.path())
         r = self.path().boundingRect()
         if self.view.off_material(self.sceneBoundingRect()) and self.element.cut:
@@ -303,8 +323,19 @@ class MaterialView(QGraphicsView):
         self._draw_start = None
         self._draw_item = None
         self._poly_points = []           # polyline being drawn (view mm)
+        self._pen = None                 # pen path being drawn: {"nodes": [...], "pressed": bool}
+        self._freehand = None            # points of a freehand line being drawn
+        self._measure_start = None
+        self._measure_item = None
         self._panning = None
         self._user_zoomed = False
+        self._design_box = None
+        self.pen_mode = False            # the cutter holds a pen: fills are drawn, not skipped
+        from PySide6.QtCore import QTimer
+        self._sheet_timer = QTimer(self)
+        self._sheet_timer.setSingleShot(True)
+        self._sheet_timer.setInterval(60)
+        self._sheet_timer.timeout.connect(self.signals.sheet_changed.emit)
         self.scene().selectionChanged.connect(self._selection_changed)
 
     # ---- content --------------------------------------------------------------
@@ -329,23 +360,28 @@ class MaterialView(QGraphicsView):
         self._snap_marker = None
         self._guides = None
         box = design.bounds()
-        # an upright sheet: at least 500 mm and 1.414 x the width (as A4), and
-        # longer when the design reaches further (y up is negative)
-        length = max(MIN_STRIP_LENGTH, self.width_mm * SHEET_RATIO, (-box[2] + 100.0) if box else 0.0)
+        self._design_box = box
+        # the sheet: the cutting width across, and long enough to fill the
+        # window from top to bottom; longer (upwards) when the design reaches
+        # further (y up is negative)
+        length = max(self.window_length(), (-box[2] + DESIGN_ROOM_MM) if box else 0.0)
         self.length_mm = length
         strip = self.material_rect(length)
         w = self.width_mm
 
         scene.addRect(strip, QPen(Qt.NoPen), QBrush(COLORS["material"]))
-        grid = cosmetic_pen(COLORS["grid"], 1)
-        x = -GRID_MM
-        while x > -w:
-            scene.addLine(x, -length, x, 0, grid)
-            x -= GRID_MM
-        y = -GRID_MM
-        while y > -length:
-            scene.addLine(-w, y, 0, y, grid)
-            y -= GRID_MM
+        # the grid: with the grid on, its step (and snapping to it); else light lines every 50 mm
+        step = self.grid_mm if self.grid_mm > 0 else GRID_MM
+        grid = cosmetic_pen(COLORS["grid_on"] if self.grid_mm > 0 else COLORS["grid"], 1)
+        if (w / step) * (length / step) < 40000:       # not thousands of lines at a tiny step
+            x = -step
+            while x > -w:
+                scene.addLine(x, -length, x, 0, grid)
+                x -= step
+            y = -step
+            while y > -length:
+                scene.addLine(-w, y, 0, y, grid)
+                y -= step
         edge = cosmetic_pen(COLORS["material_edge"], 1.5)
         scene.addLine(-w, 0, -w, -length, edge)          # the edges the knife cannot pass
         scene.addLine(0, 0, 0, -length, edge)
@@ -674,6 +710,7 @@ class MaterialView(QGraphicsView):
     # ---- tools ----------------------------------------------------------------
     def set_tool(self, tool):
         self._cancel_drawing()
+        self._clear_measure()
         self.hide_snap_marker()
         self.tool = tool
         for item in self._items:
@@ -740,7 +777,140 @@ class MaterialView(QGraphicsView):
         if len(pts) >= (3 if closed else 2):
             self.signals.polyline_drawn.emit([(q.x(), q.y()) for q in pts], closed)
 
+    # ---- pen, freehand and ruler: adapted from Kerfly's bed view (kerfly/gui/preview.py) ----
+    # pen: click = corner, press and drag = smooth node with handles; click the
+    # first node to close; double-click or Enter finishes; Backspace; Esc; Shift 45 degrees
+    def _pen_path(self, cursor=None):
+        nodes = [list(n) for n in self._pen["nodes"]]
+        if cursor is not None and nodes:
+            nodes.append(curves.node(cursor.x(), cursor.y()))
+        return [{"closed": False, "nodes": nodes}]
+
+    def _remove_draw_item(self):
+        if self._draw_item is not None and self._draw_item.scene() is self.scene():
+            self.scene().removeItem(self._draw_item)
+        self._draw_item = None
+
+    def _draw_pen(self, cursor=None):
+        self._remove_draw_item()
+        if not self._pen or not self._pen["nodes"]:
+            return
+        qp = QPainterPath()
+        for poly in curves.flatten(self._pen_path(cursor), tol=0.05):
+            qp.moveTo(QPointF(*poly[0]))
+            for q in poly[1:]:
+                qp.lineTo(QPointF(*q))
+        last = self._pen["nodes"][-1]
+        for k in (2, 4):                                   # the handles of the last node
+            if last[k] is not None:
+                qp.moveTo(QPointF(last[0], last[1]))
+                qp.lineTo(QPointF(last[k], last[k + 1]))
+        closing = cursor is not None and self._pen_near_first(cursor)
+        pen = cosmetic_pen(COLORS["cut"] if closing else COLORS["selection"], 1.3,
+                           Qt.SolidLine if closing else Qt.DashLine)
+        self._draw_item = self.scene().addPath(qp, pen)
+        self._draw_item.setZValue(30)
+        first = self._pen["nodes"][0]
+        dot = QGraphicsEllipseItem(-4, -4, 8, 8, self._draw_item)
+        dot.setPen(pen)
+        dot.setFlag(QGraphicsItem.ItemIgnoresTransformations, True)
+        dot.setPos(QPointF(first[0], first[1]))
+
+    def _pen_near_first(self, p):
+        if not self._pen or len(self._pen["nodes"]) < 2:
+            return False
+        a = self.mapFromScene(QPointF(self._pen["nodes"][0][0], self._pen["nodes"][0][1]))
+        b = self.mapFromScene(p)
+        return abs(a.x() - b.x()) <= 8 and abs(a.y() - b.y()) <= 8
+
+    def _pen_point(self, event):
+        p = self.snap_point(self.mapToScene(event.position().toPoint()))
+        if event.modifiers() & Qt.ShiftModifier and self._pen and self._pen["nodes"]:
+            last = self._pen["nodes"][-1]
+            dx, dy = p.x() - last[0], p.y() - last[1]
+            angle = round(math.atan2(dy, dx) / (math.pi / 4)) * (math.pi / 4)
+            length = math.hypot(dx, dy)
+            p = QPointF(last[0] + length * math.cos(angle), last[1] + length * math.sin(angle))
+        return p
+
+    def _finish_pen(self, closed):
+        if not self._pen:
+            return
+        nodes = []
+        for n in self._pen["nodes"]:
+            if not nodes or abs(n[0] - nodes[-1][0]) > 1e-6 or abs(n[1] - nodes[-1][1]) > 1e-6:
+                nodes.append(n)
+        self._pen = None
+        self._remove_draw_item()
+        if len(nodes) >= (3 if closed else 2) or (closed and len(nodes) == 2 and nodes[0][4] is not None):
+            self.signals.pen_drawn.emit([{"closed": closed, "nodes": nodes}])
+
+    # freehand: draw with the button held; ending near the start closes the shape
+    def _draw_freehand(self):
+        self._remove_draw_item()
+        qp = QPainterPath(QPointF(*self._freehand[0]))
+        for p in self._freehand[1:]:
+            qp.lineTo(QPointF(*p))
+        self._draw_item = self.scene().addPath(qp, cosmetic_pen(COLORS["selection"], 1.3))
+        self._draw_item.setZValue(30)
+
+    def _finish_freehand(self, end_view_pos):
+        pts, self._freehand = self._freehand, None
+        self._remove_draw_item()
+        if not pts or len(pts) < 2:
+            return
+        start = self.mapFromScene(QPointF(*pts[0]))
+        closed = len(pts) > 10 and abs(start.x() - end_view_pos.x()) <= 10 and abs(start.y() - end_view_pos.y()) <= 10
+        tol = 1.5 / max(abs(self.transform().m11()), 1e-9)          # 1.5 screen pixels, in mm
+        simple = curves.simplify(pts, tol)
+        if closed and len(simple) > 3:
+            simple = simple[:-1]
+        if len(simple) < 2:
+            return
+        self.signals.pen_drawn.emit(curves.smooth_path(simple, closed and len(simple) >= 3))
+
+    # the ruler: drag between two points (snapping works)
+    def _clear_measure(self):
+        self._measure_start = None
+        if self._measure_item is not None and self._measure_item.scene() is self.scene():
+            self.scene().removeItem(self._measure_item)
+        self._measure_item = None
+
+    def _draw_measure(self, a, b):
+        if self._measure_item is not None and self._measure_item.scene() is self.scene():
+            self.scene().removeItem(self._measure_item)
+        qp = QPainterPath(a)
+        qp.lineTo(b)
+        pen = cosmetic_pen(COLORS["origin"], 1.5)
+        item = self.scene().addPath(qp, pen)
+        item.setZValue(48)
+        for p in (a, b):
+            tick = QGraphicsEllipseItem(-3, -3, 6, 6, item)
+            tick.setPen(pen)
+            tick.setFlag(QGraphicsItem.ItemIgnoresTransformations, True)
+            tick.setPos(p)
+        dx, dy = b.x() - a.x(), b.y() - a.y()
+        text = "%.2f mm   (%.2f × %.2f, %.1f°)" % (math.hypot(dx, dy), abs(dx), abs(dy),
+                                                    math.degrees(math.atan2(-dy, dx)))
+        # the text on a light box, so it reads on the sheet and beside it alike
+        box = QGraphicsRectItem(item)
+        box.setFlag(QGraphicsItem.ItemIgnoresTransformations, True)
+        box.setPos(QPointF((a.x() + b.x()) / 2.0, (a.y() + b.y()) / 2.0))
+        label = QGraphicsSimpleTextItem(text, box)
+        label.setBrush(QBrush(QColor("#92400e")))
+        label.setPos(6, 4)
+        r = label.boundingRect()
+        box.setRect(QRectF(2, 1, r.width() + 8, r.height() + 6))
+        box.setBrush(QBrush(QColor(255, 251, 235, 235)))
+        box.setPen(cosmetic_pen(COLORS["origin"], 1.0))
+        self._measure_item = item
+        return text
+
     def _cancel_drawing(self):
+        self._pen = None
+        self._freehand = None
+        if self.tool != "measure":
+            self._clear_measure()
         self._poly_points = []
         self._draw_start = None
         if self._draw_item is not None:
@@ -787,6 +957,25 @@ class MaterialView(QGraphicsView):
             self._poly_points.append(p)
             self._draw_polyline_item()
             return
+        if self.tool == "measure" and event.button() == Qt.LeftButton:
+            self._clear_measure()
+            self._measure_start = self.snap_point(self.mapToScene(event.position().toPoint()))
+            return
+        if self.tool == "freehand" and event.button() == Qt.LeftButton:
+            p = self.mapToScene(event.position().toPoint())
+            self._freehand = [(p.x(), p.y())]
+            return
+        if self.tool == "pen" and event.button() == Qt.LeftButton:
+            p = self._pen_point(event)
+            if self._pen_near_first(p):
+                self._finish_pen(True)
+            else:
+                if self._pen is None:
+                    self._pen = {"nodes": [], "pressed": False}
+                self._pen["nodes"].append(curves.node(p.x(), p.y()))
+                self._pen["pressed"] = True
+                self._draw_pen()
+            return
         if self.tool == "text" and event.button() == Qt.LeftButton:
             self.hide_snap_marker()
             self.signals.text_clicked.emit(self.snap_point(self.mapToScene(event.position().toPoint())))
@@ -809,11 +998,30 @@ class MaterialView(QGraphicsView):
         if self._draw_start is not None:
             self._rubber(self._draw_start, self.snap_point(p))
             return
+        if self.tool == "measure" and self._measure_start is not None:
+            self._draw_measure(self._measure_start, self.snap_point(p))
+            return
+        if self.tool == "freehand" and self._freehand is not None:
+            last = self._freehand[-1]
+            if math.hypot(p.x() - last[0], p.y() - last[1]) > 0.5 / max(abs(self.transform().m11()), 1e-9):
+                self._freehand.append((p.x(), p.y()))
+                self._draw_freehand()
+            return
+        if self.tool == "pen" and self._pen:
+            if self._pen["pressed"]:                      # dragging out the handles of the new node
+                n = self._pen["nodes"][-1]
+                if math.hypot(p.x() - n[0], p.y() - n[1]) > 0.5 * self._snap_tolerance():
+                    n[4], n[5] = p.x(), p.y()
+                    n[2], n[3] = 2 * n[0] - p.x(), 2 * n[1] - p.y()
+                self._draw_pen()
+            else:
+                self._draw_pen(self._pen_point(event))
+            return
         if self.tool == "polyline" and self._poly_points:
             shift = bool(event.modifiers() & Qt.ShiftModifier)
             self._draw_polyline_item(self._poly_constrained(self.snap_point(p), shift))
             return
-        if self.tool in DRAW_TOOLS or self.tool in ("polyline", "text"):
+        if self.tool in DRAW_TOOLS or self.tool in ("polyline", "text", "pen", "measure"):
             self.snap_point(p)                  # show where a click would land
         super().mouseMoveEvent(event)
 
@@ -821,6 +1029,24 @@ class MaterialView(QGraphicsView):
         if event.button() == Qt.MiddleButton and self._panning is not None:
             self._panning = None
             self.viewport().setCursor(Qt.ArrowCursor if self.tool in ("select", "nodes") else Qt.CrossCursor)
+            return
+        if self.tool == "measure" and event.button() == Qt.LeftButton and self._measure_start is not None:
+            end = self.snap_point(self.mapToScene(event.position().toPoint()))
+            self.hide_snap_marker()
+            a, b = self.mapFromScene(self._measure_start), self.mapFromScene(end)
+            if abs(a.x() - b.x()) + abs(a.y() - b.y()) < 3:      # a click, not a drag: nothing measured
+                self._clear_measure()
+            else:
+                self._draw_measure(self._measure_start, end)
+                self.signals.measured.emit(end.x() - self._measure_start.x(), end.y() - self._measure_start.y())
+            self._measure_start = None
+            return
+        if self.tool == "freehand" and event.button() == Qt.LeftButton and self._freehand is not None:
+            self._finish_freehand(event.position())
+            return
+        if self.tool == "pen" and event.button() == Qt.LeftButton:
+            if self._pen:
+                self._pen["pressed"] = False
             return
         if self._draw_start is not None and event.button() == Qt.LeftButton:
             a = self._draw_start
@@ -842,6 +1068,11 @@ class MaterialView(QGraphicsView):
                 self.signals.edit_nodes.emit(hit.element)
                 event.accept()
                 return
+        if event.button() == Qt.LeftButton and self.tool == "pen" and self._pen:
+            # the first press of the double click put the last node here: finish an open path
+            self._finish_pen(False)
+            event.accept()
+            return
         if event.button() == Qt.LeftButton and self.tool == "polyline":
             # the press of the double click already added a corner here: finish an open line
             if len(self._poly_points) >= 2:
@@ -872,6 +1103,25 @@ class MaterialView(QGraphicsView):
         if self.tool == "nodes" and self.node_editor.item is not None and self.node_editor.key(event):
             event.accept()
             return
+        if self.tool == "pen" and self._pen:
+            if event.key() in (Qt.Key_Return, Qt.Key_Enter):
+                self._finish_pen(False)
+                event.accept()
+                return
+            if event.key() == Qt.Key_Backspace:
+                self._pen["nodes"].pop()
+                if not self._pen["nodes"]:
+                    self._pen = None
+                    self._remove_draw_item()
+                else:
+                    self._draw_pen()
+                event.accept()
+                return
+            if event.key() == Qt.Key_Escape:
+                self._pen = None
+                self._remove_draw_item()
+                event.accept()
+                return
         if self.tool == "polyline" and self._poly_points:
             if event.key() in (Qt.Key_Return, Qt.Key_Enter):
                 self._finish_polyline(False)
@@ -911,11 +1161,29 @@ class MaterialView(QGraphicsView):
             self.scale(factor, factor)
             self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
 
+    def window_length(self):
+        """The sheet length that, with the sheet fitted to the window by its
+        width, reaches the window's top and bottom: no grey bands beside it."""
+        vw, vh = self.viewport().width(), self.viewport().height()
+        w = getattr(self, "width_mm", 0.0) or 0.0
+        if vw < 50 or vh < 50 or w <= 0:                 # not laid out yet
+            return max(MIN_STRIP_LENGTH, w)
+        m = 2 * FIT_MARGIN_PX
+        return max(MIN_STRIP_LENGTH, w * (vh - m) / max(vw - m, 1))
+
     def fit_all(self):
         rect = self.material_rect(getattr(self, "length_mm", MIN_STRIP_LENGTH))
         for item in self._items:
             rect = rect.united(item.sceneBoundingRect())
-        self.fitInView(rect.adjusted(-30, -30, 30, 30), Qt.KeepAspectRatio)
+        # as fitInView, but the room round it is in screen pixels, so a narrow
+        # sheet still reaches the window's edges
+        m = 2 * FIT_MARGIN_PX
+        vw, vh = self.viewport().width(), self.viewport().height()
+        if rect.width() <= 0 or rect.height() <= 0 or vw <= m or vh <= m:
+            return
+        k = min((vw - m) / rect.width(), (vh - m) / rect.height())
+        self.setTransform(QTransform.fromScale(k, k))
+        self.centerOn(rect.center())
 
     def fit_requested(self):
         self._user_zoomed = False
@@ -923,6 +1191,12 @@ class MaterialView(QGraphicsView):
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
+        # the window changed shape: the sheet follows it (the window draws it
+        # again; a timer, so dragging the window edge does not redraw at every pixel)
+        box = self._design_box
+        wanted = max(self.window_length(), (-box[2] + DESIGN_ROOM_MM) if box else 0.0)
+        if abs(wanted - getattr(self, "length_mm", wanted)) > 0.5:
+            self._sheet_timer.start()
         if not self._user_zoomed:
             self.fit_all()
 

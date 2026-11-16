@@ -34,8 +34,8 @@ def main(argv=None):
     app.setStyleSheet(STYLE)
     win = MainWindow()
     for path in argv[1:]:
-        if path.lower().endswith(".svg"):
-            win.import_svg(path)
+        if path.lower().endswith((".svg", ".vintyl")):
+            win.open_file(path)
     win.show()
     return app.exec()
 

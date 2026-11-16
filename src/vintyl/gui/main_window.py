@@ -24,8 +24,10 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QDoubleSpinBox, QFileDialog
                                QToolBar, QVBoxLayout, QWidget)
 
 from vintyl import __version__
+from vintyl.core import pen as pens
 from vintyl.core import profile as profiles
 from vintyl.core import shapes
+from vintyl.core import project
 from vintyl.core import ready
 from vintyl.core import transport
 from vintyl.core.design import Design, Element
@@ -51,6 +53,13 @@ def _spin(maximum=10000.0, decimals=2, suffix=" mm", minimum=-10000.0):
     return s
 
 
+def outermost(rings):
+    """Only the rings not lying inside another ring (a silhouette without holes)."""
+    from vintyl.core.knife import point_in_polygon
+    return [r for i, r in enumerate(rings)
+            if not any(j != i and point_in_polygon(r[0], other) for j, other in enumerate(rings))]
+
+
 def open_settings():
     """The user's settings (QSettings). VINTYL_SETTINGS names another file
     (the tests use their own, so they never touch the user's)."""
@@ -69,6 +78,8 @@ class MainWindow(QMainWindow):
         self.design = Design()
         self.selected = None
         self.selection = []               # every selected element (selected is the first)
+        self.project_path = None          # the .vintyl file of the design, once saved or opened
+        self.modified = False
         self.counter = {}
         self.last_job = None              # the last successful build (for the summary)
         self.settings = open_settings()
@@ -122,6 +133,9 @@ class MainWindow(QMainWindow):
         s.line_drawn.connect(self._on_line_drawn)
         s.polyline_drawn.connect(self._on_polyline_drawn)
         s.text_clicked.connect(self._on_text_clicked)
+        s.pen_drawn.connect(self._on_pen_drawn)
+        s.measured.connect(self._on_measured)
+        s.sheet_changed.connect(self.refresh)
         s.resized.connect(self._on_resized)
         s.nudged.connect(self._on_moved)
         s.nodes_changed.connect(self._on_nodes_changed)
@@ -136,6 +150,12 @@ class MainWindow(QMainWindow):
             self.profile_box.blockSignals(True)
             self.profile_box.setCurrentIndex(self.profile_names.index(last))
             self.profile_box.blockSignals(False)
+        self.grid_step = float(self.settings.value("view/grid_step", 10.0))
+        self.view.snap_objects = str(self.settings.value("view/snap_objects", "true")).lower() == "true"
+        self.act_grid.blockSignals(True)
+        self.act_grid.setChecked(str(self.settings.value("view/grid", "false")).lower() == "true")
+        self.act_grid.blockSignals(False)
+        self.view.grid_mm = self.grid_step if self.act_grid.isChecked() else 0.0
         self._profile_changed(self.profile_box.currentIndex())   # fills the panel and draws
 
     # ---- actions, menu, ribbon, tools ----------------------------------------
@@ -156,10 +176,14 @@ class MainWindow(QMainWindow):
     def _make_actions(self):
         self.act_new = self._action(_("New"), self.new_design, "file-plus", QKeySequence.New,
                                     _("Start an empty design"))
-        self.act_open = self._action(_("Open SVG"), lambda: self.import_svg(), "folder-open", QKeySequence.Open,
-                                     _("Add the shapes of an SVG file to the design"))
-        self.act_save_cut = self._action(_("Save .hpgl"), lambda: self.save_cutter_file(), "device-floppy",
-                                         "Ctrl+S", _("Save exactly what would go to the cutter, as a file"))
+        self.act_open = self._action(_("Open"), lambda: self.open_file(), "folder-open", QKeySequence.Open,
+                                     _("Open a Vintyl project, or add the shapes of an SVG file to the design"))
+        self.act_save = self._action(_("Save"), lambda: self.save_project(), "device-floppy", "Ctrl+S",
+                                     _("Save the project (.vintyl): the design and the job's settings"))
+        self.act_save_as = self._action(_("Save as…"), lambda: self.save_project(ask=True), None, "Ctrl+Shift+S",
+                                        _("Save the project under another name"))
+        self.act_save_cut = self._action(_("Save .hpgl"), lambda: self.save_cutter_file(), "file-export",
+                                         "Ctrl+E", _("Save exactly what would go to the cutter, as a file"))
         self.act_delete = self._action(_("Delete"), self.delete_selected, "trash", QKeySequence.Delete,
                                        _("Delete the selected element"))
         self.act_undo = self._action(_("Undo"), self.undo, "arrow-back-up", QKeySequence.Undo,
@@ -196,6 +220,16 @@ class MainWindow(QMainWindow):
                                 ("bottom", "layout-align-bottom", N_("Bottom edges"))):
             self.act_align[key] = self._action(_(text), lambda _c=False, k=key: self.align_selected(k), icon,
                                                tip=_("Align the selected shapes to each other: %s") % _(text).lower())
+        self.act_distribute_across = self._action(_("Spread across"), lambda: self.distribute_selected(True),
+                                                  "layout-distribute-vertical", None,
+                                                  _("Spread three or more shapes evenly from left to right: "
+                                                    "equal gaps, the outermost stay"))
+        self.act_distribute_up = self._action(_("Spread up and down"), lambda: self.distribute_selected(False),
+                                              "layout-distribute-horizontal", None,
+                                              _("Spread three or more shapes evenly up and down: "
+                                                "equal gaps, the outermost stay"))
+        self.act_qr = self._action(_("QR code"), lambda: self.insert_qr(), "qrcode", None,
+                                   _("A QR code to cut: an address or a text"))
         # group / ungroup and combining shapes, as in Kerfly (and Inkscape's keys)
         self.act_group = self._action(_("Group"), self.group_selected, "squares-selected", "Ctrl+G",
                                       _("Join the selected elements into a group that is selected and moved as one"))
@@ -212,7 +246,14 @@ class MainWindow(QMainWindow):
                 ("exclusion", "layers-difference", N_("Exclusion: keep where the shapes do not overlap"), "Ctrl+^")):
             self.act_boolean[code] = self._action(_(self.BOOLEAN_NAMES[code]),
                                                   lambda _c=False, k=code: self.boolean_selected(k), icon, key, _(tip))
-        self.selection_actions = [self.act_cut, self.act_copy, self.act_group, self.act_ungroup] + \
+        self.act_offset = self._action(_("Offset"), lambda: self.offset_selected(), "box-padding", "O",
+                                       _("A new outline round the selected shapes (or inside them), "
+                                         "a set distance away: an edge round a text, a backing in another colour"))
+        self.act_fill = self._action(_("Fill"), lambda: self.fill_selected(), "bucket-droplet", "Shift+F",
+                                     _("Fill the selected closed shapes with a pattern of lines, drawn "
+                                       "with the pen (only when the tool is the pen)"))
+        self.selection_actions = [self.act_offset, self.act_fill, self.act_cut, self.act_copy, self.act_group, self.act_ungroup,
+                                  self.act_distribute_across, self.act_distribute_up] + \
             list(self.act_boolean.values()) + [
             self.act_duplicate, self.act_rot_left, self.act_rot_right,
                                   self.act_mirror_h, self.act_mirror_v] + list(self.act_align.values())
@@ -220,6 +261,12 @@ class MainWindow(QMainWindow):
                                         _("Look closer (the mouse wheel does the same)"))
         self.act_zoom_out = self._action(_("Zoom out"), lambda: self.view.zoom_by(1 / 1.25), None, "-",
                                          _("Look from further away"))
+        self.act_grid = self._action(_("Grid"), None, "grid-dots", "Ctrl+'",
+                                     _("Show the grid and snap to it (its step is in the Settings)"))
+        self.act_grid.setCheckable(True)
+        self.act_grid.toggled.connect(self.set_grid)
+        self.act_settings = self._action(_("Settings…"), self.show_settings, "settings", "Ctrl+,",
+                                         _("Grid step, snapping"))
         self.act_shortcuts = self._action(_("Keyboard shortcuts"), self.show_shortcuts, None, "Ctrl+F1",
                                           _("Every key in one window"))
         self.act_fit = self._action(_("Fit"), self.view.fit_requested, "zoom-scan", "Ctrl+0",
@@ -235,7 +282,8 @@ class MainWindow(QMainWindow):
     def _make_menu(self):
         mb = self.menuBar()
         m = mb.addMenu(_("&File"))
-        for a in (self.act_new, self.act_open, self.act_save_cut, None, self.act_quit):
+        for a in (self.act_new, self.act_open, self.act_save, self.act_save_as, None, self.act_save_cut, None,
+                  self.act_quit):
             m.addSeparator() if a is None else m.addAction(a)
         m = mb.addMenu(_("&Edit"))
         for a in (self.act_undo, self.act_redo, None, self.act_cut, self.act_copy, self.act_paste,
@@ -244,14 +292,16 @@ class MainWindow(QMainWindow):
         m = mb.addMenu(_("&Object"))
         for a in [self.act_group, self.act_ungroup, None] + list(self.act_boolean.values()) + [None] + \
                 [self.act_rot_left, self.act_rot_right, self.act_mirror_h, self.act_mirror_v, None] + \
-                list(self.act_align.values()):
+                list(self.act_align.values()) + [None, self.act_offset, self.act_fill]:
             m.addSeparator() if a is None else m.addAction(a)
         m = mb.addMenu(_("&Cutter"))
         for a in (self.act_connect, self.act_profile):
             m.addAction(a)
         m = mb.addMenu(_("&View"))
-        for a in (self.act_fit, self.act_zoom_in, self.act_zoom_out, None, self.act_knife):
+        for a in (self.act_fit, self.act_zoom_in, self.act_zoom_out, None, self.act_knife, self.act_grid):
             m.addSeparator() if a is None else m.addAction(a)
+        m = mb.addMenu(_("&Settings"))
+        m.addAction(self.act_settings)
         m = mb.addMenu(_("&Help"))
         m.addAction(self.act_shortcuts)
         m.addAction(self._action(_("About Vintyl"), self.about))
@@ -261,18 +311,19 @@ class MainWindow(QMainWindow):
         or small icon-only buttons in two rows where a group has many
         (the layout of Kerfly's ribbon, kerfly/gui/main_window.py, commit cf48565)."""
         groups = [
-            (_("File"), [(self.act_new, _("New")), (self.act_open, _("Open SVG")),
+            (_("File"), [(self.act_new, _("New")), (self.act_open, _("Open")), (self.act_save, _("Save")),
                          (self.act_save_cut, _("Save .hpgl"))]),
             (_("Edit"), [(self.act_undo, _("Undo")), (self.act_redo, _("Redo"))]),
             (_("Element"), "grid", [self.act_duplicate, self.act_delete]),
             (_("Transform"), "grid", [self.act_rot_left, self.act_rot_right,
                                       self.act_mirror_h, self.act_mirror_v]),
             (_("Align"), "grid", [self.act_align["left"], self.act_align["centre"], self.act_align["right"],
-                                  self.act_align["top"], self.act_align["middle"], self.act_align["bottom"]]),
+                                  self.act_distribute_across, self.act_align["top"], self.act_align["middle"],
+                                  self.act_align["bottom"], self.act_distribute_up]),
             (_("Shapes"), "grid", [self.act_group, self.act_boolean["union"], self.act_boolean["difference"],
                                    self.act_ungroup, self.act_boolean["intersection"],
                                    self.act_boolean["exclusion"]]),
-            (_("View"), [(self.act_fit, _("Fit")), (self.act_knife, _("Knife path"))]),
+            (_("View"), [(self.act_fit, _("Fit")), (self.act_knife, _("Knife path")), (self.act_grid, _("Grid"))]),
         ]
         tb = QToolBar(_("Main"))
         tb.setObjectName("main_toolbar")
@@ -340,14 +391,27 @@ class MainWindow(QMainWindow):
             ("tool", "polygon", N_("Polygon"), N_("Regular polygon: drag the box it fits in; the number of "
                                                   "sides is in the options bar"), "polygon"),
         ]),
-        ("ready", N_("Ready"), None, [("ready", k) for k in ready.READY]),
+        ("ready", N_("Ready"), None, [("ready", k) for k in ready.READY] + [("act", "act_qr", N_("QR code"))]),
         ("lines", N_("Lines"), "vector", [
             ("tool", "polyline", N_("Polyline"), N_("Polyline: click the corners; the first corner closes it, "
                                                      "double-click or Enter leaves it open"), "vector"),
             ("tool", "line", N_("Line"), N_("Line: drag from end to end"), "line"),
+            ("tool", "pen", N_("Pen"), N_("Pen: click = corner, press and drag = smooth curve; the first "
+                                          "node closes it, double-click or Enter leaves it open"), "vector-spline"),
+            ("tool", "freehand", N_("Freehand"), N_("Freehand: draw with the button held; ending at the start "
+                                                    "closes it"), "scribble"),
+        ]),
+        ("measure", N_("Ruler"), "ruler-measure", [
+            ("tool", "measure", N_("Ruler"), N_("Ruler: drag between two points to measure"), "ruler-measure"),
         ]),
         ("text", N_("Text"), "typography", [
             ("tool", "text", N_("Text"), N_("Text: click where it should start"), "typography"),
+        ]),
+        ("offset", N_("Offset"), "box-padding", [
+            ("act", "act_offset", N_("Offset")),
+        ]),
+        ("fill", N_("Fill"), "bucket-droplet", [
+            ("act", "act_fill", N_("Fill")),
         ]),
     ]
 
@@ -391,7 +455,8 @@ class MainWindow(QMainWindow):
         col.addStretch(1)
         # one letter per tool (a letter typed into a field goes to the field)
         for key, letter in (("select", "V"), ("nodes", "N"), ("rectangle", "R"), ("ellipse", "E"),
-                            ("polygon", "P"), ("polyline", "L"), ("line", "Shift+L"), ("text", "T")):
+                            ("polygon", "P"), ("polyline", "L"), ("line", "Shift+L"), ("text", "T"),
+                            ("pen", "B"), ("freehand", "F"), ("measure", "M")):
             a = self.tool_actions[key]
             a.setShortcut(QKeySequence(letter))
             a.setToolTip("%s (%s)" % (a.toolTip(), QKeySequence(letter).toString(QKeySequence.NativeText)))
@@ -407,6 +472,10 @@ class MainWindow(QMainWindow):
         entries = self.category_entries[cat]
         if len(entries) == 1 and entries[0][0] == "tool":
             self.set_tool(entries[0][1])
+            return None
+        if len(entries) == 1 and entries[0][0] == "act":
+            getattr(self, entries[0][1]).trigger()
+            self.category_buttons[self._category_of[self.view.tool]].setChecked(True)
             return None
         popup = QFrame(self, Qt.Popup)
         popup.setObjectName("tool_popup")
@@ -429,6 +498,12 @@ class MainWindow(QMainWindow):
                 b.setCheckable(True)
                 b.setChecked(a.isChecked())
                 b.clicked.connect(lambda _c=False, k=entry[1], p=popup: (p.close(), self.set_tool(k)))
+            elif entry[0] == "act":
+                a = getattr(self, entry[1])
+                b.setIcon(a.icon())
+                b.setText(_(entry[2]))
+                b.setToolTip(a.toolTip())
+                b.clicked.connect(lambda _c=False, act=a, p=popup: (p.close(), act.trigger()))
             else:
                 key = entry[1]
                 name = ready.READY[key][0]
@@ -464,6 +539,57 @@ class MainWindow(QMainWindow):
         e.move_to(-PLACE_MARGIN_MM - w, -PLACE_MARGIN_MM - h)
         self.add_element(e)
         return e
+
+    def insert_qr(self, text=None, size=30.0, error="m"):
+        """A QR code to cut (asks for the text and size when text is None)."""
+        if text is None:
+            from PySide6.QtWidgets import QDialog, QDialogButtonBox
+            dlg = QDialog(self)
+            dlg.setWindowTitle(_("QR code"))
+            form = QFormLayout(dlg)
+            edit = QLineEdit(self.settings.value("qr/text", "https://"))
+            edit.setMinimumWidth(320)
+            sz = _spin(2000.0, 1, minimum=5.0)
+            sz.setValue(float(self.settings.value("qr/size", 30.0)))
+            err = QComboBox()
+            for code, label in (("l", _("low (7%)")), ("m", _("medium (15%)")), ("q", _("high (25%)")),
+                                ("h", _("highest (30%)"))):
+                err.addItem(label, code)
+            err.setCurrentIndex(1)
+            err.setToolTip(_("How much of the code may be damaged and it still reads; more = more modules"))
+            form.addRow(_("Text or address"), edit)
+            form.addRow(_("Size (mm)"), sz)
+            form.addRow(_("Error correction"), err)
+            buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+            buttons.accepted.connect(dlg.accept)
+            buttons.rejected.connect(dlg.reject)
+            form.addRow(buttons)
+            if dlg.exec() != QDialog.Accepted:
+                return None
+            text, size, error = edit.text(), sz.value(), err.currentData()
+            self.settings.setValue("qr/text", text)
+            self.settings.setValue("qr/size", size)
+        try:
+            paths = ready.qr_code(text, size, error)
+        except ValueError as e:
+            QMessageBox.warning(self, _("QR code"), str(e))
+            return None
+        e = Element(self._name(_("QR code")), paths,
+                    spec={"kind": "ready", "shape": "qr", "text": text, "size": size, "error": error})
+        w, h = e.size
+        e.move_to(-PLACE_MARGIN_MM - w, -PLACE_MARGIN_MM - h)
+        self.add_element(e)
+        return e
+
+    def distribute_selected(self, across=True):
+        from vintyl.core.design import distribute
+        chosen = self._chosen()
+        if len(chosen) < 3:
+            self.statusBar().showMessage(_("Select three or more shapes to spread them evenly."), 6000)
+            return
+        self._checkpoint()
+        distribute(chosen, across)
+        self.refresh()
 
     def _ask_ready(self, title, spec):
         from PySide6.QtWidgets import QDialog, QDialogButtonBox
@@ -698,11 +824,39 @@ class MainWindow(QMainWindow):
         self.port_box.setToolTip(_("USB printer (/dev/usb/lp…) or serial port (/dev/ttyUSB…, /dev/ttyACM…)"))
         self.port_box.currentTextChanged.connect(self._port_changed)
         form.addRow(_("Port"), self.port_box)
+        self.cutter_form = form
+        # what is in the holder: the knife cuts, a pen (or a pencil) draws
+        self.tool_box = QComboBox()
+        self.tool_box.addItem(icons.tabler("scissors"), _("Knife"), "knife")
+        self.tool_box.addItem(icons.tabler("vector-spline"), _("Pen / pencil"), "pen")
+        self.tool_box.setToolTip(_("What is in the cutter's holder. Pen: drawing on paper or card, "
+                                   "with no knife offset or overcut; fill patterns are drawn too."))
+        self.tool_box.currentIndexChanged.connect(lambda _i: self._tool_changed())
+        form.addRow(_("Tool"), self.tool_box)
+        self.pen_note = QLabel(_("For drawing on paper or card, not for vinyl. To cut vinyl, choose the knife."))
+        self.pen_note.setWordWrap(True)
+        self.pen_note.setStyleSheet("color: #92400e")
+        form.addRow(self.pen_note)
+        self.pen_width = _spin(5, 2, " mm", minimum=0.05)
+        self.pen_width.setSingleStep(0.05)
+        self.pen_width.setValue(pens.DEFAULT_WIDTH_MM)
+        self.pen_width.setToolTip(_("How wide a line the pen or pencil draws (a fineliner: 0.3–0.5 mm)"))
+        self.pen_place = QComboBox()
+        for code, label in (("on", N_("on the line")), ("outside", N_("outside the line")),
+                            ("inside", N_("inside the line"))):
+            self.pen_place.addItem(_(label), code)
+        self.pen_place.setToolTip(_("Where the pen's stroke lies against the line of a closed shape. "
+                                    "Outside: the shape keeps its exact size inside the stroke; inside: "
+                                    "the stroke stays within the shape. Open lines are drawn on the line."))
+        for w in (self.pen_width, self.pen_place):
+            (w.valueChanged if w is self.pen_width else w.currentIndexChanged).connect(
+                lambda _v: self._tool_changed())
+        form.addRow(_("Pen width"), self.pen_width)
+        form.addRow(_("Draw"), self.pen_place)
         self.knife = _spin(5, 2, minimum=0)
         self.knife.setSingleStep(0.05)
-        self.knife.setSpecialValueText(_("pen (no offset)"))
         self.knife.setToolTip(_("How far the blade tip trails the holder's axis. "
-                                "A 45° blade: usually 0.20–0.30 mm. 0 = pen."))
+                                "A 45° blade: usually 0.20–0.30 mm."))
         self.overcut = _spin(5, 2, minimum=0)
         self.overcut.setSingleStep(0.1)
         self.overcut.setToolTip(_("Closed shapes are cut this far past their start, "
@@ -746,7 +900,10 @@ class MainWindow(QMainWindow):
         self.weed_margin.valueChanged.connect(lambda _v: self.refresh_job())
         frame_row.addWidget(self.weed_frame)
         frame_row.addWidget(self.weed_margin)
-        lay.addLayout(frame_row)
+        self.frame_row = QWidget()
+        self.frame_row.setLayout(frame_row)
+        frame_row.setContentsMargins(0, 0, 0, 0)
+        lay.addWidget(self.frame_row)
         self.progress = QProgressBar()
         self.progress.setVisible(False)
         lay.addWidget(self.progress)
@@ -792,7 +949,48 @@ class MainWindow(QMainWindow):
         self.force.setToolTip(_("Empty: the cutter uses what is set on its panel"))
         self.force_label.setVisible(sends)
         self.force.setVisible(sends)
+        # the tool last used in this cutter (a pen stays a pen until changed)
+        key = self.profile_box.itemData(index)
+        self._loading_tool = True
+        tool = self.settings.value("cutter/tool/" + key, "knife")
+        self.tool_box.setCurrentIndex(max(0, self.tool_box.findData(tool)))
+        try:
+            self.pen_width.setValue(float(self.settings.value("cutter/pen_width/" + key, pens.DEFAULT_WIDTH_MM)))
+        except (TypeError, ValueError):
+            self.pen_width.setValue(pens.DEFAULT_WIDTH_MM)
+        self.pen_place.setCurrentIndex(max(0, self.pen_place.findData(
+            self.settings.value("cutter/pen_place/" + key, "on"))))
+        self._loading_tool = False
+        self._tool_changed(refresh=False)
         self.refresh()
+
+    def is_pen(self):
+        return self.tool_box.currentData() == "pen"
+
+    def _tool_changed(self, refresh=True):
+        """Knife or pen: show the settings that matter for it, hide the others,
+        and remember the choice for this cutter."""
+        pen = self.is_pen()
+        form = self.cutter_form
+        for w in (self.knife, self.overcut, self.inside_first):
+            form.setRowVisible(w, not pen)
+        for w in (self.pen_width, self.pen_place):
+            form.setRowVisible(w, pen)
+        form.setRowVisible(self.pen_note, pen)
+        self.frame_row.setVisible(not pen)
+        # the fill is for drawing: with the knife it is not offered (it would cut the vinyl into strips)
+        self.act_fill.setVisible(pen)
+        self.category_buttons["fill"].setVisible(pen)
+        self.view.pen_mode = pen
+        self.act_knife.setText(_("Pen path") if pen else _("Knife path"))
+        self.act_knife.setIconText(self.act_knife.text())
+        name = self.profile_box.currentData()
+        if name and not getattr(self, "_loading_tool", False):
+            self.settings.setValue("cutter/tool/" + name, self.tool_box.currentData())
+            self.settings.setValue("cutter/pen_width/" + name, self.pen_width.value())
+            self.settings.setValue("cutter/pen_place/" + name, self.pen_place.currentData())
+        if refresh and not getattr(self, "_loading_tool", False):
+            self.refresh()
 
     def _port_changed(self, text):
         """Remember the port chosen for this cutter."""
@@ -814,16 +1012,24 @@ class MainWindow(QMainWindow):
     def job_profile(self):
         """The chosen profile with the panel's knife, overcut, speed and force
         (speed and force 0 = from the cutter's panel)."""
+        pen = self.is_pen()                  # a pen: no blade trailing behind, nothing to overcut
         return dataclasses.replace(self.profile,
                                    port=self.port_box.currentText().strip(),
-                                   knife_offset_mm=self.knife.value(),
-                                   overcut_mm=self.overcut.value(),
+                                   knife_offset_mm=0.0 if pen else self.knife.value(),
+                                   overcut_mm=0.0 if pen else self.overcut.value(),
                                    speed_cm_s=self.speed.value() or None,
                                    force_g=self.force.value() or None)
 
     def build(self):
         """The job as it would go to the cutter now (raises JobError / ProfileError)."""
         polys, groups = self.design.material_paths()
+        if self.is_pen():
+            # the outlines placed against the pen's stroke, each element's fill before its outline,
+            # in the list's order (nothing comes loose on paper)
+            polys, groups = pens.place(polys, groups, self.pen_width.value(), self.pen_place.currentData())
+            fills, fill_groups = self.design.material_fills()
+            polys, groups = pens.merge(fills, fill_groups, polys, groups)
+            return build_job(polys, self.job_profile(), groups, False)
         frame = self.weed_frame_polyline(polys)
         if frame:
             polys = polys + [frame]                      # in its own last group: cut last
@@ -833,7 +1039,7 @@ class MainWindow(QMainWindow):
     def weed_frame_polyline(self, polys):
         """The weeding frame (material mm): a rectangle round all that is cut,
         weed_margin away; None when it is off or there is nothing to cut."""
-        if not polys or not self.weed_frame.isChecked():
+        if not polys or not self.weed_frame.isChecked() or self.is_pen():
             return None
         m = self.weed_margin.value()
         xs = [x for poly in polys for x, _y in poly]
@@ -861,14 +1067,115 @@ class MainWindow(QMainWindow):
         self.refresh()
 
     def new_design(self):
-        if self.design.elements and QMessageBox.question(
-                self, _("New design"), _("Remove everything from the material?")) != QMessageBox.Yes:
+        if not self.maybe_save():
             return
-        self._checkpoint()
         self.design = Design()
         self.selected = None
+        self.selection = []
+        self._undo.clear()
+        self._redo.clear()
+        self.project_path = None
+        self.modified = False
         self.view.fit_requested()
         self.refresh()
+
+    # ---- project files (.vintyl) -------------------------------------------------------------
+    def project_settings(self):
+        """What a project keeps besides the design: the cutter and the job."""
+        return {"profile": self.profile_box.currentData(), "knife_offset_mm": self.knife.value(),
+                "overcut_mm": self.overcut.value(), "inside_first": self.inside_first.isChecked(),
+                "weed_frame": self.weed_frame.isChecked(), "weed_margin_mm": self.weed_margin.value(),
+                "tool": self.tool_box.currentData(), "pen_width_mm": self.pen_width.value(),
+                "pen_place": self.pen_place.currentData()}
+
+    def _apply_project_settings(self, st):
+        if st.get("profile") in self.profile_names:
+            self.profile_box.setCurrentIndex(self.profile_names.index(st["profile"]))
+        if st.get("tool") in ("knife", "pen"):
+            self.tool_box.setCurrentIndex(self.tool_box.findData(st["tool"]))
+        if st.get("pen_place") in pens.PLACES:
+            self.pen_place.setCurrentIndex(self.pen_place.findData(st["pen_place"]))
+        for key, widget in (("knife_offset_mm", self.knife), ("overcut_mm", self.overcut),
+                            ("weed_margin_mm", self.weed_margin), ("pen_width_mm", self.pen_width)):
+            if isinstance(st.get(key), (int, float)):
+                widget.setValue(float(st[key]))
+        for key, box in (("inside_first", self.inside_first), ("weed_frame", self.weed_frame)):
+            if isinstance(st.get(key), bool):
+                box.setChecked(st[key])
+
+    def open_file(self, path=None):
+        """Open a project (.vintyl) or add an SVG file's shapes."""
+        if path is None:
+            path, _f = QFileDialog.getOpenFileName(
+                self, _("Open"), os.path.dirname(self.project_path or ""),
+                _("Vintyl projects and SVG files (*.vintyl *.svg);;Vintyl projects (*.vintyl);;SVG files (*.svg)"))
+            if not path:
+                return None
+        if path.lower().endswith(project.EXTENSION):
+            return self.open_project(path)
+        return self.import_svg(path)
+
+    def open_project(self, path):
+        if not self.maybe_save():
+            return None
+        try:
+            design, st = project.load(path)
+        except project.ProjectError as err:
+            QMessageBox.warning(self, _("Open"), str(err))
+            return None
+        self.design = design
+        self.selected = None
+        self.selection = []
+        self._undo.clear()
+        self._redo.clear()
+        self._apply_project_settings(st)
+        self.project_path = path
+        self.modified = False
+        self.view.fit_requested()
+        self.refresh()
+        self.statusBar().showMessage(_("Opened %s") % os.path.basename(path), 5000)
+        return design
+
+    def save_project(self, path=None, ask=False):
+        """Save the project; asks for a name the first time (or with ask).
+        Returns the path, or None."""
+        if path is None:
+            path = self.project_path
+        if path is None or ask:
+            start = self.project_path or (_("design") + project.EXTENSION)
+            path, _f = QFileDialog.getSaveFileName(self, _("Save project"), start,
+                                                   _("Vintyl projects (*.vintyl)"))
+            if not path:
+                return None
+            if not path.lower().endswith(project.EXTENSION):
+                path += project.EXTENSION
+        try:
+            project.save(path, self.design, self.project_settings())
+        except OSError as err:
+            QMessageBox.warning(self, _("Save project"), _("Cannot save %s: %s") % (path, err.strerror or err))
+            return None
+        self.project_path = path
+        self.modified = False
+        self._update_title()
+        self.statusBar().showMessage(_("Saved %s") % os.path.basename(path), 5000)
+        return path
+
+    def maybe_save(self):
+        """Unsaved changes: ask whether to save them. True: go on."""
+        if not getattr(self, "modified", False):
+            return True
+        answer = QMessageBox.question(
+            self, _("Unsaved changes"), _("Save the changes to the project first?"),
+            QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel, QMessageBox.Save)
+        if answer == QMessageBox.Cancel:
+            return False
+        if answer == QMessageBox.Save:
+            return self.save_project() is not None
+        return True
+
+    def _update_title(self):
+        name = os.path.basename(self.project_path) if self.project_path else _("new project")
+        self.setWindowTitle("%s%s – Vintyl" % (name, " *" if getattr(self, "modified", False) else ""))
 
     def import_svg(self, path=None):
         if path is None:
@@ -942,6 +1249,17 @@ class MainWindow(QMainWindow):
         self.add_element(Element(self._name(name), curves.from_polylines([points], [closed])))
         self.set_tool("select")
 
+    def _on_pen_drawn(self, paths):
+        closed = any(sub["closed"] for sub in paths)
+        name = _("Freehand") if self.view.tool == "freehand" else (_("Shape") if closed else _("Curve"))
+        self.add_element(Element(self._name(name), paths))
+        self.set_tool("select")
+
+    def _on_measured(self, dx, dy):
+        import math
+        self.statusBar().showMessage(_("Measured: %.2f mm (across %.2f mm, along %.2f mm)")
+                                     % (math.hypot(dx, dy), abs(dx), abs(dy)))
+
     # ---- text --------------------------------------------------------------------------
     def _text_spec_from_widgets(self):
         return {"kind": "text", "text": self.opt_text.text(), "family": self.opt_font.currentFont().family(),
@@ -1002,6 +1320,161 @@ class MainWindow(QMainWindow):
         e.move_by(x0 - nx0, y1 - ny1)
         self.refresh()
 
+    # ---- offset --------------------------------------------------------------------------------
+    def offset_selected(self, values=None):
+        """A new outline round each selected shape (or inside it), as Kerfly's
+        Offset: the closed outlines are joined even-odd, so holes move the
+        other way. values: {"distance", "outward", "round", "keep", "no_holes"};
+        None asks. no_holes: only the outermost outlines stay (a solid backing).
+        One undo step. Returns the new elements."""
+        from vintyl.core import curves, offset
+        chosen = [e for e in self._chosen() if any(sub["closed"] for sub in e.paths)]
+        if not chosen:
+            self.statusBar().showMessage(_("Select one or more shapes with closed outlines first."), 6000)
+            return []
+        if values is None:
+            values = self._ask_offset()
+            if values is None:
+                return []
+        d = float(values["distance"]) * (1 if values.get("outward", True) else -1)
+        join = "round" if values.get("round", True) else "miter"
+        made = []
+        for e in chosen:
+            polys = [p for p in curves.flatten([sub for sub in e.paths if sub["closed"]])]
+            rings = [r[:-1] for r in offset.offset_polygons(polys, d, join)]
+            if values.get("no_holes"):
+                rings = outermost(rings)
+            if rings:
+                made.append((e, Element("%s: %s" % (_("Offset"), e.name), curves.from_polylines(rings, [True] * len(rings)),
+                                        e.cut)))
+        if not made:
+            self.statusBar().showMessage(_("Nothing is left after the offset (the shape is thinner than that)."), 6000)
+            return []
+        self._checkpoint()
+        for e, new in made:
+            i = self.design.elements.index(e)
+            if values.get("keep", True):
+                self.design.elements.insert(i + 1, new)
+            else:
+                self.design.elements[i] = new
+        self.selection = [new for _e, new in made]
+        self.selected = self.selection[0]
+        self.refresh()
+        return self.selection
+
+    def _ask_offset(self):
+        from PySide6.QtWidgets import QDialog, QDialogButtonBox, QRadioButton
+        dlg = QDialog(self)
+        dlg.setWindowTitle(_("Offset"))
+        form = QFormLayout(dlg)
+        dist = _spin(500.0, 2, minimum=0.01)
+        dist.setValue(float(self.settings.value("offset/distance", 3.0)))
+        out_btn, in_btn = QRadioButton(_("outwards")), QRadioButton(_("inwards"))
+        (out_btn if self.settings.value("offset/outward", "true") == "true" else in_btn).setChecked(True)
+        round_btn, sharp_btn = QRadioButton(_("round")), QRadioButton(_("sharp"))
+        (round_btn if self.settings.value("offset/round", "true") == "true" else sharp_btn).setChecked(True)
+        keep = QCheckBox(_("Keep the original shape"))
+        keep.setChecked(self.settings.value("offset/keep", "true") == "true")
+        no_holes = QCheckBox(_("Remove the holes inside"))
+        no_holes.setToolTip(_("Only the outer outline stays, with no holes (in O, A, a ring): "
+                              "a solid backing for a text in another colour"))
+        no_holes.setChecked(self.settings.value("offset/no_holes", "false") == "true")
+        form.addRow(_("Distance"), dist)
+        way = QHBoxLayout()
+        way.addWidget(out_btn)
+        way.addWidget(in_btn)
+        form.addRow(_("Direction"), way)
+        corners_box = QWidget()
+        corners = QHBoxLayout(corners_box)
+        corners.setContentsMargins(0, 0, 0, 0)
+        corners.addWidget(round_btn)
+        corners.addWidget(sharp_btn)
+        form.addRow(_("Corners"), corners_box)
+        form.addRow(no_holes)
+        form.addRow(keep)
+        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        buttons.accepted.connect(dlg.accept)
+        buttons.rejected.connect(dlg.reject)
+        form.addRow(buttons)
+        if dlg.exec() != QDialog.Accepted:
+            return None
+        values = {"distance": dist.value(), "outward": out_btn.isChecked(), "round": round_btn.isChecked(),
+                  "keep": keep.isChecked(), "no_holes": no_holes.isChecked()}
+        for k, v in values.items():
+            self.settings.setValue("offset/" + k, str(v).lower() if isinstance(v, bool) else v)
+        return values
+
+    # ---- fill patterns (for the pen), after Kerfly's Fill tool ---------------------------------------
+    FILL_PATTERNS = [("lines", N_("Lines")), ("cross", N_("Cross-hatch")), ("waves", N_("Waves")),
+                     ("zigzag", N_("Zigzag")), ("circles", N_("Circles")), ("honeycomb", N_("Honeycomb")),
+                     ("diamonds", N_("Diamonds")), ("bricks", N_("Bricks")), ("concentric", N_("Concentric"))]
+
+    def fill_selected(self, values=None):
+        """Give the selected closed shapes a fill pattern (values: None asks;
+        {"pattern": None} removes it). Returns the elements filled."""
+        if not self.is_pen():                    # a knife does not fill (see _tool_changed)
+            return []
+        chosen = [e for e in self._chosen() if any(sub["closed"] for sub in e.paths)]
+        if not chosen:
+            self.statusBar().showMessage(_("Select a closed shape to fill."), 6000)
+            return []
+        if values is None:
+            values = self._ask_fill(chosen[0].fill)
+            if values is None:
+                return []
+        self._checkpoint()
+        for e in chosen:
+            e.fill = None if not values.get("pattern") else {
+                "pattern": values["pattern"], "spacing": float(values["spacing"]),
+                "angle": float(values.get("angle", 0.0)), "margin": float(values.get("margin", 0.0))}
+        self.refresh()
+        return chosen
+
+    def _ask_fill(self, current=None):
+        from PySide6.QtWidgets import QDialog, QDialogButtonBox
+        dlg = QDialog(self)
+        dlg.setWindowTitle(_("Fill"))
+        form = QFormLayout(dlg)
+        pattern = QComboBox()
+        for code, label in self.FILL_PATTERNS:
+            pattern.addItem(_(label), code)
+        st = self.settings
+        start = current or {"pattern": st.value("fill/pattern", "lines"),
+                            "spacing": st.value("fill/spacing", 1.0), "angle": st.value("fill/angle", 45.0),
+                            "margin": st.value("fill/margin", 0.0)}
+        pattern.setCurrentIndex(max(0, pattern.findData(start["pattern"])))
+        spacing = _spin(100.0, 2, " mm", minimum=0.05)
+        spacing.setSingleStep(0.1)
+        spacing.setValue(float(start["spacing"]))
+        spacing.setToolTip(_("Distance between the lines (the size of one repeat). For a solid fill: "
+                             "a little less than the pen's width."))
+        angle = _spin(180.0, 1, "°", minimum=-180.0)
+        angle.setValue(float(start["angle"]))
+        margin = _spin(50.0, 2, " mm", minimum=0.0)
+        margin.setValue(float(start["margin"]))
+        margin.setToolTip(_("Keep the pattern this far from the outline"))
+        form.addRow(_("Pattern"), pattern)
+        form.addRow(_("Spacing"), spacing)
+        form.addRow(_("Angle"), angle)
+        form.addRow(_("Margin"), margin)
+        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        remove = buttons.addButton(_("Remove the fill"), QDialogButtonBox.DestructiveRole)
+        removed = []
+        remove.clicked.connect(lambda: (removed.append(True), dlg.accept()))
+        remove.setEnabled(bool(current))
+        buttons.accepted.connect(dlg.accept)
+        buttons.rejected.connect(dlg.reject)
+        form.addRow(buttons)
+        if dlg.exec() != QDialog.Accepted:
+            return None
+        if removed:
+            return {"pattern": None}
+        values = {"pattern": pattern.currentData(), "spacing": spacing.value(), "angle": angle.value(),
+                  "margin": margin.value()}
+        for k, v in values.items():
+            st.setValue("fill/" + k, v)
+        return values
+
     # ---- select all, cut, copy, paste ------------------------------------------------------
     def select_all(self):
         self.set_tool("select")
@@ -1043,6 +1516,46 @@ class MainWindow(QMainWindow):
         self.selection = pasted
         self.selected = pasted[0]
         self.refresh()
+
+    # ---- grid and settings ---------------------------------------------------------------------
+    def set_grid(self, on):
+        """Grid on: shown at the step from the Settings, and things snap to it."""
+        self.view.grid_mm = self.grid_step if on else 0.0
+        self.settings.setValue("view/grid", "true" if on else "false")
+        self.refresh()
+
+    def show_settings(self, values=None):
+        """The program's settings. values: {"grid_step", "snap_objects"} without
+        asking (for the tests); None asks."""
+        if values is None:
+            from PySide6.QtWidgets import QDialog, QDialogButtonBox
+            dlg = QDialog(self)
+            dlg.setWindowTitle(_("Settings"))
+            form = QFormLayout(dlg)
+            step = _spin(1000.0, 1, minimum=0.5)
+            step.setValue(self.grid_step)
+            step.setToolTip(_("Distance between the grid's lines; drawing and nodes snap to them "
+                              "while the grid is on"))
+            snap = QCheckBox(_("Snap to other shapes (corners, centres, edges)"))
+            snap.setChecked(self.view.snap_objects)
+            snap.setToolTip(_("Hold Alt to drag without any snapping for a moment"))
+            form.addRow(_("Grid step"), step)
+            form.addRow(snap)
+            buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+            buttons.accepted.connect(dlg.accept)
+            buttons.rejected.connect(dlg.reject)
+            form.addRow(buttons)
+            if dlg.exec() != QDialog.Accepted:
+                return None
+            values = {"grid_step": step.value(), "snap_objects": snap.isChecked()}
+        self.grid_step = float(values["grid_step"])
+        self.view.snap_objects = bool(values["snap_objects"])
+        self.settings.setValue("view/grid_step", self.grid_step)
+        self.settings.setValue("view/snap_objects", "true" if self.view.snap_objects else "false")
+        if self.act_grid.isChecked():
+            self.view.grid_mm = self.grid_step
+        self.refresh()
+        return values
 
     def show_shortcuts(self):
         """Every action with a key, in one window (built from the actions, so it is never out of date)."""
@@ -1363,6 +1876,7 @@ class MainWindow(QMainWindow):
 
     def _checkpoint(self):
         """Remember the design as it is, before a change: Undo goes back to it."""
+        self.modified = True
         self._undo.append(self._snapshot())
         del self._undo[:-self.UNDO_LIMIT]
         self._redo.clear()
@@ -1398,6 +1912,7 @@ class MainWindow(QMainWindow):
         self._enable_selection_actions()
         self.act_undo.setEnabled(bool(self._undo))
         self.act_redo.setEnabled(bool(self._redo))
+        self._update_title()
         self.refresh_job()
 
     def refresh_job(self):
@@ -1417,7 +1932,8 @@ class MainWindow(QMainWindow):
             return
         self.view.show_knife(self.last_job.knife_paths if self.act_knife.isChecked() else None)
         j = self.last_job
-        text = _("Cut length: %.2f m · travel: %.2f m") % (j.cut_mm / 1000.0, j.travel_mm / 1000.0)
+        text = (_("Drawn length: %.2f m · travel: %.2f m") if self.is_pen() else
+                _("Cut length: %.2f m · travel: %.2f m")) % (j.cut_mm / 1000.0, j.travel_mm / 1000.0)
         if p.speed_cm_s:
             minutes = (j.cut_mm + j.travel_mm) / (p.speed_cm_s * 10.0) / 60.0
             text += "\n" + _("About %.1f min at %g cm/s") % (minutes, p.speed_cm_s)
@@ -1453,16 +1969,25 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, _("Start"), str(e))
             return None
         p = self.job_profile()
-        if QMessageBox.question(
-                self, _("Cut now?"),
-                _("Send the design to %s (%s)?\n\n"
-                  "Check before you go on:\n"
-                  "• the knife is in the holder (or the pen for a test)\n"
-                  "• the material is under the pinch rollers\n"
-                  "• the origin is set (Origin key) where the design should start\n"
-                  "• speed and force are set on the cutter's panel\n\n"
-                  "To stop the cutter at once: Test (pause) or Reset on its panel.")
-                % (p.port, p.name)) != QMessageBox.Yes:
+        if self.is_pen():
+            ask = (_("Draw now?"),
+                   _("Send the drawing to %s (%s)?\n\n"
+                     "Tool: PEN. Check before you go on:\n"
+                     "• the pen (not the knife) is in the holder, its tip just above the paper\n"
+                     "• the force on the cutter's panel is LOW, for a pen\n"
+                     "• the paper is under the pinch rollers\n"
+                     "• the origin is set (Origin key) where the drawing should start\n\n"
+                     "To stop the cutter at once: Test (pause) or Reset on its panel.") % (p.port, p.name))
+        else:
+            ask = (_("Cut now?"),
+                   _("Send the design to %s (%s)?\n\n"
+                     "Tool: KNIFE. Check before you go on:\n"
+                     "• the knife is in the holder\n"
+                     "• the material is under the pinch rollers\n"
+                     "• the origin is set (Origin key) where the design should start\n"
+                     "• speed and force are set on the cutter's panel\n\n"
+                     "To stop the cutter at once: Test (pause) or Reset on its panel.") % (p.port, p.name))
+        if QMessageBox.question(self, ask[0], ask[1]) != QMessageBox.Yes:
             return None
         from vintyl.core.protocols import encoder_for
         self.worker = SendWorker(job.text, p, p.port, encoder_for(p).units_per_mm, self)
@@ -1500,6 +2025,9 @@ class MainWindow(QMainWindow):
             w.setEnabled(not on)
 
     def closeEvent(self, event):
+        if not self.maybe_save():
+            event.ignore()
+            return
         w = getattr(self, "worker", None)
         if w is not None and w.isRunning():
             w.request_stop()

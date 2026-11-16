@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-16 20:49+0100\n"
+"POT-Creation-Date: 2026-11-16 21:13+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -44,7 +44,23 @@ msgid "%s has no visible shapes to cut."
 msgstr ""
 
 #, python-format
+msgid "%s is damaged: an element cannot be read."
+msgstr ""
+
+#, python-format
+msgid "%s is damaged: it is not readable as a project."
+msgstr ""
+
+#, python-format
+msgid "%s is not a Vintyl project."
+msgstr ""
+
+#, python-format
 msgid "%s is not there. Is the cutter connected by USB and switched on?"
+msgstr ""
+
+#, python-format
+msgid "%s was saved by a newer Vintyl; please update Vintyl to open it."
 msgstr ""
 
 msgid "&Cutter"
@@ -62,10 +78,21 @@ msgstr ""
 msgid "&Object"
 msgstr ""
 
+msgid "&Settings"
+msgstr ""
+
 msgid "&View"
 msgstr ""
 
+msgid "A QR code to cut: an address or a text"
+msgstr ""
+
 msgid "A copy of the selected element, a little to the side"
+msgstr ""
+
+msgid ""
+"A new outline round the selected shapes (or inside them), a set distance "
+"away: an edge round a text, a backing in another colour"
 msgstr ""
 
 msgid "A path has a point that is not a number."
@@ -89,14 +116,14 @@ msgstr ""
 msgid "About Vintyl"
 msgstr ""
 
-msgid "Add the shapes of an SVG file to the design"
-msgstr ""
-
 msgid "Align"
 msgstr ""
 
 #, python-format
 msgid "Align the selected shapes to each other: %s"
+msgstr ""
+
+msgid "Angle"
 msgstr ""
 
 msgid "Arms"
@@ -108,8 +135,7 @@ msgstr ""
 msgid "Axle hole (mm)"
 msgstr ""
 
-#, python-format
-msgid "Bars (% of size)"
+msgid "Bar width (%)"
 msgstr ""
 
 msgid "Bold"
@@ -121,6 +147,9 @@ msgstr ""
 msgid "Bottom edges"
 msgstr ""
 
+msgid "Bricks"
+msgstr ""
+
 #, python-format
 msgid "Cannot open %s: %s"
 msgstr ""
@@ -129,10 +158,17 @@ msgstr ""
 msgid "Cannot read %s: %s"
 msgstr ""
 
+#, python-format
+msgid "Cannot save %s: %s"
+msgstr ""
+
 msgid "Centres across"
 msgstr ""
 
 msgid "Centres up and down"
+msgstr ""
+
+msgid "Circles"
 msgstr ""
 
 msgid "Closed shapes are cut this far past their start, so the cut closes cleanly"
@@ -142,6 +178,9 @@ msgid "Comes in a later step of Vintyl"
 msgstr ""
 
 msgid "Command"
+msgstr ""
+
+msgid "Concentric"
 msgstr ""
 
 msgid "Connect"
@@ -159,7 +198,16 @@ msgstr ""
 msgid "Corner radius (mm)"
 msgstr ""
 
+msgid "Corners"
+msgstr ""
+
 msgid "Cross"
+msgstr ""
+
+msgid "Cross-hatch"
+msgstr ""
+
+msgid "Curve"
 msgstr ""
 
 msgid "Cut"
@@ -204,10 +252,29 @@ msgstr ""
 msgid "Delete the selected element"
 msgstr ""
 
+msgid "Diamonds"
+msgstr ""
+
 msgid "Difference"
 msgstr ""
 
 msgid "Difference: cut the other selected shapes out of the first one"
+msgstr ""
+
+msgid "Direction"
+msgstr ""
+
+msgid "Distance"
+msgstr ""
+
+msgid ""
+"Distance between the grid's lines; drawing and nodes snap to them while "
+"the grid is on"
+msgstr ""
+
+msgid ""
+"Distance between the lines (the size of one repeat). For a solid fill: a "
+"little less than the pen's width."
 msgstr ""
 
 msgid "Do again what was taken back"
@@ -216,6 +283,16 @@ msgstr ""
 msgid ""
 "Drag nodes and handles · double-click a side: add a node · D delete · L "
 "line · C curve · O smooth · Z close/open · B break"
+msgstr ""
+
+msgid "Draw"
+msgstr ""
+
+msgid "Draw now?"
+msgstr ""
+
+#, python-format
+msgid "Drawn length: %.2f m · travel: %.2f m"
 msgstr ""
 
 msgid "Drop"
@@ -245,6 +322,9 @@ msgstr ""
 msgid "Empty: the cutter uses what is set on its panel"
 msgstr ""
 
+msgid "Error correction"
+msgstr ""
+
 msgid "Every key in one window"
 msgstr ""
 
@@ -258,6 +338,14 @@ msgid "Extra space between letters, mm"
 msgstr ""
 
 msgid "File"
+msgstr ""
+
+msgid "Fill"
+msgstr ""
+
+msgid ""
+"Fill the selected closed shapes with a pattern of lines, drawn with the "
+"pen (only when the tool is the pen)"
 msgstr ""
 
 msgid "Fit"
@@ -275,13 +363,33 @@ msgstr ""
 msgid "Font size: the height of the font's em in mm"
 msgstr ""
 
+msgid ""
+"For drawing on paper or card, not for vinyl. To cut vinyl, choose the "
+"knife."
+msgstr ""
+
 msgid "Force"
 msgstr ""
 
 msgid "Frame round the design"
 msgstr ""
 
+msgid "Freehand"
+msgstr ""
+
+msgid "Freehand: draw with the button held; ending at the start closes it"
+msgstr ""
+
 msgid "Gear"
+msgstr ""
+
+msgid "Grid"
+msgstr ""
+
+msgid "Grid step"
+msgstr ""
+
+msgid "Grid step, snapping"
 msgstr ""
 
 msgid "Group"
@@ -293,8 +401,7 @@ msgid_plural "Grouped %d elements."
 msgstr[0] ""
 msgstr[1] ""
 
-#, python-format
-msgid "Head (% of length)"
+msgid "Head length (%)"
 msgstr ""
 
 msgid "Heart"
@@ -306,6 +413,9 @@ msgstr ""
 msgid "Height (mm)"
 msgstr ""
 
+msgid "Hold Alt to drag without any snapping for a moment"
+msgstr ""
+
 msgid "Hole (mm)"
 msgstr ""
 
@@ -315,9 +425,20 @@ msgid ""
 "the list."
 msgstr ""
 
+msgid "Honeycomb"
+msgstr ""
+
 msgid ""
 "How far the blade tip trails the holder's axis. A 45° blade: usually "
-"0.20–0.30 mm. 0 = pen."
+"0.20–0.30 mm."
+msgstr ""
+
+msgid ""
+"How much of the code may be damaged and it still reads; more = more "
+"modules"
+msgstr ""
+
+msgid "How wide a line the pen or pencil draws (a fineliner: 0.3–0.5 mm)"
 msgstr ""
 
 msgid "Inner corners (%)"
@@ -345,6 +466,12 @@ msgstr ""
 msgid "Join the selected elements into a group that is selected and moved as one"
 msgstr ""
 
+msgid "Keep the original shape"
+msgstr ""
+
+msgid "Keep the pattern this far from the outline"
+msgstr ""
+
 msgid "Keep the proportions"
 msgstr ""
 
@@ -357,6 +484,9 @@ msgid "Key"
 msgstr ""
 
 msgid "Keyboard shortcuts"
+msgstr ""
+
+msgid "Knife"
 msgstr ""
 
 msgid "Knife offset"
@@ -389,6 +519,13 @@ msgstr ""
 msgid "Main"
 msgstr ""
 
+msgid "Margin"
+msgstr ""
+
+#, python-format
+msgid "Measured: %.2f mm (across %.2f mm, along %.2f mm)"
+msgstr ""
+
 msgid "Mirror"
 msgstr ""
 
@@ -410,9 +547,6 @@ msgid "Move up"
 msgstr ""
 
 msgid "New"
-msgstr ""
-
-msgid "New design"
 msgstr ""
 
 #, python-format
@@ -440,13 +574,30 @@ msgid ""
 "the time estimate."
 msgstr ""
 
+msgid "Nothing is left after the offset (the shape is thinner than that)."
+msgstr ""
+
 msgid "Nothing is left of the shapes after this operation."
 msgstr ""
 
 msgid "Nothing to split: one outline, no group."
 msgstr ""
 
+msgid "Offset"
+msgstr ""
+
+msgid ""
+"Only the outer outline stays, with no holes (in O, A, a ring): a solid "
+"backing for a text in another colour"
+msgstr ""
+
+msgid "Open"
+msgstr ""
+
 msgid "Open SVG"
+msgstr ""
+
+msgid "Open a Vintyl project, or add the shapes of an SVG file to the design"
 msgstr ""
 
 #, python-format
@@ -463,6 +614,26 @@ msgid "Overcut"
 msgstr ""
 
 msgid "Paste"
+msgstr ""
+
+msgid "Pattern"
+msgstr ""
+
+msgid "Pen"
+msgstr ""
+
+msgid "Pen / pencil"
+msgstr ""
+
+msgid "Pen path"
+msgstr ""
+
+msgid "Pen width"
+msgstr ""
+
+msgid ""
+"Pen: click = corner, press and drag = smooth curve; the first node closes"
+" it, double-click or Enter leaves it open"
 msgstr ""
 
 #, python-format
@@ -492,6 +663,9 @@ msgstr ""
 msgid "Put the copied elements back, 5 mm beside where they were"
 msgstr ""
 
+msgid "QR code"
+msgstr ""
+
 msgid "Quit"
 msgstr ""
 
@@ -515,7 +689,10 @@ msgstr ""
 msgid "Remember the selected elements, to paste them"
 msgstr ""
 
-msgid "Remove everything from the material?"
+msgid "Remove the fill"
+msgstr ""
+
+msgid "Remove the holes inside"
 msgstr ""
 
 msgid "Right edge: how far left from the origin, across the material"
@@ -542,16 +719,44 @@ msgstr ""
 msgid "Rounded rectangle"
 msgstr ""
 
+msgid "Ruler"
+msgstr ""
+
+msgid "Ruler: drag between two points to measure"
+msgstr ""
+
 msgid "SVG files (*.svg)"
 msgstr ""
 
+msgid "Save"
+msgstr ""
+
 msgid "Save .hpgl"
+msgstr ""
+
+msgid "Save as…"
 msgstr ""
 
 msgid "Save cutter file"
 msgstr ""
 
 msgid "Save exactly what would go to the cutter, as a file"
+msgstr ""
+
+msgid "Save project"
+msgstr ""
+
+msgid "Save the changes to the project first?"
+msgstr ""
+
+msgid "Save the project (.vintyl): the design and the job's settings"
+msgstr ""
+
+msgid "Save the project under another name"
+msgstr ""
+
+#, python-format
+msgid "Saved %s"
 msgstr ""
 
 #, python-format
@@ -561,6 +766,9 @@ msgstr ""
 msgid "Select"
 msgstr ""
 
+msgid "Select a closed shape to fill."
+msgstr ""
+
 msgid "Select all"
 msgstr ""
 
@@ -568,6 +776,12 @@ msgid "Select and move"
 msgstr ""
 
 msgid "Select every element"
+msgstr ""
+
+msgid "Select one or more shapes with closed outlines first."
+msgstr ""
+
+msgid "Select three or more shapes to spread them evenly."
 msgstr ""
 
 msgid "Select two or more elements to group them."
@@ -583,11 +797,24 @@ msgstr ""
 msgid ""
 "Send the design to %s (%s)?\n"
 "\n"
-"Check before you go on:\n"
-"• the knife is in the holder (or the pen for a test)\n"
+"Tool: KNIFE. Check before you go on:\n"
+"• the knife is in the holder\n"
 "• the material is under the pinch rollers\n"
 "• the origin is set (Origin key) where the design should start\n"
 "• speed and force are set on the cutter's panel\n"
+"\n"
+"To stop the cutter at once: Test (pause) or Reset on its panel."
+msgstr ""
+
+#, python-format
+msgid ""
+"Send the drawing to %s (%s)?\n"
+"\n"
+"Tool: PEN. Check before you go on:\n"
+"• the pen (not the knife) is in the holder, its tip just above the paper\n"
+"• the force on the cutter's panel is LOW, for a pen\n"
+"• the paper is under the pinch rollers\n"
+"• the origin is set (Origin key) where the drawing should start\n"
 "\n"
 "To stop the cutter at once: Test (pause) or Reset on its panel."
 msgstr ""
@@ -602,8 +829,13 @@ msgid ""
 " on its panel."
 msgstr ""
 
-#, python-format
-msgid "Shaft (% of width)"
+msgid "Settings"
+msgstr ""
+
+msgid "Settings…"
+msgstr ""
+
+msgid "Shaft width (%)"
 msgstr ""
 
 msgid "Shape"
@@ -613,6 +845,9 @@ msgid "Shapes"
 msgstr ""
 
 msgid "Show exactly where the knife goes: cuts, travels and their order"
+msgstr ""
+
+msgid "Show the grid and snap to it (its step is in the Settings)"
 msgstr ""
 
 msgid "Show the whole material and design"
@@ -625,6 +860,9 @@ msgid "Size"
 msgstr ""
 
 msgid "Size (mm)"
+msgstr ""
+
+msgid "Snap to other shapes (corners, centres, edges)"
 msgstr ""
 
 msgid "Space between the design and the frame"
@@ -642,6 +880,22 @@ msgstr ""
 msgid ""
 "Split the selected group into separate elements; a single element with "
 "several outlines is split into one element per outline"
+msgstr ""
+
+msgid "Spread across"
+msgstr ""
+
+msgid ""
+"Spread three or more shapes evenly from left to right: equal gaps, the "
+"outermost stay"
+msgstr ""
+
+msgid ""
+"Spread three or more shapes evenly up and down: equal gaps, the outermost"
+" stay"
+msgstr ""
+
+msgid "Spread up and down"
 msgstr ""
 
 msgid "Star"
@@ -683,6 +937,9 @@ msgstr ""
 msgid "Text"
 msgstr ""
 
+msgid "Text or address"
+msgstr ""
+
 msgid "Text: click where it should start"
 msgstr ""
 
@@ -714,6 +971,9 @@ msgstr ""
 msgid "Ticked: cut. Not ticked: shown only."
 msgstr ""
 
+msgid "Tool"
+msgstr ""
+
 msgid "Top edges"
 msgstr ""
 
@@ -721,6 +981,9 @@ msgid "Transform"
 msgstr ""
 
 msgid "Type the text in the options bar first."
+msgstr ""
+
+msgid "Type the text or address the QR code should hold."
 msgstr ""
 
 msgid "USB printer (/dev/usb/lp…) or serial port (/dev/ttyUSB…, /dev/ttyACM…)"
@@ -738,6 +1001,9 @@ msgstr ""
 msgid "Union: join the selected shapes into one outline"
 msgstr ""
 
+msgid "Unsaved changes"
+msgstr ""
+
 msgid "View"
 msgstr ""
 
@@ -748,7 +1014,29 @@ msgid ""
 "GPL-3.0-or-later."
 msgstr ""
 
+msgid "Vintyl projects (*.vintyl)"
+msgstr ""
+
+msgid ""
+"Vintyl projects and SVG files (*.vintyl *.svg);;Vintyl projects "
+"(*.vintyl);;SVG files (*.svg)"
+msgstr ""
+
+msgid "Waves"
+msgstr ""
+
+msgid ""
+"What is in the cutter's holder. Pen: drawing on paper or card, with no "
+"knife offset or overcut; fill patterns are drawn too."
+msgstr ""
+
 msgid "What it does"
+msgstr ""
+
+msgid ""
+"Where the pen's stroke lies against the line of a closed shape. Outside: "
+"the shape keeps its exact size inside the stroke; inside: the stroke "
+"stays within the shape. Open lines are drawn on the line."
 msgstr ""
 
 msgid "Width"
@@ -768,6 +1056,9 @@ msgid "X ↑ along the material"
 msgstr ""
 
 msgid "Y"
+msgstr ""
+
+msgid "Zigzag"
 msgstr ""
 
 msgid "Zoom in"
@@ -792,13 +1083,37 @@ msgstr ""
 msgid "corner"
 msgstr ""
 
+msgid "design"
+msgstr ""
+
 msgid "from the panel"
+msgstr ""
+
+msgid "high (25%)"
+msgstr ""
+
+msgid "highest (30%)"
 msgstr ""
 
 msgid "in line"
 msgstr ""
 
+msgid "inside the line"
+msgstr ""
+
+msgid "inwards"
+msgstr ""
+
+msgid "low (7%)"
+msgstr ""
+
+msgid "medium (15%)"
+msgstr ""
+
 msgid "middle"
+msgstr ""
+
+msgid "new project"
 msgstr ""
 
 msgid "no port"
@@ -807,11 +1122,23 @@ msgstr ""
 msgid "on line"
 msgstr ""
 
+msgid "on the line"
+msgstr ""
+
+msgid "outside the line"
+msgstr ""
+
+msgid "outwards"
+msgstr ""
+
 #, python-format
 msgid "past the length of %g mm"
 msgstr ""
 
-msgid "pen (no offset)"
+msgid "round"
+msgstr ""
+
+msgid "sharp"
 msgstr ""
 
 msgid "← Y across"
