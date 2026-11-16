@@ -1,0 +1,34 @@
+name: Something does not work
+description: Vintyl did something wrong, showed an error or stopped.
+labels: [bug]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Vintyl version
+      description: Help → About Vintyl (filled in when you start the report from Vintyl).
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: System
+      placeholder: e.g. Ubuntu 24.04, Debian 13
+  - type: input
+    id: cutter
+    attributes:
+      label: Cutter
+      placeholder: e.g. VEVOR KI-375A
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+      description: The steps that lead to it, if you can.
+    validations:
+      required: true
+  - type: textarea
+    id: report
+    attributes:
+      label: Diagnostic report
+      description: Help → Diagnostic report → Copy, then paste it here.
+      render: text

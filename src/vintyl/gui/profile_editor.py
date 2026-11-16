@@ -20,6 +20,7 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QDialogButtonBox, 
 from vintyl.core import profile as profiles
 from vintyl.core import transport
 from vintyl.gui import _
+from vintyl.gui import theme
 
 
 def _dspin(maximum, decimals=2, suffix=" mm", minimum=0.0, step=None):
@@ -238,13 +239,13 @@ class ProfileEditor(QDialog):
         import os
         problem = transport.access_problem(port)
         if problem:
-            text, color = problem, "#b91c1c"
+            text, color = problem, theme.token("error")
         elif port and not os.path.exists(port):
-            text, color = _("Not plugged in now (or switched off)."), "#6b7280"
+            text, color = _("Not plugged in now (or switched off)."), theme.token("muted")
         elif port:
-            text, color = _("Found, and you may use it."), "#15803d"
+            text, color = _("Found, and you may use it."), theme.token("ok")
         else:
-            text, color = "", "#6b7280"
+            text, color = "", theme.token("muted")
         self.port_note.setText(text)
         self.port_note.setStyleSheet("color: %s" % color)
         self.conn_form.setRowVisible(self.port_note, bool(text))

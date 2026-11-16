@@ -1342,3 +1342,118 @@ def test_open_a_dxf_from_the_window(win, tmp_path):
     assert e is not None and len(e.paths) == 2 and win.selected is e
     xmin, xmax, ymin, ymax = e.bounds
     assert xmax <= 0 and ymax <= 0                                  # on the material, near the origin
+
+
+# ---- settings, new versions, diagnostics -------------------------------------------------------------
+def test_language_and_look_are_saved_for_the_next_start(win):
+    win.show_settings({"grid_step": 5.0, "snap_objects": True, "language": "pl", "theme": "dark",
+                       "check_updates": False})
+    assert win.settings.value("view/language") == "pl" and win.settings.value("view/theme") == "dark"
+    assert win.settings.value("updates/check") == "false"
+    assert "next start" in win.statusBar().currentMessage()
+
+
+def test_a_new_version_shows_the_bar(win):
+    import time
+    from PySide6.QtTest import QTest
+    fetch = lambda current, timeout: [{"tag_name": "v99.0.0", "prerelease": False, "draft": False,
+                                       "html_url": "https://example.org", "name": "Vintyl 99.0.0"}]
+    check = win.check_for_updates(auto=False, fetch=fetch)
+    for _i in range(100):
+        if not win.update_bar.isHidden():
+            break
+        QTest.qWait(20)
+    assert check.wait(2000) and not win.update_bar.isHidden() and "99.0.0" in win.update_bar.text.text()
+    win.update_bar.skip_button.click()
+    assert win.settings.value("updates/skip") == "99.0.0" and win.update_bar.isHidden()
+    # at start: not again on the same day
+    assert win.check_for_updates(auto=True, fetch=fetch) is None
+    assert float(win.settings.value("updates/last")) > time.time() - 60
+
+
+def test_the_diagnostic_report_window(win):
+    dlg = win.show_diagnostics(show=False)
+    from PySide6.QtWidgets import QPlainTextEdit
+    text = dlg.findChildren(QPlainTextEdit)[0].toPlainText()
+    assert "Vintyl diagnostic report" in text and win.profile.name in text and "== Checks" in text
+    assert "FAIL" not in text
+
+
+def test_the_dark_look_paints_the_window_dark(app):
+    from vintyl.gui import icons, theme
+    try:
+        assert theme.apply(app, "dark") == "dark"
+        assert app.palette().window().color().lightness() < 100 and icons.INK == theme.TOKENS["dark"]["ink"]
+    finally:
+        theme.apply(app, "light")
+    assert icons.INK == theme.TOKENS["light"]["ink"]
+
+
+# ---- mirror, knife test, copies, weeding lines, strips ------------------------------------------------
+def test_mirror_for_heat_transfer_vinyl_mirrors_only_the_job(win):
+    win.use_profile_values(knife_offset_mm=0.0, overcut_mm=0.0)
+    # an L: a long bar on the right (near the origin) and a short foot on the left
+    win._on_drawn("rectangle", QRectF(-40, -60, 10, 40))
+    win._on_drawn("rectangle", QRectF(-70, -30, 30, 10))
+    view_before = [list(map(tuple, (n[:2] for n in e.paths[0]["nodes"]))) for e in win.design.elements]
+    plain = win.build()
+    win.mirror_job.setChecked(True)
+    mirrored = win.build()
+    assert "MIRRORED" in win.job_label.text()
+    # the screen is unchanged; the job's box is the same, its content turned left to right
+    assert [list(map(tuple, (n[:2] for n in e.paths[0]["nodes"]))) for e in win.design.elements] == view_before
+    assert plain.bounds_mm == pytest.approx(mirrored.bounds_mm)
+    assert plain.text != mirrored.text
+    assert win.project_settings()["mirror"] is True
+
+
+def test_the_knife_test_is_a_square_with_a_triangle_near_the_origin(win, messages):
+    job = win.knife_test_job()
+    assert job.paths == 2                                            # the square and the triangle
+    xmin, xmax, ymin, ymax = job.bounds_mm
+    assert xmin >= 5 - 1 and xmax <= 20 + 1 and ymin >= 5 - 1 and ymax <= 20 + 1    # mm from the origin
+
+
+def test_copies_in_rows_and_columns(win):
+    win._on_drawn("rectangle", QRectF(-30, -30, 20, 10))
+    made = win.copies_selected({"rows": 2, "columns": 3, "gap": 5.0})
+    assert len(made) == 5 and len(win.design.elements) == 6
+    xs = sorted({round(e.bounds[1], 3) for e in win.design.elements})
+    ys = sorted({round(e.bounds[3], 3) for e in win.design.elements})
+    assert xs == [-60.0, -35.0, -10.0] and ys == [-35.0, -20.0]    # 20+5 across, 10+5 along
+    win.undo()
+    assert len(win.design.elements) == 1
+
+
+def test_weeding_lines_reach_the_frame_and_keep_off_the_shapes(win):
+    from vintyl.core import curves
+    win._on_drawn("rectangle", QRectF(-100, -60, 20, 20))
+    win._on_drawn("ellipse", QRectF(-60, -60, 20, 20))
+    e = win.add_weeding_lines({"direction": "upright", "spacing": 10.0, "margin": 1.5})
+    assert e is not None and win.weed_frame.isChecked() and win.design.elements[-1] is e
+    frame = win.weed_frame_polyline(win._frame_polys(*win.design.material_paths()))
+    along = [p[0] for p in frame]
+    lines = curves.flatten(e.paths, 0.05)
+    # a line through a gap runs the whole frame; lines never come within the margin of a shape
+    tops = {round(-max(y for _x, y in l), 3) for l in lines}
+    assert round(min(along), 3) in tops
+    for l in lines:
+        for x, y in l:
+            assert not (-101.4 < x < -78.6 and -61.4 < y < -38.6)
+    again = win.add_weeding_lines({"direction": "both", "spacing": 10.0, "margin": 1.5})
+    assert [x for x in win.design.elements if x.spec and x.spec.get("kind") == "weeding"] == [again]
+
+
+def test_a_wide_design_is_split_into_strips_along_the_material(win):
+    win.use_profile_values(width_mm=300.0)
+    win._on_drawn("rectangle", QRectF(-700, -100, 680, 60))        # 680 mm wide on a 300 mm cutter
+    strips = win.split_into_strips({"direction": "across", "size": 280.0, "overlap": 10.0, "gap": 20.0})
+    assert len(strips) == 3
+    widths = [s.size[0] for s in strips]
+    assert sum(widths) == pytest.approx(680 + 2 * 10, abs=0.5)      # every overlap counted twice
+    for s in strips:
+        xmin, xmax, ymin, ymax = s.bounds
+        assert xmin >= -300 and xmax <= 0                            # each fits the cutting width
+    ys = sorted((s.bounds[2], s.bounds[3]) for s in strips)
+    assert all(a[1] < b[0] for a, b in zip(ys, ys[1:]))              # one after another, not on top
+    assert len(win.design.elements) == 3                             # the strips replace the design

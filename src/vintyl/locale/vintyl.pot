@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-16 22:48+0100\n"
+"POT-Creation-Date: 2026-11-16 23:05+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,6 +20,12 @@ msgstr ""
 #, python-format
 msgid "%.1f × %.1f mm"
 msgstr ""
+
+#, python-format
+msgid "%d copy made."
+msgid_plural "%d copies made."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "%d element"
@@ -114,6 +120,10 @@ msgstr ""
 msgid "&View"
 msgstr ""
 
+#, python-format
+msgid "<b>%s is available</b> (you have %s)."
+msgstr ""
+
 msgid "A QR code to cut: an address or a text"
 msgstr ""
 
@@ -122,6 +132,11 @@ msgstr ""
 
 #, python-format
 msgid "A cutter profile cannot be read: %s"
+msgstr ""
+
+msgid ""
+"A design wider than the cutter (or longer than the sheet): cut it in "
+"strips that overlap, laid one after another on the material"
 msgstr ""
 
 msgid ""
@@ -159,6 +174,14 @@ msgstr ""
 msgid "Access to the cutter (Linux groups)"
 msgstr ""
 
+msgid "Add Vintyl to the applications menu"
+msgstr ""
+
+msgid ""
+"Add Vintyl to the applications menu, and open .vintyl projects with it?\n"
+"(Help → Add Vintyl to the applications menu does it later too.)"
+msgstr ""
+
 msgid "Align"
 msgstr ""
 
@@ -172,10 +195,19 @@ msgstr ""
 msgid "Angle"
 msgstr ""
 
+msgid "Applications menu"
+msgstr ""
+
 msgid "Arms"
 msgstr ""
 
 msgid "Arrow"
+msgstr ""
+
+msgid "As many columns as fit in the width"
+msgstr ""
+
+msgid "As the system"
 msgstr ""
 
 msgid "Away"
@@ -232,6 +264,14 @@ msgstr ""
 msgid "Change one size and the others follow, so the shape keeps its look"
 msgstr ""
 
+msgid "Check for a new version"
+msgstr ""
+
+msgid ""
+"Check once a day for a new version (asks GitHub; nothing about you is "
+"sent)"
+msgstr ""
+
 msgid "Circle"
 msgstr ""
 
@@ -239,6 +279,9 @@ msgid "Circles"
 msgstr ""
 
 msgid "Closed shapes are cut this far past their start, so the cut closes cleanly"
+msgstr ""
+
+msgid "Columns (across)"
 msgstr ""
 
 msgid "Comes in a later step of Vintyl"
@@ -265,7 +308,22 @@ msgid_plural "Copied %d elements."
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "Copies"
+msgstr ""
+
+msgid "Copies the report and opens GitHub's form"
+msgstr ""
+
+msgid "Copies…"
+msgstr ""
+
 msgid "Copy"
+msgstr ""
+
+msgid ""
+"Copy this and paste it into your report on GitHub. It holds the versions,"
+" the checks, the chosen cutter and Vintyl's log; no user name, no "
+"designs."
 msgstr ""
 
 msgid "Corner from"
@@ -280,6 +338,10 @@ msgstr ""
 msgid "Corners"
 msgstr ""
 
+#, python-format
+msgid "Could not ask GitHub (no internet?): %s"
+msgstr ""
+
 msgid "Cross"
 msgstr ""
 
@@ -290,6 +352,9 @@ msgid "Curve"
 msgstr ""
 
 msgid "Cut"
+msgstr ""
+
+msgid "Cut a small square with a triangle to check the knife's force"
 msgstr ""
 
 msgid "Cut earlier"
@@ -320,7 +385,22 @@ msgstr ""
 msgid "Cut the design (after a short check list)"
 msgstr ""
 
+#, python-format
+msgid ""
+"Cut the knife test on %s: a %g mm square with a triangle, %g mm from the "
+"origin?\n"
+"\n"
+"Then peel the triangle off: it should come away cleanly, and the backing "
+"must not be cut through. Too shallow: more force (on the cutter's panel);"
+" marks in the backing: less.\n"
+"\n"
+"Afterwards move the origin on, so the design is not cut over the test."
+msgstr ""
+
 msgid "Cut this element"
+msgstr ""
+
+msgid "Cuts through the waste vinyl between the shapes, so it peels off in strips"
 msgstr ""
 
 msgid "Cutter"
@@ -352,6 +432,9 @@ msgstr ""
 msgid "DMPL mode"
 msgstr ""
 
+msgid "Dark"
+msgstr ""
+
 msgid "Delete"
 msgstr ""
 
@@ -363,6 +446,12 @@ msgid "Delete the selected element"
 msgstr ""
 
 msgid "Delete this cutter"
+msgstr ""
+
+msgid "Diagnostic report"
+msgstr ""
+
+msgid "Diagnostic report…"
 msgstr ""
 
 msgid "Diamonds"
@@ -385,12 +474,18 @@ msgid ""
 "the grid is on"
 msgstr ""
 
+msgid "Distance between the lines"
+msgstr ""
+
 msgid ""
 "Distance between the lines (the size of one repeat). For a solid fill: a "
 "little less than the pen's width."
 msgstr ""
 
 msgid "Do again what was taken back"
+msgstr ""
+
+msgid "Do not remind about this version again (a later one is shown)"
 msgstr ""
 
 msgid ""
@@ -436,6 +531,9 @@ msgid "Empty. Open an SVG file or draw a shape."
 msgstr ""
 
 msgid "Error correction"
+msgstr ""
+
+msgid "Every"
 msgstr ""
 
 msgid "Every key in one window"
@@ -498,6 +596,11 @@ msgstr ""
 msgid ""
 "For drawing on paper or card, not for vinyl. To cut vinyl, choose the "
 "knife."
+msgstr ""
+
+msgid ""
+"For vinyl ironed onto fabric: it is cut from the back, so the cut is "
+"mirrored. The design on the screen stays as it will look on the shirt."
 msgstr ""
 
 msgid "Force"
@@ -564,6 +667,9 @@ msgstr ""
 msgid "Hexagon"
 msgstr ""
 
+msgid "Hide this until the next check"
+msgstr ""
+
 msgid "Hold Alt to drag without any snapping for a moment"
 msgstr ""
 
@@ -593,6 +699,9 @@ msgstr ""
 msgid ""
 "How much of the code may be damaged and it still reads; more = more "
 "modules"
+msgstr ""
+
+msgid "How wide (or long) each strip is, with its overlap"
 msgstr ""
 
 msgid "How wide a line the pen or pencil draws (a fineliner: 0.3–0.5 mm)"
@@ -663,7 +772,13 @@ msgstr ""
 msgid "Knife path"
 msgstr ""
 
+msgid "Knife test"
+msgstr ""
+
 msgid "Language"
+msgstr ""
+
+msgid "Later"
 msgstr ""
 
 msgid "Left edges"
@@ -675,6 +790,9 @@ msgstr ""
 msgid "Length (mm)"
 msgstr ""
 
+msgid "Light"
+msgstr ""
+
 msgid "Line"
 msgstr ""
 
@@ -682,6 +800,9 @@ msgid "Line: drag from end to end"
 msgstr ""
 
 msgid "Lines"
+msgstr ""
+
+msgid "Look"
 msgstr ""
 
 msgid "Look again for cutters plugged in"
@@ -693,10 +814,21 @@ msgstr ""
 msgid "Look from further away"
 msgstr ""
 
+msgid "MIRRORED"
+msgstr ""
+
+msgid ""
+"MIRRORED for heat transfer vinyl: the vinyl's shiny side (the carrier) "
+"down, the matt side up to the knife."
+msgstr ""
+
 msgid "Machine"
 msgstr ""
 
 msgid "Main"
+msgstr ""
+
+msgid "Many copies of the selection in rows and columns, a gap apart"
 msgstr ""
 
 msgid "Margin"
@@ -707,6 +839,9 @@ msgid "Measured: %.2f mm (across %.2f mm, along %.2f mm)"
 msgstr ""
 
 msgid "Mirror"
+msgstr ""
+
+msgid "Mirror (heat transfer vinyl)"
 msgstr ""
 
 msgid "Mirror left to right"
@@ -739,6 +874,12 @@ msgid "New cutter"
 msgstr ""
 
 msgid "New cutter (a copy)"
+msgstr ""
+
+msgid "New version"
+msgstr ""
+
+msgid "No line fits between the shapes; try a smaller margin."
 msgstr ""
 
 #, python-format
@@ -831,6 +972,9 @@ msgstr ""
 msgid "Open a Vintyl project, or add the shapes of an SVG file to the design"
 msgstr ""
 
+msgid "Open the page of the new version: what is new and the file to download"
+msgstr ""
+
 #, python-format
 msgid "Opened %s"
 msgstr ""
@@ -842,6 +986,9 @@ msgid "Outer size (mm)"
 msgstr ""
 
 msgid "Overcut"
+msgstr ""
+
+msgid "Overlap"
 msgstr ""
 
 msgid "Paste"
@@ -897,6 +1044,11 @@ msgstr ""
 msgid "Put the copied elements back, 5 mm beside where they were"
 msgstr ""
 
+msgid ""
+"Put this AppImage into the desktop's menu and open .vintyl projects with "
+"it"
+msgstr ""
+
 msgid "QR code"
 msgstr ""
 
@@ -929,6 +1081,12 @@ msgstr ""
 msgid "Remove the holes inside"
 msgstr ""
 
+msgid "Report a problem…"
+msgstr ""
+
+msgid "Report my cutter…"
+msgstr ""
+
 msgid "Restore factory settings"
 msgstr ""
 
@@ -957,6 +1115,9 @@ msgid "Round corners of the rectangle (0 = sharp)"
 msgstr ""
 
 msgid "Rounded rectangle"
+msgstr ""
+
+msgid "Rows (along)"
 msgstr ""
 
 msgid "Ruler"
@@ -1001,6 +1162,9 @@ msgstr ""
 
 #, python-format
 msgid "Saved %s (%d bytes)"
+msgstr ""
+
+msgid "See the release"
 msgstr ""
 
 msgid "Select"
@@ -1118,10 +1282,16 @@ msgstr ""
 msgid "Size (mm)"
 msgstr ""
 
+msgid "Skip this version"
+msgstr ""
+
 msgid "Snap to other shapes (corners, centres, edges)"
 msgstr ""
 
 msgid "Space between the design and the frame"
+msgstr ""
+
+msgid "Space between the strips on the material"
 msgstr ""
 
 msgid "Spacing"
@@ -1131,6 +1301,25 @@ msgid "Speed"
 msgstr ""
 
 msgid "Speed and force"
+msgstr ""
+
+msgid "Split"
+msgstr ""
+
+#, python-format
+msgid ""
+"Split into %d strip, laid one after another; cut it, then lay it on its "
+"overlap."
+msgid_plural ""
+"Split into %d strips, laid one after another; cut them, then lay them "
+"together on their overlaps."
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Split into strips"
+msgstr ""
+
+msgid "Split into strips…"
 msgstr ""
 
 msgid ""
@@ -1184,6 +1373,9 @@ msgstr ""
 msgid "Stopping: lifting the knife…"
 msgstr ""
 
+msgid "Strip"
+msgstr ""
+
 msgid "Take back the last change"
 msgstr ""
 
@@ -1191,6 +1383,11 @@ msgid "Take the selected elements away, to paste them elsewhere"
 msgstr ""
 
 msgid "Teeth"
+msgstr ""
+
+msgid ""
+"Tell us how Vintyl works on your cutter (copies the report, opens "
+"GitHub's form)"
 msgstr ""
 
 msgid "Text"
@@ -1224,7 +1421,25 @@ msgstr ""
 msgid "The design does not fit on the material: it sticks out %s by %.1f mm."
 msgstr ""
 
+msgid "The design fits in one strip; nothing to split."
+msgstr ""
+
+msgid "The language and the look change at the next start of Vintyl."
+msgstr ""
+
+msgid "The lines stop this far from the shapes"
+msgstr ""
+
+msgid "The new language or look shows at the next start of Vintyl."
+msgstr ""
+
 msgid "The port speed must be a whole number."
+msgstr ""
+
+msgid "The report is copied."
+msgstr ""
+
+msgid "The strips cover this much of each other, for laying them together"
 msgstr ""
 
 msgid "The text on the other side of the path (inside a circle), still readable"
@@ -1237,6 +1452,9 @@ msgid ""
 msgstr ""
 
 msgid "The text; Enter applies it"
+msgstr ""
+
+msgid "There is nothing to cut yet."
 msgstr ""
 
 msgid "There is nothing to cut."
@@ -1301,6 +1519,9 @@ msgstr ""
 msgid "Unsaved changes"
 msgstr ""
 
+msgid "Versions, checks, the cutter and the log, to paste into a report"
+msgstr ""
+
 msgid "View"
 msgstr ""
 
@@ -1309,6 +1530,9 @@ msgid ""
 "Vintyl %s\n"
 "Software for vinyl cutters.\n"
 "GPL-3.0-or-later."
+msgstr ""
+
+msgid "Vintyl is in the applications menu (it may need a new login to show)."
 msgstr ""
 
 msgid "Vintyl projects (*.vintyl)"
@@ -1322,10 +1546,19 @@ msgstr ""
 msgid "Vinyl kept between the shapes and the outline"
 msgstr ""
 
+msgid "Vinyl left between the copies"
+msgstr ""
+
 msgid "Vinyl left between the shapes; below about 1.5 mm it tears when weeding"
 msgstr ""
 
 msgid "Waves"
+msgstr ""
+
+msgid "Weeding lines"
+msgstr ""
+
+msgid "Weeding lines…"
 msgstr ""
 
 msgid ""
@@ -1380,6 +1613,10 @@ msgid ""
 "%(port)s."
 msgstr ""
 
+#, python-format
+msgid "You have the newest Vintyl (%s)."
+msgstr ""
+
 msgid "Your own cutter profile."
 msgstr ""
 
@@ -1392,6 +1629,9 @@ msgstr ""
 msgid "Zoom out"
 msgstr ""
 
+msgid "across"
+msgstr ""
+
 msgid "across the material, below 0"
 msgstr ""
 
@@ -1399,10 +1639,22 @@ msgstr ""
 msgid "across the material, past the cutting width of %g mm"
 msgstr ""
 
+msgid "across: wider than the cutter"
+msgstr ""
+
+msgid "along: longer than the sheet"
+msgstr ""
+
 msgid "as fast as it cuts"
 msgstr ""
 
+msgid "as the system"
+msgstr ""
+
 msgid "before the origin (along the material)"
+msgstr ""
+
+msgid "both"
 msgstr ""
 
 msgid "centimetres"
@@ -1523,6 +1775,9 @@ msgid "some entities were left out: %s"
 msgstr ""
 
 msgid "swap X and Y"
+msgstr ""
+
+msgid "up and down"
 msgstr ""
 
 msgid "← Y across"

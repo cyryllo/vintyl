@@ -1,0 +1,59 @@
+name: My cutter (does it work?)
+description: Tell us how Vintyl works with your cutter, so its profile can be checked or added.
+labels: [cutter]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you! Before cutting anything, run **Help → Diagnostic report** and paste it below.
+        A good first test: a 20 mm square drawn in Vintyl, cut with the knife (or drawn with a pen).
+  - type: input
+    id: version
+    attributes:
+      label: Vintyl version
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: System
+  - type: input
+    id: cutter
+    attributes:
+      label: Cutter (brand and model, as on its label)
+      placeholder: e.g. VEVOR KI-720A, Seiki SK-870T
+    validations:
+      required: true
+  - type: dropdown
+    id: connection
+    attributes:
+      label: How it connects
+      options:
+        - USB, as a printer (/dev/usb/lp…)
+        - USB-serial or Virtual COM (/dev/ttyUSB…, /dev/ttyACM…)
+        - serial cable (RS-232)
+        - I do not know
+  - type: input
+    id: profile
+    attributes:
+      label: Vintyl profile used
+      placeholder: e.g. VEVOR 870 mm (34 in), or my own copy
+  - type: dropdown
+    id: result
+    attributes:
+      label: Result of the 20 mm square
+      options:
+        - cut (or drawn) right, 20 mm, in the right place
+        - wrong size
+        - mirrored or turned
+        - nothing happened
+        - something else (below)
+  - type: textarea
+    id: notes
+    attributes:
+      label: What you saw, settings on the cutter's panel (speed, force), anything else
+  - type: textarea
+    id: report
+    attributes:
+      label: Diagnostic report
+      render: text

@@ -10,7 +10,7 @@ or DMPL, connected as a USB printer or over a serial (or USB-serial) port.
 It is made for the cheap and popular cutters that come with Windows-only
 software (SignMaster, SignCut), so they can be used on Linux without it.
 
-> **Status: first test version (0.1.0a1, pre-release).** Vintyl is tested
+> **Status: test versions (0.2.0).** Vintyl is tested
 > on a **VEVOR KI-375A** connected by USB as a printer: it cuts from the
 > window (and from the AppImage) cleanly. VEVOR's larger cutters are said to
 > use the same control board and connect the same way, so they **should
@@ -28,19 +28,25 @@ software (SignMaster, SignCut), so they can be used on Linux without it.
 - **Knife compensation** at the corners only (curves are cut smoothly),
   **overcut** so closed shapes close cleanly, **inside shapes first** so no
   piece comes loose before its holes are cut.
-- A **weeding frame** round the design, cut last.
+- A **weeding frame** round the design, cut last, and **weeding lines**
+  through the waste between the shapes.
+- **Mirror** for heat transfer vinyl, a **knife test** (a square with a
+  triangle) to set the force, **copies** in rows and columns, and **strips**
+  for designs wider than the cutter.
 - The **knife path** shown on the sheet, with the order of the cuts.
 - **Cutter profiles** with their own settings window: port (with the
   devices found and whether you may use them), connection, command
   language, axes, knife offset, overcut, speed. Add your own cutters.
 
 **Drawing and shapes**
-- Rectangle, ellipse, polygon, line, polyline, **pen with curves**,
-  freehand, **text** with your system's fonts.
+- Rectangle (with round corners), ellipse, polygon, line, polyline, **pen
+  with curves**, freehand, **text** with your system's fonts, also **along a
+  path** (a line, a curve, round a circle).
 - **Ready shapes**: star, heart, ring, rounded rectangle, arrow, cross,
   drop, gear (sizes keep their proportions), and **QR codes**.
-- Open **SVG** files; save and open **projects** (.vintyl).
-- Move, resize with handles (proportions locked or not), rotate, mirror,
+- Open **SVG** and **DXF** files; save and open **projects** (.vintyl).
+- Move, resize with handles (proportions locked or not), rotate (by any
+  angle), mirror,
   align, distribute, group, **union / difference / intersection /
   exclusion**, **offset** (with "remove the holes inside" for a backing
   under a text), node editing, ruler, grid, snapping, undo.
@@ -58,7 +64,12 @@ software (SignMaster, SignCut), so they can be used on Linux without it.
 ![Pen mode: a circle, a star and a heart filled with patterns for drawing](docs/screenshots/pen-mode.png)
 
 **And**
-- English and Polish.
+- English and Polish; a light or dark look (Settings).
+- A right-click menu on shapes (copy, group, cutting order...).
+- Tells you when a new version is out; the AppImage adds itself to the
+  applications menu (asked once).
+- **Help → Diagnostic report** for bug reports, and GitHub forms to tell us
+  how Vintyl works on **your** cutter.
 - Keyboard shortcuts for everything common, listed in Help → Keyboard
   shortcuts.
 - `vintyl --self-test` checks that everything the program needs is there.

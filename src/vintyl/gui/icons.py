@@ -19,6 +19,13 @@ INK = "#2b2f36"
 _cache = {}
 
 
+def set_ink(color):
+    """The colour icons are drawn in (the theme's); drawn again from now on."""
+    global INK
+    INK = color
+    _cache.clear()
+
+
 def tabler(name, color=None):
     """QIcon for a Tabler icon in the given colour (default: the theme's ink)."""
     return _drawn(os.path.join(HERE, "tabler", name + ".svg"), color)

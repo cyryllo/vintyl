@@ -36,6 +36,7 @@ from vintyl.core.loaders import LoadError, load_svg
 from vintyl.core.profile import ProfileError
 from vintyl.gui import N_, _, ngettext
 from vintyl.gui import icons
+from vintyl.gui import theme
 from vintyl.gui.canvas import MaterialView, shape_icon
 from vintyl.gui.sender import SendWorker
 from vintyl.gui import text as texts
@@ -164,6 +165,11 @@ class MainWindow(QMainWindow):
         bar_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         bar_scroll.setFixedHeight(bar.sizeHint().height() + bar_scroll.horizontalScrollBar().sizeHint().height())
         outer.addWidget(bar_scroll)
+        # "a new version is available" (hidden until a check finds one)
+        from vintyl.gui.update_check import UpdateBar
+        self.update_bar = UpdateBar(self)
+        self.update_bar.skip.connect(lambda v: self.settings.setValue("updates/skip", v))
+        outer.addWidget(self.update_bar)
         middle = QHBoxLayout()
         middle.setContentsMargins(0, 0, 0, 0)
         middle.setSpacing(0)
@@ -308,10 +314,21 @@ class MainWindow(QMainWindow):
         self.act_tile = self._action(_("Pattern of shapes"), lambda: self.tile_selected(), "rosette", "Shift+T",
                                      _("Fill the selected closed shape with rows of small shapes (dots, stars, "
                                        "hearts...), each one whole, to be cut out as holes"))
+        self.act_copies = self._action(_("Copies…"), lambda: self.copies_selected(), "copy-plus", None,
+                                       _("Many copies of the selection in rows and columns, a gap apart"))
+        self.act_panels = self._action(_("Split into strips…"), lambda: self.split_into_strips(), "table", None,
+                                       _("A design wider than the cutter (or longer than the sheet): cut it in "
+                                         "strips that overlap, laid one after another on the material"))
+        self.act_weed_lines = self._action(_("Weeding lines…"), lambda: self.add_weeding_lines(), "slash", None,
+                                           _("Cuts through the waste vinyl between the shapes, so it peels off "
+                                             "in strips"))
+        self.act_knife_test = self._action(_("Knife test"), lambda: self.knife_test(), None, None,
+                                           _("Cut a small square with a triangle to check the knife's force"))
         self.act_text_path = self._action(_("Text on a path"), lambda: self.put_text_on_path(), "circle-dashed",
                                           None, _("Set the selected text along the selected shape (a line, "
                                                   "a curve, a circle...): select the text and the shape"))
-        self.selection_actions = [self.act_offset, self.act_fill, self.act_tile, self.act_text_path, self.act_cut, self.act_copy, self.act_group, self.act_ungroup,
+        self.selection_actions = [self.act_offset, self.act_fill, self.act_tile, self.act_text_path, self.act_copies,
+                                  self.act_cut, self.act_copy, self.act_group, self.act_ungroup,
                                   self.act_distribute_across, self.act_distribute_up] + \
             list(self.act_boolean.values()) + [
             self.act_duplicate, self.act_rot_left, self.act_rot_right,
@@ -353,10 +370,12 @@ class MainWindow(QMainWindow):
         for a in [self.act_group, self.act_ungroup, None] + list(self.act_boolean.values()) + [None] + \
                 [self.act_rot_left, self.act_rot_right, self.act_mirror_h, self.act_mirror_v, None] + \
                 list(self.act_align.values()) + [None, self.act_offset, self.act_tile, self.act_fill,
-                                                 self.act_text_path]:
+                                                 self.act_text_path, None, self.act_copies, self.act_panels,
+                                                 self.act_weed_lines]:
             m.addSeparator() if a is None else m.addAction(a)
         m = mb.addMenu(_("&Cutter"))
         m.addAction(self.act_profile)
+        m.addAction(self.act_knife_test)
         m = mb.addMenu(_("&View"))
         for a in (self.act_fit, self.act_zoom_in, self.act_zoom_out, None, self.act_knife, self.act_grid):
             m.addSeparator() if a is None else m.addAction(a)
@@ -365,6 +384,19 @@ class MainWindow(QMainWindow):
         m = mb.addMenu(_("&Help"))
         m.addAction(self.act_shortcuts)
         m.addAction(self._action(_("Access to the cutter (Linux groups)"), self.show_access_help))
+        m.addSeparator()
+        m.addAction(self._action(_("Diagnostic report…"), lambda: self.show_diagnostics(), "bug",
+                                 tip=_("Versions, checks, the cutter and the log, to paste into a report")))
+        m.addAction(self._action(_("Check for a new version"), lambda: self.check_for_updates(auto=False),
+                                 "cloud-download"))
+        from vintyl.gui import desktop_entry
+        self.act_menu_entry = self._action(_("Add Vintyl to the applications menu"),
+                                           lambda: self.install_menu_entry(), None,
+                                           tip=_("Put this AppImage into the desktop's menu and open "
+                                                 ".vintyl projects with it"))
+        self.act_menu_entry.setVisible(desktop_entry.applies())
+        m.addAction(self.act_menu_entry)
+        m.addSeparator()
         m.addAction(self._action(_("About Vintyl"), self.about))
 
     def _make_ribbon(self):
@@ -787,7 +819,7 @@ class MainWindow(QMainWindow):
         row.addWidget(self.btn_rotate)
         self.node_hint = QLabel(_("Drag nodes and handles · double-click a side: add a node · "
                                   "D delete · L line · C curve · O smooth · Z close/open · B break"))
-        self.node_hint.setStyleSheet("color: #4b5563")
+        self.node_hint.setObjectName("node_hint")
         # the hint wraps and never makes the window wider than the screen
         self.node_hint.setWordWrap(True)
         self.node_hint.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
@@ -974,7 +1006,7 @@ class MainWindow(QMainWindow):
         # what the machine is set to: its port and width, in one line
         self.cutter_info = QLabel()
         self.cutter_info.setWordWrap(False)
-        self.cutter_info.setStyleSheet("color: #6b7280")
+        self.cutter_info.setObjectName("muted")
         form.addRow(self.cutter_info)
         # no permission for the port (or it is not plugged in): what to do, right under it
         self.port_problem = QLabel()
@@ -1035,6 +1067,11 @@ class MainWindow(QMainWindow):
                                        "Off: exactly the order of the list."))
         self.inside_first.toggled.connect(lambda _v: self.refresh_job())
         lay.addWidget(self.inside_first)
+        self.mirror_job = QCheckBox(_("Mirror (heat transfer vinyl)"))
+        self.mirror_job.setToolTip(_("For vinyl ironed onto fabric: it is cut from the back, so the cut is "
+                                     "mirrored. The design on the screen stays as it will look on the shirt."))
+        self.mirror_job.toggled.connect(lambda _v: self.refresh_job())
+        lay.addWidget(self.mirror_job)
         # a frame round the whole design, cut last, for weeding
         frame_row = QHBoxLayout()
         self.weed_frame = QCheckBox(_("Frame round the design"))
@@ -1066,8 +1103,12 @@ class MainWindow(QMainWindow):
                                    "is stopped with Test or Reset on its panel."))
         self.btn_stop.setEnabled(False)
         self.btn_stop.clicked.connect(self.stop)
-        # Save on its own row, Start and Stop under it (the knife path is on the ribbon)
-        for b, r, c, span in ((self.btn_save, 0, 0, 2), (self.btn_start, 1, 0, 1), (self.btn_stop, 1, 1, 1)):
+        self.btn_test = QPushButton(icons.own("drag-knife"), _("Knife test"))
+        self.btn_test.setToolTip(_("Cut a small square with a triangle to check the knife's force"))
+        self.btn_test.clicked.connect(lambda: self.knife_test())
+        # Save and the knife test on a row, Start and Stop under them (the knife path is on the ribbon)
+        for b, r, c, span in ((self.btn_save, 0, 0, 1), (self.btn_test, 0, 1, 1), (self.btn_start, 1, 0, 1),
+                              (self.btn_stop, 1, 1, 1)):
             b.setMinimumHeight(40)
             b.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             grid.addWidget(b, r, c, 1, span)
@@ -1179,12 +1220,28 @@ class MainWindow(QMainWindow):
             polys, groups = pens.place(polys, groups, self.pen_width.value(), self.pen_place.currentData())
             fills, fill_groups = self.design.material_fills()
             polys, groups = pens.merge(fills, fill_groups, polys, groups)
-            return build_job(polys, self.job_profile(), groups, False)
-        frame = self.weed_frame_polyline(polys)
+            return build_job(self._mirrored(polys), self.job_profile(), groups, False)
+        frame = self.weed_frame_polyline(self._frame_polys(polys, groups))
         if frame:
             polys = polys + [frame]                      # in its own last group: cut last
             groups = groups + [max(groups) + 1]
-        return build_job(polys, self.job_profile(), groups, self.inside_first.isChecked())
+        return build_job(self._mirrored(polys), self.job_profile(), groups, self.inside_first.isChecked())
+
+    def _mirrored(self, polys):
+        """Heat transfer vinyl is cut from the back: the job is mirrored left to
+        right (across the material) within its own box, so it stays in place.
+        The design on the screen stays as it will look on the shirt."""
+        if not self.mirror_job.isChecked() or not polys:
+            return polys
+        across = [a for poly in polys for _x, a in poly]
+        lo, hi = min(across), max(across)
+        return [[(x, lo + hi - a) for x, a in poly] for poly in polys]
+
+    def _frame_polys(self, polys, groups):
+        """What the weeding frame goes round: the shapes, not the weeding lines
+        (they end at the frame)."""
+        weeding = {k for k, e in enumerate(self.design.elements) if e.spec and e.spec.get("kind") == "weeding"}
+        return [p for p, g in zip(polys, groups) if g not in weeding]
 
     def weed_frame_polyline(self, polys):
         """The weeding frame (material mm): a rectangle round all that is cut,
@@ -1234,6 +1291,7 @@ class MainWindow(QMainWindow):
         """What a project keeps besides the design: the cutter and the job."""
         return {"profile": self.profile_box.currentData(), "inside_first": self.inside_first.isChecked(),
                 "weed_frame": self.weed_frame.isChecked(), "weed_margin_mm": self.weed_margin.value(),
+                "mirror": self.mirror_job.isChecked(),
                 "tool": self.tool_box.currentData(), "pen_width_mm": self.pen_width.value(),
                 "pen_place": self.pen_place.currentData()}
 
@@ -1248,7 +1306,8 @@ class MainWindow(QMainWindow):
         for key, widget in (("weed_margin_mm", self.weed_margin), ("pen_width_mm", self.pen_width)):
             if isinstance(st.get(key), (int, float)):
                 widget.setValue(float(st[key]))
-        for key, box in (("inside_first", self.inside_first), ("weed_frame", self.weed_frame)):
+        for key, box in (("inside_first", self.inside_first), ("weed_frame", self.weed_frame),
+                         ("mirror", self.mirror_job)):
             if isinstance(st.get(key), bool):
                 box.setChecked(st[key])
 
@@ -2004,8 +2063,12 @@ class MainWindow(QMainWindow):
         self.refresh()
 
     def show_settings(self, values=None):
-        """The program's settings. values: {"grid_step", "snap_objects"} without
-        asking (for the tests); None asks."""
+        """The program's settings. values: {"grid_step", "snap_objects",
+        and optionally "language" ("" = the system's), "theme",
+        "check_updates"} without asking (for the tests); None asks. The
+        language and the theme apply at the next start."""
+        from vintyl import i18n
+        st = self.settings
         if values is None:
             from PySide6.QtWidgets import QDialog, QDialogButtonBox
             dlg = QDialog(self)
@@ -2018,19 +2081,50 @@ class MainWindow(QMainWindow):
             snap = QCheckBox(_("Snap to other shapes (corners, centres, edges)"))
             snap.setChecked(self.view.snap_objects)
             snap.setToolTip(_("Hold Alt to drag without any snapping for a moment"))
+            language = QComboBox()
+            language.addItem(_("as the system"), "")
+            for code, name in i18n.LANGUAGES.items():
+                language.addItem(name, code)
+            language.setCurrentIndex(max(0, language.findData(str(st.value("view/language", "")))))
+            look = QComboBox()
+            for code, name in theme.THEMES:
+                look.addItem(_(name), code)
+            look.setCurrentIndex(max(0, look.findData(str(st.value("view/theme", theme.DEFAULT)))))
+            updates = QCheckBox(_("Check once a day for a new version (asks GitHub; nothing about you is sent)"))
+            updates.setChecked(str(st.value("updates/check", "true")).lower() == "true")
+            note = QLabel(_("The language and the look change at the next start of Vintyl."))
+            note.setObjectName("muted")
+            note.setWordWrap(True)
             form.addRow(_("Grid step"), step)
             form.addRow(snap)
+            form.addRow(_("Language"), language)
+            form.addRow(_("Look"), look)
+            form.addRow(note)
+            form.addRow(updates)
             buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
             buttons.accepted.connect(dlg.accept)
             buttons.rejected.connect(dlg.reject)
             form.addRow(buttons)
             if dlg.exec() != QDialog.Accepted:
                 return None
-            values = {"grid_step": step.value(), "snap_objects": snap.isChecked()}
+            values = {"grid_step": step.value(), "snap_objects": snap.isChecked(),
+                      "language": language.currentData(), "theme": look.currentData(),
+                      "check_updates": updates.isChecked()}
         self.grid_step = float(values["grid_step"])
         self.view.snap_objects = bool(values["snap_objects"])
-        self.settings.setValue("view/grid_step", self.grid_step)
-        self.settings.setValue("view/snap_objects", "true" if self.view.snap_objects else "false")
+        st.setValue("view/grid_step", self.grid_step)
+        st.setValue("view/snap_objects", "true" if self.view.snap_objects else "false")
+        restart = False
+        if "language" in values and values["language"] != str(st.value("view/language", "")):
+            st.setValue("view/language", values["language"])
+            restart = True
+        if "theme" in values and values["theme"] != str(st.value("view/theme", theme.DEFAULT)):
+            st.setValue("view/theme", values["theme"])
+            restart = True
+        if "check_updates" in values:
+            st.setValue("updates/check", "true" if values["check_updates"] else "false")
+        if restart:
+            self.statusBar().showMessage(_("The new language or look shows at the next start of Vintyl."), 10000)
         if self.act_grid.isChecked():
             self.view.grid_mm = self.grid_step
         self.refresh()
@@ -2308,7 +2402,7 @@ class MainWindow(QMainWindow):
             for a in (self.act_copy, self.act_cut, self.act_paste, self.act_duplicate, self.act_delete):
                 menu.addAction(a)
             menu.addSeparator()
-            for a in (self.act_group, self.act_ungroup):
+            for a in (self.act_group, self.act_ungroup, self.act_copies):
                 menu.addAction(a)
             menu.addSeparator()
             order = menu.addMenu(_("Cutting order"))
@@ -2456,12 +2550,12 @@ class MainWindow(QMainWindow):
         port = self.profile.port
         problem = transport.access_problem(port)
         if problem:
-            text, color = problem, "#b91c1c"
+            text, color = problem, theme.token("error")
         elif port and not os.path.exists(port):
             text, color = _("%s is not there now: plug the cutter in and switch it on, or choose "
-                            "its port in the cutter's settings.") % port, "#6b7280"
+                            "its port in the cutter's settings.") % port, theme.token("muted")
         else:
-            text, color = "", "#6b7280"
+            text, color = "", theme.token("muted")
         self.port_problem.setText(text)
         self.port_problem.setStyleSheet("color: %s" % color)
         self.cutter_form.setRowVisible(self.port_problem, bool(text))
@@ -2490,7 +2584,7 @@ class MainWindow(QMainWindow):
 
     def refresh_job(self):
         self.check_port_access()
-        self.view.show_frame(self.weed_frame_polyline(self.design.material_paths()[0]))
+        self.view.show_frame(self.weed_frame_polyline(self._frame_polys(*self.design.material_paths())))
         p = self.job_profile()
         self.profile_label.setText("%s · %s · %s" % (p.name, p.language.upper(), p.port or _("no port")))
         busy = getattr(self, "sending", False)
@@ -2499,7 +2593,7 @@ class MainWindow(QMainWindow):
             self.last_job = self.build()
         except (JobError, ProfileError) as e:
             self.job_label.setText(str(e))
-            self.job_label.setStyleSheet("color: #b91c1c")
+            self.job_label.setStyleSheet("color: %s" % theme.token("error"))
             for w in (self.btn_save, self.act_save_cut, self.btn_start):
                 w.setEnabled(False)
             self.view.show_knife(None)
@@ -2508,6 +2602,8 @@ class MainWindow(QMainWindow):
         j = self.last_job
         text = (_("Drawn length: %.2f m · travel: %.2f m") if self.is_pen() else
                 _("Cut length: %.2f m · travel: %.2f m")) % (j.cut_mm / 1000.0, j.travel_mm / 1000.0)
+        if self.mirror_job.isChecked():
+            text += " · " + _("MIRRORED")
         if p.speed_cm_s:
             minutes = (j.cut_mm + j.travel_mm) / (p.speed_cm_s * 10.0) / 60.0
             text += "\n" + _("About %.1f min at %g cm/s") % (minutes, p.speed_cm_s)
@@ -2561,9 +2657,19 @@ class MainWindow(QMainWindow):
                      "• the origin is set (Origin key) where the design should start\n"
                      "• speed and force are set on the cutter's panel\n\n"
                      "To stop the cutter at once: Test (pause) or Reset on its panel.") % (p.port, p.name))
+        if self.mirror_job.isChecked():
+            ask = (ask[0], ask[1] + "\n\n" + _("MIRRORED for heat transfer vinyl: the vinyl's shiny side "
+                                               "(the carrier) down, the matt side up to the knife."))
         if QMessageBox.question(self, ask[0], ask[1]) != QMessageBox.Yes:
             return None
+        return self._send(job, p, "the design")
+
+    def _send(self, job, p, what):
+        """Send a job to the cutter in the background (after the user said yes)."""
         from vintyl.core.protocols import encoder_for
+        from vintyl.core import diag
+        diag.log.info("Start (%s): %s on %s (%s, %s), %d bytes, %.2f m to %s", what, p.name, p.port, p.connection,
+                      p.language, len(job.text), job.cut_mm / 1000.0, "draw" if self.is_pen() else "cut")
         self.worker = SendWorker(job.text, p, p.port, encoder_for(p).units_per_mm, self)
         self.worker.progress.connect(self._send_progress)
         self.worker.finished_send.connect(self._send_finished)
@@ -2583,7 +2689,266 @@ class MainWindow(QMainWindow):
         self.progress.setMaximum(total)
         self.progress.setValue(sent)
 
+    # ---- copies, weeding lines, strips ------------------------------------------------------------
+    def _ask(self, title, rows, extra=None):
+        """A small dialog of fields: rows = [(key, label, widget)]; returns
+        {key: value} or None. extra(form) may add more (e.g. a button)."""
+        from PySide6.QtWidgets import QDialog, QDialogButtonBox
+        dlg = QDialog(self)
+        dlg.setWindowTitle(title)
+        form = QFormLayout(dlg)
+        for _key, label, w in rows:
+            form.addRow(label, w) if label else form.addRow(w)
+        if extra:
+            extra(form)
+        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        buttons.accepted.connect(dlg.accept)
+        buttons.rejected.connect(dlg.reject)
+        form.addRow(buttons)
+        if dlg.exec() != QDialog.Accepted:
+            return None
+        out = {}
+        for key, _label, w in rows:
+            if isinstance(w, QComboBox):
+                out[key] = w.currentData()
+            elif isinstance(w, QCheckBox):
+                out[key] = w.isChecked()
+            else:
+                out[key] = w.value()
+        return out
+
+    def copies_selected(self, values=None):
+        """Copies of the selection in rows (up the material) and columns
+        (across, to the left), `gap` mm apart; the selection is the first.
+        values: {"rows", "columns", "gap"}; None asks. Returns the copies."""
+        chosen = self._chosen()
+        if not chosen:
+            return []
+        boxes = [e.bounds for e in chosen]
+        x0, x1 = min(b[0] for b in boxes), max(b[1] for b in boxes)
+        y0, y1 = min(b[2] for b in boxes), max(b[3] for b in boxes)
+        w, h = x1 - x0, y1 - y0
+        if values is None:
+            rows, cols = QSpinBox(), QSpinBox()
+            rows.setRange(1, 200)
+            cols.setRange(1, 200)
+            rows.setValue(int(self.settings.value("copies/rows", 2)))
+            cols.setValue(int(self.settings.value("copies/columns", 2)))
+            gap = _spin(1000.0, 1, minimum=0.0)
+            gap.setValue(float(self.settings.value("copies/gap", 3.0)))
+            gap.setToolTip(_("Vinyl left between the copies"))
+
+            def fill_width(form):
+                b = QPushButton(_("As many columns as fit in the width"))
+                b.clicked.connect(lambda: cols.setValue(max(1, int((x1 + self.profile.width_mm + gap.value())
+                                                                   / (w + gap.value())))))
+                form.addRow(b)
+            values = self._ask(_("Copies"), [("rows", _("Rows (along)"), rows), ("columns", _("Columns (across)"), cols),
+                                             ("gap", _("Gap"), gap)], fill_width)
+            if values is None:
+                return []
+            for k in ("rows", "columns", "gap"):
+                self.settings.setValue("copies/" + k, values[k])
+        import uuid
+        made = []
+        for r in range(int(values["rows"])):
+            for c in range(int(values["columns"])):
+                if r == 0 and c == 0:
+                    continue
+                groups = {}
+                for e in chosen:
+                    n = e.copy()
+                    if e.group:                         # each copy of a group is a group of its own
+                        n.group = groups.setdefault(e.group, uuid.uuid4().hex[:8])
+                    n.move_by(-c * (w + values["gap"]), -r * (h + values["gap"]))
+                    made.append(n)
+        if not made:
+            return []
+        self._checkpoint()
+        self.design.elements.extend(made)
+        self.selection = list(chosen) + made
+        self.selected = chosen[0]
+        self.refresh()
+        self.statusBar().showMessage(ngettext("%d copy made.", "%d copies made.", len(made) // len(chosen))
+                                     % (len(made) // len(chosen)), 6000)
+        return made
+
+    def add_weeding_lines(self, values=None):
+        """Weeding lines in the weeding frame (it is switched on), replacing
+        earlier ones. values: {"direction", "spacing", "margin"}; None asks.
+        Returns the new element (or None)."""
+        from vintyl.core import curves, weeding
+        shapes_ = [e for e in self.design.elements if e.cut and not (e.spec and e.spec.get("kind") == "weeding")]
+        if not shapes_:
+            self.statusBar().showMessage(_("There is nothing to cut yet."), 6000)
+            return None
+        if values is None:
+            way = QComboBox()
+            for code, label in (("upright", N_("up and down")), ("level", N_("across")), ("both", N_("both"))):
+                way.addItem(_(label), code)
+            way.setCurrentIndex(max(0, way.findData(self.settings.value("weed/direction", "upright"))))
+            spacing = _spin(1000.0, 0, minimum=5.0)
+            spacing.setValue(float(self.settings.value("weed/spacing", 40.0)))
+            spacing.setToolTip(_("Distance between the lines"))
+            margin = _spin(20.0, 1, minimum=0.5)
+            margin.setValue(float(self.settings.value("weed/margin", 1.5)))
+            margin.setToolTip(_("The lines stop this far from the shapes"))
+            values = self._ask(_("Weeding lines"), [("direction", _("Lines"), way), ("spacing", _("Every"), spacing),
+                                                    ("margin", _("Margin"), margin)])
+            if values is None:
+                return None
+            for k, v in values.items():
+                self.settings.setValue("weed/" + k, v)
+        boxes = [e.bounds for e in shapes_]
+        m = self.weed_margin.value()
+        frame = (min(b[0] for b in boxes) - m, max(b[1] for b in boxes) + m,
+                 min(b[2] for b in boxes) - m, max(b[3] for b in boxes) + m)
+        rings = []
+        for e in shapes_:
+            rings += curves.flatten([sub for sub in e.paths if sub["closed"]], 0.05)
+        lines = weeding.weeding_lines(frame, outermost(rings), values["spacing"], values["direction"],
+                                      values["margin"])
+        if not lines:
+            self.statusBar().showMessage(_("No line fits between the shapes; try a smaller margin."), 8000)
+            return None
+        self._checkpoint()
+        self.design.elements = [e for e in self.design.elements
+                                if not (e.spec and e.spec.get("kind") == "weeding")]
+        e = Element(_("Weeding lines"), curves.from_polylines(lines, [False] * len(lines)),
+                    spec={"kind": "weeding", **values})
+        self.design.elements.append(e)                  # last in the list: cut after the shapes
+        self.weed_frame.blockSignals(True)
+        self.weed_frame.setChecked(True)                # the lines end at the frame
+        self.weed_frame.blockSignals(False)
+        self.selected, self.selection = e, [e]
+        self.refresh()
+        return e
+
+    def split_into_strips(self, values=None):
+        """Split the selection (or the whole design) into strips that overlap:
+        "across" for a design wider than the cutter, "along" for one longer
+        than a sheet. The strips are laid one after another along the
+        material, a gap apart, each within the cutting width. values:
+        {"direction", "size", "overlap", "gap"}; None asks. Returns the strips."""
+        from PySide6.QtCore import QRectF
+        from PySide6.QtGui import QPainterPath, QTransform
+        from vintyl.core import curves
+        from vintyl.core.patterns import clip_polylines
+        from vintyl.gui.canvas import painter_path
+        chosen = self._chosen() or [e for e in self.design.elements]
+        if not chosen:
+            return []
+        boxes = [e.bounds for e in chosen]
+        x0, x1 = min(b[0] for b in boxes), max(b[1] for b in boxes)
+        y0, y1 = min(b[2] for b in boxes), max(b[3] for b in boxes)
+        if values is None:
+            way = QComboBox()
+            way.addItem(_("across: wider than the cutter"), "across")
+            way.addItem(_("along: longer than the sheet"), "along")
+            size = _spin(100000.0, 0, minimum=20.0)
+            size.setValue(max(20.0, self.profile.width_mm - 2 * PLACE_MARGIN_MM))
+            size.setToolTip(_("How wide (or long) each strip is, with its overlap"))
+            overlap = _spin(200.0, 1, minimum=0.0)
+            overlap.setValue(10.0)
+            overlap.setToolTip(_("The strips cover this much of each other, for laying them together"))
+            gap = _spin(500.0, 0, minimum=0.0)
+            gap.setValue(20.0)
+            gap.setToolTip(_("Space between the strips on the material"))
+            values = self._ask(_("Split into strips"), [("direction", _("Split"), way), ("size", _("Strip"), size),
+                                                         ("overlap", _("Overlap"), overlap), ("gap", _("Gap"), gap)])
+            if values is None:
+                return []
+        across = values["direction"] == "across"
+        span = (x1 - x0) if across else (y1 - y0)
+        size, lap = float(values["size"]), float(values["overlap"])
+        if size <= lap or span <= size:
+            self.statusBar().showMessage(_("The design fits in one strip; nothing to split."), 6000)
+            return []
+        step = size - lap
+        n = int((span - lap) // step) + (1 if (span - lap) % step > 1e-6 else 0)
+        scale = 10.0                                    # as the shape operations: Qt's curves stay round
+        up = QTransform.fromScale(scale, scale)
+        strips = []
+        for k in range(n):
+            if across:                                  # strips from the right (the origin's side)
+                hi = x1 - k * step
+                rect = QRectF(hi - size, y0 - 1, size, (y1 - y0) + 2)
+            else:                                       # strips from the front (the origin's side)
+                hi = y1 - k * step
+                rect = QRectF(x0 - 1, hi - size, (x1 - x0) + 2, size)
+            clip = QPainterPath()
+            clip.addRect(up.mapRect(rect))
+            paths = []
+            for e in chosen:
+                closed = [sub for sub in e.paths if sub["closed"]]
+                if closed and e.cut:
+                    path = up.map(painter_path(closed))
+                    path.setFillRule(Qt.OddEvenFill)
+                    paths += texts.painter_path_to_curves(path.intersected(clip).simplified(), 1.0 / scale)
+                opened = [sub for sub in e.paths if not sub["closed"]]
+                if opened and e.cut:
+                    ring = [(rect.left(), rect.top()), (rect.right(), rect.top()), (rect.right(), rect.bottom()),
+                            (rect.left(), rect.bottom()), (rect.left(), rect.top())]
+                    lines = clip_polylines(curves.flatten(opened, 0.05), [ring])
+                    paths += curves.from_polylines(lines, [False] * len(lines))
+            if paths:
+                strips.append(Element("%s %d" % (_("Strip"), k + 1), paths))
+        if len(strips) < 2:
+            self.statusBar().showMessage(_("The design fits in one strip; nothing to split."), 6000)
+            return []
+        # lay them one after another along the material, each near the origin's side
+        self._checkpoint()
+        pos = -PLACE_MARGIN_MM
+        for s_ in strips:
+            bx0, bx1, by0, by1 = s_.bounds
+            s_.move_by(-PLACE_MARGIN_MM - bx1, pos - by1)
+            pos -= (by1 - by0) + values["gap"]
+        index = min(self.design.elements.index(e) for e in chosen)
+        self.design.elements = [e for e in self.design.elements if not any(e is c for c in chosen)]
+        self.design.elements[index:index] = strips
+        self.selection, self.selected = list(strips), strips[0]
+        self.refresh()
+        self.statusBar().showMessage(ngettext("Split into %d strip, laid one after another; cut it, then lay it "
+                                              "on its overlap.",
+                                              "Split into %d strips, laid one after another; cut them, then lay "
+                                              "them together on their overlaps.", len(strips)) % len(strips), 10000)
+        return strips
+
+    KNIFE_TEST_MM = 15.0
+    KNIFE_TEST_FROM_ORIGIN_MM = 5.0
+
+    def knife_test_job(self):
+        """The job of the knife test alone: a 15 mm square with a triangle,
+        5 mm from the origin (raises JobError / ProfileError)."""
+        from vintyl.core import weeding
+        from vintyl.core.design import Element as _El
+        d = self.KNIFE_TEST_FROM_ORIGIN_MM
+        test = _El("knife test", weeding.knife_test(self.KNIFE_TEST_MM, right=-d, bottom=-d))
+        polys, groups = Design([test]).material_paths()
+        return build_job(polys, self.job_profile(), groups, True)
+
+    def knife_test(self):
+        """Cut the knife test (after a check list): the triangle must peel off
+        cleanly and the backing must stay whole. Returns the sending (or None)."""
+        try:
+            job = self.knife_test_job()
+        except (JobError, ProfileError) as e:
+            QMessageBox.warning(self, _("Knife test"), str(e))
+            return None
+        p = self.job_profile()
+        if QMessageBox.question(
+                self, _("Knife test"),
+                _("Cut the knife test on %s: a %g mm square with a triangle, %g mm from the origin?\n\n"
+                  "Then peel the triangle off: it should come away cleanly, and the backing must not be "
+                  "cut through. Too shallow: more force (on the cutter's panel); marks in the backing: less.\n\n"
+                  "Afterwards move the origin on, so the design is not cut over the test.")
+                % (p.name, self.KNIFE_TEST_MM, self.KNIFE_TEST_FROM_ORIGIN_MM)) != QMessageBox.Yes:
+            return None
+        return self._send(job, p, "knife test")
+
     def _send_finished(self, ok, message):
+        from vintyl.core import diag
+        (diag.log.info if ok else diag.log.warning)("Sending ended (%s): %s", "ok" if ok else "not ok", message)
         self._set_sending(False)
         self.statusBar().showMessage(message, 15000)
         if not ok:
@@ -2594,7 +2959,7 @@ class MainWindow(QMainWindow):
         self.sending = on
         self.progress.setVisible(on)
         self.btn_stop.setEnabled(on)
-        for w in (self.btn_start, self.btn_save, self.act_save_cut, self.profile_box, self.act_profile,
+        for w in (self.btn_start, self.btn_save, self.btn_test, self.act_save_cut, self.profile_box, self.act_profile,
                   self.view):
             w.setEnabled(not on)
 
@@ -2607,6 +2972,127 @@ class MainWindow(QMainWindow):
             w.request_stop()
             w.wait(15000)
         super().closeEvent(event)
+
+    # ---- new versions, the applications menu, diagnostics -----------------------------------------
+    def check_for_updates(self, auto=True, fetch=None):
+        """Ask GitHub for a newer release in the background. auto (at start): at
+        most once a day, only when allowed in the Settings, silent when there is
+        nothing new or no internet. Returns the check (a thread) or None."""
+        import time
+        from vintyl.core import updates
+        from vintyl.gui.update_check import UpdateCheck
+        st = self.settings
+        if auto:
+            if str(st.value("updates/check", "true")).lower() != "true":
+                return None
+            try:
+                last = float(st.value("updates/last", 0) or 0)
+            except (TypeError, ValueError):
+                last = 0.0
+            if time.time() - last < updates.CHECK_EVERY_S:
+                return None
+        st.setValue("updates/last", time.time())
+        check = UpdateCheck(__version__, str(st.value("updates/skip", "")) if auto else "", self, fetch)
+
+        def done(release, error):
+            if release is not None:
+                self.update_bar.show_release(release, __version__)
+            elif not auto:
+                if error:
+                    QMessageBox.warning(self, _("New version"),
+                                        _("Could not ask GitHub (no internet?): %s") % error)
+                else:
+                    QMessageBox.information(self, _("New version"), _("You have the newest Vintyl (%s).")
+                                            % __version__)
+        check.done.connect(done)
+        self._update_check = check
+        check.start()
+        return check
+
+    def install_menu_entry(self, ask=False):
+        """Put this AppImage into the desktop's applications menu (ask: first
+        start, ask first and remember the answer). Returns the files written."""
+        from vintyl.gui import desktop_entry
+        if not desktop_entry.applies():
+            return []
+        if ask:
+            if self.settings.value("desktop/asked", "") or desktop_entry.installed_for() == \
+                    desktop_entry.appimage_path():
+                return []
+            self.settings.setValue("desktop/asked", "yes")
+            if QMessageBox.question(self, _("Applications menu"),
+                                    _("Add Vintyl to the applications menu, and open .vintyl projects with it?\n"
+                                      "(Help → Add Vintyl to the applications menu does it later too.)")) \
+                    != QMessageBox.Yes:
+                return []
+        try:
+            written = desktop_entry.install()
+        except (OSError, RuntimeError) as e:
+            QMessageBox.warning(self, _("Applications menu"), str(e))
+            return []
+        self.statusBar().showMessage(_("Vintyl is in the applications menu (it may need a new login to show)."),
+                                     10000)
+        return written
+
+    def diagnostic_report(self):
+        """The text of the diagnostic report (see vintyl.core.diag)."""
+        from vintyl import selftest
+        from vintyl.core import diag
+        from PySide6 import __version__ as qt_version
+        checks = selftest.results(skip=("window",))     # this window is the window check
+        keys = ("view/language", "view/theme", "view/grid_step", "view/snap_objects", "cutter/profile",
+                "updates/check")
+        settings = {k: self.settings.value(k) for k in keys if self.settings.value(k) is not None}
+        settings["tool"] = self.tool_box.currentData()
+        return diag.build_report(__version__, checks, self.profile, settings,
+                                 extra=["PySide6 %s" % qt_version,
+                                        "Theme %s, language %s" % (theme.current(), self._language())])
+
+    @staticmethod
+    def _language():
+        from vintyl import i18n
+        return i18n.current_language()
+
+    def show_diagnostics(self, show=True):
+        """The report in a window: copy it, or open GitHub's forms to report a
+        problem or how Vintyl works on a cutter. Returns the dialog."""
+        from PySide6.QtCore import QUrl
+        from PySide6.QtGui import QDesktopServices, QGuiApplication
+        from PySide6.QtWidgets import QDialog, QDialogButtonBox, QPlainTextEdit
+        from vintyl.core import diag
+        text = self.diagnostic_report()
+        dlg = QDialog(self)
+        dlg.setWindowTitle(_("Diagnostic report"))
+        dlg.resize(760, 560)
+        lay = QVBoxLayout(dlg)
+        note = QLabel(_("Copy this and paste it into your report on GitHub. It holds the versions, the "
+                        "checks, the chosen cutter and Vintyl's log; no user name, no designs."))
+        note.setWordWrap(True)
+        lay.addWidget(note)
+        view = QPlainTextEdit(text)
+        view.setReadOnly(True)
+        from PySide6.QtGui import QFontDatabase
+        view.setFont(QFontDatabase.systemFont(QFontDatabase.FixedFont))     # the columns line up
+        view.setLineWrapMode(QPlainTextEdit.NoWrap)
+        lay.addWidget(view, 1)
+        buttons = QDialogButtonBox(QDialogButtonBox.Close)
+        copy = buttons.addButton(_("Copy"), QDialogButtonBox.ActionRole)
+        copy.clicked.connect(lambda: (QGuiApplication.clipboard().setText(text),
+                                      self.statusBar().showMessage(_("The report is copied."), 5000)))
+        bug = buttons.addButton(_("Report a problem…"), QDialogButtonBox.ActionRole)
+        bug.setToolTip(_("Copies the report and opens GitHub's form"))
+        cutter = buttons.addButton(_("Report my cutter…"), QDialogButtonBox.ActionRole)
+        cutter.setToolTip(_("Tell us how Vintyl works on your cutter (copies the report, opens GitHub's form)"))
+        for button, kind in ((bug, "bug"), (cutter, "cutter")):
+            button.clicked.connect(lambda _c=False, k=kind: (
+                QGuiApplication.clipboard().setText(text),
+                QDesktopServices.openUrl(QUrl(diag.issue_url(k, __version__, self.profile.name)))))
+        buttons.rejected.connect(dlg.reject)
+        lay.addWidget(buttons)
+        self.diagnostics_dialog = dlg
+        if show:
+            dlg.exec()
+        return dlg
 
     def about(self):
         QMessageBox.about(self, _("About Vintyl"),

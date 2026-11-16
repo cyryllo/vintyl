@@ -1,5 +1,31 @@
 # Changes
 
+## 0.2.0
+
+The second test version (Linux, AppImage). Still tested on the VEVOR KI-375A
+only; the larger cutters' profiles are to be checked on the machines. Please
+tell us how it works on yours: Help → Diagnostic report → "Report my cutter".
+
+**For vinyl**
+- Mirror for heat transfer vinyl: one switch in the Job; the screen shows the design as on the shirt.
+- Knife test: a 15 mm square with a triangle, cut near the origin to check the force.
+- Copies in rows and columns, a gap apart (or as many as fit in the width).
+- Weeding lines: cuts through the waste between the shapes, up to the weeding frame.
+- Split into strips: a design wider than the cutter (or longer than a sheet) in overlapping strips,
+  laid one after another on the material.
+
+**Drawing and files**
+- Text on a path: a text along a line, a curve or round a circle (letters keep their curves).
+- Open DXF drawings (units from the file, asked when it has none).
+- The rectangle tool has a corner radius; turn the selection by any angle; a right-click menu.
+
+**The program**
+- Settings: language (as the system, English, Polski) and look (light, dark, as the system).
+- A new version is announced in the window (asks GitHub at most once a day; can be turned off).
+- From the AppImage: add Vintyl to the applications menu (asked once, or Help menu).
+- Help → Diagnostic report: versions, checks, the cutter and the log, to paste into an issue;
+  GitHub forms to report a problem or how Vintyl works on your cutter.
+
 ## 0.1.0a1 (pre-release)
 
 The first test version, for Linux (an AppImage). Tested on a VEVOR KI-375A

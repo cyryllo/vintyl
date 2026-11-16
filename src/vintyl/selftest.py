@@ -64,6 +64,22 @@ def _checks():
             raise RuntimeError("nothing read from the SVG")
         return "%d shape(s)" % n
 
+    def dxf_file():
+        from vintyl.core.loaders import load_dxf
+        dxf = "\n".join(["0", "SECTION", "2", "HEADER", "9", "$INSUNITS", "70", "4", "0", "ENDSEC",
+                         "0", "SECTION", "2", "ENTITIES",
+                         "0", "CIRCLE", "8", "0", "10", "20", "20", "20", "30", "0", "40", "10",
+                         "0", "ENDSEC", "0", "EOF"]) + "\n"
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "test.dxf")
+            with open(path, "w", encoding="utf-8") as f:
+                f.write(dxf)
+            element = load_dxf(path)
+        w, h = element.size
+        if not (19.9 < w < 20.1 and 19.9 < h < 20.1):
+            raise RuntimeError("a 20 mm circle came out %.2f x %.2f mm" % (w, h))
+        return "a 20 mm circle"
+
     def offset_and_patterns():
         from vintyl.core import offset, shapes, tile
         from vintyl.core.design import Element
@@ -76,10 +92,10 @@ def _checks():
         return "offset, fill, %d stars" % n
 
     def translations():
+        import gettext
         from vintyl import i18n
-        i18n.setup("pl")
-        text = i18n._("Cut")
-        i18n.setup("en")
+        # read the catalogue directly: the language in use is not changed
+        text = gettext.translation(i18n.DOMAIN, i18n.LOCALE_DIR, languages=["pl"], fallback=True).gettext("Cut")
         if text == "Cut":
             raise RuntimeError("the Polish catalogue was not found")
         return "pl: %s" % text
@@ -107,8 +123,21 @@ def _checks():
 
     return [("Vintyl %s" % __version__, lambda: sys.version.split()[0]),
             ("libraries", libraries), ("cutter profiles", profiles), ("jobs", jobs),
-            ("SVG", svg_file), ("offset and patterns", offset_and_patterns),
+            ("SVG", svg_file), ("DXF", dxf_file), ("offset and patterns", offset_and_patterns),
             ("translations", translations), ("window", window)]
+
+
+def results(skip=()):
+    """[(OK/FAIL, name, detail), ...] of the checks, without the ones named in skip."""
+    out = []
+    for name, check in _checks():
+        if name in skip:
+            continue
+        try:
+            out.append(("OK", name, check()))
+        except Exception as e:
+            out.append(("FAIL", name, str(e) or type(e).__name__))
+    return out
 
 
 def run(out=None):

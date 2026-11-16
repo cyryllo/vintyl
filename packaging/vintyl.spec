@@ -27,6 +27,7 @@ def files(pattern):
 datas = (files("vintyl/locale/*/LC_MESSAGES/*.mo")
          + files("vintyl/core/profiles/*.toml")
          + files("vintyl/gui/icons/*.svg")
+         + files("vintyl/gui/icons/*.png")
          + files("vintyl/gui/icons/tabler/*.svg")
          + files("vintyl/gui/icons/tabler/LICENSE")
          + [(os.path.join(ROOT, name), ".") for name in ("LICENSE", "THIRD-PARTY-NOTICES.md")]

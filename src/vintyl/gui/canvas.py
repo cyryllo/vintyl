@@ -1229,8 +1229,11 @@ class MaterialView(QGraphicsView):
             self.fit_all()
 
 
-def shape_icon(subpaths, size=48, color="#2b2f36"):
+def shape_icon(subpaths, size=48, color=None):
     """An icon drawn from a shape itself (for the ready shapes)."""
+    if color is None:                        # the theme's ink (light or dark)
+        from vintyl.gui import icons
+        color = icons.INK
     from PySide6.QtGui import QIcon, QPixmap
     path = painter_path(subpaths)
     r = path.boundingRect()
