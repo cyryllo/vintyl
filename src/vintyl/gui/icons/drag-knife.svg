@@ -1,0 +1,14 @@
+<!-- The cutter's drag knife: the holder with its grip, the collar, the
+     blade with its slanted tip on the vinyl. Drawn for Vintyl in the style
+     of Tabler's outline icons (24 px grid, 2 px round strokes).
+     Copyright (C) 2026 Vintyl contributors. GPL-3.0-or-later. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M9 2h6v8h-6z" />
+  <path d="M12 2.5v7" />
+  <path d="M7.5 10h9" />
+  <path d="M9.5 10l1.5 4h2l1.5 -4" />
+  <path d="M11.2 14v3.4l1.8 3.1v-6.5" />
+  <path d="M3 21h5" />
+  <path d="M16 21h5" />
+</svg>

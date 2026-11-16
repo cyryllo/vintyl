@@ -1,6 +1,7 @@
 """
 Icons: Tabler outline icons (MIT, see icons/tabler/LICENSE) drawn in the
-theme's colour, and the Vintyl program icon.
+theme's colour, Vintyl's own icons in the same style (icons/*.svg, GPL, as
+the drag knife: Tabler has no cutter's knife), and the program icon.
 
 tabler() is adapted from Kerfly (kerfly/gui/icons/__init__.py, commit
 cf48565): the same idea, without Kerfly's jog-pad drawings.
@@ -20,12 +21,21 @@ _cache = {}
 
 def tabler(name, color=None):
     """QIcon for a Tabler icon in the given colour (default: the theme's ink)."""
+    return _drawn(os.path.join(HERE, "tabler", name + ".svg"), color)
+
+
+def own(name, color=None):
+    """QIcon for one of Vintyl's own icons drawn in the Tabler style (icons/<name>.svg)."""
+    return _drawn(os.path.join(HERE, name + ".svg"), color)
+
+
+def _drawn(path, color=None):
     from PySide6.QtSvg import QSvgRenderer
     color = color or INK
-    key = (name, color)
+    key = (path, color)
     if key in _cache:
         return _cache[key]
-    with open(os.path.join(HERE, "tabler", name + ".svg"), encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         svg = f.read().replace("currentColor", color)
     renderer = QSvgRenderer(QByteArray(svg.encode("utf-8")))
     icon = QIcon()

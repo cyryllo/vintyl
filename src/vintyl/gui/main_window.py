@@ -817,6 +817,7 @@ class MainWindow(QMainWindow):
         col.addWidget(box, 1)
 
         box = QGroupBox(_("Cutter"))
+        self.cutter_box = box
         form = QFormLayout(box)
         self.profile_box = QComboBox()
         for name in self.profile_names:
@@ -832,15 +833,25 @@ class MainWindow(QMainWindow):
         self.cutter_form = form
         # what is in the holder: the knife cuts, a pen (or a pencil) draws
         self.tool_box = QComboBox()
-        self.tool_box.addItem(icons.tabler("scissors"), _("Knife"), "knife")
-        self.tool_box.addItem(icons.tabler("vector-spline"), _("Pen / pencil"), "pen")
+        self.tool_box.addItem(icons.own("drag-knife"), _("Knife"), "knife")
+        self.tool_box.addItem(icons.tabler("pencil"), _("Pen / pencil"), "pen")
         self.tool_box.setToolTip(_("What is in the cutter's holder. Pen: drawing on paper or card, "
                                    "with no knife offset or overcut; fill patterns are drawn too."))
+        # bigger than the other fields: the knife or the pen is seen at a glance
+        self.tool_box.setObjectName("tool_box")
+        self.tool_box.setIconSize(QSize(30, 30))
+        self.tool_box.setFixedHeight(46)
+        big = self.tool_box.font()
+        big.setPointSizeF(big.pointSizeF() * 1.2)
+        self.tool_box.setFont(big)
+        self.tool_box.view().setFont(big)
         self.tool_box.currentIndexChanged.connect(lambda _i: self._tool_changed())
-        form.addRow(_("Tool"), self.tool_box)
+        tool_label = QLabel(_("Tool"))
+        tool_label.setFixedHeight(46)
+        tool_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        form.addRow(tool_label, self.tool_box)
         self.pen_note = QLabel(_("For drawing on paper or card, not for vinyl. To cut vinyl, choose the knife."))
         self.pen_note.setWordWrap(True)
-        self.pen_note.setStyleSheet("color: #92400e")
         form.addRow(self.pen_note)
         self.pen_width = _spin(5, 2, " mm", minimum=0.05)
         self.pen_width.setSingleStep(0.05)
@@ -889,6 +900,7 @@ class MainWindow(QMainWindow):
         col.addWidget(box)
 
         box = QGroupBox(_("Job"))
+        self.job_box = box
         lay = QVBoxLayout(box)
         self.job_label = QLabel()
         self.job_label.setWordWrap(True)
@@ -993,8 +1005,17 @@ class MainWindow(QMainWindow):
             self.settings.setValue("cutter/tool/" + name, self.tool_box.currentData())
             self.settings.setValue("cutter/pen_width/" + name, self.pen_width.value())
             self.settings.setValue("cutter/pen_place/" + name, self.pen_place.currentData())
+        self._fit_side_boxes()
         if refresh and not getattr(self, "_loading_tool", False):
             self.refresh()
+
+    def _fit_side_boxes(self):
+        """The Cutter and Job boxes keep the height of what they show (rows
+        come and go with the tool); only the project list gives way. Without
+        it the column squeezed their rows into each other on a low window."""
+        for b in (self.cutter_box, self.job_box):
+            b.setMinimumHeight(0)
+            b.setMinimumHeight(b.sizeHint().height() + 8)
 
     def _port_changed(self, text):
         """Remember the port chosen for this cutter."""
