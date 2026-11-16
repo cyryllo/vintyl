@@ -517,7 +517,7 @@ def test_right_bar_category_opens_a_square_of_icons(win):
     assert win.view.tool == "polygon" and win.category_buttons["shapes"].isChecked()
     assert not popup.isVisible()
     # a category with one tool takes it at once
-    assert win.show_category("text") is None and win.view.tool == "text"
+    assert win.show_category("measure") is None and win.view.tool == "measure"
     win.set_tool("select")
     assert win.category_buttons["pick"].isChecked()
 
@@ -1248,3 +1248,97 @@ def test_the_machine_line_says_when_the_port_is_missing(win, tmp_path):
     win.use_profile_values(port=str(tmp_path / "lp9"))
     win.refresh_job()
     assert win.cutter_form.isRowVisible(win.port_problem) and "not there" in win.port_problem.text()
+
+
+# ---- text on a path, rounded rectangles, any angle, the right-click menu -------------------------------
+def test_a_text_runs_round_a_circle_and_keeps_its_path_when_moved(win):
+    import math
+    from vintyl.core import curves
+    win.opt_text.setText("VINTYL")
+    win.opt_size.setValue(8.0)
+    win._on_text_clicked(QPointF(-150, -100))
+    t = win.design.elements[-1]
+    win._on_drawn("ellipse", QRectF(-120, -120, 100, 100))         # a circle, centre (-70, -70), r 50
+    circle = win.design.elements[-1]
+    win.view.select_many([t, circle])
+    win.selection = [t, circle]
+    assert win.put_text_on_path() is t
+    assert t.spec["path"] and not circle.cut                        # the circle stays, as a guide
+    # every letter on the circle's top half, standing outside it (r about 50..60 mm)
+    for sub in t.paths:
+        for n in sub["nodes"]:
+            r = math.hypot(n[0] + 70, n[1] + 70)
+            assert 48 < r < 62 and n[1] < -70 + 5
+    xmin, xmax, _y0, _y1 = t.bounds
+    assert abs((xmin + xmax) / 2.0 + 70) < 4                        # centred at the top
+    # moved: the path goes with it; a change of the text keeps it there
+    t.move_by(30.0, 0.0)
+    win.opt_text.setText("VINTYL CUT")
+    win._text_changed()
+    xmin, xmax, _y0, _y1 = t.bounds
+    assert abs((xmin + xmax) / 2.0 + 40) < 6
+    # the other side: inside the circle
+    win.opt_path_flip.setChecked(True)
+    inside = [math.hypot(n[0] + 40, n[1] + 70) for sub in t.paths for n in sub["nodes"]]
+    assert max(inside) < 51
+
+
+def test_a_rectangle_with_round_corners_stays_round_when_resized(win):
+    from vintyl.core import curves
+    win.set_tool("rectangle")
+    win.opt_radius.setValue(5.0)
+    win._on_drawn("rectangle", QRectF(-100, -60, 40, 20))
+    e = win.selected
+    assert e.spec == {"kind": "rectangle", "radius": 5.0} and len(e.paths[0]["nodes"]) == 8
+    win.opt_radius.setValue(8.0)                                   # the selected one follows
+    assert e.spec["radius"] == 8.0
+    win.opt_w.setValue(80.0)                                       # resized: corners stay round
+    assert e.spec["radius"] == 8.0
+    n = e.paths[0]["nodes"][0]
+    assert n[2] is not None and abs(n[2] - n[0]) == pytest.approx(curves.KAPPA * 8.0)
+    win.opt_radius.setValue(0.0)
+    assert len(e.paths[0]["nodes"]) == 4
+
+
+def test_any_angle_turns_the_selection_together(win):
+    import math
+    win._on_drawn("rectangle", QRectF(-100, -60, 40, 20))
+    e = win.selected
+    w0, h0 = e.size
+    win.opt_angle.setValue(30.0)
+    win.btn_rotate.click()
+    w, h = e.size
+    c, s = math.cos(math.radians(30)), math.sin(math.radians(30))
+    assert w == pytest.approx(w0 * c + h0 * s, abs=0.01) and h == pytest.approx(w0 * s + h0 * c, abs=0.01)
+    win.undo()
+    assert e.size != (w, h) or win.design.elements[0].size == pytest.approx((w0, h0))
+
+
+def test_the_right_click_menu_for_an_element_and_for_the_sheet(win):
+    win._on_drawn("rectangle", QRectF(-100, -60, 40, 20))
+    win._on_drawn("ellipse", QRectF(-50, -60, 20, 20))
+    a, b = win.design.elements
+    menu = win.show_context_menu(b, None, show=False)
+    texts = [x.text().replace("&", "") for x in menu.actions()]
+    assert "Copy" in texts and "Delete" in texts and "Group" in texts and "Cut this element" in texts
+    order = [x for x in menu.actions() if x.menu() is not None][0].menu()
+    win.selected = b
+    [x for x in order.actions() if x.text() == "Cut first"][0].trigger()
+    assert win.design.elements[0] is b                              # now cut first
+    cut = [x for x in menu.actions() if x.text() == "Cut this element"][0]
+    cut.setChecked(False)
+    assert not b.cut
+    empty = win.show_context_menu(None, None, show=False)
+    assert [x.text().replace("&", "") for x in empty.actions()] == ["Paste", "Select all"]
+
+
+def test_open_a_dxf_from_the_window(win, tmp_path):
+    import sys
+    sys.path.insert(0, os.path.dirname(__file__))
+    from test_dxf import CIRCLE, SQUARE, _dxf
+    path = tmp_path / "parts.dxf"
+    path.write_text(_dxf(CIRCLE + SQUARE))
+    e = win.open_file(str(path))
+    assert e is not None and len(e.paths) == 2 and win.selected is e
+    xmin, xmax, ymin, ymax = e.bounds
+    assert xmax <= 0 and ymax <= 0                                  # on the material, near the origin

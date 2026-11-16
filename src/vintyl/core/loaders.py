@@ -2,6 +2,7 @@
 Reading designs from files.
 
     load_svg(path) -> Element    every visible shape, in view mm (y down)
+    load_dxf(path) -> Element    every visible entity of a DXF drawing, in view mm
 
 For a vinyl cutter every visible outline is a cut, whatever its colour:
 a shape is taken when it has a stroke or a fill (designs for vinyl are
@@ -92,3 +93,63 @@ def load_svg(path):
         raise LoadError(_("%s has no visible shapes to cut.") % os.path.basename(path))
     name = os.path.splitext(os.path.basename(path))[0]
     return Element(name=name, paths=paths, source=path)
+
+
+# ---- DXF ----------------------------------------------------------------------------------
+# millimetres per DXF unit ($INSUNITS); "Unitless" drawings ask (ask_units)
+DXF_MM_PER_UNIT = {
+    "Inches": 25.4, "Feet": 304.8, "Miles": 1609344.0, "Millimeters": 1.0, "Centimeters": 10.0,
+    "Meters": 1000.0, "Kilometers": 1000000.0, "Microinches": 25.4e-6, "Mils": 0.0254,
+}
+DXF_UNITS = list(DXF_MM_PER_UNIT)
+DXF_TOLERANCE_MM = 0.01          # how far arcs and splines, made of straight pieces, may stray
+
+
+class LoadCancelled(Exception):
+    """The user did not say the drawing's units."""
+
+
+def load_dxf(path, ask_units=None):
+    """One element with every visible entity of the DXF drawing, in view mm.
+    The reader (vintyl.core.dxf_reader, from K40 Whisperer through Kerfly)
+    gives straight pieces; they are joined end to end into outlines, and an
+    outline that comes back to its start is closed. ask_units() is called for
+    a drawing without units and returns one of DXF_UNITS (None: cancel)."""
+    from .dxf_reader import DXF_CLASS
+    from .patterns import _without_straight_points, chain_polylines
+    name = os.path.splitext(os.path.basename(path))[0]
+    reader = DXF_CLASS()
+    try:
+        # a text in another encoding must not stop the drawing from loading
+        with open(path, errors="replace") as fd:
+            reader.GET_DXF_DATA(fd, lin_tol=0.001, get_units=True)
+            units = reader.units
+            if units == "Unitless":
+                units = ask_units() if ask_units is not None else "Millimeters"
+            if units is None:
+                raise LoadCancelled()
+            if units not in DXF_MM_PER_UNIT:
+                raise LoadError(_("%s: unknown units %s.") % (os.path.basename(path), units))
+            mm = DXF_MM_PER_UNIT[units]
+            fd.seek(0)
+            reader = DXF_CLASS()
+            reader.GET_DXF_DATA(fd, lin_tol=DXF_TOLERANCE_MM / mm, get_units=False)
+    except OSError as e:
+        raise LoadError(_("Cannot open %s: %s") % (os.path.basename(path), e.strerror or e)) from None
+    # DXF y runs up; the view's y runs down
+    pieces = [[(x0 * mm, -y0 * mm), (x1 * mm, -y1 * mm)] for x0, y0, x1, y1 in reader.coords
+              if abs(x0 - x1) + abs(y0 - y1) > 1e-12]
+    if not pieces:
+        raise LoadError(_("%s has no visible shapes to cut.") % os.path.basename(path))
+    lines = chain_polylines(pieces, tol=1e-4)
+    polys, closed = [], []
+    for line in lines:
+        pts = _without_straight_points(line, 1e-9) if len(line) > 2 else line
+        shut = len(pts) > 2 and abs(pts[0][0] - pts[-1][0]) < 1e-4 and abs(pts[0][1] - pts[-1][1]) < 1e-4
+        if shut:
+            pts = pts[:-1]
+        polys.append(pts)
+        closed.append(shut)
+    element = Element(name=name, paths=curves.from_polylines(polys, closed), source=path)
+    element.dxf_messages = reader.dxf_messages.strip()
+    return element

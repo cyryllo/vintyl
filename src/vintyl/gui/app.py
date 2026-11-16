@@ -1,5 +1,5 @@
 """
-Start the Vintyl window:  python -m vintyl [design.svg | project.vintyl ...]
+Start the Vintyl window:  python -m vintyl [design.svg | drawing.dxf | project.vintyl ...]
 Checks:                   python -m vintyl --self-test   (or --version)
 
 Copyright (C) 2026 Vintyl contributors
@@ -42,7 +42,7 @@ def main(argv=None):
     app.setStyleSheet(STYLE)
     win = MainWindow()
     for path in argv[1:]:
-        if path.lower().endswith((".svg", ".vintyl")):
+        if path.lower().endswith((".svg", ".dxf", ".vintyl")):
             win.open_file(path)
     win.show()
     return app.exec()

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-16 22:20+0100\n"
+"POT-Creation-Date: 2026-11-16 22:48+0100\n"
 "PO-Revision-Date: 2026-11-15 17:49+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -64,6 +64,10 @@ msgstr ""
 " o tyle od krawędzi."
 
 #, python-format
+msgid "%s does not say its units. They are:"
+msgstr "%s nie podaje jednostek. To są:"
+
+#, python-format
 msgid "%s has no visible shapes to cut."
 msgstr "W pliku %s nie ma widocznych kształtów do cięcia."
 
@@ -96,6 +100,10 @@ msgid "%s was saved by a newer Vintyl; please update Vintyl to open it."
 msgstr ""
 "Plik %s zapisała nowsza wersja Vintyl; zaktualizuj Vintyl, żeby go "
 "otworzyć."
+
+#, python-format
+msgid "%s: unknown units %s."
+msgstr "%s: nieznane jednostki %s."
 
 msgid "&Cutter"
 msgstr "&Ploter"
@@ -176,6 +184,9 @@ msgstr "Wyrównaj"
 msgid "Align the selected shapes to each other: %s"
 msgstr "Wyrównaj zaznaczone kształty do siebie: %s"
 
+msgid "Along"
+msgstr "Wzdłuż"
+
 msgid "Angle"
 msgstr "Kąt"
 
@@ -184,6 +195,9 @@ msgstr "Ramiona"
 
 msgid "Arrow"
 msgstr "Strzałka"
+
+msgid "Away"
+msgstr "Odstęp"
 
 msgid "Axes"
 msgstr "Osie"
@@ -282,6 +296,9 @@ msgstr "Kopiuj"
 msgid "Corner from"
 msgstr "Narożnik od"
 
+msgid "Corner radius"
+msgstr "Promień narożników"
+
 msgid "Corner radius (mm)"
 msgstr "Promień narożników (mm)"
 
@@ -303,8 +320,20 @@ msgstr "Wytnij"
 msgid "Cut earlier"
 msgstr "Tnij wcześniej"
 
+msgid "Cut earlier (up the list)"
+msgstr "Tnij wcześniej (wyżej na liście)"
+
+msgid "Cut first"
+msgstr "Tnij jako pierwszy"
+
+msgid "Cut last"
+msgstr "Tnij jako ostatni"
+
 msgid "Cut later"
 msgstr "Tnij później"
+
+msgid "Cut later (down the list)"
+msgstr "Tnij później (niżej na liście)"
 
 #, python-format
 msgid "Cut length: %.2f m · travel: %.2f m"
@@ -334,6 +363,9 @@ msgstr "Ustawienia plotera…"
 
 msgid "Cutting"
 msgstr "Cięcie"
+
+msgid "Cutting order"
+msgstr "Kolejność cięcia"
 
 msgid "Cutting width"
 msgstr "Szerokość cięcia"
@@ -415,6 +447,9 @@ msgstr "Duplikuj"
 
 msgid "Edit"
 msgstr "Edycja"
+
+msgid "Edit nodes"
+msgstr "Edytuj węzły"
 
 msgid "Edit nodes (or double-click an element)"
 msgstr "Edycja węzłów (albo dwuklik na elemencie)"
@@ -596,6 +631,9 @@ msgid ""
 "How far the blade tip trails the holder's axis. A 45° blade: usually "
 "0.20–0.30 mm."
 msgstr "O ile czubek ostrza jest za osią oprawki. Ostrze 45°: zwykle 0,20–0,30 mm."
+
+msgid "How far the letters stand from the path, mm"
+msgstr "Jak daleko od ścieżki stoją litery, mm"
 
 msgid ""
 "How much of the code may be damaged and it still reads; more = more "
@@ -865,6 +903,9 @@ msgstr ""
 msgid "Open"
 msgstr "Otwórz"
 
+msgid "Open DXF"
+msgstr "Otwórz DXF"
+
 msgid "Open SVG"
 msgstr "Otwórz SVG"
 
@@ -999,6 +1040,9 @@ msgstr "Obróć w lewo"
 msgid "Rotate right"
 msgstr "Obróć w prawo"
 
+msgid "Round corners of the rectangle (0 = sharp)"
+msgstr "Zaokrąglone narożniki prostokąta (0 = ostre)"
+
 msgid "Rounded rectangle"
 msgstr "Zaokrąglony prostokąt"
 
@@ -1066,6 +1110,13 @@ msgstr "Zaznacz wszystkie elementy"
 
 msgid "Select one or more shapes with closed outlines first."
 msgstr "Najpierw zaznacz jeden lub więcej kształtów z zamkniętym konturem."
+
+msgid ""
+"Select one text and one shape (a line, a curve, a circle) for it to run "
+"along."
+msgstr ""
+"Zaznacz jeden tekst i jeden kształt (linię, krzywą, okrąg), wzdłuż "
+"którego ma biec."
 
 msgid "Select three or more shapes to spread them evenly."
 msgstr "Zaznacz trzy lub więcej kształtów, żeby je rozmieścić."
@@ -1139,6 +1190,13 @@ msgid ""
 msgstr ""
 "Wysłano %d bajtów do %s. Ploter tnie ze swojej pamięci z prędkością "
 "ustawioną na panelu."
+
+msgid ""
+"Set the selected text along the selected shape (a line, a curve, a "
+"circle...): select the text and the shape"
+msgstr ""
+"Ustaw zaznaczony tekst wzdłuż zaznaczonego kształtu (linii, krzywej, "
+"okręgu...): zaznacz tekst i kształt"
 
 msgid "Settings"
 msgstr "Ustawienia"
@@ -1262,6 +1320,9 @@ msgstr "Zęby"
 msgid "Text"
 msgstr "Tekst"
 
+msgid "Text on a path"
+msgstr "Tekst po ścieżce"
+
 msgid "Text or address"
 msgstr "Tekst albo adres"
 
@@ -1294,6 +1355,17 @@ msgstr "Projekt nie mieści się na folii: wystaje %s o %.1f mm."
 msgid "The port speed must be a whole number."
 msgstr "Prędkość portu musi być liczbą całkowitą."
 
+msgid "The text on the other side of the path (inside a circle), still readable"
+msgstr "Tekst po drugiej stronie ścieżki (wewnątrz okręgu), nadal czytelny"
+
+#, python-format
+msgid ""
+"The text runs along \"%s\"; that shape stays as a guide and is not cut "
+"(tick it in the list to cut it too)."
+msgstr ""
+"Tekst biegnie wzdłuż „%s”; ten kształt zostaje jako prowadnica i nie jest"
+" cięty (zaznacz go na liście, żeby też go wyciąć)."
+
 msgid "The text; Enter applies it"
 msgstr "Treść napisu; Enter zatwierdza"
 
@@ -1317,6 +1389,12 @@ msgstr "Przekształć"
 
 msgid "Triangle"
 msgstr "Trójkąt"
+
+msgid "Turn the selection by the angle (Enter in the field does the same)"
+msgstr "Obróć zaznaczenie o kąt (Enter w polu robi to samo)"
+
+msgid "Turn the selection by this angle: plus = counter-clockwise"
+msgstr "Obróć zaznaczenie o ten kąt: plus = przeciwnie do ruchu wskazówek zegara"
 
 msgid ""
 "Turns smaller than this count as straight: the knife is turned only at "
@@ -1372,11 +1450,11 @@ msgid "Vintyl projects (*.vintyl)"
 msgstr "Projekty Vintyl (*.vintyl)"
 
 msgid ""
-"Vintyl projects and SVG files (*.vintyl *.svg);;Vintyl projects "
-"(*.vintyl);;SVG files (*.svg)"
+"Vintyl projects and drawings (*.vintyl *.svg *.dxf);;Vintyl projects "
+"(*.vintyl);;SVG files (*.svg);;DXF files (*.dxf)"
 msgstr ""
-"Projekty Vintyl i pliki SVG (*.vintyl *.svg);;Projekty Vintyl "
-"(*.vintyl);;Pliki SVG (*.svg)"
+"Projekty Vintyl i rysunki (*.vintyl *.svg *.dxf);;Projekty Vintyl "
+"(*.vintyl);;Pliki SVG (*.svg);;Pliki DXF (*.dxf)"
 
 msgid "Vinyl kept between the shapes and the outline"
 msgstr "Folia zostawiona między kształtami a obrysem"
@@ -1407,6 +1485,9 @@ msgstr ""
 "Gdzie leży kreska pisaka względem linii zamkniętego kształtu. Na "
 "zewnątrz: kształt w środku kreski ma dokładnie swój rozmiar; wewnątrz: "
 "kreska nie wychodzi poza kształt. Otwarte linie są rysowane na linii."
+
+msgid "Where the text starts along its path, mm"
+msgstr "Gdzie wzdłuż ścieżki zaczyna się tekst, mm"
 
 msgid "Width"
 msgstr "Szerokość"
@@ -1471,6 +1552,9 @@ msgstr "tak szybko, jak tnie"
 msgid "before the origin (along the material)"
 msgstr "przed punktem zerowym (wzdłuż folii)"
 
+msgid "centimetres"
+msgstr "centymetry"
+
 msgid "centre"
 msgstr "środek"
 
@@ -1487,6 +1571,9 @@ msgstr "projekt"
 msgid "everything at once"
 msgstr "wszystko naraz"
 
+msgid "feet"
+msgstr "stopy"
+
 msgid "from the panel"
 msgstr "z panelu"
 
@@ -1502,6 +1589,9 @@ msgstr "najwyższa (30%)"
 msgid "in line"
 msgstr "w linii"
 
+msgid "inches"
+msgstr "cale"
+
 msgid "inside the line"
 msgstr "wewnątrz linii"
 
@@ -1514,8 +1604,17 @@ msgstr "niska (7%)"
 msgid "medium (15%)"
 msgstr "średnia (15%)"
 
+msgid "metres"
+msgstr "metry"
+
 msgid "middle"
 msgstr "połowa"
+
+msgid "millimetres"
+msgstr "milimetry"
+
+msgid "mils (1/1000 inch)"
+msgstr "mile (1/1000 cala)"
 
 msgid "new project"
 msgstr "nowy projekt"
@@ -1534,6 +1633,9 @@ msgstr "na linii"
 
 msgid "on the line"
 msgstr "na linii"
+
+msgid "other side"
+msgstr "druga strona"
 
 msgid "outside the line"
 msgstr "na zewnątrz linii"
@@ -1562,6 +1664,10 @@ msgstr "ostre"
 
 msgid "software (XON/XOFF)"
 msgstr "programowa (XON/XOFF)"
+
+#, python-format
+msgid "some entities were left out: %s"
+msgstr "część elementów pominięto: %s"
 
 msgid "swap X and Y"
 msgstr "zamień X i Y"
@@ -1759,4 +1865,13 @@ msgstr "← Y w poprzek"
 #~ msgstr ""
 #~ "Drukarka USB (/dev/usb/lp…) albo port "
 #~ "szeregowy (/dev/ttyUSB…, /dev/ttyACM…)"
+
+#~ msgid ""
+#~ "Vintyl projects and SVG files (*.vintyl"
+#~ " *.svg);;Vintyl projects (*.vintyl);;SVG files"
+#~ " (*.svg)"
+#~ msgstr ""
+#~ "Projekty Vintyl i pliki SVG (*.vintyl"
+#~ " *.svg);;Projekty Vintyl (*.vintyl);;Pliki SVG"
+#~ " (*.svg)"
 

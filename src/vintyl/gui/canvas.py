@@ -20,7 +20,7 @@ Licensed under the GNU General Public License v3 or later. See LICENSE.
 """
 import math
 
-from PySide6.QtCore import QEvent, QObject, QPointF, QRectF, Qt, Signal
+from PySide6.QtCore import QEvent, QObject, QPoint, QPointF, QRectF, Qt, Signal
 from PySide6.QtGui import QBrush, QColor, QFont, QPainter, QPainterPath, QPen, QTransform
 from PySide6.QtWidgets import (QApplication, QGraphicsEllipseItem, QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem,
                                QGraphicsScene,
@@ -94,7 +94,8 @@ class CanvasSignals(QObject):
     text_clicked = Signal(QPointF)            # text tool: where the text starts (top left, view mm)
     pen_drawn = Signal(list)                  # pen or freehand: the drawn path (curves subpaths, view mm)
     measured = Signal(float, float)
-    sheet_changed = Signal()                  # the window changed shape: draw the sheet again           # the ruler: dx, dy in mm (screen right / down)
+    sheet_changed = Signal()                  # the window changed shape: draw the sheet again
+    context = Signal(object, QPoint)          # right click: the element under the pointer (or None), screen point           # the ruler: dx, dy in mm (screen right / down)
     cursor = Signal(float, float)             # pointer in material coordinates (along, across)
     nodes_changed = Signal(object, list, bool)  # element, its new paths (view mm), unused
     node_selection = Signal(int)              # number of selected nodes in the node tool
@@ -1062,6 +1063,19 @@ class MaterialView(QGraphicsView):
                     self.signals.drawn.emit(self.tool, QRectF(a, b).normalized())
             return
         super().mouseReleaseEvent(event)
+
+    def contextMenuEvent(self, event):
+        """Right click with the select tool: the window's menu for the element
+        under the pointer (it gets selected first, unless it already is)."""
+        if self.tool != "select":
+            event.ignore()
+            return
+        hit = self.itemAt(event.pos())
+        element = hit.element if isinstance(hit, ElementItem) else None
+        if element is not None and not hit.isSelected():
+            self.select(element)
+        self.signals.context.emit(element, event.globalPos())
+        event.accept()
 
     def mouseDoubleClickEvent(self, event):
         if event.button() == Qt.LeftButton and self.tool == "select":

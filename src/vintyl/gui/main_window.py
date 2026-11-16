@@ -192,6 +192,7 @@ class MainWindow(QMainWindow):
         s.pen_drawn.connect(self._on_pen_drawn)
         s.measured.connect(self._on_measured)
         s.sheet_changed.connect(self.refresh)
+        s.context.connect(self.show_context_menu)
         s.resized.connect(self._on_resized)
         s.nudged.connect(self._on_moved)
         s.nodes_changed.connect(self._on_nodes_changed)
@@ -307,7 +308,10 @@ class MainWindow(QMainWindow):
         self.act_tile = self._action(_("Pattern of shapes"), lambda: self.tile_selected(), "rosette", "Shift+T",
                                      _("Fill the selected closed shape with rows of small shapes (dots, stars, "
                                        "hearts...), each one whole, to be cut out as holes"))
-        self.selection_actions = [self.act_offset, self.act_fill, self.act_tile, self.act_cut, self.act_copy, self.act_group, self.act_ungroup,
+        self.act_text_path = self._action(_("Text on a path"), lambda: self.put_text_on_path(), "circle-dashed",
+                                          None, _("Set the selected text along the selected shape (a line, "
+                                                  "a curve, a circle...): select the text and the shape"))
+        self.selection_actions = [self.act_offset, self.act_fill, self.act_tile, self.act_text_path, self.act_cut, self.act_copy, self.act_group, self.act_ungroup,
                                   self.act_distribute_across, self.act_distribute_up] + \
             list(self.act_boolean.values()) + [
             self.act_duplicate, self.act_rot_left, self.act_rot_right,
@@ -348,7 +352,8 @@ class MainWindow(QMainWindow):
         m = mb.addMenu(_("&Object"))
         for a in [self.act_group, self.act_ungroup, None] + list(self.act_boolean.values()) + [None] + \
                 [self.act_rot_left, self.act_rot_right, self.act_mirror_h, self.act_mirror_v, None] + \
-                list(self.act_align.values()) + [None, self.act_offset, self.act_tile, self.act_fill]:
+                list(self.act_align.values()) + [None, self.act_offset, self.act_tile, self.act_fill,
+                                                 self.act_text_path]:
             m.addSeparator() if a is None else m.addAction(a)
         m = mb.addMenu(_("&Cutter"))
         m.addAction(self.act_profile)
@@ -462,6 +467,7 @@ class MainWindow(QMainWindow):
         ]),
         ("text", N_("Text"), "typography", [
             ("tool", "text", N_("Text"), N_("Text: click where it should start"), "typography"),
+            ("act", "act_text_path", N_("Text on a path")),
         ]),
         ("offset", N_("Offset"), "box-padding", [
             ("act", "act_offset", N_("Offset")),
@@ -756,6 +762,29 @@ class MainWindow(QMainWindow):
         self.sides_label.setBuddy(self.opt_sides)
         row.addWidget(self.sides_label)
         row.addWidget(self.opt_sides)
+        # a rectangle's round corners: for new rectangles and the selected one
+        self.radius_label = QLabel(_("Corner radius"))
+        self.opt_radius = _spin(1000.0, 1, minimum=0.0)
+        self.opt_radius.setValue(float(self.settings.value("draw/corner_radius", 0.0)))
+        self.opt_radius.setToolTip(_("Round corners of the rectangle (0 = sharp)"))
+        self.opt_radius.valueChanged.connect(self._radius_changed)
+        self.radius_label.setBuddy(self.opt_radius)
+        row.addWidget(self.radius_label)
+        row.addWidget(self.opt_radius)
+        # turn the selection by any angle (the buttons on the ribbon turn by 90°)
+        self.angle_label = QLabel(_("Angle"))
+        self.opt_angle = _spin(360.0, 1, "°", minimum=-360.0)
+        self.opt_angle.setValue(float(self.settings.value("draw/rotate_by", 15.0)))
+        self.opt_angle.setToolTip(_("Turn the selection by this angle: plus = counter-clockwise"))
+        self.btn_rotate = QToolButton()
+        self.btn_rotate.setIcon(icons.tabler("rotate-2"))
+        self.btn_rotate.setToolTip(_("Turn the selection by the angle (Enter in the field does the same)"))
+        self.btn_rotate.clicked.connect(lambda: self.rotate_selected(self.opt_angle.value()))
+        self.opt_angle.lineEdit().returnPressed.connect(lambda: self.rotate_selected(self.opt_angle.value()))
+        self.angle_label.setBuddy(self.opt_angle)
+        row.addWidget(self.angle_label)
+        row.addWidget(self.opt_angle)
+        row.addWidget(self.btn_rotate)
         self.node_hint = QLabel(_("Drag nodes and handles · double-click a side: add a node · "
                                   "D delete · L line · C curve · O smooth · Z close/open · B break"))
         self.node_hint.setStyleSheet("color: #4b5563")
@@ -763,7 +792,7 @@ class MainWindow(QMainWindow):
         self.node_hint.setWordWrap(True)
         self.node_hint.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
         row.addWidget(self.node_hint, 1)
-        for w in (self.sides_label, self.opt_sides, self.node_hint):
+        for w in (self.sides_label, self.opt_sides, self.node_hint, self.radius_label, self.opt_radius):
             w.setVisible(False)
         # text: the text itself, font, size (em height), bold, italic, letter spacing
         self.text_defaults = dict(texts.DEFAULTS)
@@ -798,6 +827,27 @@ class MainWindow(QMainWindow):
                 row.addWidget(lab)
                 self.text_labels.append(lab)
             row.addWidget(w)
+        # a text on a path: where along the path, how far from it, which side
+        self.opt_path_offset = _spin(100000.0, 1, minimum=-100000.0)
+        self.opt_path_offset.setToolTip(_("Where the text starts along its path, mm"))
+        self.opt_path_distance = _spin(1000.0, 1, minimum=-1000.0)
+        self.opt_path_distance.setToolTip(_("How far the letters stand from the path, mm"))
+        self.opt_path_flip = QCheckBox(_("other side"))
+        self.opt_path_flip.setToolTip(_("The text on the other side of the path (inside a circle), still readable"))
+        self.path_widgets, self.path_labels = [self.opt_path_offset, self.opt_path_distance, self.opt_path_flip], []
+        for label, w in ((_("Along"), self.opt_path_offset), (_("Away"), self.opt_path_distance),
+                         (None, self.opt_path_flip)):
+            if label:
+                lab = QLabel(label)
+                lab.setBuddy(w)
+                row.addWidget(lab)
+                self.path_labels.append(lab)
+            row.addWidget(w)
+        for w in self.path_widgets + self.path_labels:
+            w.setVisible(False)
+        for w in (self.opt_path_offset, self.opt_path_distance):
+            w.valueChanged.connect(lambda _v: self._text_changed())
+        self.opt_path_flip.toggled.connect(lambda _v: self._text_changed())
         self.opt_text.editingFinished.connect(self._text_changed)
         self.opt_font.currentFontChanged.connect(lambda _f: self._text_changed())
         for w in (self.opt_size, self.opt_spacing):
@@ -842,7 +892,7 @@ class MainWindow(QMainWindow):
         self._checkpoint()
         for e in elements:
             e.transform(lambda x, y: (new.left() + (x - old.left()) * sx, new.top() + (y - old.top()) * sy))
-            e.spec = None
+            self._after_resize(e)
         self.selection = list(elements)
         self.selected = elements[0] if elements else None
         self.refresh()
@@ -862,7 +912,7 @@ class MainWindow(QMainWindow):
                 w = h * w0 / h0
         if (w, h) != tuple(round(v, 2) for v in e.size) and w > 0 and h > 0:
             e.set_size(w, h)
-            e.spec = None                # stretched: it is a shape now, no longer an editable text
+            self._after_resize(e)        # stretched: a shape now (a rectangle keeps round corners)
         _xmin, xmax, _ymin, ymax = e.bounds
         e.move_by(-self.opt_y.value() - xmax, -self.opt_x.value() - ymax)
         e.cut = self.opt_cut.isChecked()
@@ -1203,16 +1253,51 @@ class MainWindow(QMainWindow):
                 box.setChecked(st[key])
 
     def open_file(self, path=None):
-        """Open a project (.vintyl) or add an SVG file's shapes."""
+        """Open a project (.vintyl) or add an SVG or DXF file's shapes."""
         if path is None:
             path, _f = QFileDialog.getOpenFileName(
                 self, _("Open"), os.path.dirname(self.project_path or ""),
-                _("Vintyl projects and SVG files (*.vintyl *.svg);;Vintyl projects (*.vintyl);;SVG files (*.svg)"))
+                _("Vintyl projects and drawings (*.vintyl *.svg *.dxf);;Vintyl projects (*.vintyl);;"
+                  "SVG files (*.svg);;DXF files (*.dxf)"))
             if not path:
                 return None
         if path.lower().endswith(project.EXTENSION):
             return self.open_project(path)
+        if path.lower().endswith(".dxf"):
+            return self.import_dxf(path)
         return self.import_svg(path)
+
+    def import_dxf(self, path, units=None):
+        """Add a DXF drawing's shapes. units: for a drawing that does not say
+        them (None asks; "Millimeters", "Inches", ...)."""
+        from vintyl.core.loaders import DXF_UNITS, LoadCancelled, load_dxf
+
+        def ask():
+            if units is not None:
+                return units
+            from PySide6.QtWidgets import QInputDialog
+            names = {"Millimeters": _("millimetres"), "Centimeters": _("centimetres"), "Inches": _("inches"),
+                     "Meters": _("metres"), "Feet": _("feet"), "Mils": _("mils (1/1000 inch)")}
+            codes = [u for u in DXF_UNITS if u in names]
+            choice, ok = QInputDialog.getItem(self, _("Open DXF"),
+                                              _("%s does not say its units. They are:") % os.path.basename(path),
+                                              [names[c] for c in codes], 0, False)
+            return codes[[names[c] for c in codes].index(choice)] if ok else None
+        try:
+            e = load_dxf(path, ask)
+        except LoadCancelled:
+            return None
+        except LoadError as err:
+            QMessageBox.warning(self, _("Open DXF"), str(err))
+            return None
+        w, h = e.size
+        e.move_to(-PLACE_MARGIN_MM - w, -PLACE_MARGIN_MM - h)
+        self.add_element(e)
+        note = _("Opened %s") % os.path.basename(path)
+        if getattr(e, "dxf_messages", ""):
+            note += " · " + _("some entities were left out: %s") % e.dxf_messages.splitlines()[0]
+        self.statusBar().showMessage(note, 8000)
+        return e
 
     def open_project(self, path):
         if not self.maybe_save():
@@ -1294,7 +1379,7 @@ class MainWindow(QMainWindow):
         return e
 
     def _on_drawn(self, tool, rect):
-        make = {"rectangle": (shapes.rectangle, _("Rectangle")),
+        make = {"rectangle": (lambda *r: shapes.rounded_rectangle(*r, self.opt_radius.value()), _("Rectangle")),
                 "ellipse": (shapes.ellipse, _("Ellipse")),
                 "polygon": (lambda *r: shapes.polygon(*r, sides=self.opt_sides.value()), _("Polygon"))}[tool]
         paths = make[0](rect.left(), rect.top(), rect.right(), rect.bottom())
@@ -1305,6 +1390,8 @@ class MainWindow(QMainWindow):
             b = e.bounds
             e.spec = {"kind": "polygon", "sides": self.opt_sides.value(), "w": rect.width(), "h": rect.height(),
                       "ox": b[0] - rect.left(), "oy": b[2] - rect.top()}
+        if tool == "rectangle":
+            e.spec = {"kind": "rectangle", "radius": self.opt_radius.value()}
         self.add_element(e)
         self.set_tool("select")
 
@@ -1321,6 +1408,62 @@ class MainWindow(QMainWindow):
             self._updating = True
             self.opt_sides.setValue(e.spec["sides"])
             self._updating = False
+        rect = self.view.tool == "rectangle" or self._is_rectangle(e)
+        self.radius_label.setVisible(rect)
+        self.opt_radius.setVisible(rect)
+        if self._is_rectangle(e) and abs(self.opt_radius.value() - e.spec["radius"]) > 1e-9:
+            self._updating = True
+            self.opt_radius.setValue(e.spec["radius"])
+            self._updating = False
+        has = e is not None
+        for w in (self.angle_label, self.opt_angle, self.btn_rotate):
+            w.setVisible(has)
+
+    @staticmethod
+    def _is_rectangle(e):
+        return e is not None and e.spec is not None and e.spec.get("kind") == "rectangle"
+
+    def _radius_changed(self, radius):
+        """New rectangles get these corners; a selected rectangle is redrawn
+        with them in its own box."""
+        self.settings.setValue("draw/corner_radius", radius)
+        e = self.selected
+        if self._updating or not self._is_rectangle(e) or abs(e.spec["radius"] - radius) < 1e-9:
+            return
+        self._checkpoint()
+        x0, x1, y0, y1 = e.bounds
+        e.paths = shapes.rounded_rectangle(x0, y0, x1, y1, radius)
+        e.spec = {"kind": "rectangle", "radius": radius}
+        self.refresh()
+
+    def _after_resize(self, e):
+        """A resized element: a rectangle keeps round (not stretched) corners
+        and stays editable; texts and polygons become plain shapes."""
+        if self._is_rectangle(e):
+            x0, x1, y0, y1 = e.bounds
+            e.paths = shapes.rounded_rectangle(x0, y0, x1, y1, e.spec["radius"])
+        else:
+            e.spec = None
+
+    def rotate_selected(self, degrees):
+        """Turn the selected elements together by any angle (plus =
+        counter-clockwise), about the middle of their box."""
+        chosen = self._chosen()
+        if not chosen or abs(degrees) < 1e-9:
+            return
+        self.settings.setValue("draw/rotate_by", degrees)
+        self._checkpoint()
+        boxes = [e.bounds for e in chosen]
+        cx = (min(b[0] for b in boxes) + max(b[1] for b in boxes)) / 2.0
+        cy = (min(b[2] for b in boxes) + max(b[3] for b in boxes)) / 2.0
+        import math
+        a = math.radians(degrees)
+        c, s_ = math.cos(a), math.sin(a)
+        for e in chosen:
+            # y is down on screen: counter-clockwise on screen is -a here (as Element.rotate)
+            e.transform(lambda x, y: (cx + (x - cx) * c + (y - cy) * s_, cy - (x - cx) * s_ + (y - cy) * c))
+            e.spec = None
+        self.refresh()
 
     def _sides_changed(self, sides):
         """New polygons get this many sides; a selected polygon is redrawn with them,
@@ -1361,9 +1504,18 @@ class MainWindow(QMainWindow):
 
     # ---- text --------------------------------------------------------------------------
     def _text_spec_from_widgets(self):
-        return {"kind": "text", "text": self.opt_text.text(), "family": self.opt_font.currentFont().family(),
+        spec = {"kind": "text", "text": self.opt_text.text(), "family": self.opt_font.currentFont().family(),
                 "size": self.opt_size.value(), "bold": self.opt_bold.isChecked(),
                 "italic": self.opt_italic.isChecked(), "spacing": self.opt_spacing.value()}
+        e = self.selected
+        if self._is_text(e) and e.spec.get("path"):           # a text on a path keeps its path
+            def exact(widget, key):
+                # the field shows 0.1 mm: its value as shown means "unchanged", keep the exact one
+                old = e.spec.get(key, 0.0)
+                return old if abs(widget.value() - round(old, widget.decimals())) < 1e-9 else widget.value()
+            spec.update(path=e.spec["path"], offset=exact(self.opt_path_offset, "offset"),
+                        distance=exact(self.opt_path_distance, "distance"), flip=self.opt_path_flip.isChecked())
+        return spec
 
     def _is_text(self, e):
         return e is not None and e.spec is not None and e.spec.get("kind") == "text"
@@ -1374,6 +1526,15 @@ class MainWindow(QMainWindow):
         show = self.view.tool == "text" or self._is_text(e)
         for w in self.text_widgets + self.text_labels:
             w.setVisible(show)
+        on_path = self._is_text(e) and bool(e.spec.get("path"))
+        for w in self.path_widgets + self.path_labels:
+            w.setVisible(on_path)
+        if on_path:
+            self._updating = True
+            self.opt_path_offset.setValue(e.spec.get("offset", 0.0))
+            self.opt_path_distance.setValue(e.spec.get("distance", 0.0))
+            self.opt_path_flip.setChecked(bool(e.spec.get("flip", False)))
+            self._updating = False
         if self._is_text(e):
             self._updating = True
             spec = e.spec
@@ -1407,6 +1568,15 @@ class MainWindow(QMainWindow):
         e = self.selected
         if not self._is_text(e) or spec == e.spec:
             return
+        if spec.get("path") and abs(spec["offset"] - e.spec.get("offset", 0.0)) < 1e-9:
+            # a text on a path changed (not moved along it): its middle stays where it was
+            def length(sp):
+                return texts.text_length(sp["text"], sp["family"], sp["size"], sp["bold"], sp["italic"],
+                                         sp["spacing"])
+            spec["offset"] = e.spec.get("offset", 0.0) + (length(e.spec) - length(spec)) / 2.0
+            self._updating = True
+            self.opt_path_offset.setValue(spec["offset"])
+            self._updating = False
         paths = texts.spec_paths(spec)
         if not paths:
             return
@@ -1415,9 +1585,49 @@ class MainWindow(QMainWindow):
         e.paths = paths
         e.spec = spec
         e.name = spec["text"].split("\n")[0][:30] or e.name
-        nx0, _nx1, _ny0, ny1 = e.bounds
-        e.move_by(x0 - nx0, y1 - ny1)
+        if not spec.get("path"):                 # on a path it stands where its path is
+            nx0, _nx1, _ny0, ny1 = e.bounds
+            e.move_by(x0 - nx0, y1 - ny1)
         self.refresh()
+
+    def put_text_on_path(self):
+        """The selected text along the other selected shape (its longest
+        outline): a closed one runs clockwise with the text centred at its
+        top. The shape stays, but is no longer cut (tick it to cut it too).
+        Returns the text (or None)."""
+        chosen = self._chosen()
+        text = [e for e in chosen if self._is_text(e)]
+        guides = [e for e in chosen if e not in text]
+        if len(text) != 1 or len(guides) != 1:
+            if len(text) == 2 and not guides:          # a text can be the path of another text
+                text, guides = text[:1], text[1:]
+            else:
+                self.statusBar().showMessage(_("Select one text and one shape (a line, a curve, a circle) "
+                                               "for it to run along."), 8000)
+                return None
+        e, guide = text[0], guides[0]
+        from vintyl.core import curves
+        subs = sorted(guide.paths, key=lambda sub: -len(curves.flatten([sub], 0.05)[0]))
+        sub = subs[0]
+        pts = curves.flatten([sub], 0.05)[0]
+        if sub["closed"] and pts[0] != pts[-1]:
+            pts = pts + [pts[0]]
+        sp = dict(e.spec)
+        sp.pop("path", None)
+        length = texts.text_length(sp["text"], sp["family"], sp["size"], sp["bold"], sp["italic"], sp["spacing"])
+        path, offset = texts.prepare_path(pts, sub["closed"], length)
+        spec = dict(sp, path=path, offset=offset, distance=0.0, flip=False)
+        paths = texts.spec_paths(spec)
+        if not paths:
+            return None
+        self._checkpoint()
+        e.paths, e.spec = paths, spec
+        guide.cut = False
+        self.selected, self.selection = e, [e]
+        self.refresh()
+        self.statusBar().showMessage(_("The text runs along \"%s\"; that shape stays as a guide and is not cut "
+                                       "(tick it in the list to cut it too).") % guide.name, 10000)
+        return e
 
     # ---- offset --------------------------------------------------------------------------------
     def offset_selected(self, values=None):
@@ -2085,6 +2295,52 @@ class MainWindow(QMainWindow):
         for a in self.selection_actions:
             a.setEnabled(self.selected is not None)
         self.act_delete.setEnabled(self.selected is not None)
+
+    def show_context_menu(self, element, pos, show=True):
+        """The right-click menu: for an element (copy, cut, duplicate, delete,
+        group, the cutting order, nodes, cut or not), or for the empty sheet
+        (paste, select all). Returns the menu (shown at pos unless show is False)."""
+        menu = QMenu(self)
+        if element is None:
+            for a in (self.act_paste, self.act_select_all):
+                menu.addAction(a)
+        else:
+            for a in (self.act_copy, self.act_cut, self.act_paste, self.act_duplicate, self.act_delete):
+                menu.addAction(a)
+            menu.addSeparator()
+            for a in (self.act_group, self.act_ungroup):
+                menu.addAction(a)
+            menu.addSeparator()
+            order = menu.addMenu(_("Cutting order"))
+            order.addAction(_("Cut earlier (up the list)"), lambda: self.move_selected(-1))
+            order.addAction(_("Cut later (down the list)"), lambda: self.move_selected(1))
+            order.addAction(_("Cut first"), lambda: self.move_selected_to(0))
+            order.addAction(_("Cut last"), lambda: self.move_selected_to(-1))
+            menu.addSeparator()
+            for a in (self.act_rot_left, self.act_rot_right, self.act_mirror_h):
+                menu.addAction(a)
+            menu.addAction(icons.tabler("vector-bezier-2"), _("Edit nodes"), lambda: self._on_edit_nodes(element))
+            cut = menu.addAction(_("Cut this element"))
+            cut.setCheckable(True)
+            cut.setChecked(element.cut)
+            cut.toggled.connect(lambda on: self.opt_cut.setChecked(on))
+        self.context_menu = menu
+        if show:
+            menu.popup(pos)
+        return menu
+
+    def move_selected_to(self, where):
+        """Move the selected element to the start (0) or the end (-1) of the
+        list: it is cut first or last."""
+        els = self.design.elements
+        if self.selected not in els:
+            return
+        i = els.index(self.selected)
+        j = 0 if where == 0 else len(els) - 1
+        if i != j:
+            self._checkpoint()
+            els.insert(j, els.pop(i))
+            self.refresh()
 
     def move_selected(self, step):
         els = self.design.elements

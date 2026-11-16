@@ -9,6 +9,6 @@ Exec=vintyl %F
 Icon=vintyl
 Terminal=false
 Categories=Graphics;Engineering;
-MimeType=application/x-vintyl;image/svg+xml;
+MimeType=application/x-vintyl;image/svg+xml;image/vnd.dxf;
 Keywords=vinyl;cutter;plotter;HPGL;sticker;folia;ploter;
 StartupWMClass=Vintyl

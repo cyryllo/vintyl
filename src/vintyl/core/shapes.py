@@ -1,7 +1,6 @@
 """
-Basic drawn shapes as curves subpaths (view mm, y down): rectangle, ellipse
-and line. The full set from Kerfly (polygon, text, text on a path, ...)
-comes in a later step.
+Basic drawn shapes as curves subpaths (view mm, y down): rectangle (with
+round corners or not), ellipse, polygon and line.
 
 Copyright (C) 2026 Vintyl contributors
 Licensed under the GNU General Public License v3 or later. See LICENSE.
@@ -15,6 +14,24 @@ def rectangle(x0, y0, x1, y1):
     xa, xb = sorted((x0, x1))
     ya, yb = sorted((y0, y1))
     return [{"closed": True, "nodes": [node(xa, ya), node(xb, ya), node(xb, yb), node(xa, yb)]}]
+
+
+def rounded_rectangle(x0, y0, x1, y1, radius):
+    """A rectangle with round corners (true quarter circles); the radius is
+    at most half the shorter side; 0 = sharp corners."""
+    xa, xb = sorted((x0, x1))
+    ya, yb = sorted((y0, y1))
+    r = max(0.0, min(radius, (xb - xa) / 2.0, (yb - ya) / 2.0))
+    if r <= 1e-9:
+        return rectangle(xa, ya, xb, yb)
+    k = KAPPA * r
+    nodes = [
+        node(xa + r, ya, hin=(xa + r - k, ya)), node(xb - r, ya, hout=(xb - r + k, ya)),
+        node(xb, ya + r, hin=(xb, ya + r - k)), node(xb, yb - r, hout=(xb, yb - r + k)),
+        node(xb - r, yb, hin=(xb - r + k, yb)), node(xa + r, yb, hout=(xa + r - k, yb)),
+        node(xa, yb - r, hin=(xa, yb - r + k)), node(xa, ya + r, hout=(xa, ya + r - k)),
+    ]
+    return [{"closed": True, "nodes": nodes}]
 
 
 def ellipse(x0, y0, x1, y1):

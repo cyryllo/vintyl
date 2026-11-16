@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-16 22:20+0100\n"
+"POT-Creation-Date: 2026-11-16 22:48+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,6 +56,10 @@ msgid ""
 msgstr ""
 
 #, python-format
+msgid "%s does not say its units. They are:"
+msgstr ""
+
+#, python-format
 msgid "%s has no visible shapes to cut."
 msgstr ""
 
@@ -83,6 +87,10 @@ msgstr ""
 
 #, python-format
 msgid "%s was saved by a newer Vintyl; please update Vintyl to open it."
+msgstr ""
+
+#, python-format
+msgid "%s: unknown units %s."
 msgstr ""
 
 msgid "&Cutter"
@@ -158,6 +166,9 @@ msgstr ""
 msgid "Align the selected shapes to each other: %s"
 msgstr ""
 
+msgid "Along"
+msgstr ""
+
 msgid "Angle"
 msgstr ""
 
@@ -165,6 +176,9 @@ msgid "Arms"
 msgstr ""
 
 msgid "Arrow"
+msgstr ""
+
+msgid "Away"
 msgstr ""
 
 msgid "Axes"
@@ -257,6 +271,9 @@ msgstr ""
 msgid "Corner from"
 msgstr ""
 
+msgid "Corner radius"
+msgstr ""
+
 msgid "Corner radius (mm)"
 msgstr ""
 
@@ -278,7 +295,19 @@ msgstr ""
 msgid "Cut earlier"
 msgstr ""
 
+msgid "Cut earlier (up the list)"
+msgstr ""
+
+msgid "Cut first"
+msgstr ""
+
+msgid "Cut last"
+msgstr ""
+
 msgid "Cut later"
+msgstr ""
+
+msgid "Cut later (down the list)"
 msgstr ""
 
 #, python-format
@@ -308,6 +337,9 @@ msgid "Cutter settings…"
 msgstr ""
 
 msgid "Cutting"
+msgstr ""
+
+msgid "Cutting order"
 msgstr ""
 
 msgid "Cutting width"
@@ -383,6 +415,9 @@ msgid "Duplicate"
 msgstr ""
 
 msgid "Edit"
+msgstr ""
+
+msgid "Edit nodes"
 msgstr ""
 
 msgid "Edit nodes (or double-click an element)"
@@ -550,6 +585,9 @@ msgstr ""
 msgid ""
 "How far the blade tip trails the holder's axis. A 45° blade: usually "
 "0.20–0.30 mm."
+msgstr ""
+
+msgid "How far the letters stand from the path, mm"
 msgstr ""
 
 msgid ""
@@ -784,6 +822,9 @@ msgstr ""
 msgid "Open"
 msgstr ""
 
+msgid "Open DXF"
+msgstr ""
+
 msgid "Open SVG"
 msgstr ""
 
@@ -912,6 +953,9 @@ msgstr ""
 msgid "Rotate right"
 msgstr ""
 
+msgid "Round corners of the rectangle (0 = sharp)"
+msgstr ""
+
 msgid "Rounded rectangle"
 msgstr ""
 
@@ -980,6 +1024,11 @@ msgstr ""
 msgid "Select one or more shapes with closed outlines first."
 msgstr ""
 
+msgid ""
+"Select one text and one shape (a line, a curve, a circle) for it to run "
+"along."
+msgstr ""
+
 msgid "Select three or more shapes to spread them evenly."
 msgstr ""
 
@@ -1029,6 +1078,11 @@ msgstr ""
 msgid ""
 "Sent %d bytes to %s. The cutter cuts from its own memory at the speed set"
 " on its panel."
+msgstr ""
+
+msgid ""
+"Set the selected text along the selected shape (a line, a curve, a "
+"circle...): select the text and the shape"
 msgstr ""
 
 msgid "Settings"
@@ -1142,6 +1196,9 @@ msgstr ""
 msgid "Text"
 msgstr ""
 
+msgid "Text on a path"
+msgstr ""
+
 msgid "Text or address"
 msgstr ""
 
@@ -1170,6 +1227,15 @@ msgstr ""
 msgid "The port speed must be a whole number."
 msgstr ""
 
+msgid "The text on the other side of the path (inside a circle), still readable"
+msgstr ""
+
+#, python-format
+msgid ""
+"The text runs along \"%s\"; that shape stays as a guide and is not cut "
+"(tick it in the list to cut it too)."
+msgstr ""
+
 msgid "The text; Enter applies it"
 msgstr ""
 
@@ -1192,6 +1258,12 @@ msgid "Transform"
 msgstr ""
 
 msgid "Triangle"
+msgstr ""
+
+msgid "Turn the selection by the angle (Enter in the field does the same)"
+msgstr ""
+
+msgid "Turn the selection by this angle: plus = counter-clockwise"
 msgstr ""
 
 msgid ""
@@ -1243,8 +1315,8 @@ msgid "Vintyl projects (*.vintyl)"
 msgstr ""
 
 msgid ""
-"Vintyl projects and SVG files (*.vintyl *.svg);;Vintyl projects "
-"(*.vintyl);;SVG files (*.svg)"
+"Vintyl projects and drawings (*.vintyl *.svg *.dxf);;Vintyl projects "
+"(*.vintyl);;SVG files (*.svg);;DXF files (*.dxf)"
 msgstr ""
 
 msgid "Vinyl kept between the shapes and the outline"
@@ -1268,6 +1340,9 @@ msgid ""
 "Where the pen's stroke lies against the line of a closed shape. Outside: "
 "the shape keeps its exact size inside the stroke; inside: the stroke "
 "stays within the shape. Open lines are drawn on the line."
+msgstr ""
+
+msgid "Where the text starts along its path, mm"
 msgstr ""
 
 msgid "Width"
@@ -1330,6 +1405,9 @@ msgstr ""
 msgid "before the origin (along the material)"
 msgstr ""
 
+msgid "centimetres"
+msgstr ""
+
 msgid "centre"
 msgstr ""
 
@@ -1344,6 +1422,9 @@ msgid "design"
 msgstr ""
 
 msgid "everything at once"
+msgstr ""
+
+msgid "feet"
 msgstr ""
 
 msgid "from the panel"
@@ -1361,6 +1442,9 @@ msgstr ""
 msgid "in line"
 msgstr ""
 
+msgid "inches"
+msgstr ""
+
 msgid "inside the line"
 msgstr ""
 
@@ -1373,7 +1457,16 @@ msgstr ""
 msgid "medium (15%)"
 msgstr ""
 
+msgid "metres"
+msgstr ""
+
 msgid "middle"
+msgstr ""
+
+msgid "millimetres"
+msgstr ""
+
+msgid "mils (1/1000 inch)"
 msgstr ""
 
 msgid "new project"
@@ -1392,6 +1485,9 @@ msgid "on line"
 msgstr ""
 
 msgid "on the line"
+msgstr ""
+
+msgid "other side"
 msgstr ""
 
 msgid "outside the line"
@@ -1420,6 +1516,10 @@ msgid "sharp"
 msgstr ""
 
 msgid "software (XON/XOFF)"
+msgstr ""
+
+#, python-format
+msgid "some entities were left out: %s"
 msgstr ""
 
 msgid "swap X and Y"

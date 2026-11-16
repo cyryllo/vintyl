@@ -80,6 +80,8 @@ class Element:
 
     def move_by(self, dx, dy):
         self.paths = curves.translate(self.paths, dx, dy)
+        if self.spec and self.spec.get("path"):         # a text on a path: its path goes with it
+            self.spec = dict(self.spec, path=[(x + dx, y + dy) for x, y in self.spec["path"]])
 
     def move_to(self, left, top):
         xmin, _xmax, ymin, _ymax = self.bounds
