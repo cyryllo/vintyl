@@ -76,3 +76,27 @@ def test_a_damaged_fill_is_refused():
     data["elements"][0]["fill"] = {"pattern": "nonsense", "spacing": 1}
     with pytest.raises(project.ProjectError):
         project.from_dict(data)
+
+
+@pytest.mark.parametrize("code", __import__("vintyl.core.tile", fromlist=["MOTIFS"]).MOTIFS)
+def test_every_motif_tiles_whole_inside_with_its_margin(code):
+    from vintyl.core import curves, tile
+    from vintyl.core.knife import point_in_polygon
+    circle = __import__("vintyl.core.shapes", fromlist=["ellipse"]).ellipse(0, 0, 80, 80)
+    paths, n = tile.tile(circle, tile.motif(code), 6.0, 2.0, True, 1.5)
+    assert n > 10
+    ring = curves.flatten(circle, 0.01)[0]
+    for poly in curves.flatten(paths, 0.05):
+        for x, y in poly:
+            assert point_in_polygon((x, y), ring)
+            assert (x - 40) ** 2 + (y - 40) ** 2 <= (40 - 1.5 + 0.05) ** 2      # the margin kept
+
+
+def test_a_hole_in_the_outline_stays_free():
+    from vintyl.core import curves, shapes, tile
+    outline = shapes.rectangle(0, 0, 60, 60) + shapes.rectangle(20, 20, 40, 40)
+    paths, n = tile.tile(outline, tile.motif("circle"), 4.0, 2.0, False, 1.0)
+    assert n > 0
+    for poly in curves.flatten(paths, 0.05):
+        for x, y in poly:
+            assert not (19.0 < x < 41.0 and 19.0 < y < 41.0)

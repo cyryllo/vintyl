@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-16 21:13+0100\n"
+"POT-Creation-Date: 2026-11-16 21:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,6 +30,12 @@ msgstr[1] ""
 #, python-format
 msgid "%d node selected"
 msgid_plural "%d nodes selected"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "%d shape placed."
+msgid_plural "%d shapes placed."
 msgstr[0] ""
 msgstr[1] ""
 
@@ -166,6 +172,9 @@ msgid "Centres across"
 msgstr ""
 
 msgid "Centres up and down"
+msgstr ""
+
+msgid "Circle"
 msgstr ""
 
 msgid "Circles"
@@ -328,6 +337,9 @@ msgstr ""
 msgid "Every key in one window"
 msgstr ""
 
+msgid "Every second row shifted"
+msgstr ""
+
 msgid "Exclusion"
 msgstr ""
 
@@ -341,6 +353,11 @@ msgid "File"
 msgstr ""
 
 msgid "Fill"
+msgstr ""
+
+msgid ""
+"Fill the selected closed shape with rows of small shapes (dots, stars, "
+"hearts...), each one whole, to be cut out as holes"
 msgstr ""
 
 msgid ""
@@ -380,6 +397,9 @@ msgstr ""
 msgid "Freehand: draw with the button held; ending at the start closes it"
 msgstr ""
 
+msgid "Gap"
+msgstr ""
+
 msgid "Gear"
 msgstr ""
 
@@ -413,6 +433,9 @@ msgstr ""
 msgid "Height (mm)"
 msgstr ""
 
+msgid "Hexagon"
+msgstr ""
+
 msgid "Hold Alt to drag without any snapping for a moment"
 msgstr ""
 
@@ -426,6 +449,9 @@ msgid ""
 msgstr ""
 
 msgid "Honeycomb"
+msgstr ""
+
+msgid "How big each shape is (its longer side)"
 msgstr ""
 
 msgid ""
@@ -566,6 +592,9 @@ msgstr ""
 msgid "No port is set. Choose the cutter's port in the panel."
 msgstr ""
 
+msgid "No shape fits inside: make them smaller or the margin narrower."
+msgstr ""
+
 msgid "Nodes"
 msgstr ""
 
@@ -584,6 +613,9 @@ msgid "Nothing to split: one outline, no group."
 msgstr ""
 
 msgid "Offset"
+msgstr ""
+
+msgid "Only shapes that fit whole are placed; they are cut before the outline."
 msgstr ""
 
 msgid ""
@@ -617,6 +649,9 @@ msgid "Paste"
 msgstr ""
 
 msgid "Pattern"
+msgstr ""
+
+msgid "Pattern of shapes"
 msgstr ""
 
 msgid "Pen"
@@ -766,6 +801,9 @@ msgstr ""
 msgid "Select"
 msgstr ""
 
+msgid "Select a closed shape to fill with a pattern of shapes."
+msgstr ""
+
 msgid "Select a closed shape to fill."
 msgstr ""
 
@@ -898,6 +936,9 @@ msgstr ""
 msgid "Spread up and down"
 msgstr ""
 
+msgid "Square"
+msgstr ""
+
 msgid "Star"
 msgstr ""
 
@@ -980,6 +1021,9 @@ msgstr ""
 msgid "Transform"
 msgstr ""
 
+msgid "Triangle"
+msgstr ""
+
 msgid "Type the text in the options bar first."
 msgstr ""
 
@@ -1020,6 +1064,12 @@ msgstr ""
 msgid ""
 "Vintyl projects and SVG files (*.vintyl *.svg);;Vintyl projects "
 "(*.vintyl);;SVG files (*.svg)"
+msgstr ""
+
+msgid "Vinyl kept between the shapes and the outline"
+msgstr ""
+
+msgid "Vinyl left between the shapes; below about 1.5 mm it tears when weeding"
 msgstr ""
 
 msgid "Waves"

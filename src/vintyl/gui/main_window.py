@@ -252,7 +252,10 @@ class MainWindow(QMainWindow):
         self.act_fill = self._action(_("Fill"), lambda: self.fill_selected(), "bucket-droplet", "Shift+F",
                                      _("Fill the selected closed shapes with a pattern of lines, drawn "
                                        "with the pen (only when the tool is the pen)"))
-        self.selection_actions = [self.act_offset, self.act_fill, self.act_cut, self.act_copy, self.act_group, self.act_ungroup,
+        self.act_tile = self._action(_("Pattern of shapes"), lambda: self.tile_selected(), "rosette", "Shift+T",
+                                     _("Fill the selected closed shape with rows of small shapes (dots, stars, "
+                                       "hearts...), each one whole, to be cut out as holes"))
+        self.selection_actions = [self.act_offset, self.act_fill, self.act_tile, self.act_cut, self.act_copy, self.act_group, self.act_ungroup,
                                   self.act_distribute_across, self.act_distribute_up] + \
             list(self.act_boolean.values()) + [
             self.act_duplicate, self.act_rot_left, self.act_rot_right,
@@ -292,7 +295,7 @@ class MainWindow(QMainWindow):
         m = mb.addMenu(_("&Object"))
         for a in [self.act_group, self.act_ungroup, None] + list(self.act_boolean.values()) + [None] + \
                 [self.act_rot_left, self.act_rot_right, self.act_mirror_h, self.act_mirror_v, None] + \
-                list(self.act_align.values()) + [None, self.act_offset, self.act_fill]:
+                list(self.act_align.values()) + [None, self.act_offset, self.act_tile, self.act_fill]:
             m.addSeparator() if a is None else m.addAction(a)
         m = mb.addMenu(_("&Cutter"))
         for a in (self.act_connect, self.act_profile):
@@ -410,7 +413,8 @@ class MainWindow(QMainWindow):
         ("offset", N_("Offset"), "box-padding", [
             ("act", "act_offset", N_("Offset")),
         ]),
-        ("fill", N_("Fill"), "bucket-droplet", [
+        ("fill", N_("Fill"), "rosette", [
+            ("act", "act_tile", N_("Pattern of shapes")),
             ("act", "act_fill", N_("Fill")),
         ]),
     ]
@@ -469,7 +473,8 @@ class MainWindow(QMainWindow):
     def show_category(self, cat):
         """A click on a category: one tool takes it at once; more open a square
         of icons beside the button. Returns the square (or None)."""
-        entries = self.category_entries[cat]
+        # an action not offered now (the pen's fill with the knife) is left out
+        entries = [e for e in self.category_entries[cat] if e[0] != "act" or getattr(self, e[1]).isVisible()]
         if len(entries) == 1 and entries[0][0] == "tool":
             self.set_tool(entries[0][1])
             return None
@@ -980,7 +985,6 @@ class MainWindow(QMainWindow):
         self.frame_row.setVisible(not pen)
         # the fill is for drawing: with the knife it is not offered (it would cut the vinyl into strips)
         self.act_fill.setVisible(pen)
-        self.category_buttons["fill"].setVisible(pen)
         self.view.pen_mode = pen
         self.act_knife.setText(_("Pen path") if pen else _("Knife path"))
         self.act_knife.setIconText(self.act_knife.text())
@@ -1429,6 +1433,84 @@ class MainWindow(QMainWindow):
                 "angle": float(values.get("angle", 0.0)), "margin": float(values.get("margin", 0.0))}
         self.refresh()
         return chosen
+
+    # ---- a pattern of shapes (for the knife and the pen) ------------------------------------------
+    def tile_selected(self, values=None):
+        """Rows of small shapes inside the selected closed shape, as a new
+        element grouped with it. Returns the new element (or None)."""
+        from vintyl.core import tile
+        chosen = [e for e in self._chosen() if any(sub["closed"] for sub in e.paths)]
+        if not chosen:
+            self.statusBar().showMessage(_("Select a closed shape to fill with a pattern of shapes."), 6000)
+            return None
+        if values is None:
+            values = self._ask_tile()
+            if values is None:
+                return None
+        outline = [sub for e in chosen for sub in e.paths]
+        paths, count = tile.tile(outline, tile.motif(values["motif"]), values["size"], values["gap"],
+                                 values["stagger"], values["margin"])
+        if not count:
+            self.statusBar().showMessage(_("No shape fits inside: make them smaller or the margin narrower."),
+                                         8000)
+            return None
+        self._checkpoint()
+        import uuid
+        gid = chosen[0].group or uuid.uuid4().hex[:8]
+        for e in chosen:                          # the pattern moves with its shape
+            e.group = gid
+        new = Element(self._name(_("Pattern")), paths, chosen[0].cut, group=gid)
+        i = max(self.design.elements.index(e) for e in chosen)
+        self.design.elements.insert(i, new)        # in the list before its shape: cut before it
+        self.selected = new
+        self.selection = [new]
+        self.refresh()
+        self.statusBar().showMessage(ngettext("%d shape placed.", "%d shapes placed.", count) % count, 6000)
+        return new
+
+    def _ask_tile(self):
+        from PySide6.QtWidgets import QDialog, QDialogButtonBox
+        from vintyl.core import tile
+        dlg = QDialog(self)
+        dlg.setWindowTitle(_("Pattern of shapes"))
+        form = QFormLayout(dlg)
+        st = self.settings
+        motif = QComboBox()
+        motif.setIconSize(QSize(22, 22))
+        for code in tile.MOTIFS:
+            name = tile.BASIC[code][0] if code in tile.BASIC else ready.READY[code][0]
+            motif.addItem(shape_icon(tile.motif(code), 22), _(name), code)
+        motif.setCurrentIndex(max(0, motif.findData(st.value("tile/motif", "circle"))))
+        size = _spin(500.0, 1, " mm", minimum=0.5)
+        size.setValue(float(st.value("tile/size", 5.0)))
+        size.setToolTip(_("How big each shape is (its longer side)"))
+        gap = _spin(500.0, 1, " mm", minimum=0.0)
+        gap.setValue(float(st.value("tile/gap", 3.0)))
+        gap.setToolTip(_("Vinyl left between the shapes; below about 1.5 mm it tears when weeding"))
+        margin = _spin(100.0, 1, " mm", minimum=0.0)
+        margin.setValue(float(st.value("tile/margin", 2.0)))
+        margin.setToolTip(_("Vinyl kept between the shapes and the outline"))
+        stagger = QCheckBox(_("Every second row shifted"))
+        stagger.setChecked(st.value("tile/stagger", "true") == "true")
+        form.addRow(_("Shape"), motif)
+        form.addRow(_("Size"), size)
+        form.addRow(_("Gap"), gap)
+        form.addRow(_("Margin"), margin)
+        form.addRow(stagger)
+        note = QLabel(_("Only shapes that fit whole are placed; they are cut before the outline."))
+        note.setWordWrap(True)
+        form.addRow(note)
+        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        buttons.accepted.connect(dlg.accept)
+        buttons.rejected.connect(dlg.reject)
+        form.addRow(buttons)
+        if dlg.exec() != QDialog.Accepted:
+            return None
+        values = {"motif": motif.currentData(), "size": size.value(), "gap": gap.value(),
+                  "margin": margin.value(), "stagger": stagger.isChecked()}
+        for k, v in values.items():
+            st.setValue("tile/" + k, str(v).lower() if isinstance(v, bool) else v)
+        return values
 
     def _ask_fill(self, current=None):
         from PySide6.QtWidgets import QDialog, QDialogButtonBox

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-16 21:13+0100\n"
+"POT-Creation-Date: 2026-11-16 21:26+0100\n"
 "PO-Revision-Date: 2026-11-15 17:49+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -36,6 +36,13 @@ msgid_plural "%d nodes selected"
 msgstr[0] "Zaznaczono %d węzeł"
 msgstr[1] "Zaznaczono %d węzły"
 msgstr[2] "Zaznaczono %d węzłów"
+
+#, python-format
+msgid "%d shape placed."
+msgid_plural "%d shapes placed."
+msgstr[0] "Wstawiono %d kształt."
+msgstr[1] "Wstawiono %d kształty."
+msgstr[2] "Wstawiono %d kształtów."
 
 #, python-format
 msgid ""
@@ -181,6 +188,9 @@ msgstr "Środki w poziomie"
 
 msgid "Centres up and down"
 msgstr "Środki w pionie"
+
+msgid "Circle"
+msgstr "Koło"
 
 msgid "Circles"
 msgstr "Okręgi"
@@ -351,6 +361,9 @@ msgstr "Korekcja błędów"
 msgid "Every key in one window"
 msgstr "Wszystkie skróty w jednym oknie"
 
+msgid "Every second row shifted"
+msgstr "Co drugi rząd przesunięty"
+
 msgid "Exclusion"
 msgstr "Wykluczenie"
 
@@ -365,6 +378,13 @@ msgstr "Plik"
 
 msgid "Fill"
 msgstr "Wypełnienie"
+
+msgid ""
+"Fill the selected closed shape with rows of small shapes (dots, stars, "
+"hearts...), each one whole, to be cut out as holes"
+msgstr ""
+"Wypełnij zaznaczony zamknięty kształt rzędami małych kształtów (kropki, "
+"gwiazdki, serduszka...), każdy w całości, do wycięcia jako otwory"
 
 msgid ""
 "Fill the selected closed shapes with a pattern of lines, drawn with the "
@@ -409,6 +429,9 @@ msgstr ""
 "Odręcznie: rysuj z wciśniętym przyciskiem; skończenie przy początku "
 "zamyka kształt"
 
+msgid "Gap"
+msgstr "Odstęp"
+
 msgid "Gear"
 msgstr "Koło zębate"
 
@@ -443,6 +466,9 @@ msgstr "Wysokość"
 msgid "Height (mm)"
 msgstr "Wysokość (mm)"
 
+msgid "Hexagon"
+msgstr "Sześciokąt"
+
 msgid "Hold Alt to drag without any snapping for a moment"
 msgstr "Przytrzymaj Alt, żeby przez chwilę przesuwać bez przyciągania"
 
@@ -460,6 +486,9 @@ msgstr ""
 
 msgid "Honeycomb"
 msgstr "Plaster miodu"
+
+msgid "How big each shape is (its longer side)"
+msgstr "Jak duży jest każdy kształt (jego dłuższy bok)"
 
 msgid ""
 "How far the blade tip trails the holder's axis. A 45° blade: usually "
@@ -611,6 +640,9 @@ msgstr ""
 msgid "No port is set. Choose the cutter's port in the panel."
 msgstr "Nie ustawiono portu. Wybierz port plotera w panelu."
 
+msgid "No shape fits inside: make them smaller or the margin narrower."
+msgstr "Żaden kształt się nie mieści: zmniejsz je albo zwęź margines."
+
 msgid "Nodes"
 msgstr "Węzły"
 
@@ -632,6 +664,11 @@ msgstr "Nie ma czego rozdzielać: jeden kontur, bez grupy."
 
 msgid "Offset"
 msgstr "Odsunięcie"
+
+msgid "Only shapes that fit whole are placed; they are cut before the outline."
+msgstr ""
+"Wstawiane są tylko kształty, które mieszczą się w całości; są cięte przed"
+" obrysem."
 
 msgid ""
 "Only the outer outline stays, with no holes (in O, A, a ring): a solid "
@@ -667,6 +704,9 @@ msgstr "Wklej"
 
 msgid "Pattern"
 msgstr "Wzór"
+
+msgid "Pattern of shapes"
+msgstr "Wzór z kształtów"
 
 msgid "Pen"
 msgstr "Pióro"
@@ -820,6 +860,9 @@ msgstr "Zapisano %s (%d bajtów)"
 
 msgid "Select"
 msgstr "Zaznacz"
+
+msgid "Select a closed shape to fill with a pattern of shapes."
+msgstr "Zaznacz zamknięty kształt, który ma dostać wzór z kształtów."
 
 msgid "Select a closed shape to fill."
 msgstr "Zaznacz zamknięty kształt do wypełnienia."
@@ -981,6 +1024,9 @@ msgstr ""
 msgid "Spread up and down"
 msgstr "Rozmieść w pionie"
 
+msgid "Square"
+msgstr "Kwadrat"
+
 msgid "Star"
 msgstr "Gwiazda"
 
@@ -1072,6 +1118,9 @@ msgstr "Górne krawędzie"
 msgid "Transform"
 msgstr "Przekształć"
 
+msgid "Triangle"
+msgstr "Trójkąt"
+
 msgid "Type the text in the options bar first."
 msgstr "Najpierw wpisz napis w pasku opcji."
 
@@ -1120,6 +1169,14 @@ msgid ""
 msgstr ""
 "Projekty Vintyl i pliki SVG (*.vintyl *.svg);;Projekty Vintyl "
 "(*.vintyl);;Pliki SVG (*.svg)"
+
+msgid "Vinyl kept between the shapes and the outline"
+msgstr "Folia zostawiona między kształtami a obrysem"
+
+msgid "Vinyl left between the shapes; below about 1.5 mm it tears when weeding"
+msgstr ""
+"Folia zostawiona między kształtami; poniżej ok. 1,5 mm rwie się przy "
+"wybieraniu"
 
 msgid "Waves"
 msgstr "Fale"

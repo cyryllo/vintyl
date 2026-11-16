@@ -1016,10 +1016,10 @@ def test_a_fill_is_offered_and_drawn_only_with_the_pen(win):
     win._on_drawn("rectangle", QRectF(-60, -40, 20, 10))
     lines = {"pattern": "lines", "spacing": 1.0, "angle": 0.0, "margin": 0.0}
     # the knife: no fill tool (it would cut the vinyl into strips)
-    assert not win.act_fill.isVisible() and win.category_buttons["fill"].isHidden()
+    assert not win.act_fill.isVisible()
     assert win.fill_selected(lines) == [] and win.design.elements[0].fill is None
     win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
-    assert win.act_fill.isVisible() and not win.category_buttons["fill"].isHidden()
+    assert win.act_fill.isVisible()
     assert win.cutter_form.isRowVisible(win.pen_note)
     filled = win.fill_selected(lines)
     assert filled and filled[0].fill["pattern"] == "lines"
@@ -1034,3 +1034,35 @@ def test_a_fill_is_offered_and_drawn_only_with_the_pen(win):
     assert win.design.elements[0].fill is None
     win.fill_selected({"pattern": None})
     assert win.design.elements[0].fill is None
+
+
+def test_a_pattern_of_shapes_is_cut_with_the_knife_before_its_outline(win):
+    """Stars inside a rectangle: whole ones only, a margin from the outline,
+    grouped with it, cut before it."""
+    win._on_drawn("rectangle", QRectF(-120, -80, 100, 60))
+    box = win.selected
+    # with the knife the Fill category offers only the pattern of shapes (no popup, it asks at once)
+    asked = []
+    win._ask_tile = lambda: asked.append(True) or None
+    assert win.show_category("fill") is None and asked
+    new = win.tile_selected({"motif": "star", "size": 8.0, "gap": 3.0, "margin": 2.0, "stagger": True})
+    assert new is not None and new.group and new.group == box.group
+    assert win.design.elements.index(new) < win.design.elements.index(box)
+    assert len(new.paths) > 20
+    xmin, xmax, ymin, ymax = new.bounds
+    assert xmin >= -120 + 2 - 1e-6 and xmax <= -20 - 2 + 1e-6
+    assert ymin >= -80 + 2 - 1e-6 and ymax <= -20 - 2 + 1e-6
+    job = win.build()
+    assert job.cut_mm > 200
+    # in the pen mode the square offers both
+    win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
+    popup = win.show_category("fill")
+    assert [b.text() for b in popup.findChildren(QToolButton)] == ["Pattern of shapes", "Fill"]
+    popup.close()
+
+
+def test_a_pattern_needs_room(win, messages):
+    win._on_drawn("rectangle", QRectF(-60, -40, 10, 10))
+    assert win.tile_selected({"motif": "circle", "size": 20.0, "gap": 2.0, "margin": 1.0,
+                              "stagger": False}) is None
+    assert len(win.design.elements) == 1
