@@ -21,7 +21,8 @@ number jumps from 0.2 to 0.8: the cutters are tested and cut cleanly, and
   in the left panel, with the cutter's state and what to do when its port cannot be used.
 - The selection bar shows the type and name of what is selected; a text's fields have a second row;
   the ruler's result is shown in it too. Fits a 1366 × 768 screen in every state.
-- The element list shows the cutting order and scissors to leave an element uncut.
+- The element list shows the cutting order and scissors to leave an element uncut; the right button
+  on it opens the same menu as on the sheet (duplicate, delete, cutting order...).
 - The sheet has rulers in mm, sizes beside the selection and zoom buttons.
 - Start, Save .hpgl and the knife test stay at the bottom of the left panel, always in sight;
   Stop takes Start's place while sending, with the percentage sent.

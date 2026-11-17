@@ -1239,6 +1239,9 @@ class MainWindow(QMainWindow):
         self.element_list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.element_list.itemChanged.connect(self._list_item_changed)
         self.element_list.currentRowChanged.connect(self._list_row_changed)
+        # the right button: the same menu as on the sheet (duplicate, delete...)
+        self.element_list.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.element_list.customContextMenuRequested.connect(lambda pos: self.list_context_menu(pos))
         lay.addWidget(self.element_list, 1)
         self.empty_hint = QLabel(_("Open an SVG or DXF file, or draw a shape with the tools on the right."))
         self.empty_hint.setObjectName("hint")
@@ -3054,6 +3057,20 @@ class MainWindow(QMainWindow):
         self._checkpoint()
         e.cut = item.checkState() == Qt.Checked
         self.refresh()
+
+    def list_context_menu(self, pos, show=True):
+        """The right button on the element list (pos: in its viewport): the
+        row's element is selected (a selection it is part of stays) and the
+        same menu as on the sheet opens; below the rows, the sheet's menu.
+        Returns the menu."""
+        item = self.element_list.itemAt(pos)
+        element = None
+        if item is not None:
+            element = self.design.elements[self.element_list.row(item)]
+            if element not in (self.selection or [self.selected]):
+                self.element_list.setCurrentRow(self.element_list.row(item))
+                self._enable_selection_actions()
+        return self.show_context_menu(element, self.element_list.viewport().mapToGlobal(pos), show)
 
     def _list_row_changed(self, row):
         if self._updating or not 0 <= row < len(self.design.elements):

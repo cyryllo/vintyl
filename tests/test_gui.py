@@ -1922,3 +1922,24 @@ def test_to_the_origin_is_in_the_menus_and_on_the_ribbon(win):
     win.design.elements.clear()
     win.refresh()
     assert win.move_to_origin() is None                         # an empty design: nothing to move
+
+
+def test_the_element_list_has_the_right_click_menu(win):
+    """Right button on a row: that element is selected and the menu offers
+    Duplicate and Delete (as on the sheet); they act on it."""
+    win.show()
+    win._on_drawn("rectangle", QRectF(-100, -60, 40, 20))
+    win._on_drawn("ellipse", QRectF(-50, -60, 20, 20))
+    first = win.design.elements[0]
+    lst = win.element_list
+    pos = lst.visualItemRect(lst.item(0)).center()
+    menu = win.list_context_menu(pos, show=False)
+    assert win.selected is first
+    texts = [a.text().replace("&", "") for a in menu.actions()]
+    assert "Duplicate" in texts and "Delete" in texts
+    [a for a in menu.actions() if a.text().replace("&", "") == "Duplicate"][0].trigger()
+    assert len(win.design.elements) == 3
+    win.selected, win.selection = first, [first]
+    menu = win.list_context_menu(lst.visualItemRect(lst.item(0)).center(), show=False)
+    [a for a in menu.actions() if a.text().replace("&", "") == "Delete"][0].trigger()
+    assert first not in win.design.elements and len(win.design.elements) == 2
