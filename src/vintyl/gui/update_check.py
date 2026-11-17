@@ -11,7 +11,7 @@ Licensed under the GNU General Public License v3 or later. See LICENSE.
 """
 from PySide6.QtCore import QThread, QUrl, Signal
 from PySide6.QtGui import QDesktopServices
-from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton
+from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton, QWidget
 
 from vintyl.core import updates
 from vintyl.gui import _, icons, theme
@@ -34,15 +34,22 @@ class UpdateCheck(QThread):
         self.done.emit(release, "")
 
 
-class UpdateBar(QFrame):
-    """'Vintyl 0.1.0a2 is available': see it, later, skip this version."""
+class UpdateBar(QWidget):
+    """'Vintyl 0.1.0a2 is available': see it, later, skip this version. The
+    blue box sits in this widget with the same gap all round (a margin in the
+    style sheet is not counted by the window's layout: the box touched the
+    bar below it)."""
     skip = Signal(str)                               # the version not to remind about
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setObjectName("update_bar")
         self.release = None
-        row = QHBoxLayout(self)
+        around = QHBoxLayout(self)
+        around.setContentsMargins(12, 8, 12, 8)
+        box = QFrame()
+        box.setObjectName("update_bar")
+        around.addWidget(box)
+        row = QHBoxLayout(box)
         row.setContentsMargins(12, 6, 8, 6)
         row.setSpacing(8)
         icon = QLabel()

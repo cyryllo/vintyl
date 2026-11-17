@@ -97,8 +97,7 @@ QToolBar#main_toolbar QToolButton:disabled { color: $disabled_text; }
 QLabel#ribbon_caption { color: $muted; font-size: 11px; padding-bottom: 1px; }
 QFrame#ribbon_separator { color: $border; margin: 4px 2px; }
 QWidget#options_bar { background: $bar; border-bottom: 1px solid $border; }
-QFrame#update_bar { background: $info_bg; border: 1px solid $info_border; border-radius: 8px;
-    margin: 8px 12px 0 12px; }
+QFrame#update_bar { background: $info_bg; border: 1px solid $info_border; border-radius: 8px; }
 QFrame#update_bar QLabel { color: $info_ink; }
 QLabel#node_hint, QLabel#muted, QLabel#hint, QLabel#sel_hint { color: $muted; }
 QLabel#sel_name { font-weight: 600; color: $ink; }
