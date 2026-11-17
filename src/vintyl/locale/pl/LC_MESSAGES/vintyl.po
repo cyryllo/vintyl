@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 18:08+0100\n"
+"POT-Creation-Date: 2026-11-17 18:14+0100\n"
 "PO-Revision-Date: 2026-11-15 17:49+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -263,6 +263,9 @@ msgid ""
 msgstr ""
 "Profil wbudowany: zmiany są zapisywane jako Twoja kopia; „Przywróć "
 "ustawienia fabryczne” przywraca oryginał."
+
+msgid "Cancel"
+msgstr "Anuluj"
 
 #, python-format
 msgid "Cannot open %s: %s"
@@ -1013,6 +1016,9 @@ msgstr "Teraz: nie wybrano portu."
 #, python-format
 msgid "Now: you may use %s."
 msgstr "Teraz: możesz używać %s."
+
+msgid "OK"
+msgstr "OK"
 
 msgid ""
 "Off: the cutter takes them from its panel only (as the VEVOR KI-375A); "

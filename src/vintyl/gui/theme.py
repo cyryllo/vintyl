@@ -17,25 +17,112 @@ from vintyl.i18n import N_
 THEMES = [("light", N_("Light")), ("dark", N_("Dark")), ("system", N_("As the system"))]
 DEFAULT = "light"
 
+# The colours of the window (UI v2, "Vintyl - projekt okna", page "Wersja 2").
+# Light: as designed; dark: chosen from dark_palette() below so that text keeps
+# a contrast of at least 4.5:1 (tests/test_widgets.py checks the pairs).
+# The sheet stays light in both: it stands for the vinyl.
 TOKENS = {
-    "light": {"bar": "#eef0f3", "bar_border": "#c4c9d0", "update_bg": "#e3f2fd", "update_border": "#90caf9",
-              "hint": "#4b5563", "caption": "#6b7280", "separator": "#c4c9d0", "ink": "#2b2f36",
-              "muted": "#6b7280", "error": "#b91c1c", "ok": "#15803d"},
-    "dark": {"bar": "#2b2f35", "bar_border": "#1b1e22", "update_bg": "#1d3a5c", "update_border": "#2f6aa8",
-             "hint": "#b4bac3", "caption": "#9aa1ab", "separator": "#4a505a", "ink": "#d9dce1",
-             "muted": "#9aa1ab", "error": "#ef5350", "ok": "#66bb6a"},
+    "light": {
+        "window": "#f4f5f7",          # dialog background
+        "panel": "#ffffff",           # ribbon, left panel, tool strip, cards
+        "bar": "#fafbfc",             # the selection bar
+        "border": "#dfe2e7",          # lines between areas, card frames
+        "field_border": "#cfd4dc",    # frames of fields and buttons
+        "ink": "#1f2430",             # text and icons
+        "ink_2": "#3b4352",           # field labels
+        "muted": "#5b6472",           # hints, group captions
+        "disabled_icon": "#a3aab5",
+        "disabled_text": "#6b7480",
+        "accent": "#be185d",          # Start, the main button, a switch that is on, cut lines
+        "accent_soft": "#fce7f1",     # the chosen tool, the selected row, a button that is on
+        "accent_ink": "#9d174d",
+        "on_accent": "#ffffff",       # text on the accent (and on stop, danger)
+        "well": "#eef0f3",            # behind a group of choice buttons
+        "stat": "#f4f5f7",            # tiles with numbers
+        "canvas": "#3d4350",          # round the sheet
+        "sheet": "#f7f8fa",
+        "selection": "#2563eb",
+        "info_bg": "#eef2ff", "info_ink": "#1e3a8a",
+        "warn_bg": "#fef3c7", "warn_ink": "#7c2d12",
+        "ok": "#15803d", "ok_bg": "#dcfce7",
+        "danger": "#b91c1c",
+        "switch_off": "#8c95a3",
+        "stop": "#1f2430",
+        # older names, still used by some widgets
+        "error": "#b91c1c", "hint": "#5b6472", "caption": "#5b6472", "separator": "#dfe2e7",
+        "update_bg": "#eef2ff", "update_border": "#c7d2fe", "bar_border": "#dfe2e7",
+    },
+    "dark": {
+        "window": "#26292e",
+        "panel": "#30343a",
+        "bar": "#2b2f34",
+        "border": "#41464e",
+        "field_border": "#555b66",
+        "ink": "#e3e6ea",
+        "ink_2": "#c9ced6",
+        "muted": "#a7afba",
+        "disabled_icon": "#636a75",
+        "disabled_text": "#99a1ad",
+        "accent": "#be185d",
+        "accent_soft": "#4a1d33",
+        "accent_ink": "#f9a8d4",
+        "on_accent": "#ffffff",
+        "well": "#24272b",
+        "stat": "#26292e",
+        "canvas": "#1f2227",
+        "sheet": "#f7f8fa",
+        "selection": "#2563eb",
+        "info_bg": "#1e2a4a", "info_ink": "#c7d2fe",
+        "warn_bg": "#422006", "warn_ink": "#fde68a",
+        "ok": "#4ade80", "ok_bg": "#14361f",
+        "danger": "#b91c1c",
+        "switch_off": "#6b7280",
+        "stop": "#4b5563",
+        "error": "#f87171", "hint": "#a7afba", "caption": "#a7afba", "separator": "#41464e",
+        "update_bg": "#1e2a4a", "update_border": "#2f6aa8", "bar_border": "#41464e",
+    },
 }
 
+# Sizes (UI v2): fields 30 px high, rounded 6 px; buttons 36 px, rounded 8 px;
+# cards rounded 8 px; Start 48 px. Main text 13 px, ribbon captions 11 px, hints 12 px.
 STYLE = Template("""
-QToolBar#main_toolbar { spacing: 1px; padding: 2px; }
+QWidget { font-size: 13px; }
+QDialog { background: $window; }
+QToolBar#main_toolbar { background: $panel; border-bottom: 1px solid $border; spacing: 1px; padding: 2px; }
 QToolBar#main_toolbar QToolButton { padding: 2px 3px; font-size: 11px; }
-QLabel#ribbon_caption { color: $caption; font-size: 10px; padding-bottom: 1px; }
-QFrame#ribbon_separator { color: $separator; margin: 4px 2px; }
-QWidget#options_bar { background: $bar; border-bottom: 1px solid $bar_border; }
-QFrame#update_bar { background: $update_bg; border-bottom: 1px solid $update_border; }
-QLabel#node_hint { color: $hint; }
-QLabel#muted { color: $muted; }
-QPushButton#start:enabled { background: #be185d; color: white; font-weight: bold; }
+QLabel#ribbon_caption { color: $muted; font-size: 11px; padding-bottom: 1px; }
+QFrame#ribbon_separator { color: $border; margin: 4px 2px; }
+QWidget#options_bar { background: $bar; border-bottom: 1px solid $border; }
+QFrame#update_bar { background: $info_bg; border-bottom: 1px solid $update_border; }
+QFrame#update_bar QLabel { color: $info_ink; }
+QLabel#node_hint, QLabel#muted, QLabel#hint { color: $muted; }
+QLabel#hint { font-size: 12px; }
+QFrame#card { background: $panel; border: 1px solid $border; border-radius: 8px; }
+QFrame#card QLabel { background: transparent; }
+QLabel#card_title { font-weight: 600; color: $ink; }
+QLabel#field_label { color: $ink_2; }
+QFrame#footer { background: $panel; border-top: 1px solid $border; }
+QLineEdit, QAbstractSpinBox, QComboBox {
+    min-height: 28px; padding: 0 6px; border: 1px solid $field_border; border-radius: 6px;
+    background: $panel; color: $ink; }
+QComboBox::drop-down { border: 0; width: 22px; }
+QComboBox::down-arrow { image: url($chevron); width: 12px; height: 12px; }
+QAbstractSpinBox::up-button, QAbstractSpinBox::down-button { width: 0; border: 0; }
+QPushButton { min-height: 34px; padding: 0 14px; border: 1px solid $field_border; border-radius: 8px;
+    background: $panel; color: $ink; }
+QPushButton:hover { border-color: $muted; }
+QPushButton:disabled { color: $disabled_text; }
+QPushButton#primary, QPushButton#start { background: $accent; color: $on_accent; border: 0; font-weight: 600; }
+QPushButton#start { min-height: 46px; }
+QPushButton#danger { background: $danger; color: $on_accent; border: 0; font-weight: 600; }
+QPushButton#stop { background: $stop; color: $on_accent; border: 0; font-weight: 600; min-height: 46px; }
+QPushButton#primary:disabled, QPushButton#start:disabled { background: $well; color: $disabled_text; }
+QWidget#segmented { background: $well; border-radius: 8px; }
+QWidget#segmented QToolButton { border: 1px solid transparent; border-radius: 6px; background: transparent;
+    color: $ink_2; padding: 4px 10px; min-height: 22px; }
+QWidget#segmented QToolButton:checked { background: $panel; border: 1px solid $accent; color: $accent_ink;
+    font-weight: 600; }
+QWidget#segmented QToolButton:focus { border: 1px dashed $accent; }
 QGroupBox { font-weight: bold; }
 QGroupBox QLabel, QGroupBox QCheckBox { font-weight: normal; }
 """)
@@ -70,7 +157,11 @@ def token(key):
 
 
 def style_sheet(resolved=None):
-    return STYLE.substitute(TOKENS[resolved or _current])
+    import os
+    look = resolved or _current
+    # the drop-down arrow is a file (style sheets take images by path), one per look
+    chevron = os.path.join(os.path.dirname(os.path.abspath(__file__)), "icons", "chevron-down-%s.svg" % look)
+    return STYLE.substitute(TOKENS[look], chevron=chevron.replace("\\", "/"))
 
 
 def dark_palette():

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 18:08+0100\n"
+"POT-Creation-Date: 2026-11-17 18:14+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -237,6 +237,9 @@ msgstr ""
 msgid ""
 "Built-in profile: your changes are kept as your own copy; \"Restore "
 "factory settings\" brings back the original."
+msgstr ""
+
+msgid "Cancel"
 msgstr ""
 
 #, python-format
@@ -928,6 +931,9 @@ msgstr ""
 
 #, python-format
 msgid "Now: you may use %s."
+msgstr ""
+
+msgid "OK"
 msgstr ""
 
 msgid ""
