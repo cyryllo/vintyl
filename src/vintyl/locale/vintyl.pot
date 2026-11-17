@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 19:28+0100\n"
+"POT-Creation-Date: 2026-11-17 19:43+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -582,6 +582,9 @@ msgstr ""
 msgid "Don't save"
 msgstr ""
 
+msgid "Drag between two points to measure"
+msgstr ""
+
 msgid ""
 "Drag nodes and handles · double-click a side: add a node · D delete · L "
 "line · C curve · O smooth · Z close/open · B break"
@@ -926,6 +929,12 @@ msgid "Length"
 msgstr ""
 
 msgid "Length (mm)"
+msgstr ""
+
+#, python-format
+msgid ""
+"Length <b>%(length)s mm</b> &nbsp; across %(across)s mm &nbsp; along "
+"%(along)s mm"
 msgstr ""
 
 msgid "Licence"
@@ -1437,6 +1446,9 @@ msgid ""
 " on its panel."
 msgstr ""
 
+msgid "Sent by the computer"
+msgstr ""
+
 msgid "Serial port or USB-serial cable (/dev/ttyUSB0, /dev/ttyACM0)"
 msgstr ""
 
@@ -1582,6 +1594,9 @@ msgid "Stopping: lifting the knife…"
 msgstr ""
 
 msgid "Strip"
+msgstr ""
+
+msgid "Swap X and Y"
 msgstr ""
 
 msgid "Take back the last change"
@@ -2065,9 +2080,6 @@ msgstr ""
 msgid "round"
 msgstr ""
 
-msgid "sent by the computer"
-msgstr ""
-
 msgid "serial port"
 msgstr ""
 
@@ -2086,9 +2098,6 @@ msgstr ""
 
 #, python-format
 msgid "speed %g mm/s"
-msgstr ""
-
-msgid "swap X and Y"
 msgstr ""
 
 msgid "up and down"

@@ -40,6 +40,16 @@ def _checks():
             profile.load_builtin(n).validate()
         return ", ".join(names)
 
+    def materials():
+        # the built-in materials travel with the program (the AppImage too)
+        from vintyl.core import material
+        names = material.builtin_names()
+        for n in names:
+            material.load_builtin(n).validate()
+        if not names:
+            raise RuntimeError("no built-in materials")
+        return ", ".join(names)
+
     def jobs():
         from vintyl.core import profile
         from vintyl.core.job import build_job
@@ -122,7 +132,8 @@ def _checks():
         return "window, icons, text; a drawn square: %.0f mm to cut" % job.cut_mm
 
     return [("Vintyl %s" % __version__, lambda: sys.version.split()[0]),
-            ("libraries", libraries), ("cutter profiles", profiles), ("jobs", jobs),
+            ("libraries", libraries), ("cutter profiles", profiles), ("materials", materials),
+            ("jobs", jobs),
             ("SVG", svg_file), ("DXF", dxf_file), ("offset and patterns", offset_and_patterns),
             ("translations", translations), ("window", window)]
 

@@ -515,8 +515,12 @@ def test_ruler_measures_a_drag(win):
     assert len(got) == 1 and math_hypot(*got[0]) == pytest.approx(50, abs=1)
     assert ("%.2f mm" % math_hypot(*got[0])) in win.statusBar().currentMessage()
     assert not win.design.elements                                   # measuring adds nothing
+    # the result is in the selection bar too, while the ruler is the tool
+    assert win.sel_name.text() == "Ruler" and not win.sel_hint.isHidden()
+    assert "Length <b>%.1f mm</b>" % math_hypot(*got[0]) in win.sel_hint.text()
     win.set_tool("select")
     assert v._measure_item is None                                   # the line goes with the tool
+    assert win.sel_hint.text() == "Select an element to change its place and size" and win.sel_name.isHidden()
 
 
 def math_hypot(dx, dy):
@@ -1074,7 +1078,8 @@ def test_a_pattern_of_shapes_is_cut_with_the_knife_before_its_outline(win):
     # in the pen mode the square offers both
     win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
     popup = win.show_category("fill")
-    assert [b.text() for b in popup.findChildren(QToolButton)] == ["Pattern of shapes", "Fill"]
+    # (a long name is on two lines)
+    assert [b.text().replace("\n", " ") for b in popup.findChildren(QToolButton)] == ["Pattern of shapes", "Fill"]
     popup.close()
 
 
@@ -1744,3 +1749,32 @@ def test_the_access_window_says_the_state_and_copies_the_commands(win):
     dlg = info_dialogs.access_dialog(win, "/dev/usb/lp1", "you are not in the group lp", show=False)
     assert dlg.state.objectName() == "warn"
     assert win.show_access_help(show=False).windowTitle() == "Access to the cutter"
+
+
+def test_the_window_fits_a_1366_screen_in_every_state_of_the_bar(win):
+    """UI v2, 8: the selection bar never makes the window wider than 1366 px:
+    a rectangle, a polygon, a text, a text on a path (and nothing selected)."""
+    from PySide6.QtTest import QTest
+    win.resize(1366, 768)
+    win.show()
+    QTest.qWait(30)
+
+    def fits():
+        QTest.qWait(20)
+        return win.width() == 1366 and win.minimumSizeHint().width() <= 1366 - 24
+    assert fits()
+    win._on_drawn("rectangle", QRectF(-160, -120, 90, 60))
+    assert fits()
+    win._on_drawn("polygon", QRectF(-280, -120, 70, 70))
+    assert fits()
+    win._on_text_clicked(QPointF(-260, -260))
+    text = win.selected
+    assert fits()
+    win._on_drawn("ellipse", QRectF(-200, -330, 120, 120))
+    win.selection, win.selected = [text, win.selected], text
+    win.put_text_on_path()
+    win.selection = [win.selected]
+    win._show_options()
+    assert fits() and not win.opt_path_flip.isHidden()
+    win.set_tool("nodes")
+    assert fits() and not win.node_hint.isHidden()

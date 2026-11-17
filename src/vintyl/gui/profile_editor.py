@@ -192,7 +192,7 @@ class ProfileEditor(QDialog):
         left.addWidget(card)
 
         card = widgets.Card(_("Speed and force"))
-        self.send_sf = widgets.Switch(_("sent by the computer"))
+        self.send_sf = widgets.Switch(_("Sent by the computer"))
         # mm/s on screen; the profile keeps cm/s (the cutters' HPGL VS and the profile files)
         self.speed = _dspin(2000.0, 0, " mm/s")
         self.speed.setSpecialValueText(_("from the panel"))
@@ -223,7 +223,7 @@ class ProfileEditor(QDialog):
             self.dmpl_mode.addItem(str(m), m)
         self.units = _dspin(1000.0, 3, "", minimum=1.0)
         self.units.setToolTip(_("HPGL: 40 units per mm on most cutters. Check with a 20 mm square."))
-        self.swap = widgets.Switch(_("swap X and Y"))
+        self.swap = widgets.Switch(_("Swap X and Y"))
         self.inv_x = widgets.Switch(_("X the other way"))
         self.inv_y = widgets.Switch(_("Y the other way"))
         card.add_row(_("Language"), self.language)

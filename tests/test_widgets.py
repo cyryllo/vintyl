@@ -172,3 +172,26 @@ def test_a_question_returns_the_buttons_action(app):
     assert ask(None, "Delete this cutter", "Delete it?", buttons) is None
     dlg = ask(None, "Delete this cutter", "Delete it?", buttons, warning=True, show=False)
     assert [b.objectName() for b in dlg.findChildren(QPushButton)] == ["", "danger"]
+
+
+def test_switches_and_segments_work_from_the_keyboard(app):
+    """UI v2, 8: Tab reaches every switch and every segment; space changes them."""
+    from PySide6.QtWidgets import QWidget, QVBoxLayout
+    box = QWidget()
+    lay = QVBoxLayout(box)
+    sw = Switch("Mirror")
+    seg = Segmented()
+    seg.addItem("Out", "out")
+    seg.addItem("In", "in")
+    lay.addWidget(sw)
+    lay.addWidget(seg)
+    box.show()
+    for w in [sw] + [seg.button(i) for i in range(seg.count())]:
+        assert w.focusPolicy() & Qt.TabFocus, w
+    sw.setFocus()
+    QTest.keyClick(sw, Qt.Key_Space)
+    assert sw.isChecked()
+    seg.button(1).setFocus()
+    QTest.keyClick(seg.button(1), Qt.Key_Space)
+    assert seg.currentData() == "in"
+    box.close()

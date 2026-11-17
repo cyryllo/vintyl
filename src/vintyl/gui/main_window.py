@@ -658,7 +658,20 @@ class MainWindow(QMainWindow):
                 b.setText(_(name))
                 b.setToolTip(_("Insert: %s") % _(name))
                 b.clicked.connect(lambda _c=False, k=key, p=popup: (p.close(), self.insert_ready(k)))
+            # a name too long for the tile ("Rounded rectangle") goes on two
+            # lines, not cut in the middle
+            text = b.text()
+            if b.fontMetrics().horizontalAdvance(text) > b.width() - 10 and " " in text:
+                spaces = [i for i, c in enumerate(text) if c == " "]
+                cut = min(spaces, key=lambda i: abs(i - len(text) / 2))
+                b.setText(text[:cut] + "\n" + text[cut + 1:])
+                b.setFixedHeight(b.height() + 14)
             grid.addWidget(b, n // per_row, n % per_row)
+        # one tile on two lines: all of the set as high, so the icons line up
+        tiles = card.findChildren(ToolTile)
+        tallest = max(t.height() for t in tiles)
+        for t in tiles:
+            t.setFixedHeight(tallest)
         # beside the category's button, on the side of the material
         button = self.category_buttons[cat]
         popup.adjustSize()
@@ -804,8 +817,9 @@ class MainWindow(QMainWindow):
         self.category_buttons[self._category_of[tool]].setChecked(True)
         self.view.set_tool(tool)
         self.node_hint.setVisible(tool == "nodes")
-        self._show_text_options()
-        self._show_polygon_options()
+        if tool != "measure":
+            self.measure_text = ""                # the ruler's result goes with the tool
+        self._show_options()
 
     # ---- options bar: the selected element ------------------------------------
     def _bar_separator(self, row):
@@ -866,7 +880,7 @@ class MainWindow(QMainWindow):
                 self.place_widgets.append(lab)
             if tip:
                 spin.setToolTip(tip)
-            spin.setFixedWidth(104) if spin is not self.opt_lock else None
+            spin.setFixedWidth(96) if spin is not self.opt_lock else None
             row.addWidget(spin)
             self.place_widgets.append(spin)
             if spin is not self.opt_lock:
@@ -911,10 +925,9 @@ class MainWindow(QMainWindow):
         self.node_hint = QLabel(_("Drag nodes and handles · double-click a side: add a node · "
                                   "D delete · L line · C curve · O smooth · Z close/open · B break"))
         self.node_hint.setObjectName("node_hint")
-        # the hint wraps and never makes the window wider than the screen
-        self.node_hint.setWordWrap(True)
+        # one line of its own under the bar (wrapped beside the fields it made
+        # the bar many lines high); it never makes the window wider
         self.node_hint.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
-        row.addWidget(self.node_hint, 1)
         for w in (self.sides_label, self.opt_sides, self.node_hint, self.radius_label, self.opt_radius):
             w.setVisible(False)
         row.addStretch(1)
@@ -928,12 +941,13 @@ class MainWindow(QMainWindow):
         trow.setContentsMargins(0, 0, 0, 0)
         trow.setSpacing(8)
         rows.addWidget(self.text_row)
+        rows.addWidget(self.node_hint)
         self.text_defaults = dict(texts.DEFAULTS)
         self.opt_text = QLineEdit(self.text_defaults["text"])
-        self.opt_text.setFixedWidth(180)
+        self.opt_text.setFixedWidth(140)
         self.opt_text.setToolTip(_("The text; Enter applies it"))
         self.opt_font = QFontComboBox()
-        self.opt_font.setFixedWidth(170)
+        self.opt_font.setFixedWidth(140)
         self.opt_font.setCurrentFont(self.opt_font.currentFont().__class__(self.text_defaults["family"]))
         self.opt_size = _spin(1000.0, 1, minimum=1.0)
         self.opt_size.setFixedWidth(90)
@@ -973,10 +987,10 @@ class MainWindow(QMainWindow):
         trow.addWidget(self.btn_text_path)
         # a text on a path: where along the path, how far from it, which side
         self.opt_path_offset = _spin(100000.0, 1, minimum=-100000.0)
-        self.opt_path_offset.setFixedWidth(96)
+        self.opt_path_offset.setFixedWidth(88)
         self.opt_path_offset.setToolTip(_("Where the text starts along its path, mm"))
         self.opt_path_distance = _spin(1000.0, 1, minimum=-1000.0)
-        self.opt_path_distance.setFixedWidth(90)
+        self.opt_path_distance.setFixedWidth(84)
         self.opt_path_distance.setToolTip(_("How far the letters stand from the path, mm"))
         self.opt_path_flip = Switch(_("other side"))
         self.opt_path_flip.setToolTip(_("The text on the other side of the path (inside a circle), still readable"))
@@ -1035,11 +1049,20 @@ class MainWindow(QMainWindow):
         n_sel = len(self.selection) if self.selection else (1 if has else 0)
         self.selected_label.setText("" if not has else _("Selected: %s") % (
             e.name if n_sel <= 1 else ngettext("%d element", "%d elements", n_sel) % n_sel))
-        # nothing selected: a hint instead of greyed-out fields
-        for w in self.place_widgets + [self.angle_label, self.opt_angle, self.btn_rotate, self.opt_cut,
-                                       self.sel_icon, self.sel_name]:
-            w.setVisible(has)
-        self.sel_hint.setVisible(not has)
+        # nothing selected: a hint instead of greyed-out fields (see _set_visible)
+        fields = self.place_widgets + [self.angle_label, self.opt_angle, self.btn_rotate, self.opt_cut,
+                                       self.sel_icon, self.sel_name]
+        self._set_visible([(self.sel_hint, not has)] + [(w, has) for w in fields])
+        # the ruler, with nothing selected: its result in the bar (UI v2, 6.3)
+        ruler = not has and getattr(self.view, "tool", None) == "measure"
+        self.sel_icon.setVisible(has or ruler)
+        self.sel_name.setVisible(has or ruler)
+        if ruler:
+            self.sel_icon.setPixmap(icons.tabler("ruler-measure").pixmap(18, 18))
+            self.sel_name.setText(_("Ruler"))
+            self.sel_hint.setText(getattr(self, "measure_text", "") or _("Drag between two points to measure"))
+        else:
+            self.sel_hint.setText(_("Select an element to change its place and size"))
         if has:
             n = len(self.selection) if self.selection else 1
             self.sel_icon.setPixmap(self.kind_icon(e).pixmap(18, 18))
@@ -1053,8 +1076,7 @@ class MainWindow(QMainWindow):
         self._updating = False
         self._show_text_options()
         self._show_polygon_options()
-        kind = self.sides_label.isVisibleTo(self.options_bar) or self.radius_label.isVisibleTo(self.options_bar) \
-            or self.node_hint.isVisibleTo(self.options_bar)
+        kind = self.sides_label.isVisibleTo(self.options_bar) or self.radius_label.isVisibleTo(self.options_bar)
         self.kind_separator.setVisible(kind)
 
     def _lock_toggled(self, on):
@@ -1856,25 +1878,35 @@ class MainWindow(QMainWindow):
     def _is_polygon(self, e):
         return e is not None and e.spec is not None and e.spec.get("kind") == "polygon"
 
+    @staticmethod
+    def _set_visible(pairs):
+        """[(widget, shown)]: the ones that go are hidden first, then the ones
+        that come are shown. Qt may lay the selection bar out in between, and
+        both sets at once are wider than a 1366 px screen: the window then
+        grew and stayed wider."""
+        for w, shown in pairs:
+            if not shown:
+                w.setVisible(False)
+        for w, shown in pairs:
+            if shown:
+                w.setVisible(True)
+
     def _show_polygon_options(self):
         e = self.selected
         show = self.view.tool == "polygon" or self._is_polygon(e)
-        self.sides_label.setVisible(show)
-        self.opt_sides.setVisible(show)
+        rect = self.view.tool == "rectangle" or self._is_rectangle(e)
+        has = e is not None
+        self._set_visible([(self.sides_label, show), (self.opt_sides, show), (self.radius_label, rect),
+                           (self.opt_radius, rect), (self.angle_label, has), (self.opt_angle, has),
+                           (self.btn_rotate, has)])
         if self._is_polygon(e) and self.opt_sides.value() != e.spec["sides"]:
             self._updating = True
             self.opt_sides.setValue(e.spec["sides"])
             self._updating = False
-        rect = self.view.tool == "rectangle" or self._is_rectangle(e)
-        self.radius_label.setVisible(rect)
-        self.opt_radius.setVisible(rect)
         if self._is_rectangle(e) and abs(self.opt_radius.value() - e.spec["radius"]) > 1e-9:
             self._updating = True
             self.opt_radius.setValue(e.spec["radius"])
             self._updating = False
-        has = e is not None
-        for w in (self.angle_label, self.opt_angle, self.btn_rotate):
-            w.setVisible(has)
 
     @staticmethod
     def _is_rectangle(e):
@@ -1959,6 +1991,13 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage(_("Measured: %.2f mm (across %.2f mm, along %.2f mm)")
                                      % (math.hypot(dx, dy), abs(dx), abs(dy)))
 
+        def mm(v):                               # as the window writes numbers (a comma in Polish)
+            return MaterialView._mm(v)
+        self.measure_text = _("Length <b>%(length)s mm</b> &nbsp; across %(across)s mm &nbsp; along "
+                              "%(along)s mm") % {"length": mm(math.hypot(dx, dy)), "across": mm(abs(dx)),
+                                                 "along": mm(abs(dy))}
+        self._show_options()
+
     # ---- text --------------------------------------------------------------------------
     def _text_spec_from_widgets(self):
         spec = {"kind": "text", "text": self.opt_text.text(), "family": self.opt_font.currentFont().family(),
@@ -1981,12 +2020,13 @@ class MainWindow(QMainWindow):
         """The text fields: with the text tool, or when a text is selected (filled from it)."""
         e = self.selected
         show = self.view.tool == "text" or self._is_text(e)
-        for w in self.text_widgets + self.text_labels:
-            w.setVisible(show)
-        self.text_row.setVisible(show)                 # the second row of the selection bar
         on_path = self._is_text(e) and bool(e.spec.get("path"))
-        for w in self.path_widgets + self.path_labels:
-            w.setVisible(on_path)
+        # on a path already: the button keeps only its icon (its name in the
+        # tooltip), so the path's fields fit a 1366 px screen
+        self.btn_text_path.setToolButtonStyle(Qt.ToolButtonIconOnly if on_path else Qt.ToolButtonTextBesideIcon)
+        # the second row of the selection bar (see _set_visible)
+        self._set_visible([(w, show) for w in self.text_widgets + self.text_labels] + [(self.text_row, show)]
+                          + [(w, on_path) for w in self.path_widgets + self.path_labels])
         if on_path:
             self._updating = True
             self.opt_path_offset.setValue(e.spec.get("offset", 0.0))

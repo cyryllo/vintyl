@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 19:28+0100\n"
+"POT-Creation-Date: 2026-11-17 19:43+0100\n"
 "PO-Revision-Date: 2026-11-15 17:49+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -627,6 +627,9 @@ msgstr ""
 msgid "Don't save"
 msgstr "Nie zapisuj"
 
+msgid "Drag between two points to measure"
+msgstr "Przeciągnij między dwoma punktami, żeby zmierzyć"
+
 msgid ""
 "Drag nodes and handles · double-click a side: add a node · D delete · L "
 "line · C curve · O smooth · Z close/open · B break"
@@ -999,6 +1002,14 @@ msgstr "Długość"
 
 msgid "Length (mm)"
 msgstr "Długość (mm)"
+
+#, python-format
+msgid ""
+"Length <b>%(length)s mm</b> &nbsp; across %(across)s mm &nbsp; along "
+"%(along)s mm"
+msgstr ""
+"Długość <b>%(length)s mm</b> &nbsp; w poprzek %(across)s mm &nbsp; wzdłuż"
+" %(along)s mm"
 
 msgid "Licence"
 msgstr "Licencja"
@@ -1539,6 +1550,9 @@ msgstr ""
 "Wysłano %d bajtów do %s. Ploter tnie ze swojej pamięci z prędkością "
 "ustawioną na panelu."
 
+msgid "Sent by the computer"
+msgstr "Wysyłane z komputera"
+
 msgid "Serial port or USB-serial cable (/dev/ttyUSB0, /dev/ttyACM0)"
 msgstr "Port szeregowy albo kabel USB-szeregowy (/dev/ttyUSB0, /dev/ttyACM0)"
 
@@ -1705,6 +1719,9 @@ msgstr "Zatrzymywanie: podnoszę nóż…"
 
 msgid "Strip"
 msgstr "Pas"
+
+msgid "Swap X and Y"
+msgstr "Zamień X i Y"
 
 msgid "Take back the last change"
 msgstr "Cofnij ostatnią zmianę"
@@ -2221,9 +2238,6 @@ msgstr "poza długość %g mm"
 msgid "round"
 msgstr "zaokrąglone"
 
-msgid "sent by the computer"
-msgstr "Wysyłane z komputera"
-
 msgid "serial port"
 msgstr "port szeregowy"
 
@@ -2243,9 +2257,6 @@ msgstr "część elementów pominięto: %s"
 #, python-format
 msgid "speed %g mm/s"
 msgstr "prędkość %g mm/s"
-
-msgid "swap X and Y"
-msgstr "Zamień X i Y"
 
 msgid "up and down"
 msgstr "pionowe"
@@ -2694,4 +2705,10 @@ msgstr "← Y w poprzek, mm"
 
 #~ msgid "What it does"
 #~ msgstr "Co robi"
+
+#~ msgid "sent by the computer"
+#~ msgstr "Wysyłane z komputera"
+
+#~ msgid "swap X and Y"
+#~ msgstr "Zamień X i Y"
 

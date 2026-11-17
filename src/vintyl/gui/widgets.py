@@ -213,6 +213,17 @@ class Card(QFrame):
         self.body.addWidget(row)
         return row
 
+    def fit_labels(self):
+        """Make the label column as wide as the longest label (at least
+        LABEL_WIDTH), so "Corner radius (mm)" is not cut off; the fields still
+        line up."""
+        labels = [w for w in self.findChildren(QLabel, "field_label")]
+        if not labels:
+            return
+        width = max([LABEL_WIDTH] + [w.sizeHint().width() for w in labels])
+        for w in labels:
+            w.setFixedWidth(width)
+
     def add_hint(self, text):
         hint = QLabel(text)
         hint.setObjectName("hint")
@@ -289,6 +300,7 @@ def form_dialog(parent, title, rows, action=None, hint=None, extra=None, left=No
     card = Card()
     for key, label, widget in rows:
         card.add_row(label, widget)
+    card.fit_labels()
     if hint:
         card.add_hint(hint)
     if extra is not None:
