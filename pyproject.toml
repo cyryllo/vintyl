@@ -9,7 +9,7 @@ description = "Software for vinyl cutters"
 readme = "README.md"
 license = "GPL-3.0-or-later"
 license-files = ["LICENSE"]
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 authors = [{ name = "Vintyl contributors" }]
 # The core needs no GUI toolkit; pyserial is only imported when sending to a port.
 dependencies = ["pyserial>=3.5", "pyclipper>=1.3"]

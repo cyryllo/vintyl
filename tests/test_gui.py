@@ -2018,11 +2018,11 @@ def test_the_window_fits_a_1366_screen_in_every_language(app, lang):
         w.resize(1366, 768)
         w.show()
         assert w.findChild(QToolBar).sizeHint().width() <= 1366 - 10, "ribbon"
-        tile_font = QFont(QApplication.font())
-        tile_font.setPixelSize(10)                       # as the style sheet has it, bold when chosen
-        tile_font.setWeight(QFont.DemiBold)
-        for b in w.category_buttons.values():
-            assert QFontMetrics(tile_font).horizontalAdvance(b.text()) <= b.width() - 6, b.text()
+        for cat, b in w.category_buttons.items():
+            font = QFont(b.font())                       # the tile's own (10 px, or 9 when its name is long)
+            if any(e[0] == "tool" for e in w.category_entries[cat]):
+                font.setWeight(QFont.DemiBold)           # bold when chosen
+            assert QFontMetrics(font).horizontalAdvance(b.text()) <= b.width() - 6, b.text()
 
         def fits():
             QTest.qWait(20)

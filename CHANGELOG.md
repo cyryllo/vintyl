@@ -17,10 +17,14 @@ Four more languages, and small fixes.
 **Fixed**
 - The cutter settings and materials windows scroll their cards when made low, instead of squeezing
   them over each other.
+- The window fits a 1366 px screen also with a wide system font (DejaVu Sans): the ribbon and the
+  selection bar are a little tighter, and a tool's name too long for its tile is a pixel smaller.
 
 **For developers**
-- Tests on GitHub after every push (Linux, Python 3.11 and 3.13): the self-test, all the tests and
-  the translations' check.
+- Tests on GitHub after every push (Linux, Python 3.12 and 3.13, DejaVu Sans): the self-test, all
+  the tests and the translations' check.
+- From the source, Vintyl needs Python 3.12 or newer: with 3.11, PySide6 miscounts None and Python
+  aborts. The AppImage has its own Python and is not affected.
 
 ## 0.8.0
 

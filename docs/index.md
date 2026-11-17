@@ -135,7 +135,7 @@ Start.
   </div>
   <div class="platform">
     <h3>From the source</h3>
-    <p>Python 3.11 or newer and Qt 6 (PySide6).</p>
+    <p>Python 3.12 or newer and Qt 6 (PySide6).</p>
     <p><a href="{{ site.repo }}#run-it-from-the-source">How to run it</a> · <a href="{{ site.repo }}/blob/main/CHANGELOG.md">What is new</a></p>
   </div>
 </div>

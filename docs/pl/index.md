@@ -136,7 +136,7 @@ materiału przed Startem.
   </div>
   <div class="platform">
     <h3>Ze źródeł</h3>
-    <p>Python 3.11 lub nowszy i Qt 6 (PySide6).</p>
+    <p>Python 3.12 lub nowszy i Qt 6 (PySide6).</p>
     <p><a href="{{ site.repo }}#run-it-from-the-source">Jak uruchomić</a> · <a href="{{ site.repo }}/blob/main/CHANGELOG.md">Co nowego</a></p>
   </div>
 </div>

@@ -470,7 +470,7 @@ class MainWindow(QMainWindow):
                 tb.addWidget(line)
             group = QWidget()
             v = QVBoxLayout(group)
-            v.setContentsMargins(4, 2, 4, 0)
+            v.setContentsMargins(2, 2, 2, 0)
             v.setSpacing(0)
             if kind == big:
                 row = QHBoxLayout()
@@ -603,6 +603,7 @@ class MainWindow(QMainWindow):
             # the strip's own words (context "tool strip"): a language may give
             # a shorter one than its menus, so it fits the 66 px tile
             cb.setText(pgettext("tool strip", title))
+            self._fit_tile_text(cb, any(e[0] == "tool" for e in entries))
             cb.setCheckable(True)
             cb.clicked.connect(lambda _c=False, c=cat: self.show_category(c))
             cat_group.addButton(cb)
@@ -622,6 +623,19 @@ class MainWindow(QMainWindow):
         self.tool_popup = None
         self.tool_actions["select"].setChecked(True)
         self.category_buttons["pick"].setChecked(True)
+
+    @staticmethod
+    def _fit_tile_text(tile, can_be_chosen):
+        """A name too wide for its tile (a wide font such as DejaVu Sans, a
+        long word) is written a pixel smaller instead of being cut; bold when
+        the tile can be the chosen one (the style sheet makes it bold then)."""
+        from PySide6.QtGui import QFont, QFontMetrics
+        tile.ensurePolished()
+        font = QFont(tile.font())
+        if can_be_chosen:
+            font.setWeight(QFont.DemiBold)
+        if QFontMetrics(font).horizontalAdvance(tile.text()) > tile.width() - 6:
+            tile.setStyleSheet("font-size: 9px;")
 
     def _offered(self, cat):
         """The entries of a category offered now (the pen's fill not with the knife)."""
@@ -915,7 +929,7 @@ class MainWindow(QMainWindow):
         rows.setContentsMargins(12, 6, 12, 6)
         rows.setSpacing(6)
         row = QHBoxLayout()
-        row.setSpacing(8)
+        row.setSpacing(6)        # 6, not 8: the bar fits 1366 px also with wide fonts (DejaVu Sans)
         rows.addLayout(row)
         # what is selected: its type's icon and its name
         self.sel_icon = QLabel()
@@ -1014,7 +1028,7 @@ class MainWindow(QMainWindow):
         self.text_row = QWidget()
         trow = QHBoxLayout(self.text_row)
         trow.setContentsMargins(0, 0, 0, 0)
-        trow.setSpacing(8)
+        trow.setSpacing(6)
         rows.addWidget(self.text_row)
         rows.addWidget(self.node_hint)
         self.text_defaults = dict(texts.DEFAULTS)

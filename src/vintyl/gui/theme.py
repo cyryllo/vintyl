@@ -89,7 +89,7 @@ STYLE = Template("""
 QWidget { font-size: 13px; }
 QDialog { background: $window; }
 QToolBar#main_toolbar { background: $panel; border-bottom: 1px solid $border; spacing: 1px; padding: 2px; }
-QToolBar#main_toolbar QToolButton { padding: 2px 4px; font-size: 11px; border: 0; border-radius: 6px; color: $ink; }
+QToolBar#main_toolbar QToolButton { padding: 2px 3px; font-size: 11px; border: 0; border-radius: 6px; color: $ink; }
 QToolBar#main_toolbar QToolButton[toolButtonStyle="2"] { font-size: 13px; }
 QToolBar#main_toolbar QToolButton:hover { background: $well; }
 QToolBar#main_toolbar QToolButton:checked { background: $accent_soft; color: $accent_ink; }

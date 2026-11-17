@@ -16,8 +16,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # the oldest Python Vintyl takes (pyproject.toml) and a recent one
-        python-version: ["3.11", "3.13"]
+        # the oldest Python Vintyl takes (pyproject.toml) and a recent one. Not
+        # 3.11: PySide6 miscounts None there and Python aborts ("none_dealloc");
+        # from 3.12 None is immortal and nothing happens
+        python-version: ["3.12", "3.13"]
     name: linux (Python ${{ matrix.python-version }})
     env:
       QT_QPA_PLATFORM: offscreen
@@ -29,7 +31,7 @@ jobs:
       - name: System libraries for Qt
         run: |
           .github/scripts/apt-install.sh --no-install-recommends libegl1 libgl1 libxkbcommon0 \
-            libfontconfig1 libdbus-1-3 fonts-dejavu-core
+            libfontconfig1 libdbus-1-3 libglib2.0-0 fonts-dejavu-core
       - name: Install Vintyl with the window and the test tools
         run: |
           python -m venv .venv
