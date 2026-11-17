@@ -121,6 +121,38 @@ Built-in cutters can be changed: your changes are kept as your own copy,
 and **Restore factory settings** brings back the original. **New cutter (a
 copy)** starts a profile of your own from the one shown.
 
+<a id="blades"></a>
+
+### Blades and their knife offset
+
+The blade's angle says how thick a material it cuts; its **offset** (how far
+the tip trails behind the holder's axis) is what Vintyl needs to turn
+corners sharply. The offset is set by the blade's maker: when the pack
+prints it, use that. Otherwise:
+
+| Blade | Knife offset | For |
+|---|---|---|
+| 45° (standard) | 0.25 mm | ordinary vinyl, heat transfer vinyl (flex), "all purpose" |
+| 60° | 0.50 mm | thick materials: reflective vinyl, sandblast, flock, magnetic, card, vinyl over 3 mil (0.08 mm) |
+| 60°, for very thick | 1.00 mm | very thick: card, magnetic, sandblast |
+| 30° (fine, thin films) | about 0.25 mm | thin films and fine detail |
+
+The 45° and 60° rows are Roland's (Cutter Blade Reference Guide, 2017:
+blades ZEC-U5032, ZEC-U1005, USA-C145-X at 45°/0.25; ZEC-U3050 at
+60°/0.50; ZEC-U3100 at 60°/1.00). The 30° row comes from blade sellers
+and is only a starting point. Blades of other makers come in the same
+angles, but their offsets can differ: cut the knife test.
+
+Where to set it: the cutter's own value is in the cutter settings (Knife
+offset, 0.25 mm for the 45° blade it comes with). A material that needs
+another blade can have its own: in the materials window, Blade and Knife
+offset (empty: the cutter's value). The built-in reflective vinyl names
+the 60° blade but keeps the cutter's offset: if your 60° blade is a
+0.50 mm one, write 0.5 there.
+
+**Reading the corners** (Roland): rounded corners mean too little offset;
+small flaps sticking out at the corners mean too much.
+
 | Cutter | Status |
 |---|---|
 | VEVOR KI-375A | tested: cuts cleanly |
@@ -333,8 +365,10 @@ Help → Keyboard shortcuts (Ctrl+F1) lists every key, with a search.
   its port in the cutter settings (Find).
 - **It cuts too deep or not through**: change the force on the cutter's
   panel, cut the knife test, and write the value in the material.
-- **Corners are rounded or have small burrs**: adjust the knife offset in
-  the cutter settings (0.25 mm suits a standard 45° blade).
+- **Corners are rounded**: the knife offset is too small; **small flaps
+  stick out at the corners**: it is too large. Set it for your blade (see
+  [Blades and their knife offset](#blades): 0.25 mm for a 45° blade,
+  0.50 mm for most 60° ones) and cut the knife test again.
 - **"The design does not fit on the material"**: it sticks out before the
   origin or past the cutting width; use To 0,0, or move it in.
 - **A bug, or your cutter works (or not)**: Help → Diagnostic report shows

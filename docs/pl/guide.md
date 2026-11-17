@@ -119,6 +119,38 @@ Wbudowane plotery można zmieniać: zmiany są zapisywane jako Twoja kopia, a
 **Przywróć ustawienia fabryczne** przywraca oryginał. **Nowy ploter (kopia)**
 zaczyna własny profil od pokazanego.
 
+<a id="ostrza"></a>
+
+### Ostrza i przesunięcie noża
+
+Kąt ostrza mówi, jak gruby materiał tnie; jego **przesunięcie** (o ile
+czubek jest za osią oprawki) jest Vintylowi potrzebne, żeby ostro brać
+narożniki. Przesunięcie podaje producent ostrza: jeśli jest na opakowaniu,
+użyj tej wartości. W przeciwnym razie:
+
+| Ostrze | Przesunięcie noża | Do czego |
+|---|---|---|
+| 45° (zwykłe) | 0,25 mm | zwykła folia, flex (termotransferowa), „do wszystkiego” |
+| 60° | 0,50 mm | grube materiały: folia odblaskowa, do piaskowania, flock, magnetyczna, karton, folia grubsza niż 3 mil (0,08 mm) |
+| 60°, do bardzo grubych | 1,00 mm | bardzo grube: karton, magnetyczna, do piaskowania |
+| 30° (cienkie folie) | ok. 0,25 mm | cienkie folie i drobne detale |
+
+Wiersze 45° i 60° pochodzą od Rolanda (Cutter Blade Reference Guide, 2017:
+ostrza ZEC-U5032, ZEC-U1005, USA-C145-X jako 45°/0,25; ZEC-U3050 jako
+60°/0,50; ZEC-U3100 jako 60°/1,00). Wiersz 30° pochodzi od sprzedawców
+ostrzy i jest tylko punktem wyjścia. Ostrza innych producentów mają te
+same kąty, ale ich przesunięcie może się różnić: wytnij test noża.
+
+Gdzie to ustawić: wartość plotera jest w ustawieniach plotera
+(Przesunięcie noża, 0,25 mm dla dołączonego ostrza 45°). Materiał, który
+potrzebuje innego ostrza, może mieć własną: w oknie materiałów pola Ostrze
+i Przesunięcie noża (puste: wartość plotera). Wbudowana folia odblaskowa
+podaje ostrze 60°, ale zostawia przesunięcie plotera: jeśli Twoje ostrze
+60° ma 0,50 mm, wpisz tam 0,5.
+
+**Jak czytać narożniki** (Roland): zaokrąglone narożniki to za małe
+przesunięcie; małe chorągiewki wystające na narożnikach to za duże.
+
 | Ploter | Stan |
 |---|---|
 | VEVOR KI-375A | przetestowany: tnie czysto |
@@ -338,8 +370,10 @@ wyszukiwaniem.
   włączony i jego port w ustawieniach plotera (Szukaj).
 - **Tnie za głęboko albo nie przecina**: zmień nacisk na panelu plotera,
   wytnij test noża i wpisz wartość w materiale.
-- **Narożniki są zaokrąglone albo mają zadziory**: popraw przesunięcie noża
-  w ustawieniach plotera (0,25 mm pasuje do zwykłego ostrza 45°).
+- **Narożniki są zaokrąglone**: przesunięcie noża jest za małe; **na
+  narożnikach wystają małe chorągiewki**: jest za duże. Ustaw je dla swojego
+  ostrza (zobacz [Ostrza i przesunięcie noża](#ostrza): 0,25 mm dla ostrza
+  45°, 0,50 mm dla większości ostrzy 60°) i wytnij test noża jeszcze raz.
 - **„Projekt nie mieści się na folii”**: wystaje przed punkt zerowy
   albo poza szerokość cięcia; użyj Do 0,0 albo przesuń go.
 - **Błąd albo informacja, czy Twój ploter działa**: Pomoc → Raport
