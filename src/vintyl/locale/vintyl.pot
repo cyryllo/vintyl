@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 20:09+0100\n"
+"POT-Creation-Date: 2026-11-17 20:17+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -839,6 +839,9 @@ msgstr ""
 msgid ""
 "How wide the knife can cut (not how wide the material may be: an \"870 "
 "mm\" cutter cuts about 780 mm)"
+msgstr ""
+
+msgid "In the holder"
 msgstr ""
 
 msgid "Inner corners (%)"
@@ -1911,6 +1914,12 @@ msgid "Width"
 msgstr ""
 
 msgid "Width (mm)"
+msgstr ""
+
+msgid "Worked into the knife's path by Vintyl"
+msgstr ""
+
+msgid "Worked into the pen's path by Vintyl"
 msgstr ""
 
 msgid "Working it out…"

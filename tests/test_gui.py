@@ -1599,7 +1599,7 @@ def test_the_materials_window_keeps_values_for_each_cutter(win, tmp_path, monkey
     dlg.force.setValue(90)
     dlg.speed.setValue(300.0)                                        # mm/s on screen: 30 cm/s kept
     dlg.for_cutter.setCurrentIndex(dlg.for_cutter.findData("seiki-sk-870t"))
-    assert dlg.force.value() == 80                                   # the other cutter: its own (starting) value
+    assert dlg.force.value() == 80                                   # the other (big) cutter: its own value
     dlg.force.setValue(110)
     assert not dlg.panel_note.isHidden()                              # it takes them from its panel
     dlg.save()
@@ -1805,19 +1805,22 @@ def test_the_check_list_always_shows_the_cutting_values(win):
     bare = Material(name="Own vinyl", blade="45")                   # the user's own, no values yet
     values = win.material_values(bare)
     assert values is not None and values[1] is None and values[2] is None
-    details = dict(win.cut_details(bare))
-    assert details["Blade"] == "45° (standard)" and details["Knife offset"].endswith(" mm")
-    assert "Overcut" in details
+    lines = dict(win.cut_details(bare))
+    assert dict(lines["In the holder"])["Blade"] == "45° (standard)"   # the blade: put in, not sent
+    vintyl = dict(lines["Worked into the knife's path by Vintyl"])      # offset and overcut: in the path
+    assert vintyl["Knife offset"].endswith(" mm") and "Overcut" in vintyl
     dlg = REAL_START_DIALOGS[0](win, "VEVOR KI-375A", "/dev/usb/lp1", False, "Own vinyl", values, True,
                                 False, "", show=False, details=win.cut_details(bare))
     texts = " ".join(l.text() for l in dlg.findChildren(QLabel))
     assert "–" in texts and "has no force or speed" in texts and "Knife offset <b>" in texts
+    assert "In the holder: Blade <b>" in texts and "Worked into the knife's path by Vintyl: " in texts
     assert "not in the material" not in texts                     # one hint, not one under each dash
     # the pen: its width and where its stroke lies
     win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
-    assert [label for label, _v in win.cut_details()] == ["Pen width", "Draw"]
+    assert [label for label, _v in dict(win.cut_details())["Worked into the pen's path by Vintyl"]] == \
+        ["Pen width", "Draw"]
     # the knife test shows the knife's values, also from the pen mode
-    assert "Knife offset" in dict(win.cut_details(pen=False))
+    assert "Knife offset" in dict(dict(win.cut_details(pen=False))["Worked into the knife's path by Vintyl"])
 
 
 def _drag(view, start, end, steps=5):

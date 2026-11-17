@@ -1652,9 +1652,12 @@ class MainWindow(QMainWindow):
                 "%g mm/s" % round(speed * 10.0, 1) if speed is not None else None)
 
     def cut_details(self, material=None, pen=None):
-        """[(label, value)] of the rest the job uses, for the windows before
-        sending: the knife's blade (from the material), offset and overcut;
-        the pen's width and where its stroke lies."""
+        """The rest the job uses, for the windows before sending, as lines
+        [(heading, [(label, value)])] that say who does what: the blade to put
+        in the holder (the material's); the knife offset and overcut that
+        Vintyl works into the knife's path (nothing of them is sent as a
+        setting); the pen's width and where its stroke lies. Only force and
+        speed are set on the cutter's panel."""
         from vintyl import i18n
         from vintyl.gui.material_editor import BLADE_NAMES
 
@@ -1663,13 +1666,15 @@ class MainWindow(QMainWindow):
             return text.replace(".", ",") if i18n.current_language() == "pl" else text
         pen = self.is_pen() if pen is None else pen
         if pen:
-            return [(_("Pen width"), mm(self.pen_width.value())), (_("Draw"), self.pen_place.currentText())]
+            return [(_("Worked into the pen's path by Vintyl"),
+                     [(_("Pen width"), mm(self.pen_width.value())), (_("Draw"), self.pen_place.currentText())])]
         m = material if material is not None else self.material()
         p = self.job_profile(material)
         out = []
         if m is not None and m.blade:
-            out.append((_("Blade"), _(BLADE_NAMES[m.blade])))
-        out += [(_("Knife offset"), mm(p.knife_offset_mm)), (_("Overcut"), mm(p.overcut_mm))]
+            out.append((_("In the holder"), [(_("Blade"), _(BLADE_NAMES[m.blade]))]))
+        out.append((_("Worked into the knife's path by Vintyl"),
+                    [(_("Knife offset"), mm(p.knife_offset_mm)), (_("Overcut"), mm(p.overcut_mm))]))
         return out
 
     def _material_is_builtin(self):

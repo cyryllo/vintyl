@@ -35,10 +35,9 @@ def _checks(card, items):
         card.body.addLayout(row)
 
 
-def _values_card(values, details=()):
-    """The force and speed in large type, on the information colour; under
-    them the rest of what the job uses (details: [(label, value)]: the
-    blade, the knife offset and overcut, or the pen's width)."""
+def _values_card(values):
+    """The force and speed in large type, on the information colour: what is
+    set on the cutter's panel (or sent), and nothing else in it."""
     title, force, speed = values
     box = QFrame()
     box.setObjectName("info")
@@ -71,11 +70,20 @@ def _values_card(values, details=()):
                         "material (the button beside Material) and they show here."))
         hint.setWordWrap(True)
         lay.addWidget(hint)
-    if details:
-        line = QLabel(" &nbsp;·&nbsp; ".join("%s <b>%s</b>" % (label, value) for label, value in details))
-        line.setWordWrap(True)
-        lay.addWidget(line)
     return box
+
+
+def _details(body, details):
+    """Under the card, a line each, what does what (details: [(heading,
+    [(label, value)])]): the blade to put in the holder; what Vintyl works
+    into the knife's path (the knife offset, the overcut) or the pen's. Out
+    of the card on purpose: none of it is set on the cutter's panel."""
+    for heading, items in details:
+        line = QLabel("%s: %s" % (heading, " &nbsp;·&nbsp; ".join("%s <b>%s</b>" % (label, value)
+                                                                  for label, value in items)))
+        line.setObjectName("muted")
+        line.setWordWrap(True)
+        body.addWidget(line)
 
 
 def _dialog(parent, title):
@@ -102,7 +110,8 @@ def _footer(dlg, outer, go_text, go_icon):
 def confirm_start(parent, cutter, port, pen, material_name, values, panel_only, mirror, note, show=True,
                   details=()):
     """The check list before Start. values: (title, force text, speed text)
-    or None; details: [(label, value)] of the knife or the pen, under them;
+    or None; details: [(heading, [(label, value)])] of the knife or the pen,
+    under them (see _values_card);
     panel_only: the cutter takes force and speed from its panel;
     True = go on. show=False returns the dialog, not run (for tests)."""
     dlg, outer, body = _dialog(parent, _("Draw now?") if pen else _("Cut now?"))
@@ -114,7 +123,8 @@ def confirm_start(parent, cutter, port, pen, material_name, values, panel_only, 
     facts.setWordWrap(True)
     body.addWidget(facts)
     if values is not None:
-        body.addWidget(_values_card(values, details))
+        body.addWidget(_values_card(values))
+    _details(body, details)
     card = widgets.Card(_("Check before you go on"))
     if pen:
         items = [_("The pen (not the knife) is in the holder, its tip just above the paper"),
@@ -174,7 +184,8 @@ def confirm_knife_test(parent, cutter, size_mm, test_paths, values=None, show=Tr
     top.addWidget(question, 1)
     body.addLayout(top)
     if values is not None:
-        body.addWidget(_values_card(values, details))
+        body.addWidget(_values_card(values))
+    _details(body, details)
     card = widgets.Card(_("After cutting"))
     _checks(card, [_("Peel the triangle off: it should come away cleanly, and the backing must not be cut through"),
                    _("Too shallow: more force on the cutter's panel. Marks in the backing: less"),

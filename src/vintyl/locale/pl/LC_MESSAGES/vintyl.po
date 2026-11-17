@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 20:09+0100\n"
+"POT-Creation-Date: 2026-11-17 20:17+0100\n"
 "PO-Revision-Date: 2026-11-15 17:49+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -908,6 +908,9 @@ msgid ""
 msgstr ""
 "Jak szeroko nóż może ciąć (nie jak szeroki może być materiał: ploter „870"
 " mm” tnie około 780 mm)"
+
+msgid "In the holder"
+msgstr "W oprawce"
 
 msgid "Inner corners (%)"
 msgstr "Wcięcie (%)"
@@ -2072,6 +2075,12 @@ msgstr "Szerokość"
 
 msgid "Width (mm)"
 msgstr "Szerokość (mm)"
+
+msgid "Worked into the knife's path by Vintyl"
+msgstr "Program wlicza w ścieżkę noża"
+
+msgid "Worked into the pen's path by Vintyl"
+msgstr "Program wlicza w ścieżkę pisaka"
 
 msgid "Working it out…"
 msgstr "Liczę…"
