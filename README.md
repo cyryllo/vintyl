@@ -58,7 +58,7 @@ the stroke on, outside or inside the line and nine fill patterns.
 **Colours**: an SVG of several colours opens in its colours (similar ones
 merged, so one pen draws them; you see and change what goes where). The
 Colours panel sets the order they are drawn in, leaves a colour out and
-gives it its own pen width. Start goes colour after colour, with a pause to
+gives it its own pen width and its own fill pattern. Start goes colour after colour, with a pause to
 put in the next pen (or the next colour of vinyl); the origin stays, so the
 colours land on each other. Try it with
 [docs/demo/vintyl-demo.svg](docs/demo/vintyl-demo.svg).
@@ -143,7 +143,8 @@ website is built from [docs/](docs/) on GitHub Pages.
 ## License and credits
 
 Vintyl is free software under the **GPL-3.0-or-later**, see
-[LICENSE](LICENSE). Changes: [CHANGELOG.md](CHANGELOG.md).
+[LICENSE](LICENSE). Changes: [CHANGELOG.md](CHANGELOG.md); planned:
+[TODO.md](TODO.md) (in Polish).
 
 - **Code from other programs** (GPL-3.0-or-later, marked in each file's
   header): the drawing and editing code comes from

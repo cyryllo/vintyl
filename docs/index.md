@@ -98,7 +98,7 @@ description: Vintyl is free software for vinyl cutters on Linux. Draw, open SVG 
     <h3>Several colours, one after another</h3>
     <ul>
       <li>An SVG of several colours opens in its colours; similar ones are merged, so one pen draws them. You see and change what goes where.</li>
-      <li>The Colours panel: the order they are drawn in, a colour left out, its own pen width.</li>
+      <li>The Colours panel: the order they are drawn in, a colour left out, its own pen width and fill pattern.</li>
       <li>Start goes colour after colour, with a pause to put in the next pen, or the next colour of vinyl; the origin stays, so the colours land on each other.</li>
     </ul>
   </div>
@@ -148,7 +148,7 @@ Start.
   <div class="platform">
     <h3>From the source</h3>
     <p>Python 3.12 or newer and Qt 6 (PySide6).</p>
-    <p><a href="{{ site.repo }}#run-it-from-the-source">How to run it</a> · <a href="{{ site.repo }}/blob/main/CHANGELOG.md">What is new</a></p>
+    <p><a href="{{ site.repo }}#run-it-from-the-source">How to run it</a> · <a href="{{ site.repo }}/blob/main/CHANGELOG.md">What is new</a> · <a href="{{ site.repo }}/blob/main/TODO.md">Planned (in Polish)</a></p>
   </div>
 </div>
 
