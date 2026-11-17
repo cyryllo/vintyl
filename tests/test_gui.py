@@ -1638,4 +1638,9 @@ def test_the_knife_test_window_has_the_tests_picture(win):
     dlg = REAL_START_DIALOGS[1](win, "Seiki SK-870T", 15, weeding.knife_test(15), show=False)
     labels = dlg.findChildren(QLabel)
     assert any(l.pixmap() is not None and not l.pixmap().isNull() for l in labels)
+    # a value the material has not got: still there, as a dash with a note
+    dlg = REAL_START_DIALOGS[1](win, "Seiki SK-870T", 15, weeding.knife_test(15),
+                                ("Set on the cutter's panel", "90 g", None), show=False)
+    texts = [l.text() for l in dlg.findChildren(QLabel)]
+    assert "90 g" in texts and "–" in texts and any(t.startswith("not in the material") for t in texts)
     assert "Seiki SK-870T" in " ".join(l.text() for l in labels) and dlg.go_button.text() == "Cut the test"

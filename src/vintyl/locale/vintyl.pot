@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 19:11+0100\n"
+"POT-Creation-Date: 2026-11-17 19:15+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1963,6 +1963,9 @@ msgid "no port"
 msgstr ""
 
 msgid "none"
+msgstr ""
+
+msgid "not in the material: as the cutter has it now"
 msgstr ""
 
 msgid "not set"

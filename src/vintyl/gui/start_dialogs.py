@@ -48,14 +48,18 @@ def _values_card(values):
     lay.addWidget(head)
     grid = QGridLayout()
     grid.setHorizontalSpacing(24)
+    # both are always shown: a value the material has not got for this cutter
+    # is a dash and a note, so it does not look forgotten by the program
     for col, (name, value) in enumerate(((_("Force"), force), (_("Speed"), speed))):
-        if value is None:
-            continue
         small = QLabel(name)
-        big = QLabel(value)
+        big = QLabel(value if value is not None else "–")
         big.setObjectName("big_value")
         grid.addWidget(small, 0, col)
         grid.addWidget(big, 1, col)
+        if value is None:
+            missing = QLabel(_("not in the material: as the cutter has it now"))
+            missing.setWordWrap(True)
+            grid.addWidget(missing, 2, col)
     lay.addLayout(grid)
     return box
 
