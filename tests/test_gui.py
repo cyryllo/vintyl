@@ -37,9 +37,23 @@ def app():
 def messages(monkeypatch):
     """Message boxes wait for a click, which never comes offscreen: record them instead."""
     from PySide6.QtWidgets import QMessageBox
+    from vintyl.gui import widgets
     shown = []
     monkeypatch.setattr(QMessageBox, "warning", lambda parent, title, text, *a: shown.append(text))
     monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: QMessageBox.Yes)
+
+    def answer(parent, title, text, buttons, warning=False, show=True):
+        # a question: the main button (what the dialog offers to do); unsaved
+        # changes when a window closes: not saved (no file dialog in the tests)
+        if any(key == "discard" for key, _l, _r in buttons):
+            return "discard"
+        for key, _label, role in buttons:
+            if role in ("main", "danger"):
+                return key
+        return None
+    monkeypatch.setattr(widgets, "ask", answer)
+    monkeypatch.setattr(widgets, "warn", lambda parent, title, text: shown.append(text))
+    monkeypatch.setattr(widgets, "inform", lambda parent, title, text: None)
     return shown
 
 

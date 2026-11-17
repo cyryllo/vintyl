@@ -37,6 +37,7 @@ from vintyl.core.profile import ProfileError
 from vintyl.gui import N_, _, ngettext
 from vintyl.gui import icons
 from vintyl.gui import theme
+from vintyl.gui import widgets
 from vintyl.gui.canvas import MaterialView, shape_icon
 from vintyl.gui.sender import SendWorker
 from vintyl.gui import text as texts
@@ -665,7 +666,7 @@ class MainWindow(QMainWindow):
         10 mm from the origin, like an opened file. Returns the element or None."""
         name, _func, spec = ready.READY[key]
         if values is None:
-            values = self._ask_ready(_(name), spec, ready.LINKED.get(key, ()))
+            values = self._ask_ready(_(name), spec, ready.LINKED.get(key, ()), key)
             if values is None:
                 return None
         paths = ready.make(key, **values)
@@ -678,10 +679,6 @@ class MainWindow(QMainWindow):
     def insert_qr(self, text=None, size=30.0, error="m"):
         """A QR code to cut (asks for the text and size when text is None)."""
         if text is None:
-            from PySide6.QtWidgets import QDialog, QDialogButtonBox
-            dlg = QDialog(self)
-            dlg.setWindowTitle(_("QR code"))
-            form = QFormLayout(dlg)
             edit = QLineEdit(self.settings.value("qr/text", "https://"))
             edit.setMinimumWidth(320)
             sz = _spin(2000.0, 1, minimum=5.0)
@@ -691,15 +688,13 @@ class MainWindow(QMainWindow):
                                 ("h", _("highest (30%)"))):
                 err.addItem(label, code)
             err.setCurrentIndex(1)
-            err.setToolTip(_("How much of the code may be damaged and it still reads; more = more modules"))
-            form.addRow(_("Text or address"), edit)
-            form.addRow(_("Size (mm)"), sz)
-            form.addRow(_("Error correction"), err)
-            buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-            buttons.accepted.connect(dlg.accept)
-            buttons.rejected.connect(dlg.reject)
-            form.addRow(buttons)
-            if dlg.exec() != QDialog.Accepted:
+            got = widgets.form_dialog(self, _("QR code"), [("text", _("Text or address"), edit),
+                                                          ("size", _("Size (mm)"), sz),
+                                                          ("error", _("Error correction"), err)],
+                                      action=_("Insert"),
+                                      hint=_("Error correction: how much of the code may be damaged and it still "
+                                             "reads; more = more modules."))
+            if got is None:
                 return None
             text, size, error = edit.text(), sz.value(), err.currentData()
             self.settings.setValue("qr/text", text)
@@ -707,7 +702,7 @@ class MainWindow(QMainWindow):
         try:
             paths = ready.qr_code(text, size, error)
         except ValueError as e:
-            QMessageBox.warning(self, _("QR code"), str(e))
+            widgets.warn(self, _("QR code"), str(e))
             return None
         e = Element(self._name(_("QR code")), paths,
                     spec={"kind": "ready", "shape": "qr", "text": text, "size": size, "error": error})
@@ -726,15 +721,13 @@ class MainWindow(QMainWindow):
         distribute(chosen, across)
         self.refresh()
 
-    def _ask_ready(self, title, spec, linked=()):
-        """The parameters of a ready shape. linked: the sizes that keep their
-        proportions while the lock is on (on by default)."""
-        from PySide6.QtWidgets import QDialog, QDialogButtonBox
-        dlg = QDialog(self)
-        dlg.setWindowTitle(title)
-        form = QFormLayout(dlg)
+    def _ask_ready(self, title, spec, linked=(), key=None):
+        """The parameters of a ready shape (UI v2: its picture on the left,
+        changing with the fields). linked: the sizes that keep their
+        proportions while the switch is on (on by default)."""
         fields = {}
-        for key, label, default, lo, hi, step in spec:
+        rows = []
+        for k, label, default, lo, hi, step in spec:
             if isinstance(default, int):
                 w = QSpinBox()
                 w.setRange(int(lo), int(hi))
@@ -744,45 +737,56 @@ class MainWindow(QMainWindow):
                 w.setDecimals(1 if step >= 0.5 else 2)
                 w.setSingleStep(step)
             w.setValue(default)
-            form.addRow(_(label), w)
-            fields[key] = w
+            rows.append((k, _(label), w))
+            fields[k] = w
+        # the picture of the shape, drawn again at every change
+        preview = QLabel()
+        preview.setFixedSize(112, 112)
+        preview.setAlignment(Qt.AlignCenter)
+
+        def redraw(*_a):
+            if key is None:
+                return
+            try:
+                preview.setPixmap(shape_icon(ready.make(key, **{k: w.value() for k, w in fields.items()}),
+                                             96, theme.token("accent")).pixmap(96, 96))
+            except (ValueError, ZeroDivisionError):
+                preview.clear()
+        for w in fields.values():
+            w.valueChanged.connect(redraw)
+        redraw()
         self.ready_lock = None
         linked = [k for k in linked if k in fields]
         if len(linked) >= 2:
-            # the lock: change one size and the others follow, so the shape keeps its look
-            lock = QCheckBox(_("Keep the proportions"))
-            lock.setIcon(icons.tabler("link"))
+            # the switch: change one size and the others follow, so the shape keeps its look
+            lock = Switch(_("Keep the proportions"))
             lock.setChecked(str(self.settings.value("ready/keep_ratio", "true")).lower() == "true")
             lock.setToolTip(_("Change one size and the others follow, so the shape keeps its look"))
-            lock.toggled.connect(lambda on: (lock.setIcon(icons.tabler("link" if on else "link-off")),
-                                             self.settings.setValue("ready/keep_ratio", "true" if on else "false")))
-            lock.toggled.emit(lock.isChecked())
-            form.addRow(lock)
+            lock.toggled.connect(lambda on: self.settings.setValue("ready/keep_ratio", "true" if on else "false"))
+            rows.append((None, None, lock))
             self.ready_lock = lock
             last = {k: fields[k].value() for k in linked}
 
-            def follow(key, value):
-                old = last[key]
+            def follow(name, value):
+                old = last[name]
                 if lock.isChecked() and old > 1e-9:
-                    k = value / old
+                    factor = value / old
                     for other in linked:
-                        if other != key:
+                        if other != name:
                             w = fields[other]
                             w.blockSignals(True)
-                            w.setValue(min(w.maximum(), max(w.minimum(), last[other] * k)))
+                            w.setValue(min(w.maximum(), max(w.minimum(), last[other] * factor)))
                             w.blockSignals(False)
+                    redraw()
                 for other in linked:
                     last[other] = fields[other].value()
             for k in linked:
-                fields[k].valueChanged.connect(lambda v, key=k: follow(key, v))
-        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-        buttons.accepted.connect(dlg.accept)
-        buttons.rejected.connect(dlg.reject)
-        form.addRow(buttons)
+                fields[k].valueChanged.connect(lambda v, name=k: follow(name, v))
         self._ready_fields = fields
-        if dlg.exec() != QDialog.Accepted:
+        got = widgets.form_dialog(self, title, rows, action=_("Insert"), left=preview)
+        if got is None:
             return None
-        return {k: w.value() for k, w in fields.items()}
+        return {k: got[k] for k in fields}           # the fields went with the dialog
 
     def set_tool(self, tool):
         self.tool_actions[tool].setChecked(True)
@@ -1552,20 +1556,23 @@ class MainWindow(QMainWindow):
         def ask():
             if units is not None:
                 return units
-            from PySide6.QtWidgets import QInputDialog
             names = {"Millimeters": _("millimetres"), "Centimeters": _("centimetres"), "Inches": _("inches"),
                      "Meters": _("metres"), "Feet": _("feet"), "Mils": _("mils (1/1000 inch)")}
-            codes = [u for u in DXF_UNITS if u in names]
-            choice, ok = QInputDialog.getItem(self, _("Open DXF"),
-                                              _("%s does not say its units. They are:") % os.path.basename(path),
-                                              [names[c] for c in codes], 0, False)
-            return codes[[names[c] for c in codes].index(choice)] if ok else None
+            units_box = QComboBox()
+            for code in DXF_UNITS:
+                if code in names:
+                    units_box.addItem(names[code], code)
+            note = QLabel(_("%s does not say its units. They are:") % os.path.basename(path))
+            note.setWordWrap(True)
+            got = widgets.form_dialog(self, _("Open DXF"), [(None, None, note), ("units", _("Units"), units_box)],
+                                      action=_("Open"))
+            return got["units"] if got else None
         try:
             e = load_dxf(path, ask)
         except LoadCancelled:
             return None
         except LoadError as err:
-            QMessageBox.warning(self, _("Open DXF"), str(err))
+            widgets.warn(self, _("Open DXF"), str(err))
             return None
         w, h = e.size
         e.move_to(-PLACE_MARGIN_MM - w, -PLACE_MARGIN_MM - h)
@@ -1582,7 +1589,7 @@ class MainWindow(QMainWindow):
         try:
             design, st = project.load(path)
         except project.ProjectError as err:
-            QMessageBox.warning(self, _("Open"), str(err))
+            widgets.warn(self, _("Open"), str(err))
             return None
         self.design = design
         self.selected = None
@@ -1613,7 +1620,7 @@ class MainWindow(QMainWindow):
         try:
             project.save(path, self.design, self.project_settings())
         except OSError as err:
-            QMessageBox.warning(self, _("Save project"), _("Cannot save %s: %s") % (path, err.strerror or err))
+            widgets.warn(self, _("Save project"), _("Cannot save %s: %s") % (path, err.strerror or err))
             return None
         self.project_path = path
         self.modified = False
@@ -1625,12 +1632,12 @@ class MainWindow(QMainWindow):
         """Unsaved changes: ask whether to save them. True: go on."""
         if not getattr(self, "modified", False):
             return True
-        answer = QMessageBox.question(
-            self, _("Unsaved changes"), _("Save the changes to the project first?"),
-            QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel, QMessageBox.Save)
-        if answer == QMessageBox.Cancel:
+        answer = widgets.ask(self, _("Unsaved changes"), _("Save the changes to the project first?"),
+                             [("discard", _("Don't save"), "left"), ("cancel", _("Cancel"), "cancel"),
+                              ("save", _("Save"), "main")])
+        if answer is None:
             return False
-        if answer == QMessageBox.Save:
+        if answer == "save":
             return self.save_project() is not None
         return True
 
@@ -1646,7 +1653,7 @@ class MainWindow(QMainWindow):
         try:
             e = load_svg(path)
         except LoadError as err:
-            QMessageBox.warning(self, _("Open SVG"), str(err))
+            widgets.warn(self, _("Open SVG"), str(err))
             return None
         # place it on the material, PLACE_MARGIN_MM from the origin (lower right) both ways
         w, h = e.size
@@ -1832,7 +1839,7 @@ class MainWindow(QMainWindow):
         spec = self._text_spec_from_widgets()
         paths = texts.spec_paths(spec)
         if not paths:
-            QMessageBox.warning(self, _("Text"), _("Type the text in the options bar first."))
+            widgets.warn(self, _("Text"), _("Type the text in the options bar first."))
             return
         e = Element(spec["text"].split("\n")[0][:30] or _("Text"), paths, spec=spec)
         e.move_to(p.x(), p.y())                       # the text starts where it was clicked
@@ -1952,45 +1959,31 @@ class MainWindow(QMainWindow):
         return self.selection
 
     def _ask_offset(self):
-        from PySide6.QtWidgets import QDialog, QDialogButtonBox, QRadioButton
-        dlg = QDialog(self)
-        dlg.setWindowTitle(_("Offset"))
-        form = QFormLayout(dlg)
-        dist = _spin(500.0, 2, minimum=0.01)
-        dist.setValue(float(self.settings.value("offset/distance", 3.0)))
-        out_btn, in_btn = QRadioButton(_("outwards")), QRadioButton(_("inwards"))
-        (out_btn if self.settings.value("offset/outward", "true") == "true" else in_btn).setChecked(True)
-        round_btn, sharp_btn = QRadioButton(_("round")), QRadioButton(_("sharp"))
-        (round_btn if self.settings.value("offset/round", "true") == "true" else sharp_btn).setChecked(True)
-        keep = QCheckBox(_("Keep the original shape"))
-        keep.setChecked(self.settings.value("offset/keep", "true") == "true")
-        no_holes = QCheckBox(_("Remove the holes inside"))
-        no_holes.setToolTip(_("Only the outer outline stays, with no holes (in O, A, a ring): "
-                              "a solid backing for a text in another colour"))
-        no_holes.setChecked(self.settings.value("offset/no_holes", "false") == "true")
-        form.addRow(_("Distance"), dist)
-        way = QHBoxLayout()
-        way.addWidget(out_btn)
-        way.addWidget(in_btn)
-        form.addRow(_("Direction"), way)
-        corners_box = QWidget()
-        corners = QHBoxLayout(corners_box)
-        corners.setContentsMargins(0, 0, 0, 0)
-        corners.addWidget(round_btn)
-        corners.addWidget(sharp_btn)
-        form.addRow(_("Corners"), corners_box)
-        form.addRow(no_holes)
-        form.addRow(keep)
-        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-        buttons.accepted.connect(dlg.accept)
-        buttons.rejected.connect(dlg.reject)
-        form.addRow(buttons)
-        if dlg.exec() != QDialog.Accepted:
+        from vintyl.gui.widgets import Segmented
+        st = self.settings
+        dist = _spin(500.0, 2, " mm", minimum=0.01)
+        dist.setValue(float(st.value("offset/distance", 3.0)))
+        way = Segmented()
+        way.addItem(_("outwards"), True)
+        way.addItem(_("inwards"), False)
+        way.setCurrentIndex(0 if st.value("offset/outward", "true") == "true" else 1)
+        corners = Segmented()
+        corners.addItem(_("round"), True)
+        corners.addItem(_("sharp"), False)
+        corners.setCurrentIndex(0 if st.value("offset/round", "true") == "true" else 1)
+        keep = Switch(_("Keep the original shape"))
+        keep.setChecked(st.value("offset/keep", "true") == "true")
+        no_holes = Switch(_("Remove the holes inside"))
+        no_holes.setChecked(st.value("offset/no_holes", "false") == "true")
+        values = self._ask(_("Offset"), [("distance", _("Distance"), dist), ("outward", _("Direction"), way),
+                                         ("round", _("Corners"), corners), ("keep", None, keep),
+                                         ("no_holes", None, no_holes)],
+                           hint=_("Only the outer outline stays, with no holes (in O, A, a ring): "
+                                  "a solid backing for a text in another colour"))
+        if values is None:
             return None
-        values = {"distance": dist.value(), "outward": out_btn.isChecked(), "round": round_btn.isChecked(),
-                  "keep": keep.isChecked(), "no_holes": no_holes.isChecked()}
         for k, v in values.items():
-            self.settings.setValue("offset/" + k, str(v).lower() if isinstance(v, bool) else v)
+            st.setValue("offset/" + k, str(v).lower() if isinstance(v, bool) else v)
         return values
 
     # ---- fill patterns (for the pen), after Kerfly's Fill tool ---------------------------------------
@@ -2626,7 +2619,7 @@ class MainWindow(QMainWindow):
             for a in (self.act_group, self.act_ungroup, self.act_copies):
                 menu.addAction(a)
             menu.addSeparator()
-            order = menu.addMenu(_("Cutting order"))
+            order = menu.addMenu(icons.tabler("arrow-up"), _("Cutting order"))
             order.addAction(_("Cut earlier (up the list)"), lambda: self.move_selected(-1))
             order.addAction(_("Cut later (down the list)"), lambda: self.move_selected(1))
             order.addAction(_("Cut first"), lambda: self.move_selected_to(0))
@@ -2635,7 +2628,8 @@ class MainWindow(QMainWindow):
             for a in (self.act_rot_left, self.act_rot_right, self.act_mirror_h):
                 menu.addAction(a)
             menu.addAction(icons.tabler("vector-bezier-2"), _("Edit nodes"), lambda: self._on_edit_nodes(element))
-            cut = menu.addAction(_("Cut this element"))
+            cut = menu.addAction(icons.tabler("check"), _("Cut this element"))
+            cut.setIconVisibleInMenu(False)            # the check mark of a checkable item shows it
             cut.setCheckable(True)
             cut.setChecked(element.cut)
             cut.toggled.connect(lambda on: self.opt_cut.setChecked(on))
@@ -2854,7 +2848,7 @@ class MainWindow(QMainWindow):
         try:
             job = self.build()
         except (JobError, ProfileError) as e:
-            QMessageBox.warning(self, _("Save cutter file"), str(e))
+            widgets.warn(self, _("Save cutter file"), str(e))
             return None
         if path is None:
             path, _f = QFileDialog.getSaveFileName(self, _("Save cutter file"), "design" + job.extension,
@@ -2872,7 +2866,7 @@ class MainWindow(QMainWindow):
         try:
             job = self.build()
         except (JobError, ProfileError) as e:
-            QMessageBox.warning(self, _("Start"), str(e))
+            widgets.warn(self, _("Start"), str(e))
             return None
         p = self.job_profile()
         if self.is_pen():
@@ -2896,7 +2890,8 @@ class MainWindow(QMainWindow):
         if self.mirror_job.isChecked():
             ask = (ask[0], ask[1] + "\n\n" + _("MIRRORED for heat transfer vinyl: the vinyl's shiny side "
                                                "(the carrier) down, the matt side up to the knife."))
-        if QMessageBox.question(self, ask[0], ask[1]) != QMessageBox.Yes:
+        if widgets.ask(self, ask[0], ask[1], [("cancel", _("Cancel"), "cancel"),
+                                              ("go", _("Draw") if self.is_pen() else _("Cut"), "main")]) != "go":
             return None
         return self._send(job, p, "the design")
 
@@ -2927,32 +2922,11 @@ class MainWindow(QMainWindow):
         self.send_label.setText("%s  %d%%" % (_("Sending to the cutter"), round(100.0 * sent / max(total, 1))))
 
     # ---- copies, weeding lines, strips ------------------------------------------------------------
-    def _ask(self, title, rows, extra=None):
-        """A small dialog of fields: rows = [(key, label, widget)]; returns
-        {key: value} or None. extra(form) may add more (e.g. a button)."""
-        from PySide6.QtWidgets import QDialog, QDialogButtonBox
-        dlg = QDialog(self)
-        dlg.setWindowTitle(title)
-        form = QFormLayout(dlg)
-        for _key, label, w in rows:
-            form.addRow(label, w) if label else form.addRow(w)
-        if extra:
-            extra(form)
-        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-        buttons.accepted.connect(dlg.accept)
-        buttons.rejected.connect(dlg.reject)
-        form.addRow(buttons)
-        if dlg.exec() != QDialog.Accepted:
-            return None
-        out = {}
-        for key, _label, w in rows:
-            if isinstance(w, QComboBox):
-                out[key] = w.currentData()
-            elif isinstance(w, QCheckBox):
-                out[key] = w.isChecked()
-            else:
-                out[key] = w.value()
-        return out
+    def _ask(self, title, rows, extra=None, hint=None, action=None):
+        """A small dialog of fields (UI v2, widgets.form_dialog): rows =
+        [(key, label, widget)]; returns {key: value} or None. extra(layout)
+        may add more (e.g. a button); hint: a line under the fields."""
+        return widgets.form_dialog(self, title, rows, action=action, hint=hint, extra=extra)
 
     def copies_selected(self, values=None):
         """Copies of the selection in rows (up the material) and columns
@@ -2979,9 +2953,10 @@ class MainWindow(QMainWindow):
                 b = QPushButton(_("As many columns as fit in the width"))
                 b.clicked.connect(lambda: cols.setValue(max(1, int((x1 + self.profile.width_mm + gap.value())
                                                                    / (w + gap.value())))))
-                form.addRow(b)
+                form.addWidget(b)
             values = self._ask(_("Copies"), [("rows", _("Rows (along)"), rows), ("columns", _("Columns (across)"), cols),
-                                             ("gap", _("Gap"), gap)], fill_width)
+                                             ("gap", _("Gap"), gap)], fill_width,
+                               hint=_("The gap is the vinyl left between the copies."))
             if values is None:
                 return []
             for k in ("rows", "columns", "gap"):
@@ -3020,8 +2995,9 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage(_("There is nothing to cut yet."), 6000)
             return None
         if values is None:
-            way = QComboBox()
-            for code, label in (("upright", N_("up and down")), ("level", N_("across")), ("both", N_("both"))):
+            from vintyl.gui.widgets import Segmented
+            way = Segmented()
+            for code, label in (("level", N_("across")), ("upright", N_("up and down")), ("both", N_("both"))):
                 way.addItem(_(label), code)
             way.setCurrentIndex(max(0, way.findData(self.settings.value("weed/direction", "upright"))))
             spacing = _spin(1000.0, 0, minimum=5.0)
@@ -3031,7 +3007,8 @@ class MainWindow(QMainWindow):
             margin.setValue(float(self.settings.value("weed/margin", 1.5)))
             margin.setToolTip(_("The lines stop this far from the shapes"))
             values = self._ask(_("Weeding lines"), [("direction", _("Lines"), way), ("spacing", _("Every"), spacing),
-                                                    ("margin", _("Margin"), margin)])
+                                                    ("margin", _("Margin"), margin)],
+                               hint=_("Margin: the lines stop this far from the shapes."))
             if values is None:
                 return None
             for k, v in values.items():
@@ -3092,7 +3069,9 @@ class MainWindow(QMainWindow):
             gap.setValue(20.0)
             gap.setToolTip(_("Space between the strips on the material"))
             values = self._ask(_("Split into strips"), [("direction", _("Split"), way), ("size", _("Strip"), size),
-                                                         ("overlap", _("Overlap"), overlap), ("gap", _("Gap"), gap)])
+                                                         ("overlap", _("Overlap"), overlap), ("gap", _("Gap"), gap)],
+                               hint=_("Overlap: the strips cover this much of each other, for laying them "
+                                      "together."))
             if values is None:
                 return []
         across = values["direction"] == "across"
@@ -3170,16 +3149,17 @@ class MainWindow(QMainWindow):
         try:
             job = self.knife_test_job()
         except (JobError, ProfileError) as e:
-            QMessageBox.warning(self, _("Knife test"), str(e))
+            widgets.warn(self, _("Knife test"), str(e))
             return None
         p = self.job_profile()
-        if QMessageBox.question(
+        if widgets.ask(
                 self, _("Knife test"),
                 _("Cut the knife test on %s: a %g mm square with a triangle, %g mm from the origin?\n\n"
                   "Then peel the triangle off: it should come away cleanly, and the backing must not be "
                   "cut through. Too shallow: more force (on the cutter's panel); marks in the backing: less.\n\n"
                   "Afterwards move the origin on, so the design is not cut over the test.")
-                % (p.name, self.KNIFE_TEST_MM, self.KNIFE_TEST_FROM_ORIGIN_MM)) != QMessageBox.Yes:
+                % (p.name, self.KNIFE_TEST_MM, self.KNIFE_TEST_FROM_ORIGIN_MM),
+                [("cancel", _("Cancel"), "cancel"), ("go", _("Cut the test"), "main")]) != "go":
             return None
         return self._send(job, p, "knife test")
 
@@ -3189,7 +3169,7 @@ class MainWindow(QMainWindow):
         self._set_sending(False)
         self.statusBar().showMessage(message, 15000)
         if not ok:
-            QMessageBox.warning(self, _("Cutting"), message)
+            widgets.warn(self, _("Cutting"), message)
 
     def _set_sending(self, on):
         """While sending: Stop works, nothing else that would change the job."""
@@ -3240,10 +3220,10 @@ class MainWindow(QMainWindow):
                 self.update_bar.show_release(release, __version__)
             elif not auto:
                 if error:
-                    QMessageBox.warning(self, _("New version"),
+                    widgets.warn(self, _("New version"),
                                         _("Could not ask GitHub (no internet?): %s") % error)
                 else:
-                    QMessageBox.information(self, _("New version"), _("You have the newest Vintyl (%s).")
+                    widgets.inform(self, _("New version"), _("You have the newest Vintyl (%s).")
                                             % __version__)
         check.done.connect(done)
         self._update_check = check
@@ -3261,15 +3241,15 @@ class MainWindow(QMainWindow):
                     desktop_entry.appimage_path():
                 return []
             self.settings.setValue("desktop/asked", "yes")
-            if QMessageBox.question(self, _("Applications menu"),
-                                    _("Add Vintyl to the applications menu, and open .vintyl projects with it?\n"
-                                      "(Help → Add Vintyl to the applications menu does it later too.)")) \
-                    != QMessageBox.Yes:
+            if widgets.ask(self, _("Applications menu"),
+                           _("Add Vintyl to the applications menu, and open .vintyl projects with it?\n"
+                             "(Help → Add Vintyl to the applications menu does it later too.)"),
+                           [("cancel", _("Not now"), "cancel"), ("add", _("Add to the menu"), "main")]) != "add":
                 return []
         try:
             written = desktop_entry.install()
         except (OSError, RuntimeError) as e:
-            QMessageBox.warning(self, _("Applications menu"), str(e))
+            widgets.warn(self, _("Applications menu"), str(e))
             return []
         self.statusBar().showMessage(_("Vintyl is in the applications menu (it may need a new login to show)."),
                                      10000)

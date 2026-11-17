@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 18:35+0100\n"
+"POT-Creation-Date: 2026-11-17 18:50+0100\n"
 "PO-Revision-Date: 2026-11-15 17:49+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -209,6 +209,9 @@ msgstr ""
 "Dodać Vintyl do menu aplikacji i otwierać nim projekty .vintyl?\n"
 "(Pomoc → Dodaj Vintyl do menu aplikacji zrobi to też później.)"
 
+msgid "Add to the menu"
+msgstr "Dodaj do menu"
+
 msgid "Align"
 msgstr "Wyrównaj"
 
@@ -387,6 +390,9 @@ msgstr "Narożniki"
 msgid "Could not ask GitHub (no internet?): %s"
 msgstr "Nie udało się zapytać GitHuba (brak internetu?): %s"
 
+msgid "Create"
+msgstr "Utwórz"
+
 msgid "Cross"
 msgstr "Krzyżyk"
 
@@ -452,6 +458,9 @@ msgstr ""
 "mniejszy.\n"
 "\n"
 "Potem przesuń punkt zerowy dalej, żeby projekt nie wypadł na teście."
+
+msgid "Cut the test"
+msgstr "Wytnij test"
 
 msgid "Cut this element"
 msgstr "Tnij ten element"
@@ -548,6 +557,9 @@ msgstr "Zrób ponownie to, co zostało cofnięte"
 msgid "Do not remind about this version again (a later one is shown)"
 msgstr "Nie przypominaj o tej wersji (późniejsza zostanie pokazana)"
 
+msgid "Don't save"
+msgstr "Nie zapisuj"
+
 msgid ""
 "Drag nodes and handles · double-click a side: add a node · D delete · L "
 "line · C curve · O smooth · Z close/open · B break"
@@ -596,6 +608,13 @@ msgstr "Pusto"
 
 msgid "Error correction"
 msgstr "Korekcja błędów"
+
+msgid ""
+"Error correction: how much of the code may be damaged and it still reads;"
+" more = more modules."
+msgstr ""
+"Korekcja: jaka część kodu może być uszkodzona, a dalej da się go "
+"odczytać. Więcej = więcej kwadracików."
 
 msgid "Every"
 msgstr "Co"
@@ -787,13 +806,6 @@ msgstr "O ile czubek ostrza jest za osią oprawki. Ostrze 45°: zwykle 0,20–0,
 msgid "How far the letters stand from the path, mm"
 msgstr "Jak daleko od ścieżki stoją litery, mm"
 
-msgid ""
-"How much of the code may be damaged and it still reads; more = more "
-"modules"
-msgstr ""
-"Jaka część kodu może być uszkodzona, a dalej da się go odczytać; więcej ="
-" więcej kwadracików"
-
 msgid "How to do it"
 msgstr "Jak to zrobić"
 
@@ -812,6 +824,9 @@ msgstr ""
 
 msgid "Inner corners (%)"
 msgstr "Wcięcie (%)"
+
+msgid "Insert"
+msgstr "Wstaw"
 
 #, python-format
 msgid "Insert: %s"
@@ -938,6 +953,9 @@ msgstr "Wiele kopii zaznaczenia w rzędach i kolumnach, z odstępem"
 msgid "Margin"
 msgstr "Margines"
 
+msgid "Margin: the lines stop this far from the shapes."
+msgstr "Margines: linie kończą się tak daleko od kształtów."
+
 msgid "Marker pen"
 msgstr "Pisak"
 
@@ -1017,6 +1035,9 @@ msgstr "Żaden kształt się nie mieści: zmniejsz je albo zwęź margines."
 
 msgid "Nodes"
 msgstr "Węzły"
+
+msgid "Not now"
+msgstr "Nie teraz"
 
 msgid "Not plugged in"
 msgstr "Niepodłączony"
@@ -1134,6 +1155,11 @@ msgstr "Nadcięcie"
 msgid "Overlap"
 msgstr "Zakładka"
 
+msgid ""
+"Overlap: the strips cover this much of each other, for laying them "
+"together."
+msgstr "Zakładka: o tyle pasy na siebie zachodzą, żeby je złożyć."
+
 msgid "Paste"
 msgstr "Wklej"
 
@@ -1228,6 +1254,9 @@ msgstr "Zgłoś problem…"
 
 msgid "Report my cutter…"
 msgstr "Zgłoś mój ploter…"
+
+msgid "Restore"
+msgstr "Przywróć"
 
 msgid "Restore factory settings"
 msgstr "Przywróć ustawienia fabryczne"
@@ -1626,6 +1655,9 @@ msgstr "Projekt nie mieści się na folii: wystaje %s o %.1f mm."
 msgid "The design fits in one strip; nothing to split."
 msgstr "Projekt mieści się w jednym pasie; nie ma czego dzielić."
 
+msgid "The gap is the vinyl left between the copies."
+msgstr "Odstęp to folia zostawiona między kopiami."
+
 msgid "The language and the look change at the next start of Vintyl."
 msgstr "Język i wygląd zmienią się przy następnym uruchomieniu Vintyla."
 
@@ -1718,6 +1750,9 @@ msgstr "Suma"
 
 msgid "Union: join the selected shapes into one outline"
 msgstr "Suma: połącz zaznaczone kształty w jeden kontur"
+
+msgid "Units"
+msgstr "Jednostki"
 
 msgid "Units per mm"
 msgstr "Jednostki na mm"
@@ -2250,4 +2285,13 @@ msgstr "← Y w poprzek, mm"
 
 #~ msgid "← Y across"
 #~ msgstr "← Y w poprzek"
+
+#~ msgid ""
+#~ "How much of the code may be "
+#~ "damaged and it still reads; more ="
+#~ " more modules"
+#~ msgstr ""
+#~ "Jaka część kodu może być uszkodzona, "
+#~ "a dalej da się go odczytać; więcej"
+#~ " = więcej kwadracików"
 

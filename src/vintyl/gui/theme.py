@@ -166,6 +166,12 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: trans
 QFrame#zoom_box { background: rgba(31, 36, 48, 215); border-radius: 8px; }
 QFrame#zoom_box QToolButton { color: #ffffff; border: 0; padding: 2px 6px; min-height: 26px; }
 QToolButton#zoom_label { min-width: 48px; font-weight: 600; }
+QMenu { background: $panel; border: 1px solid $border; border-radius: 8px; padding: 6px; color: $ink; }
+QMenu::item { padding: 6px 28px 6px 10px; border-radius: 6px; }
+QMenu::item:selected { background: $accent_soft; color: $accent_ink; }
+QMenu::item:disabled { color: $disabled_text; }
+QMenu::separator { height: 1px; background: $border; margin: 4px 6px; }
+QMenu::icon { padding-left: 8px; }
 QGroupBox { font-weight: bold; }
 QGroupBox QLabel, QGroupBox QCheckBox { font-weight: normal; }
 """)

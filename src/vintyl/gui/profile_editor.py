@@ -21,6 +21,7 @@ from vintyl.core import profile as profiles
 from vintyl.core import transport
 from vintyl.gui import _
 from vintyl.gui import theme
+from vintyl.gui import widgets
 
 
 def _dspin(maximum, decimals=2, suffix=" mm", minimum=0.0, step=None):
@@ -276,7 +277,7 @@ class ProfileEditor(QDialog):
         try:
             profiles.save_user(pid, self.profile())
         except (profiles.ProfileError, OSError) as e:
-            QMessageBox.warning(self, _("Cutter settings"), str(e))
+            widgets.warn(self, _("Cutter settings"), str(e))
             return False
         self.chosen = pid
         return True
@@ -288,27 +289,31 @@ class ProfileEditor(QDialog):
 
     def save_new(self, name=None):
         if not isinstance(name, str):
-            name, ok = QInputDialog.getText(self, _("New cutter"), _("Name of the new cutter:"),
-                                            text=_("%s (mine)") % self.name.text().strip())
-            if not ok or not name.strip():
+            field = QLineEdit(_("%s (mine)") % self.name.text().strip())
+            field.setMinimumWidth(320)
+            got = widgets.form_dialog(self, _("New cutter"), [("name", None, field)], action=_("Create"),
+                                      hint=_("Name of the new cutter:"))
+            name = (got or {}).get("name", "")
+            if not name.strip():
                 return
         self.name.setText(name.strip())
         if self._write(profiles.new_id(name.strip())):
             self.accept()
 
     def restore(self):
-        if QMessageBox.question(self, _("Restore factory settings"),
-                                _("Forget your changes of \"%s\" and use the settings it came with?")
-                                % self.entry["profile"].name) != QMessageBox.Yes:
+        if widgets.ask(self, _("Restore factory settings"),
+                       _("Forget your changes of \"%s\" and use the settings it came with?")
+                       % self.entry["profile"].name,
+                       [("cancel", _("Cancel"), "cancel"), ("restore", _("Restore"), "main")]) != "restore":
             return
         profiles.delete_user(self.entry["id"])
         self.chosen = self.entry["id"]
         self.accept()
 
     def delete(self):
-        if QMessageBox.question(self, _("Delete this cutter"),
-                                _("Delete the cutter profile \"%s\"?") % self.entry["profile"].name) \
-                != QMessageBox.Yes:
+        if widgets.ask(self, _("Delete this cutter"),
+                       _("Delete the cutter profile \"%s\"?") % self.entry["profile"].name,
+                       [("cancel", _("Cancel"), "cancel"), ("delete", _("Delete"), "danger")]) != "delete":
             return
         profiles.delete_user(self.entry["id"])
         self.chosen = ""                       # the window chooses another one

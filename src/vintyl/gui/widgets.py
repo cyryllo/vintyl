@@ -402,3 +402,59 @@ class ToolTile(QToolButton):
             p.setPen(color)
             p.drawText(self.rect().adjusted(0, 0, 0, -4), Qt.AlignHCenter | Qt.AlignBottom, self.hint)
         p.end()
+
+
+# ---- questions and messages (UI v2: the main button says what will happen) --------------------------
+def ask(parent, title, text, buttons, warning=False, show=True):
+    """A question. buttons: [(key, label, role)], role "left" (a button on the
+    left, e.g. "Don't save"), "cancel", "main" (the accent) or "danger" (red).
+    Returns the key of the button pressed, None when closed or cancelled.
+    show=False returns the dialog, not run (for tests)."""
+    dlg = QDialog(parent)
+    dlg.setWindowTitle(title)
+    outer = QVBoxLayout(dlg)
+    outer.setContentsMargins(0, 0, 0, 0)
+    outer.setSpacing(0)
+    body = QHBoxLayout()
+    body.setContentsMargins(20, 18, 20, 18)
+    body.setSpacing(12)
+    if warning:
+        from vintyl.gui import icons
+        mark = QLabel()
+        mark.setPixmap(icons.tabler("alert-triangle", theme.token("warn_ink")).pixmap(24, 24))
+        body.addWidget(mark, 0, Qt.AlignTop)
+    label = QLabel(text)
+    label.setWordWrap(True)
+    label.setMinimumWidth(360)
+    label.setTextInteractionFlags(Qt.TextSelectableByMouse)
+    body.addWidget(label, 1)
+    outer.addLayout(body, 1)
+    chosen = []
+    left, right = [], []
+    for key, text_, role in buttons:
+        b = QPushButton(text_)
+        if role == "main":
+            b.setObjectName("primary")
+            b.setDefault(True)
+        elif role == "danger":
+            b.setObjectName("danger")
+        if role == "cancel":
+            b.clicked.connect(dlg.reject)
+        else:
+            b.clicked.connect(lambda _c=False, k=key: (chosen.append(k), dlg.accept()))
+        (left if role == "left" else right).append(b)
+    footer(outer, right, left)
+    if not show:
+        return dlg
+    dlg.exec()
+    return chosen[0] if chosen else None
+
+
+def warn(parent, title, text):
+    """Something went wrong or cannot be done: a warning sign, the text, OK."""
+    ask(parent, title, text, [("ok", _("OK"), "main")], warning=True)
+
+
+def inform(parent, title, text):
+    """A message without a warning: the text and OK."""
+    ask(parent, title, text, [("ok", _("OK"), "main")])

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 18:35+0100\n"
+"POT-Creation-Date: 2026-11-17 18:50+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -186,6 +186,9 @@ msgid ""
 "(Help → Add Vintyl to the applications menu does it later too.)"
 msgstr ""
 
+msgid "Add to the menu"
+msgstr ""
+
 msgid "Align"
 msgstr ""
 
@@ -352,6 +355,9 @@ msgstr ""
 msgid "Could not ask GitHub (no internet?): %s"
 msgstr ""
 
+msgid "Create"
+msgstr ""
+
 msgid "Cross"
 msgstr ""
 
@@ -408,6 +414,9 @@ msgid ""
 " marks in the backing: less.\n"
 "\n"
 "Afterwards move the origin on, so the design is not cut over the test."
+msgstr ""
+
+msgid "Cut the test"
 msgstr ""
 
 msgid "Cut this element"
@@ -501,6 +510,9 @@ msgstr ""
 msgid "Do not remind about this version again (a later one is shown)"
 msgstr ""
 
+msgid "Don't save"
+msgstr ""
+
 msgid ""
 "Drag nodes and handles · double-click a side: add a node · D delete · L "
 "line · C curve · O smooth · Z close/open · B break"
@@ -546,6 +558,11 @@ msgid "Empty"
 msgstr ""
 
 msgid "Error correction"
+msgstr ""
+
+msgid ""
+"Error correction: how much of the code may be damaged and it still reads;"
+" more = more modules."
 msgstr ""
 
 msgid "Every"
@@ -721,11 +738,6 @@ msgstr ""
 msgid "How far the letters stand from the path, mm"
 msgstr ""
 
-msgid ""
-"How much of the code may be damaged and it still reads; more = more "
-"modules"
-msgstr ""
-
 msgid "How to do it"
 msgstr ""
 
@@ -741,6 +753,9 @@ msgid ""
 msgstr ""
 
 msgid "Inner corners (%)"
+msgstr ""
+
+msgid "Insert"
 msgstr ""
 
 #, python-format
@@ -862,6 +877,9 @@ msgstr ""
 msgid "Margin"
 msgstr ""
 
+msgid "Margin: the lines stop this far from the shapes."
+msgstr ""
+
 msgid "Marker pen"
 msgstr ""
 
@@ -932,6 +950,9 @@ msgid "No shape fits inside: make them smaller or the margin narrower."
 msgstr ""
 
 msgid "Nodes"
+msgstr ""
+
+msgid "Not now"
 msgstr ""
 
 msgid "Not plugged in"
@@ -1028,6 +1049,11 @@ msgstr ""
 msgid "Overlap"
 msgstr ""
 
+msgid ""
+"Overlap: the strips cover this much of each other, for laying them "
+"together."
+msgstr ""
+
 msgid "Paste"
 msgstr ""
 
@@ -1115,6 +1141,9 @@ msgid "Report a problem…"
 msgstr ""
 
 msgid "Report my cutter…"
+msgstr ""
+
+msgid "Restore"
 msgstr ""
 
 msgid "Restore factory settings"
@@ -1464,6 +1493,9 @@ msgstr ""
 msgid "The design fits in one strip; nothing to split."
 msgstr ""
 
+msgid "The gap is the vinyl left between the copies."
+msgstr ""
+
 msgid "The language and the look change at the next start of Vintyl."
 msgstr ""
 
@@ -1551,6 +1583,9 @@ msgid "Union"
 msgstr ""
 
 msgid "Union: join the selected shapes into one outline"
+msgstr ""
+
+msgid "Units"
 msgstr ""
 
 msgid "Units per mm"

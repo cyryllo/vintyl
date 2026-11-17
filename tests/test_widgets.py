@@ -149,3 +149,25 @@ def test_value_of_a_combo_box(app):
     assert value_of(c) == "a"
     with pytest.raises(TypeError):
         value_of(object())
+
+
+def test_a_question_returns_the_buttons_action(app):
+    from PySide6.QtWidgets import QPushButton
+    from vintyl.gui.widgets import ask
+
+    def press(label):
+        def go():
+            for w in QApplication.topLevelWidgets():
+                if w.isVisible() and w.windowTitle() == "Delete this cutter":
+                    [b for b in w.findChildren(QPushButton) if b.text() == label][0].click()
+                    return
+            QTimer.singleShot(20, go)
+        QTimer.singleShot(20, go)
+
+    buttons = [("cancel", "Cancel", "cancel"), ("delete", "Delete", "danger")]
+    press("Delete")
+    assert ask(None, "Delete this cutter", "Delete it?", buttons) == "delete"
+    press("Cancel")
+    assert ask(None, "Delete this cutter", "Delete it?", buttons) is None
+    dlg = ask(None, "Delete this cutter", "Delete it?", buttons, warning=True, show=False)
+    assert [b.objectName() for b in dlg.findChildren(QPushButton)] == ["", "danger"]
