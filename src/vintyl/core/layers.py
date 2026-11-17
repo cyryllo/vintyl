@@ -61,6 +61,15 @@ def new_id(layers):
     return "c%d" % n
 
 
+def unique_name(base, layers):
+    """base, or "base 2", "base 3"... when a layer has that name."""
+    names = {layer.name for layer in layers}
+    label, n = base, 2
+    while label in names:
+        label, n = "%s %d" % (base, n), n + 1
+    return label
+
+
 # ---- colours ---------------------------------------------------------------------------------
 _HEX = re.compile(r"^#?([0-9a-fA-F]{6})$")
 
@@ -102,8 +111,8 @@ def delta_e(a, b):
 
 def merge_similar(counts, limit=SIMILAR_DELTA_E):
     """Group similar colours. counts: {colour: how many shapes have it}.
-    Returns [(kept colour, [colours merged into it])], the most used first;
-    each group is kept as its most used colour."""
+    Returns [(kept colour, [colours merged into it])], the groups with the
+    most shapes first; each group is kept as its most used colour."""
     groups = []
     for color in sorted(counts, key=lambda c: (-counts[c], c)):
         for kept, members in groups:
@@ -112,12 +121,36 @@ def merge_similar(counts, limit=SIMILAR_DELTA_E):
                 break
         else:
             groups.append((color, [color]))
+    groups.sort(key=lambda g: -sum(counts[c] for c in g[1]))      # stable: ties keep their order
     return groups
 
 
+def assign(colors, layers, merge=True, name=None, limit=SIMILAR_DELTA_E):
+    """Each colour of an imported file to a layer: {colour: layer}. colors:
+    {colour: how many shapes have it}. A colour goes to an existing layer of
+    the same colour, or with merge to one of a similar colour (also to one
+    made for a similar colour of this file); else a new layer is appended to
+    `layers`, named name(colour) (default: color_name), with a number when
+    that name is taken."""
+    out = {}
+    groups = merge_similar(colors, limit) if merge else [(c, [c]) for c in sorted(colors, key=lambda c: (-colors[c], c))]
+    for kept, members in groups:
+        target = None
+        for layer in layers:
+            if layer.color == kept or (merge and delta_e(layer.color, kept) < limit):
+                target = layer
+                break
+        if target is None:
+            target = Layer(new_id(layers), unique_name((name or color_name)(kept), layers), kept)
+            layers.append(target)
+        for color in members:
+            out[color] = target
+    return out
+
+
 # a colour's name in words: (name, hue from, hue to) for the colourful ones
-COLOR_NAMES = (N_("Black"), N_("White"), N_("Grey"), N_("Red"), N_("Orange"), N_("Yellow"), N_("Green"),
-               N_("Light blue"), N_("Blue"), N_("Purple"), N_("Pink"), N_("Brown"))
+COLOR_NAMES = (N_("Black"), N_("White"), N_("Grey"), N_("Dark grey"), N_("Light grey"), N_("Red"), N_("Orange"),
+               N_("Yellow"), N_("Green"), N_("Light blue"), N_("Blue"), N_("Purple"), N_("Pink"), N_("Brown"))
 _HUES = ((15, N_("Red")), (40, N_("Orange")), (70, N_("Yellow")), (165, N_("Green")), (200, N_("Light blue")),
          (255, N_("Blue")), (290, N_("Purple")), (340, N_("Pink")), (360, N_("Red")))
 
@@ -129,10 +162,14 @@ def color_name(color):
     hi, lo = max(r, g, b), min(r, g, b)
     light = (hi + lo) / 2
     chroma = hi - lo
-    if chroma < 0.12:                            # no clear hue: black, grey or white
+    if chroma < 0.12:                            # no clear hue: black, a grey or white
         if light < 0.2:
             return "Black"
-        return "White" if light > 0.85 else "Grey"
+        if light > 0.85:
+            return "White"
+        if light < 0.45:
+            return "Dark grey"
+        return "Light grey" if light > 0.65 else "Grey"
     if hi == r:
         hue = (60 * ((g - b) / chroma)) % 360
     elif hi == g:

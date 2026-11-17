@@ -32,6 +32,7 @@ def test_similar_colours_are_merged_into_the_most_used():
 
 
 @pytest.mark.parametrize("color,name", [("#000000", "Black"), ("#ffffff", "White"), ("#808080", "Grey"),
+                                        ("#4b5563", "Dark grey"), ("#c8cfda", "Light grey"),
                                         ("#ff0000", "Red"), ("#ff8000", "Orange"), ("#ffd700", "Yellow"),
                                         ("#22aa22", "Green"), ("#38bdf8", "Light blue"), ("#1d4ed8", "Blue"),
                                         ("#7e22ce", "Purple"), ("#ec4899", "Pink"), ("#8b4513", "Brown"),
@@ -90,3 +91,45 @@ def test_a_damaged_layer_says_so(tmp_path):
     path.write_text(json.dumps(data))
     with pytest.raises(project.ProjectError, match="colour layer"):
         project.load(str(path))
+
+
+# ---- import by colour --------------------------------------------------------------------------
+DEMO = __import__("os").path.join(__import__("os").path.dirname(__file__), "..", "docs", "demo", "vintyl-demo.svg")
+
+
+def test_an_svg_is_read_by_colour():
+    from vintyl.core.loaders import load_svg_colors, svg_subpaths
+    groups = load_svg_colors(DEMO)
+    assert ("#be185d", True) in groups and ("#5be37f", False) in groups      # filled, and a stroke only
+    assert len(groups[("#1f2430", True)]) == 4                              # V, i, n and the i's dot
+    # the shapes are the same as without colours
+    assert sum(len(s) for s in groups.values()) == len(svg_subpaths(DEMO))
+
+
+def test_a_gradient_gives_its_first_colour(tmp_path):
+    from vintyl.core.loaders import load_svg_colors
+    p = tmp_path / "g.svg"
+    p.write_text('<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" '
+                 'width="50mm" height="50mm" viewBox="0 0 50 50"><defs>'
+                 '<linearGradient id="a"><stop offset="0" stop-color="#ff0000"/><stop offset="1" stop-color="#00f"/>'
+                 '</linearGradient><linearGradient id="b" xlink:href="#a"/></defs>'
+                 '<rect x="5" y="5" width="10" height="10" fill="url(#b)"/>'
+                 '<rect x="25" y="5" width="10" height="10" fill="#00ff00" fill-opacity="0"/></svg>')
+    assert list(load_svg_colors(str(p))) == [("#ff0000", True)]          # the invisible one is left out
+
+
+def test_colours_go_to_layers_merged_or_not():
+    from vintyl.core.layers import assign
+    counts = {"#be185d": 1, "#c21a63": 1, "#e11d74": 1, "#1f2430": 4, "#232838": 3, "#5be37f": 1}
+    layers = []
+    to = assign(counts, layers)
+    assert [layer.name for layer in layers] == ["Black", "Pink", "Green"]
+    assert to["#c21a63"] is to["#be185d"] is to["#e11d74"] and to["#232838"] is to["#1f2430"]
+    assert layers[1].color == "#be185d"                                      # the group's first colour
+    # not merged: one layer each, names numbered
+    layers = []
+    assign(counts, layers, merge=False)
+    assert len(layers) == 6 and "Pink 2" in [layer.name for layer in layers]
+    # into a design that has layers: the same colour goes to its layer
+    again = assign({"#be185d": 2}, layers, merge=False)
+    assert again["#be185d"].name == "Pink" and len(layers) == 6

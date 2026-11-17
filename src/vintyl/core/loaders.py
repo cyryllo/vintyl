@@ -2,6 +2,7 @@
 Reading designs from files.
 
     load_svg(path) -> Element    every visible shape, in view mm (y down)
+    load_svg_colors(path)        the same shapes by colour: {(colour, filled): subpaths}
     load_dxf(path) -> Element    every visible entity of a DXF drawing, in view mm
 
 For a vinyl cutter every visible outline is a cut, whatever its colour:
@@ -41,20 +42,84 @@ def _hidden(el):
     return v.get("visibility") in ("hidden", "collapse") or v.get("display") == "none"
 
 
-def svg_subpaths(path):
-    """All visible painted shapes of an SVG as curves subpaths, in mm, y down
-    from the top of the page."""
+def _gradient_colors(path):
+    """{gradient id: '#rrggbb'}: a gradient's first stop colour (following
+    xlink:href to the gradient that has the stops). svgelements reports a
+    shape painted with a gradient as black; for the colour layers it is the
+    gradient's first colour."""
+    import xml.etree.ElementTree as ET
+    try:
+        root = ET.parse(path).getroot()
+    except (ET.ParseError, OSError):
+        return {}
+    stops, links = {}, {}
+    for el in root.iter():
+        tag = el.tag.rsplit("}", 1)[-1]
+        if tag not in ("linearGradient", "radialGradient") or not el.get("id"):
+            continue
+        href = el.get("{http://www.w3.org/1999/xlink}href") or el.get("href") or ""
+        links[el.get("id")] = href.lstrip("#")
+        for stop in el:
+            if stop.tag.rsplit("}", 1)[-1] != "stop":
+                continue
+            color = stop.get("stop-color")
+            style = stop.get("style") or ""
+            for part in style.split(";"):
+                if part.strip().startswith("stop-color:"):
+                    color = part.split(":", 1)[1].strip()
+            if color:
+                stops[el.get("id")] = color
+                break
+    out = {}
+    for gid in links:
+        seen, g = set(), gid
+        while g and g not in stops and g not in seen:
+            seen.add(g)
+            g = links.get(g, "")
+        if g in stops:
+            out[gid] = stops[g]
+    return out
+
+
+def _paint_hex(paint, written, gradients):
+    """'#rrggbb' of a fill or stroke, or None (none, or fully transparent)."""
+    import svgelements as se
+    written = (written or "").strip()
+    if written.startswith("url("):
+        gid = written[4:].strip(")'\" #")
+        color = gradients.get(gid)
+        try:
+            return se.Color(color).hex[:7] if color else "#000000"
+        except Exception:
+            return "#000000"
+    if paint is None or getattr(paint, "value", None) is None:
+        return None
+    if paint.alpha == 0:
+        return None
+    return paint.hex[:7]
+
+
+def svg_shapes(path):
+    """All visible painted shapes of an SVG: [(subpaths, fill, stroke)], the
+    subpaths in curves format (mm, y down from the top of the page), fill and
+    stroke as '#rrggbb' or None."""
     import svgelements as se
     try:
         svg = se.SVG.parse(path, ppi=SVG_PPI)
     except Exception as e:                      # svgelements raises many kinds
         raise LoadError(_("Cannot read %s: %s") % (os.path.basename(path), e)) from None
-    out = []
+    gradients = _gradient_colors(path)
+    shapes_out = []
     for el in svg.elements():
         if not isinstance(el, se.Shape) or _hidden(el) or not _painted(el):
             continue
+        fill = _paint_hex(el.fill, el.values.get("fill"), gradients)
+        stroke = _paint_hex(el.stroke, el.values.get("stroke"), gradients)
+        if fill is None and stroke is None:
+            continue                            # painted, but fully transparent
         shape = abs(se.Path(el))              # transforms applied
         segments = []
+        out = []
 
         def flush():
             if segments:
@@ -83,7 +148,28 @@ def svg_subpaths(path):
                 for cb in seg.as_cubic_curves():
                     segments.append((pt(cb.start), pt(cb.control1), pt(cb.control2), pt(cb.end)))
         flush()
-    return out
+        if out:
+            shapes_out.append((out, fill, stroke))
+    return shapes_out
+
+
+def svg_subpaths(path):
+    """All visible painted shapes of an SVG as curves subpaths, in mm, y down
+    from the top of the page."""
+    return [sub for subpaths, _fill, _stroke in svg_shapes(path) for sub in subpaths]
+
+
+def load_svg_colors(path):
+    """The visible shapes of an SVG by colour: {(colour, filled): subpaths}.
+    A shape's colour is its fill's, or its stroke's when it has no fill;
+    "filled" tells which (a filled shape gets a fill pattern with a pen)."""
+    groups = {}
+    for subpaths, fill, stroke in svg_shapes(path):
+        key = (fill, True) if fill is not None else (stroke, False)
+        groups.setdefault(key, []).extend(subpaths)
+    if not groups:
+        raise LoadError(_("%s has no visible shapes to cut.") % os.path.basename(path))
+    return groups
 
 
 def load_svg(path):
