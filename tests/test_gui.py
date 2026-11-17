@@ -33,6 +33,11 @@ def app():
     return QApplication.instance() or QApplication([])
 
 
+# the real windows before sending, kept before the fixture below answers them
+from vintyl.gui import start_dialogs as _start_dialogs  # noqa: E402
+REAL_START_DIALOGS = (_start_dialogs.confirm_start, _start_dialogs.confirm_knife_test)
+
+
 @pytest.fixture(autouse=True)
 def messages(monkeypatch):
     """Message boxes wait for a click, which never comes offscreen: record them instead."""
@@ -54,6 +59,10 @@ def messages(monkeypatch):
     monkeypatch.setattr(widgets, "ask", answer)
     monkeypatch.setattr(widgets, "warn", lambda parent, title, text: shown.append(text))
     monkeypatch.setattr(widgets, "inform", lambda parent, title, text: None)
+    from vintyl.gui import start_dialogs
+    # the windows before sending say yes; their own tests use REAL_START_DIALOGS
+    monkeypatch.setattr(start_dialogs, "confirm_start", lambda *a, **k: True)
+    monkeypatch.setattr(start_dialogs, "confirm_knife_test", lambda *a, **k: True)
     return shown
 
 
@@ -1604,3 +1613,29 @@ def test_speeds_are_shown_in_mm_per_second(win):
     saved = {e["id"]: e for e in profiles.catalogue()}["vevor-ki-375a"]["profile"]
     assert saved.speed_cm_s == pytest.approx(30.0)
     assert ProfileEditor({**win.profile_entries["vevor-ki-375a"], "profile": saved}, win).speed.value() == 300.0
+
+
+# ---- the windows before sending (UI v2, 5.4 and 5.5) ---------------------------------------------------
+def test_the_check_list_shows_the_materials_values_and_the_mirror(win):
+    from PySide6.QtWidgets import QLabel
+    dlg = REAL_START_DIALOGS[0](win, "VEVOR KI-375A", "/dev/usb/lp1", False, "Vinyl film",
+                                      ("Set on the cutter's panel", "90 g", "300 mm/s"), True, True,
+                                      "Slowly.", show=False)
+    texts = " ".join(l.text() for l in dlg.findChildren(QLabel))
+    assert "90 g" in texts and "300 mm/s" in texts and "Slowly." in texts and "Mirror on" in texts
+    assert "The knife is in the holder" in texts and "Speed and force are set" not in texts
+    assert dlg.windowTitle() == "Cut now?" and dlg.go_button.text() == "Cut it"
+    # a pen, no values: the panel point, no mirror warning
+    dlg = REAL_START_DIALOGS[0](win, "X", "", True, "Paper", None, True, False, "", show=False)
+    texts = " ".join(l.text() for l in dlg.findChildren(QLabel))
+    assert dlg.windowTitle() == "Draw now?" and dlg.go_button.text() == "Draw"
+    assert "Speed and force are set on the cutter's panel" in texts and "Mirror on" not in texts
+
+
+def test_the_knife_test_window_has_the_tests_picture(win):
+    from PySide6.QtWidgets import QLabel
+    from vintyl.core import weeding
+    dlg = REAL_START_DIALOGS[1](win, "Seiki SK-870T", 15, weeding.knife_test(15), show=False)
+    labels = dlg.findChildren(QLabel)
+    assert any(l.pixmap() is not None and not l.pixmap().isNull() for l in labels)
+    assert "Seiki SK-870T" in " ".join(l.text() for l in labels) and dlg.go_button.text() == "Cut the test"

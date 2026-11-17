@@ -42,7 +42,7 @@ TOKENS = {
         "canvas": "#3d4350",          # round the sheet
         "sheet": "#f7f8fa",
         "selection": "#2563eb",
-        "info_bg": "#eef2ff", "info_ink": "#1e3a8a",
+        "info_bg": "#eef2ff", "info_ink": "#1e3a8a", "info_border": "#c7d2fe",
         "warn_bg": "#fef3c7", "warn_ink": "#7c2d12",
         "ok": "#15803d", "ok_bg": "#dcfce7",
         "danger": "#b91c1c",
@@ -72,7 +72,7 @@ TOKENS = {
         "canvas": "#1f2227",
         "sheet": "#f7f8fa",
         "selection": "#2563eb",
-        "info_bg": "#1e2a4a", "info_ink": "#c7d2fe",
+        "info_bg": "#1e2a4a", "info_ink": "#c7d2fe", "info_border": "#334a7d",
         "warn_bg": "#422006", "warn_ink": "#fde68a",
         "ok": "#4ade80", "ok_bg": "#14361f",
         "danger": "#b91c1c",
@@ -143,8 +143,10 @@ QListWidget#element_list { background: transparent; border: 0; outline: 0; }
 QListWidget#element_list::item:selected, QListWidget#element_list::item:hover { background: transparent; }
 QFrame#warn { background: $warn_bg; border-radius: 8px; }
 QFrame#warn QLabel { color: $warn_ink; }
-QFrame#info { background: $info_bg; border-radius: 8px; }
+QFrame#info { background: $info_bg; border: 1px solid $info_border; border-radius: 8px; }
 QFrame#info QLabel { color: $info_ink; }
+QLabel#info_title { font-weight: 600; font-size: 14px; }
+QLabel#big_value { font-size: 26px; font-weight: 700; }
 QFrame#stat { background: $stat; border-radius: 8px; }
 QLabel#stat_title { color: $muted; font-size: 12px; }
 QLabel#stat_value { color: $ink; font-size: 18px; font-weight: 700; }

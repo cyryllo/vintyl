@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 19:04+0100\n"
+"POT-Creation-Date: 2026-11-17 19:11+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -137,6 +137,11 @@ msgstr ""
 msgid "<b>%s is available</b> (you have %s)."
 msgstr ""
 
+msgid ""
+"<b>Mirror on.</b> The vinyl's shiny side (the carrier) down, the matt "
+"side up to the knife."
+msgstr ""
+
 msgid "A QR code to cut: an address or a text"
 msgstr ""
 
@@ -196,6 +201,9 @@ msgid ""
 msgstr ""
 
 msgid "Add to the menu"
+msgstr ""
+
+msgid "After cutting"
 msgstr ""
 
 msgid "Align"
@@ -293,6 +301,9 @@ msgid "Centres up and down"
 msgstr ""
 
 msgid "Change one size and the others follow, so the shape keeps its look"
+msgstr ""
+
+msgid "Check before you go on"
 msgstr ""
 
 msgid "Check for a new version"
@@ -411,6 +422,9 @@ msgstr ""
 msgid "Cut first"
 msgstr ""
 
+msgid "Cut it"
+msgstr ""
+
 msgid "Cut last"
 msgstr ""
 
@@ -431,14 +445,8 @@ msgstr ""
 
 #, python-format
 msgid ""
-"Cut the knife test on %s: a %g mm square with a triangle, %g mm from the "
-"origin?\n"
-"\n"
-"Then peel the triangle off: it should come away cleanly, and the backing "
-"must not be cut through. Too shallow: more force (on the cutter's panel);"
-" marks in the backing: less.\n"
-"\n"
-"Afterwards move the origin on, so the design is not cut over the test."
+"Cut the knife test on <b>%(cutter)s</b>: a %(size)g mm square with a "
+"triangle, near the origin?"
 msgstr ""
 
 msgid "Cut the test"
@@ -461,6 +469,12 @@ msgid "Cutter settings"
 msgstr ""
 
 msgid "Cutter settings…"
+msgstr ""
+
+#, python-format
+msgid ""
+"Cutter: <b>%(cutter)s</b> (%(port)s) &nbsp;&nbsp; Tool: <b>%(tool)s</b> "
+"&nbsp;&nbsp; Material: <b>%(material)s</b>"
 msgstr ""
 
 msgid "Cutters"
@@ -915,11 +929,6 @@ msgstr ""
 msgid "MIRRORED"
 msgstr ""
 
-msgid ""
-"MIRRORED for heat transfer vinyl: the vinyl's shiny side (the carrier) "
-"down, the matt side up to the knife."
-msgstr ""
-
 msgid "Machine"
 msgstr ""
 
@@ -972,6 +981,9 @@ msgid ""
 msgstr ""
 
 msgid "Move down"
+msgstr ""
+
+msgid "Move the origin on, so the design is not cut over the test"
 msgstr ""
 
 msgid "Move up"
@@ -1035,6 +1047,10 @@ msgid "Not plugged in now (or switched off)."
 msgstr ""
 
 msgid "Note"
+msgstr ""
+
+#, python-format
+msgid "Note of the material: %s"
 msgstr ""
 
 msgid "Nothing is left after the offset (the shape is thinner than that)."
@@ -1140,6 +1156,11 @@ msgid "Pattern"
 msgstr ""
 
 msgid "Pattern of shapes"
+msgstr ""
+
+msgid ""
+"Peel the triangle off: it should come away cleanly, and the backing must "
+"not be cut through"
 msgstr ""
 
 msgid "Pen"
@@ -1357,32 +1378,6 @@ msgstr ""
 msgid "Selected: %s"
 msgstr ""
 
-#, python-format
-msgid ""
-"Send the design to %s (%s)?\n"
-"\n"
-"Tool: KNIFE. Check before you go on:\n"
-"• the knife is in the holder\n"
-"• the material is under the pinch rollers\n"
-"• the origin is set (Origin key) where the design should start\n"
-"• speed and force are set on the cutter's panel\n"
-"\n"
-"To stop the cutter at once: Test (pause) or Reset on its panel."
-msgstr ""
-
-#, python-format
-msgid ""
-"Send the drawing to %s (%s)?\n"
-"\n"
-"Tool: PEN. Check before you go on:\n"
-"• the pen (not the knife) is in the holder, its tip just above the paper\n"
-"• the force on the cutter's panel is LOW, for a pen\n"
-"• the paper is under the pinch rollers\n"
-"• the origin is set (Origin key) where the drawing should start\n"
-"\n"
-"To stop the cutter at once: Test (pause) or Reset on its panel."
-msgstr ""
-
 msgid "Sending"
 msgstr ""
 
@@ -1462,6 +1457,9 @@ msgid "Speed"
 msgstr ""
 
 msgid "Speed and force"
+msgstr ""
+
+msgid "Speed and force are set on the cutter's panel"
 msgstr ""
 
 msgid "Split"
@@ -1585,7 +1583,13 @@ msgstr ""
 msgid "The design fits in one strip; nothing to split."
 msgstr ""
 
+msgid "The force on the cutter's panel is low, for a pen"
+msgstr ""
+
 msgid "The gap is the vinyl left between the copies."
+msgstr ""
+
+msgid "The knife is in the holder"
 msgstr ""
 
 msgid "The language and the look change at the next start of Vintyl."
@@ -1594,10 +1598,25 @@ msgstr ""
 msgid "The lines stop this far from the shapes"
 msgstr ""
 
+msgid "The material is under the pinch rollers"
+msgstr ""
+
 msgid "The new language or look shows at the next start of Vintyl."
 msgstr ""
 
 msgid "The note shows on the check list before Start."
+msgstr ""
+
+msgid "The origin is set (Origin key) where the design should start"
+msgstr ""
+
+msgid "The origin is set (Origin key) where the drawing should start"
+msgstr ""
+
+msgid "The paper is under the pinch rollers"
+msgstr ""
+
+msgid "The pen (not the knife) is in the holder, its tip just above the paper"
 msgstr ""
 
 msgid "The port speed must be a whole number."
@@ -1639,6 +1658,12 @@ msgid ""
 msgstr ""
 
 msgid "This cutter's own values. A material can have its own offset and overcut."
+msgstr ""
+
+msgid "To stop the cutter at once: Test (pause) or Reset on its panel."
+msgstr ""
+
+msgid "Too shallow: more force on the cutter's panel. Marks in the backing: less"
 msgstr ""
 
 msgid "Top edges"

@@ -1532,6 +1532,28 @@ class MainWindow(QMainWindow):
         self._show_material_hint()
         self.refresh_job()
 
+    def material_values(self, material=None):
+        """(title, force text, speed text) of the material for this cutter, for
+        the windows before Start; None when it has neither (speeds in mm/s)."""
+        m = material if material is not None else self.material()
+        if m is None:
+            return None
+        force, speed = m.for_cutter(self.profile_box.currentData())
+        if force is None and speed is None:
+            return None
+        title = _("Vintyl sends to the cutter") if self.profile.send_speed_force else _("Set on the cutter's panel")
+        return (title, "%g g" % force if force is not None else None,
+                "%g mm/s" % round(speed * 10.0, 1) if speed is not None else None)
+
+    def _material_is_builtin(self):
+        e = self.material_entries.get(self.material_box.currentData())
+        return bool(e and e["builtin"])
+
+    def _material_name(self):
+        from vintyl.gui.material_editor import display_name
+        e = self.material_entries.get(self.material_box.currentData())
+        return display_name(e) if e else ""
+
     def material_values_text(self, material=None):
         """("Set on the cutter's panel" / "Vintyl sends", "force 90 g · speed 300 mm/s"),
         or None when the material has no force or speed for this cutter."""
@@ -3035,29 +3057,13 @@ class MainWindow(QMainWindow):
             widgets.warn(self, _("Start"), str(e))
             return None
         p = self.job_profile()
-        if self.is_pen():
-            ask = (_("Draw now?"),
-                   _("Send the drawing to %s (%s)?\n\n"
-                     "Tool: PEN. Check before you go on:\n"
-                     "• the pen (not the knife) is in the holder, its tip just above the paper\n"
-                     "• the force on the cutter's panel is LOW, for a pen\n"
-                     "• the paper is under the pinch rollers\n"
-                     "• the origin is set (Origin key) where the drawing should start\n\n"
-                     "To stop the cutter at once: Test (pause) or Reset on its panel.") % (p.port, p.name))
-        else:
-            ask = (_("Cut now?"),
-                   _("Send the design to %s (%s)?\n\n"
-                     "Tool: KNIFE. Check before you go on:\n"
-                     "• the knife is in the holder\n"
-                     "• the material is under the pinch rollers\n"
-                     "• the origin is set (Origin key) where the design should start\n"
-                     "• speed and force are set on the cutter's panel\n\n"
-                     "To stop the cutter at once: Test (pause) or Reset on its panel.") % (p.port, p.name))
-        if self.mirror_job.isChecked():
-            ask = (ask[0], ask[1] + "\n\n" + _("MIRRORED for heat transfer vinyl: the vinyl's shiny side "
-                                               "(the carrier) down, the matt side up to the knife."))
-        if widgets.ask(self, ask[0], ask[1], [("cancel", _("Cancel"), "cancel"),
-                                              ("go", _("Draw") if self.is_pen() else _("Cut"), "main")]) != "go":
+        # the check list (UI v2): the cutter, the tool, the material; its force and speed; what to check
+        from vintyl.gui import start_dialogs
+        m = self.material()
+        note = (_(m.note) if self._material_is_builtin() else m.note) if m is not None and m.note else ""
+        if not start_dialogs.confirm_start(self, p.name, p.port, self.is_pen(), self._material_name(),
+                                           self.material_values(), not self.profile.send_speed_force,
+                                           self.mirror_job.isChecked(), note):
             return None
         return self._send(job, p, "the design")
 
@@ -3318,14 +3324,11 @@ class MainWindow(QMainWindow):
             widgets.warn(self, _("Knife test"), str(e))
             return None
         p = self.job_profile(material)
-        if widgets.ask(
-                self, _("Knife test"),
-                _("Cut the knife test on %s: a %g mm square with a triangle, %g mm from the origin?\n\n"
-                  "Then peel the triangle off: it should come away cleanly, and the backing must not be "
-                  "cut through. Too shallow: more force (on the cutter's panel); marks in the backing: less.\n\n"
-                  "Afterwards move the origin on, so the design is not cut over the test.")
-                % (p.name, self.KNIFE_TEST_MM, self.KNIFE_TEST_FROM_ORIGIN_MM),
-                [("cancel", _("Cancel"), "cancel"), ("go", _("Cut the test"), "main")]) != "go":
+        from vintyl.core import weeding
+        from vintyl.gui import start_dialogs
+        if not start_dialogs.confirm_knife_test(self, p.name, self.KNIFE_TEST_MM,
+                                                weeding.knife_test(self.KNIFE_TEST_MM),
+                                                self.material_values(material)):
             return None
         return self._send(job, p, "knife test")
 
