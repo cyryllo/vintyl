@@ -1,6 +1,9 @@
 # Heat transfer vinyl (flex), ironed onto fabric: cut from the back, mirrored.
-# Starting force and speed (17.11.2026): a general guide gives 100-150 g at
-# 300-450 mm/s for HTV (LaserForce, no cutter named); the middle, at 300 mm/s.
+# Force: the big cutters 120 g, the small one 60 g; a general guide gives 100-150 g
+# at 300-450 mm/s for HTV (LaserForce, no cutter named). Speed 300 mm/s.
+# Per cutter (the owner, 17.11.2026): the small KI-375A presses hard and takes
+# half; the big 870 mm cutters (Seiki SK-870T, VEVOR 870) need the full value;
+# another model starts with the small one's (less force does not cut the backing).
 name = "Heat transfer vinyl (flex)"
 tool = "knife"
 blade = "45"
@@ -17,9 +20,9 @@ force_g = 120
 speed_cm_s = 30.0
 
 [per_cutter."vevor-ki-375a"]
-force_g = 120
+force_g = 60
 speed_cm_s = 30.0
 
 [per_cutter."xili-usb"]
-force_g = 120
+force_g = 60
 speed_cm_s = 30.0

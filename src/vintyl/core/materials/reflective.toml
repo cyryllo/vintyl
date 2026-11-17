@@ -1,6 +1,9 @@
 # Reflective vinyl: thicker than plain vinyl.
-# Starting force and speed (17.11.2026): Stahls' CAD-CUT Reflective II gives
-# 70-90 g at 30 cm/s for a Roland (its grams may differ from these cutters').
+# Force: the big cutters 80 g, the small one 40 g; Stahls' CAD-CUT Reflective II
+# gives 70-90 g at 30 cm/s for a Roland. Speed 300 mm/s.
+# Per cutter (the owner, 17.11.2026): the small KI-375A presses hard and takes
+# half; the big 870 mm cutters (Seiki SK-870T, VEVOR 870) need the full value;
+# another model starts with the small one's (less force does not cut the backing).
 name = "Reflective vinyl"
 tool = "knife"
 blade = "60"
@@ -16,9 +19,9 @@ force_g = 80
 speed_cm_s = 30.0
 
 [per_cutter."vevor-ki-375a"]
-force_g = 80
+force_g = 40
 speed_cm_s = 30.0
 
 [per_cutter."xili-usb"]
-force_g = 80
+force_g = 40
 speed_cm_s = 30.0

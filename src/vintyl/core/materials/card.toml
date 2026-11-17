@@ -1,5 +1,8 @@
 # Card with a marker in the holder.
-# Force and speed (the owner's choice, 17.11.2026): 70 g, 300 mm/s.
+# Force: the big cutters 70 g, the small one 35 g, at 300 mm/s (the owner's).
+# Per cutter (the owner, 17.11.2026): the small KI-375A presses hard and takes
+# half; the big 870 mm cutters (Seiki SK-870T, VEVOR 870) need the full value;
+# another model starts with the small one's (less force does not cut the backing).
 name = "Card, marker"
 tool = "pen"
 pen_width_mm = 1.0
@@ -14,9 +17,9 @@ force_g = 70
 speed_cm_s = 30.0
 
 [per_cutter."vevor-ki-375a"]
-force_g = 70
+force_g = 35
 speed_cm_s = 30.0
 
 [per_cutter."xili-usb"]
-force_g = 70
+force_g = 35
 speed_cm_s = 30.0

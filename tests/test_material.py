@@ -23,10 +23,11 @@ def test_built_in_materials_have_starting_values_for_the_xili_cutters():
         assert set(m.per_cutter) == xili and m.knife_offset_mm is None, mid
         for force, speed in (m.for_cutter(pid) for pid in xili):
             assert 10 <= force <= 500 and 1 <= speed <= 80, mid
-    # VEVOR's manual: 100 g, 300 mm/s; the Seiki user: 70-90 g; pens: the owner's 70 g
-    assert entries["vinyl"].for_cutter("vevor-ki-375a") == (100.0, 30.0)
-    assert entries["vinyl"].for_cutter("seiki-sk-870t") == (80.0, 30.0)
-    assert entries["paper"].for_cutter("seiki-sk-870t") == (70.0, 30.0)
+    # the small cutter presses hard: half of the big ones' (the owner's), at 300 mm/s
+    for mid, big in (("vinyl", 80.0), ("htv", 120.0), ("reflective", 80.0), ("paper", 70.0), ("card", 70.0)):
+        small = 50.0 if mid == "vinyl" else big / 2
+        assert entries[mid].for_cutter("seiki-sk-870t") == entries[mid].for_cutter("vevor-870") == (big, 30.0)
+        assert entries[mid].for_cutter("vevor-ki-375a") == entries[mid].for_cutter("xili-usb") == (small, 30.0)
     tools = [e["material"].tool for e in mat.catalogue()]
     assert tools == sorted(tools, key=lambda t: t != "knife")         # knife ones first
 
