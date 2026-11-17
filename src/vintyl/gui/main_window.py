@@ -2001,7 +2001,7 @@ class MainWindow(QMainWindow):
         name = os.path.basename(self.project_path) if self.project_path else _("new project")
         self.setWindowTitle("%s%s – Vintyl" % (name, " *" if getattr(self, "modified", False) else ""))
 
-    def import_svg(self, path=None):
+    def import_svg(self, path=None, colours=None):
         if path is None:
             path, _f = QFileDialog.getOpenFileName(self, _("Open SVG"), "", _("SVG files (*.svg)"))
             if not path:
@@ -2011,8 +2011,30 @@ class MainWindow(QMainWindow):
         except LoadError as err:
             widgets.warn(self, _("Open SVG"), str(err))
             return None
+        # a drawing of several colours: which colour of the design each one goes to
+        # (colours: "auto" merged, "separate" each its own, or {colour: layer}; None: the window)
+        existing, candidates, chosen, merged, separate = self._colour_plan(groups)
+        if len({c for c, _f in groups}) > 1:
+            if isinstance(colours, dict):
+                chosen = colours
+            elif colours == "auto":
+                chosen = merged
+            elif colours == "separate":
+                chosen = separate
+            else:
+                from vintyl.gui.colour_import import colour_dialog
+                chosen = colour_dialog(self, groups, candidates, chosen, merged, separate)
+                if chosen is None:
+                    return None
         self._checkpoint()
-        elements = self._colour_elements(path, groups)
+        # the new colours used, the one with most shapes first
+        counts = {}
+        for (color, _filled), subpaths in groups.items():
+            counts[color] = counts.get(color, 0) + len(subpaths)
+        new = [layer for layer in candidates if layer not in existing and layer in chosen.values()]
+        new.sort(key=lambda ly: -sum(n for c, n in counts.items() if chosen[c] is ly))
+        self.design.layers = existing + new
+        elements = self._colour_elements(path, groups, chosen)
         # place them on the material, together, PLACE_MARGIN_MM from the origin (lower right) both ways
         boxes = [e.bounds for e in elements]
         x0, x1 = min(b[0] for b in boxes), max(b[1] for b in boxes)
@@ -2028,24 +2050,36 @@ class MainWindow(QMainWindow):
     # default fill of a shape that is filled with a colour in the file (drawn by a pen)
     IMPORT_FILL = {"pattern": "lines", "spacing": 1.0, "angle": 45.0, "margin": 0.0}
 
-    def _colour_elements(self, path, groups):
-        """The elements of an SVG read by colour (vintyl.core.loaders.
-        load_svg_colors), in the colour layers, similar colours merged;
-        grouped, so they move as one. A drawing of several colours (for
-        pens): one element per colour and kind, its filled shapes with a
-        fill pattern; a drawing of one colour (a sticker): one element, no
-        fill. A design with only its empty first layer gets the file's
-        colours instead of it."""
-        import uuid
+    def _colour_plan(self, groups):
+        """What opening a drawing offers (vintyl.core.layers.plan): (the
+        design's layers it keeps, the candidate layers, the proposal as the
+        Settings say, merged, each on its own). A design with only its empty
+        first layer gets the file's colours instead of it."""
         from vintyl.core import layers as lay
         design = self.design
-        first = design.layers[0]
-        if len(design.layers) == 1 and not design.elements_of(first) and first.id == lay.DEFAULT_ID:
-            design.layers = []                 # the empty black layer of a new design: the file's colours instead
+        existing = list(design.layers)
+        first = existing[0]
+        if len(existing) == 1 and not design.elements_of(first) and first.id == lay.DEFAULT_ID:
+            existing = []                      # the empty black layer of a new design
         counts = {}
         for (color, _filled), subpaths in groups.items():
             counts[color] = counts.get(color, 0) + len(subpaths)
-        to_layer = lay.assign(counts, design.layers, merge=True, name=lambda c: _(lay.color_name(c)))
+
+        def name(c):
+            return _(lay.color_name(c))
+        candidates, merged, separate = lay.plan(counts, existing, name=name)
+        ask = str(self.settings.value("import/colours", "auto")) == "ask"
+        return existing, candidates, (separate if ask else merged), merged, separate
+
+    def _colour_elements(self, path, groups, to_layer):
+        """The elements of an SVG read by colour (vintyl.core.loaders.
+        load_svg_colors), each colour into its layer (to_layer: {colour:
+        layer}); grouped, so they move as one. A drawing of several colours
+        (for pens): one element per colour and kind, its filled shapes with
+        a fill pattern; a drawing of one colour (a sticker): one element, no
+        fill."""
+        import uuid
+        design = self.design
         name = os.path.splitext(os.path.basename(path))[0]
         group = uuid.uuid4().hex[:8] if len(groups) > 1 else ""
         several = len({layer.id for layer in to_layer.values()}) > 1
@@ -2761,9 +2795,16 @@ class MainWindow(QMainWindow):
                               "while the grid is on"))
             snap = Switch(_("Snap to other shapes (corners, centres, edges)"))
             snap.setChecked(self.view.snap_objects)
+            colours = Segmented()
+            colours.addItem(_("Merge similar"), "auto")
+            colours.addItem(_("Each on its own"), "ask")
+            colours.setCurrentIndex(max(0, colours.findData(str(st.value("import/colours", "auto")))))
+            colours.setToolTip(_("Opening an SVG of several colours: what the window proposes first; "
+                                 "you see it and can change it before the drawing opens"))
             card.add_row(_("Grid step"), step)
             card.add_row(None, snap)
             card.add_hint(_("Hold Alt to drag without any snapping for a moment."))
+            card.add_row(_("SVG colours"), colours)
             body.addWidget(card)
             # language and look: applied at the next start
             card = Card(_("Language and look"))
@@ -2806,7 +2847,7 @@ class MainWindow(QMainWindow):
                 return None
             values = {"grid_step": step.value(), "snap_objects": snap.isChecked(),
                       "language": language.currentData(), "theme": look.currentData(),
-                      "check_updates": updates.isChecked()}
+                      "check_updates": updates.isChecked(), "import_colours": colours.currentData()}
         self.grid_step = float(values["grid_step"])
         self.view.snap_objects = bool(values["snap_objects"])
         st.setValue("view/grid_step", self.grid_step)
@@ -2820,6 +2861,8 @@ class MainWindow(QMainWindow):
             restart = True
         if "check_updates" in values:
             st.setValue("updates/check", "true" if values["check_updates"] else "false")
+        if values.get("import_colours") in ("auto", "ask"):
+            st.setValue("import/colours", values["import_colours"])
         if restart:
             self.statusBar().showMessage(_("The new language or look shows at the next start of Vintyl."), 10000)
         if self.act_grid.isChecked():

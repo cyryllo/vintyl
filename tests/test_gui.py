@@ -2052,7 +2052,7 @@ def test_a_colour_drawing_is_imported_by_colour(win):
     """Vintyl's demo logo: its colours become layers (similar ones merged),
     one element per colour and kind, grouped; filled shapes get a fill for
     the pen; undo takes the layers back too."""
-    first = win.import_svg(DEMO_SVG)
+    first = win.import_svg(DEMO_SVG, "auto")
     d = win.design
     names = [layer.name for layer in d.layers]
     assert names[:2] == ["Black", "Pink"] and "Green" in names and "Black 2" not in names   # no empty black left
@@ -2071,7 +2071,7 @@ def test_a_colour_drawing_is_imported_by_colour(win):
 def test_the_colours_section_lists_the_layers_and_changes_them(win):
     win.show()
     assert win.colours_box.isHidden()                                  # one colour: no section
-    win.import_svg(DEMO_SVG)
+    win.import_svg(DEMO_SVG, "auto")
     d = win.design
     assert not win.colours_box.isHidden() and win.layer_list.count() == len(d.layers)
     assert win.layer_list.item(1).text().startswith("Pink")
@@ -2100,3 +2100,49 @@ def test_the_colours_section_lists_the_layers_and_changes_them(win):
     menu = win.show_context_menu(e, None, show=False)
     colour = [a.menu() for a in menu.actions() if a.menu() is not None and a.text() == "Colour"][0]
     assert [a.text() for a in colour.actions() if a.text()][:2] == [d.layers[0].name, d.layers[1].name]
+
+
+def test_the_colours_window_proposes_and_can_be_changed(win, monkeypatch):
+    """Opening a drawing of several colours: the window shows the proposal
+    (merged by default; each on its own when the Settings say so), and what
+    it returns is what opens."""
+    from vintyl.gui import colour_import
+    real = colour_import.colour_dialog
+    seen = {}
+
+    def fake(parent, groups, candidates, chosen, merged, separate, show=True):
+        dlg = real(parent, groups, candidates, chosen, merged, separate, show=False)
+        seen["start"] = {c: layer.name for c, layer in dlg.chosen_now().items()}
+        assert not dlg.picture.pixmap().isNull()
+        dlg.separate_button.click()
+        seen["separate"] = len(set(dlg.chosen_now().values()))
+        dlg.all_one_button.click()                    # all in one colour: what opens
+        return dlg.chosen_now()
+    monkeypatch.setattr(colour_import, "colour_dialog", fake)
+    win.import_svg(DEMO_SVG)
+    assert seen["start"]["#c21a63"] == seen["start"]["#be185d"] == "Pink"     # merged
+    assert seen["separate"] == 9                                                 # each its own
+    assert len(win.design.layers) == 1 and win.colours_box.isHidden()        # all in one
+    # the Settings: each on its own first
+    win.new_design()
+    win.show_settings({"grid_step": 10.0, "snap_objects": True, "import_colours": "ask"})
+    win.import_svg(DEMO_SVG)
+    assert seen["start"]["#c21a63"] != seen["start"]["#be185d"]
+    # cancelled: nothing opens
+    monkeypatch.setattr(colour_import, "colour_dialog", lambda *a, **k: None)
+    win.new_design()
+    assert win.import_svg(DEMO_SVG) is None and not win.design.elements
+
+
+def test_a_drawing_of_many_colours_scrolls_its_list(win, tmp_path):
+    from vintyl.gui import colour_import
+    from vintyl.core.loaders import load_svg_colors
+    rects = "".join('<rect x="%d" y="5" width="4" height="4" fill="#%02x%02x%02x"/>' % (6 * k, 12 * k, 200 - 9 * k, 40)
+                    for k in range(20))
+    p = tmp_path / "many.svg"
+    p.write_text('<svg xmlns="http://www.w3.org/2000/svg" width="130mm" height="20mm" viewBox="0 0 130 20">%s</svg>'
+                 % rects)
+    groups = load_svg_colors(str(p))
+    _e, candidates, chosen, merged, separate = win._colour_plan(groups)
+    dlg = colour_import.colour_dialog(win, groups, candidates, chosen, merged, separate, show=False)
+    assert len(dlg.combos) == 20 and dlg.height() < 768

@@ -32,7 +32,7 @@ PEN_PLACES = ("on", "outside", "inside")
 SIMILAR_DELTA_E = 15.0
 
 
-@dataclass
+@dataclass(eq=False)          # a layer is itself: two layers alike are still two
 class Layer:
     id: str                         # stable within the project ("black", "c2", ...)
     name: str                       # what the user sees ("Red"; editable)
@@ -146,6 +146,29 @@ def assign(colors, layers, merge=True, name=None, limit=SIMILAR_DELTA_E):
         for color in members:
             out[color] = target
     return out
+
+
+def plan(colors, existing, name=None, limit=SIMILAR_DELTA_E):
+    """What an import offers: (candidates, merged, separate).
+    candidates: the existing layers, then one new layer for each colour of
+    the file that has no layer of the same colour (named, numbered);
+    merged and separate: {colour: candidate}, similar colours to one (the
+    group's most used colour's, or an existing layer of a similar colour),
+    or each to its own. Nothing is changed in `existing`: the caller adds
+    the new layers it uses."""
+    pool = list(existing)
+    own = assign(colors, pool, merge=False, name=name, limit=limit)
+    chosen = {}
+    for kept, members in merge_similar(colors, limit):
+        target = own[kept]
+        if target not in existing:
+            for layer in existing:
+                if delta_e(layer.color, kept) < limit:
+                    target = layer
+                    break
+        for color in members:
+            chosen[color] = target
+    return pool, chosen, dict(own)
 
 
 # a colour's name in words: (name, hue from, hue to) for the colourful ones

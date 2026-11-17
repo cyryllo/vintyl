@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 22:28+0100\n"
+"POT-Creation-Date: 2026-11-17 23:00+0100\n"
 "PO-Revision-Date: 2026-11-17 21:27+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -49,6 +49,12 @@ msgid "%d node selected"
 msgid_plural "%d nodes selected"
 msgstr[0] "%d Knoten ausgewählt"
 msgstr[1] "%d Knoten ausgewählt"
+
+#, python-format
+msgid "%d shape"
+msgid_plural "%d shapes"
+msgstr[0] "%d Form"
+msgstr[1] "%d Formen"
 
 #, python-format
 msgid "%d shape fits."
@@ -243,6 +249,9 @@ msgstr "Ausrichten"
 msgid "Align the selected shapes to each other: %s"
 msgstr "Die ausgewählten Formen aneinander ausrichten: %s"
 
+msgid "All in one colour"
+msgstr "Alles in einer Farbe"
+
 msgid "Along"
 msgstr "Entlang"
 
@@ -386,6 +395,12 @@ msgstr "Farbe"
 
 msgid "Colours"
 msgstr "Farben"
+
+msgid "Colours in the file"
+msgstr "Farben in der Datei"
+
+msgid "Colours of the drawing"
+msgstr "Farben der Zeichnung"
 
 msgid "Columns (across)"
 msgstr "Spalten (quer)"
@@ -706,6 +721,9 @@ msgid ""
 msgstr ""
 "Z. B. wie weit die Klinge herausragt, welche Rolle, was vor dem Schneiden"
 " zu prüfen ist"
+
+msgid "Each on its own"
+msgstr "Jede einzeln"
 
 msgid "Edit"
 msgstr "Bearbeiten"
@@ -1180,6 +1198,9 @@ msgstr "Materialien: Druck, Geschwindigkeit, Messer- und Stiftwerte"
 msgid "Measured: %.2f mm (across %.2f mm, along %.2f mm)"
 msgstr "Gemessen: %.2f mm (quer %.2f mm, entlang %.2f mm)"
 
+msgid "Merge similar"
+msgstr "Ähnliche zusammenlegen"
+
 msgid "Mirror"
 msgstr "Spiegeln"
 
@@ -1412,6 +1433,14 @@ msgstr ""
 msgid "Opened %s"
 msgstr "%s geöffnet"
 
+msgid ""
+"Opening an SVG of several colours: what the window proposes first; you "
+"see it and can change it before the drawing opens"
+msgstr ""
+"Beim Öffnen einer SVG mit mehreren Farben: was das Fenster zuerst "
+"vorschlägt; Sie sehen es und können es ändern, bevor die Zeichnung "
+"geöffnet wird"
+
 msgid "Orange"
 msgstr "Orange"
 
@@ -1613,6 +1642,9 @@ msgstr "Lineal"
 msgid "Ruler: drag between two points to measure"
 msgstr "Lineal: zwischen zwei Punkten ziehen, um zu messen"
 
+msgid "SVG colours"
+msgstr "SVG-Farben"
+
 msgid "SVG files (*.svg)"
 msgstr "SVG-Dateien (*.svg)"
 
@@ -1797,6 +1829,14 @@ msgstr "Das ganze Material und Motiv zeigen"
 
 msgid "Sides"
 msgstr "Seiten"
+
+msgid ""
+"Similar colours (two pinks, two greys) are drawn with one pen: merged, "
+"they go to one colour. The order of drawing is in the Colours panel."
+msgstr ""
+"Ähnliche Farben (zwei Rosa, zwei Grau) zeichnet ein Stift: zusammengelegt"
+" kommen sie in eine Farbe. Die Zeichenreihenfolge steht im Bereich "
+"Farben."
 
 msgid "Size"
 msgstr "Größe"
@@ -1992,6 +2032,20 @@ msgstr "Das Motiv passt nicht auf das Material: es ragt %s um %.1f mm heraus."
 
 msgid "The design fits in one strip; nothing to split."
 msgstr "Das Motiv passt in eine Bahn; nichts zu teilen."
+
+#, python-format
+msgid ""
+"The drawing has %d colour. Each goes to a colour of the design: check "
+"what the program chose, and change it if you like."
+msgid_plural ""
+"The drawing has %d colours. Each goes to a colour of the design: check "
+"what the program chose, and change it if you like."
+msgstr[0] ""
+"Die Zeichnung hat %d Farbe. Jede kommt in eine Farbe des Motivs: prüfen "
+"Sie die Wahl des Programms und ändern Sie sie, wenn Sie möchten."
+msgstr[1] ""
+"Die Zeichnung hat %d Farben. Jede kommt in eine Farbe des Motivs: prüfen "
+"Sie die Wahl des Programms und ändern Sie sie, wenn Sie möchten."
 
 msgid "The force on the cutter's panel is low, for a pen"
 msgstr "Der Druck am Bedienfeld des Plotters ist niedrig, für einen Stift"

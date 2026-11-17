@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 22:28+0100\n"
+"POT-Creation-Date: 2026-11-17 23:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -46,6 +46,12 @@ msgstr[1] ""
 #, python-format
 msgid "%d node selected"
 msgid_plural "%d nodes selected"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "%d shape"
+msgid_plural "%d shapes"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -223,6 +229,9 @@ msgstr ""
 msgid "Align the selected shapes to each other: %s"
 msgstr ""
 
+msgid "All in one colour"
+msgstr ""
+
 msgid "Along"
 msgstr ""
 
@@ -359,6 +368,12 @@ msgid "Colour"
 msgstr ""
 
 msgid "Colours"
+msgstr ""
+
+msgid "Colours in the file"
+msgstr ""
+
+msgid "Colours of the drawing"
 msgstr ""
 
 msgid "Columns (across)"
@@ -657,6 +672,9 @@ msgstr ""
 msgid ""
 "E.g. how far the blade sticks out, which roll, what to check before "
 "cutting"
+msgstr ""
+
+msgid "Each on its own"
 msgstr ""
 
 msgid "Edit"
@@ -1094,6 +1112,9 @@ msgstr ""
 msgid "Measured: %.2f mm (across %.2f mm, along %.2f mm)"
 msgstr ""
 
+msgid "Merge similar"
+msgstr ""
+
 msgid "Mirror"
 msgstr ""
 
@@ -1301,6 +1322,11 @@ msgstr ""
 msgid "Opened %s"
 msgstr ""
 
+msgid ""
+"Opening an SVG of several colours: what the window proposes first; you "
+"see it and can change it before the drawing opens"
+msgstr ""
+
 msgid "Orange"
 msgstr ""
 
@@ -1490,6 +1516,9 @@ msgstr ""
 msgid "Ruler: drag between two points to measure"
 msgstr ""
 
+msgid "SVG colours"
+msgstr ""
+
 msgid "SVG files (*.svg)"
 msgstr ""
 
@@ -1657,6 +1686,11 @@ msgid "Show the whole material and design"
 msgstr ""
 
 msgid "Sides"
+msgstr ""
+
+msgid ""
+"Similar colours (two pinks, two greys) are drawn with one pen: merged, "
+"they go to one colour. The order of drawing is in the Colours panel."
 msgstr ""
 
 msgid "Size"
@@ -1827,6 +1861,16 @@ msgstr ""
 
 msgid "The design fits in one strip; nothing to split."
 msgstr ""
+
+#, python-format
+msgid ""
+"The drawing has %d colour. Each goes to a colour of the design: check "
+"what the program chose, and change it if you like."
+msgid_plural ""
+"The drawing has %d colours. Each goes to a colour of the design: check "
+"what the program chose, and change it if you like."
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "The force on the cutter's panel is low, for a pen"
 msgstr ""

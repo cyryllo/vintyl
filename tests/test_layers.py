@@ -133,3 +133,16 @@ def test_colours_go_to_layers_merged_or_not():
     # into a design that has layers: the same colour goes to its layer
     again = assign({"#be185d": 2}, layers, merge=False)
     assert again["#be185d"].name == "Pink" and len(layers) == 6
+
+
+def test_an_import_plan_offers_merged_and_separate_over_the_same_layers():
+    from vintyl.core.layers import plan
+    counts = {"#be185d": 2, "#c21a63": 1, "#1f2430": 4}
+    red = Layer("c1", "Red", "#ff0000")
+    candidates, merged, separate = plan(counts, [red])
+    assert candidates[0] is red and len(candidates) == 4                   # red, then one per colour
+    assert merged["#c21a63"] is merged["#be185d"] and separate["#c21a63"] is not separate["#be185d"]
+    assert set(merged.values()) | set(separate.values()) <= set(candidates)
+    # a colour like an existing layer goes to it when merged
+    _c, merged, _s = plan({"#fe0101": 1}, [red])
+    assert merged["#fe0101"] is red
