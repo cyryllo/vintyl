@@ -1,11 +1,14 @@
 """
-The README's screenshots, made again from the program itself:
+The screenshots of the README and the website (docs/), made again from the
+program itself:
 
-    .venv/bin/python tools/readme_shots.py [docs/screenshots]
+    .venv/bin/python tools/screenshots.py          # English: docs/screenshots/
+    .venv/bin/python tools/screenshots.py pl       # Polish:  docs/screenshots/pl/
 
-English, the light look, a 1400 x 860 window. It runs offscreen with its own
+The light look, a 1400 x 860 window. It runs offscreen with its own
 settings, cutter profiles and materials in a temporary folder, so it never
-changes the user's own (~/.config/Vintyl). Nothing is sent to a cutter.
+changes the user's own (~/.config/Vintyl). Nothing is sent to a cutter:
+Start is never pressed, and the windows before sending are only shown.
 
 Copyright (C) 2026 Vintyl contributors
 Licensed under the GNU General Public License v3 or later. See LICENSE.
@@ -15,7 +18,8 @@ import sys
 import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "..", "docs", "screenshots"))
+LANG = sys.argv[1] if len(sys.argv) > 1 else "en"
+OUT = os.path.join(HERE, "..", "docs", "screenshots", *([] if LANG == "en" else [LANG]))
 
 # before anything of Vintyl or Qt is loaded: offscreen, and settings of its own
 TEMP = tempfile.mkdtemp(prefix="vintyl-shots-")
@@ -27,7 +31,7 @@ sys.path.insert(0, os.path.join(HERE, "..", "src"))
 
 from vintyl import i18n  # noqa: E402
 
-i18n.setup("en")
+i18n.setup(LANG)
 
 from PySide6.QtCore import QPoint, QPointF, QRectF  # noqa: E402
 from PySide6.QtGui import QPainter  # noqa: E402
@@ -95,7 +99,7 @@ def ready(win, key, left, top, **values):
 def main_window():
     win = window()
     win._on_drawn("ellipse", QRectF(-700, -470, 120, 120))
-    ready(win, "star", -580, -470, points=5, size=90.0, inner=45.0)
+    star = ready(win, "star", -580, -470, points=5, size=90.0, inner=45.0)
     win._on_text_clicked(QPointF(-560, -170))
     win.opt_text.setText("Vintyl")
     win.opt_size.setValue(40.0)
@@ -104,7 +108,6 @@ def main_window():
     win.selected, win.selection = heart, [heart]
     win.tile_selected({"motif": "star", "size": 8.0, "gap": 3.0, "margin": 3.0, "stagger": True})
     win.weed_frame.setChecked(True)
-    star = [e for e in win.design.elements if e.name.startswith("Star")][0]
     win.view.select_many([star])
     win.selected, win.selection = star, [star]
     win._show_list()
@@ -112,6 +115,23 @@ def main_window():
     win.act_fit.trigger()
     wait(200)
     save(win.grab(), "main-window.png")
+    # a tool set, beside its button
+    pop = win.show_category("lines")
+    wait(150)
+    save(pop.grab(), "tool-set.png")
+    pop.close()
+    # the right-click menu on the element list
+    lst = win.element_list
+    pos = lst.visualItemRect(lst.item(1)).center()
+    menu = win.list_context_menu(pos, show=False)
+    menu.popup(lst.viewport().mapToGlobal(pos))
+    wait(150)
+    shot = win.grab()
+    p = QPainter(shot)
+    p.drawPixmap(menu.pos() - win.pos(), menu.grab())
+    p.end()
+    save(shot.copy(0, 100, 720, 600), "list-menu.png")
+    menu.close()
     return win
 
 
@@ -150,6 +170,55 @@ def pen_mode():
     win.act_fit.trigger()
     wait(200)
     save(win.grab(), "pen-mode.png")
+    # the fill window, with its preview
+    win.selected, win.selection = heart, [heart]
+    dlg = win._ask_fill([heart], show=False)
+    win._place_beside(dlg)
+    dlg.show()
+    until(lambda: not dlg.preview._pattern.isEmpty())
+    wait(200)
+    save(dlg.grab(), "fill.png")
+    dlg.previewer.wait()
+    dlg.close()
+
+
+def knife_path():
+    """The knife path on a plain design: the order of the cuts and the travels."""
+    win = window()
+    win.tool_box.setCurrentIndex(win.tool_box.findData("knife"))
+    win.material_box.setCurrentIndex(win.material_box.findData("vinyl"))
+    win._on_drawn("ellipse", QRectF(-560, -330, 120, 120))
+    ready(win, "star", -400, -340, points=5, size=130.0, inner=45.0)
+    win._on_text_clicked(QPointF(-520, -150))
+    win.opt_text.setText("Vintyl")
+    win.opt_size.setValue(50.0)
+    win._text_changed()
+    win.view.select_many([])
+    win.selected, win.selection = None, []
+    win._show_options()
+    win.act_knife.setChecked(True)
+    win.act_fit.trigger()
+    wait(200)
+    save(win.grab(), "knife-path.png")
+
+
+def to_origin():
+    """Two shapes far from the origin, then To 0,0 with the weeding frame."""
+    win = window()
+    win.tool_box.setCurrentIndex(win.tool_box.findData("knife"))
+    win.material_box.setCurrentIndex(win.material_box.findData("vinyl"))
+    win._on_drawn("ellipse", QRectF(-420, -330, 110, 80))
+    win._on_drawn("rectangle", QRectF(-560, -420, 90, 90))
+    win.weed_frame.setChecked(True)
+    win.view.select_many([])
+    win.selected, win.selection = None, []
+    win._show_options()
+    win.act_fit.trigger()
+    wait(150)
+    save(win.grab(), "to-origin-before.png")
+    win.move_to_origin()
+    wait(150)
+    save(win.grab(), "to-origin-after.png")
 
 
 def dialog_shot(open_it, name, size=None):
@@ -176,16 +245,30 @@ def main():
     win = main_window()
     pattern_of_shapes()
     pen_mode()
+    knife_path()
+    to_origin()
     dialog_shot(win.edit_profile, "cutter-settings.png", None)       # their own size, 1000 x 700
     dialog_shot(win.edit_material, "materials.png", None)
-    # the check list before Start, shown by itself: Start is never pressed here
+    dialog_shot(lambda: win.show_shortcuts(), "shortcuts.png", (1180, 760))
+    # the windows before sending, shown by themselves: Start is never pressed here
+    from vintyl.core import weeding
     from vintyl.gui import start_dialogs
+    from vintyl.gui import _
+    m = win.material()
+    note = _(m.note) if m is not None and m.note else ""        # a built-in material's note, as Start has it
     dlg = start_dialogs.confirm_start(win, win.profile.name, win.profile.port, False, win._material_name(),
-                                      ("Set on the cutter's panel", "90 g", "300 mm/s"), True, False,
-                                      "", show=False)
+                                      win.material_values(), not win.profile.send_speed_force, False, note,
+                                      show=False, details=win.cut_details())
     dlg.show()
     wait(150)
     save(dlg.grab(), "check-list.png")
+    dlg.close()
+    dlg = start_dialogs.confirm_knife_test(win, win.profile.name, win.KNIFE_TEST_MM,
+                                           weeding.knife_test(win.KNIFE_TEST_MM), win.material_values(),
+                                           show=False, details=win.cut_details(pen=False))
+    dlg.show()
+    wait(150)
+    save(dlg.grab(), "knife-test.png")
     dlg.close()
     os._exit(0)
 
