@@ -20,7 +20,7 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QDoubleSpinBox, QFileDialog
                                QFrame, QLineEdit, QMenu, QScrollArea,
                                QProgressBar, QSpinBox, QToolButton,
                                QGridLayout, QGroupBox, QHBoxLayout, QLabel, QListWidget,
-                               QListWidgetItem, QMainWindow, QMessageBox, QPushButton, QSizePolicy,
+                               QListWidgetItem, QMainWindow, QPushButton, QSizePolicy,
                                QToolBar, QVBoxLayout, QWidget)
 
 from vintyl import __version__
@@ -156,14 +156,15 @@ class MainWindow(QMainWindow):
         outer = QVBoxLayout(central)
         outer.setContentsMargins(0, 0, 0, 0)
         outer.setSpacing(0)
-        # the selection bar: two rows (the second only for a text), so it never
-        # scrolls sideways (UI v2)
-        outer.addWidget(self._make_options_bar())
-        # "a new version is available" (hidden until a check finds one)
+        # "a new version is available", right under the ribbon (hidden until a
+        # check finds one)
         from vintyl.gui.update_check import UpdateBar
         self.update_bar = UpdateBar(self)
         self.update_bar.skip.connect(lambda v: self.settings.setValue("updates/skip", v))
         outer.addWidget(self.update_bar)
+        # the selection bar: two rows (the second only for a text), so it never
+        # scrolls sideways (UI v2)
+        outer.addWidget(self._make_options_bar())
         middle = QHBoxLayout()
         middle.setContentsMargins(0, 0, 0, 0)
         middle.setSpacing(0)
@@ -356,15 +357,19 @@ class MainWindow(QMainWindow):
 
     def _make_menu(self):
         mb = self.menuBar()
+        self.menus = {}
         m = mb.addMenu(_("&File"))
+        self.menus["file"] = m
         for a in (self.act_new, self.act_open, self.act_save, self.act_save_as, None, self.act_save_cut, None,
                   self.act_quit):
             m.addSeparator() if a is None else m.addAction(a)
         m = mb.addMenu(_("&Edit"))
+        self.menus["edit"] = m
         for a in (self.act_undo, self.act_redo, None, self.act_cut, self.act_copy, self.act_paste,
                   self.act_duplicate, self.act_delete, None, self.act_select_all):
             m.addSeparator() if a is None else m.addAction(a)
         m = mb.addMenu(_("&Object"))
+        self.menus["object"] = m
         for a in [self.act_group, self.act_ungroup, None] + list(self.act_boolean.values()) + [None] + \
                 [self.act_rot_left, self.act_rot_right, self.act_mirror_h, self.act_mirror_v, None] + \
                 list(self.act_align.values()) + [None, self.act_offset, self.act_tile, self.act_fill,
@@ -372,14 +377,18 @@ class MainWindow(QMainWindow):
                                                  self.act_weed_lines]:
             m.addSeparator() if a is None else m.addAction(a)
         m = mb.addMenu(_("&Cutter"))
+        self.menus["cutter"] = m
         m.addAction(self.act_profile)
         m.addAction(self.act_knife_test)
         m = mb.addMenu(_("&View"))
+        self.menus["view"] = m
         for a in (self.act_fit, self.act_zoom_in, self.act_zoom_out, None, self.act_knife, self.act_grid):
             m.addSeparator() if a is None else m.addAction(a)
         m = mb.addMenu(_("&Settings"))
+        self.menus["settings"] = m
         m.addAction(self.act_settings)
         m = mb.addMenu(_("&Help"))
+        self.menus["help"] = m
         m.addAction(self.act_shortcuts)
         m.addAction(self._action(_("Access to the cutter (Linux groups)"), self.show_access_help))
         m.addSeparator()
@@ -2566,53 +2575,70 @@ class MainWindow(QMainWindow):
         self.refresh()
         return values
 
-    def show_shortcuts(self):
-        """Every action with a key, in one window (built from the actions, so it is never out of date)."""
-        from PySide6.QtWidgets import QDialog, QDialogButtonBox, QTableWidget, QTableWidgetItem
-        rows = self.shortcut_list()
-        dlg = QDialog(self)
-        dlg.setWindowTitle(_("Keyboard shortcuts"))
-        lay = QVBoxLayout(dlg)
-        table = QTableWidget(len(rows), 3)
-        table.setHorizontalHeaderLabels([_("Key"), _("Command"), _("What it does")])
-        for r, (keys, name, about) in enumerate(rows):
-            table.setItem(r, 0, QTableWidgetItem(keys))
-            table.setItem(r, 1, QTableWidgetItem(name))
-            table.setItem(r, 2, QTableWidgetItem(about))
-        table.setWordWrap(True)
-        table.resizeColumnsToContents()
-        table.setColumnWidth(2, 380)
-        table.resizeRowsToContents()
-        table.horizontalHeader().setStretchLastSection(True)
-        table.verticalHeader().setVisible(False)
-        lay.addWidget(table)
-        hint = QLabel(_("Mouse: the wheel zooms, the middle button moves the view, Alt turns snapping off, "
-                        "Shift draws lines in 45° steps, Escape leaves a tool."))
-        hint.setWordWrap(True)
-        lay.addWidget(hint)
-        buttons = QDialogButtonBox(QDialogButtonBox.Close)
-        buttons.rejected.connect(dlg.reject)
-        lay.addWidget(buttons)
-        dlg.resize(760, 640)
-        dlg.exec()
-        return rows
+    def show_shortcuts(self, show=True):
+        """Every action with a key, in groups (UI v2, 5.10); built from the
+        actions, so it is never out of date. Returns the dialog."""
+        from vintyl.gui import info_dialogs
+        return info_dialogs.shortcuts_dialog(self, self.shortcut_groups(), show)
+
+    @staticmethod
+    def _keys_of(a):
+        return [k.toString(QKeySequence.NativeText) for k in a.shortcuts() if not k.isEmpty()]
+
+    def _shortcut_row(self, a):
+        """(name, [keys], short description) of an action with a key."""
+        keys = self._keys_of(a)
+        name = (a.iconText() or a.text()).replace("&", "")
+        about = a.toolTip().replace("&", "")
+        for k in keys:                                    # the key is shown on its own
+            about = about.replace(" (%s)" % k, "")
+        about = about.split(":", 1)[1].strip() if about.startswith(name + ":") else about
+        if about.strip() == name:                          # no description of its own
+            about = ""
+        return name, keys, about[:1].upper() + about[1:]
+
+    def shortcut_groups(self):
+        """[(group, [(name, [keys], about)])]: the tools in the order of the
+        tool strip, then by the menu each action is in (File, Edit, Object);
+        the rest (view, cutter, settings, help, keys in no menu) together."""
+        seen = set()
+
+        def take(actions):
+            rows = []
+            for a in actions:
+                if a is None or id(a) in seen or not self._keys_of(a):
+                    continue
+                seen.add(id(a))
+                rows.append(self._shortcut_row(a))
+            return rows
+
+        def in_menu(menu):
+            out = []
+            for a in menu.actions():
+                out += in_menu(a.menu()) if a.menu() is not None else [a]
+            return out
+        tools = []
+        for _cat, _title, _icon, entries in self.PANEL:
+            for e in entries:
+                if e[0] == "tool":
+                    tools.append(self.tool_actions[e[1]])
+                elif e[0] == "act":
+                    tools.append(getattr(self, e[1]))
+        groups = [(_("Tools"), take(tools)), (_("File"), take(in_menu(self.menus["file"]))),
+                  (_("Edit"), take(in_menu(self.menus["edit"]))),
+                  (_("Object"), take(in_menu(self.menus["object"])))]
+        rest = []
+        for key in ("view", "cutter", "settings", "help"):
+            rest += in_menu(self.menus[key])
+        rest += self.findChildren(QAction)
+        groups.append((_("View and program"), take(rest)))
+        return [(title, rows) for title, rows in groups if rows]
 
     def shortcut_list(self):
         """(keys, command, short description) of every action with a key, by command."""
-        rows, seen = [], set()
-        for a in self.findChildren(QAction):
-            keys = [k.toString(QKeySequence.NativeText) for k in a.shortcuts() if not k.isEmpty()]
-            if not keys or id(a) in seen:
-                continue
-            seen.add(id(a))
-            name = (a.iconText() or a.text()).replace("&", "")
-            about = a.toolTip().replace("&", "")
-            for k in keys:                                    # the key is in its own column
-                about = about.replace(" (%s)" % k, "")
-            about = about.split(":", 1)[1].strip() if about.startswith(name + ":") else about
-            if about.strip() == name:                          # no description of its own
-                about = ""
-            rows.append((", ".join(keys), name, about[:1].upper() + about[1:]))
+        rows = []
+        for _group, entries in self.shortcut_groups():
+            rows += [(", ".join(keys), name, about) for name, keys, about in entries]
         rows.sort(key=lambda r: r[1].lower())
         return rows
 
@@ -3006,26 +3032,12 @@ class MainWindow(QMainWindow):
         self.port_warning.setVisible(bool(text))
         return problem
 
-    def show_access_help(self):
+    def show_access_help(self, show=True):
+        """Which Linux group the cutter's device needs, and the commands to
+        join it (UI v2, 5.11). Returns the dialog."""
+        from vintyl.gui import info_dialogs
         port = self.profile.port
-        problem = transport.access_problem(port)
-        now = (_("Now: %s") % problem) if problem else (
-            _("Now: you may use %s.") % port if port else _("Now: no port is chosen."))
-        box = QMessageBox(self)
-        box.setWindowTitle(_("Access to the cutter"))
-        box.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        box.setText(_(
-            "On Linux a cutter is a device file, and only the members of its group may send to it:\n\n"
-            "• a cutter connected as a USB printer (/dev/usb/lp0, as the VEVOR KI-375A): the group lp\n"
-            "• a serial port or a USB-serial cable (/dev/ttyUSB0, /dev/ttyACM0): the group dialout "
-            "(on Arch and Manjaro: uucp)\n\n"
-            "Join the group once, in a terminal:\n"
-            "    sudo usermod -aG lp $USER\n"
-            "    sudo usermod -aG dialout $USER\n"
-            "then log out and in again (a running session keeps its old groups).\n\n"
-            "Vintyl checks the port you choose and says under it which group that device needs.")
-            + "\n\n" + now)
-        box.exec()
+        return info_dialogs.access_dialog(self, port, transport.access_problem(port), show)
 
     def refresh_job(self):
         self.check_port_access()
@@ -3481,43 +3493,21 @@ class MainWindow(QMainWindow):
         """The report in a window: copy it, or open GitHub's forms to report a
         problem or how Vintyl works on a cutter. Returns the dialog."""
         from PySide6.QtCore import QUrl
-        from PySide6.QtGui import QDesktopServices, QGuiApplication
-        from PySide6.QtWidgets import QDialog, QDialogButtonBox, QPlainTextEdit
+        from PySide6.QtGui import QDesktopServices
         from vintyl.core import diag
-        text = self.diagnostic_report()
-        dlg = QDialog(self)
-        dlg.setWindowTitle(_("Diagnostic report"))
-        dlg.resize(760, 560)
-        lay = QVBoxLayout(dlg)
-        note = QLabel(_("Copy this and paste it into your report on GitHub. It holds the versions, the "
-                        "checks, the chosen cutter and Vintyl's log; no user name, no designs."))
-        note.setWordWrap(True)
-        lay.addWidget(note)
-        view = QPlainTextEdit(text)
-        view.setReadOnly(True)
-        from PySide6.QtGui import QFontDatabase
-        view.setFont(QFontDatabase.systemFont(QFontDatabase.FixedFont))     # the columns line up
-        view.setLineWrapMode(QPlainTextEdit.NoWrap)
-        lay.addWidget(view, 1)
-        buttons = QDialogButtonBox(QDialogButtonBox.Close)
-        copy = buttons.addButton(_("Copy"), QDialogButtonBox.ActionRole)
-        copy.clicked.connect(lambda: (QGuiApplication.clipboard().setText(text),
-                                      self.statusBar().showMessage(_("The report is copied."), 5000)))
-        bug = buttons.addButton(_("Report a problem…"), QDialogButtonBox.ActionRole)
-        bug.setToolTip(_("Copies the report and opens GitHub's form"))
-        cutter = buttons.addButton(_("Report my cutter…"), QDialogButtonBox.ActionRole)
-        cutter.setToolTip(_("Tell us how Vintyl works on your cutter (copies the report, opens GitHub's form)"))
-        for button, kind in ((bug, "bug"), (cutter, "cutter")):
-            button.clicked.connect(lambda _c=False, k=kind: (
-                QGuiApplication.clipboard().setText(text),
-                QDesktopServices.openUrl(QUrl(diag.issue_url(k, __version__, self.profile.name)))))
-        buttons.rejected.connect(dlg.reject)
-        lay.addWidget(buttons)
+        from vintyl.gui import info_dialogs
+        dlg = info_dialogs.report_dialog(
+            self, self.diagnostic_report(),
+            lambda: self.statusBar().showMessage(_("The report is copied."), 5000),
+            lambda kind: QDesktopServices.openUrl(QUrl(diag.issue_url(kind, __version__, self.profile.name))),
+            show=False)
         self.diagnostics_dialog = dlg
         if show:
             dlg.exec()
         return dlg
 
-    def about(self):
-        QMessageBox.about(self, _("About Vintyl"),
-                          _("Vintyl %s\nSoftware for vinyl cutters.\nGPL-3.0-or-later.") % __version__)
+    def about(self, show=True):
+        """About Vintyl (UI v2, 5.9). Returns the dialog."""
+        from vintyl.gui import info_dialogs
+        return info_dialogs.about_dialog(self, __version__, lambda: self.check_for_updates(auto=False),
+                                         lambda: self.show_diagnostics(), show)

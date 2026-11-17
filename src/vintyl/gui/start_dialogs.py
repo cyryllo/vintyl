@@ -65,17 +65,7 @@ def _values_card(values):
 
 
 def _dialog(parent, title):
-    dlg = QDialog(parent)
-    dlg.setWindowTitle(title)
-    dlg.setMinimumWidth(560)
-    outer = QVBoxLayout(dlg)
-    outer.setContentsMargins(0, 0, 0, 0)
-    outer.setSpacing(0)
-    body = QVBoxLayout()
-    body.setContentsMargins(18, 16, 18, 16)
-    body.setSpacing(12)
-    outer.addLayout(body, 1)
-    return dlg, outer, body
+    return widgets.plain_dialog(parent, title, 560)
 
 
 def _footer(dlg, outer, go_text, go_icon):

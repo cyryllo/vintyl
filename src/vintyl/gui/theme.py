@@ -44,7 +44,7 @@ TOKENS = {
         "selection": "#2563eb",
         "info_bg": "#eef2ff", "info_ink": "#1e3a8a", "info_border": "#c7d2fe",
         "warn_bg": "#fef3c7", "warn_ink": "#7c2d12",
-        "ok": "#15803d", "ok_bg": "#dcfce7",
+        "ok": "#15803d", "ok_bg": "#dcfce7", "code_bg": "#1f2430", "code_ink": "#e3e6ea",
         "danger": "#b91c1c",
         "switch_off": "#8c95a3",
         "stop": "#1f2430",
@@ -74,7 +74,7 @@ TOKENS = {
         "selection": "#2563eb",
         "info_bg": "#1e2a4a", "info_ink": "#c7d2fe", "info_border": "#334a7d",
         "warn_bg": "#422006", "warn_ink": "#fde68a",
-        "ok": "#4ade80", "ok_bg": "#14361f",
+        "ok": "#4ade80", "ok_bg": "#14361f", "code_bg": "#17191d", "code_ink": "#e3e6ea",
         "danger": "#b91c1c",
         "switch_off": "#6b7280",
         "stop": "#4b5563",
@@ -97,7 +97,8 @@ QToolBar#main_toolbar QToolButton:disabled { color: $disabled_text; }
 QLabel#ribbon_caption { color: $muted; font-size: 11px; padding-bottom: 1px; }
 QFrame#ribbon_separator { color: $border; margin: 4px 2px; }
 QWidget#options_bar { background: $bar; border-bottom: 1px solid $border; }
-QFrame#update_bar { background: $info_bg; border-bottom: 1px solid $update_border; }
+QFrame#update_bar { background: $info_bg; border: 1px solid $info_border; border-radius: 8px;
+    margin: 8px 12px 0 12px; }
 QFrame#update_bar QLabel { color: $info_ink; }
 QLabel#node_hint, QLabel#muted, QLabel#hint, QLabel#sel_hint { color: $muted; }
 QLabel#sel_name { font-weight: 600; color: $ink; }
@@ -143,6 +144,17 @@ QListWidget#element_list { background: transparent; border: 0; outline: 0; }
 QListWidget#element_list::item:selected, QListWidget#element_list::item:hover { background: transparent; }
 QFrame#warn { background: $warn_bg; border-radius: 8px; }
 QFrame#warn QLabel { color: $warn_ink; }
+QScrollArea#plain_scroll, QWidget#plain_scroll_inner { background: $window; border: none; }
+QLabel#app_name { font-size: 30px; font-weight: 700; }
+QLabel#keycap { background: $panel; color: $ink; border: 1px solid $field_border; border-bottom-width: 2px;
+    border-radius: 5px; padding: 0 6px; font-size: 12px; min-width: 12px; }
+QLabel#group_value { font-weight: 700; }
+QFrame#state_ok { background: $ok_bg; border-radius: 8px; }
+QFrame#state_ok QLabel { color: $ok; }
+QFrame#code_box { background: $code_bg; border-radius: 8px; }
+QFrame#code_box QLabel { color: $code_ink; }
+QFrame#code_box QToolButton { background: transparent; border: none; border-radius: 6px; padding: 4px; }
+QFrame#code_box QToolButton:hover { background: $ink_2; }
 QFrame#preview_box { background: $sheet; border: 1px solid $border; border-radius: 8px; }
 QLabel#preview_caption { color: $muted; }
 QFrame#info { background: $info_bg; border: 1px solid $info_border; border-radius: 8px; }

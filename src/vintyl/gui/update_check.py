@@ -14,7 +14,7 @@ from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton
 
 from vintyl.core import updates
-from vintyl.gui import _, icons
+from vintyl.gui import _, icons, theme
 
 
 class UpdateCheck(QThread):
@@ -43,10 +43,10 @@ class UpdateBar(QFrame):
         self.setObjectName("update_bar")
         self.release = None
         row = QHBoxLayout(self)
-        row.setContentsMargins(8, 4, 8, 4)
+        row.setContentsMargins(12, 6, 8, 6)
         row.setSpacing(8)
         icon = QLabel()
-        icon.setPixmap(icons.tabler("cloud-download").pixmap(18, 18))
+        icon.setPixmap(icons.tabler("cloud-download", theme.token("info_ink")).pixmap(20, 20))
         row.addWidget(icon)
         self.text = QLabel()
         row.addWidget(self.text, 1)
@@ -66,7 +66,7 @@ class UpdateBar(QFrame):
 
     def show_release(self, release, current):
         self.release = release
-        self.text.setText(_("<b>%s is available</b> (you have %s).") % (release.name, current))
+        self.text.setText(_("<b>A new version of Vintyl is out: %s</b> (you have %s).") % (release.name, current))
         self.show()
 
     def open_release(self):

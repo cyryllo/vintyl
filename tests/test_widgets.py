@@ -42,7 +42,8 @@ def contrast(a, b):
 PAIRS = [("ink", "panel"), ("ink", "window"), ("ink", "bar"), ("ink_2", "panel"), ("muted", "panel"),
          ("muted", "window"), ("accent_ink", "accent_soft"), ("accent_ink", "panel"), ("on_accent", "accent"),
          ("on_accent", "stop"), ("on_accent", "danger"), ("info_ink", "info_bg"), ("warn_ink", "warn_bg"),
-         ("ink", "stat"), ("ink_2", "well"), ("disabled_text", "panel")]
+         ("ink", "stat"), ("ink_2", "well"), ("disabled_text", "panel"), ("ok", "ok_bg"),
+         ("code_ink", "code_bg")]
 
 
 @pytest.mark.parametrize("look", ["light", "dark"])

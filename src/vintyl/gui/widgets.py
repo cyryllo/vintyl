@@ -251,6 +251,22 @@ def value_of(widget):
     raise TypeError("no value for %r" % (widget,))
 
 
+def plain_dialog(parent, title, min_width=560):
+    """An empty dialog in the common style: (dialog, outer layout for the
+    footer, body layout with the dialog's margins)."""
+    dlg = QDialog(parent)
+    dlg.setWindowTitle(title)
+    dlg.setMinimumWidth(min_width)
+    outer = QVBoxLayout(dlg)
+    outer.setContentsMargins(0, 0, 0, 0)
+    outer.setSpacing(0)
+    body = QVBoxLayout()
+    body.setContentsMargins(18, 16, 18, 16)
+    body.setSpacing(12)
+    outer.addLayout(body, 1)
+    return dlg, outer, body
+
+
 def form_dialog(parent, title, rows, action=None, hint=None, extra=None, left=None, show=True,
                 buttons_left=()):
     """A dialog of fields. rows: [(key, label, widget)], label None = the

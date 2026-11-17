@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 19:21+0100\n"
+"POT-Creation-Date: 2026-11-17 19:28+0100\n"
 "PO-Revision-Date: 2026-11-15 17:49+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -147,8 +147,8 @@ msgid "60° (thick materials)"
 msgstr "60° (grube materiały)"
 
 #, python-format
-msgid "<b>%s is available</b> (you have %s)."
-msgstr "<b>Jest już %s</b> (masz %s)."
+msgid "<b>A new version of Vintyl is out: %s</b> (you have %s)."
+msgstr "<b>Jest już nowa wersja Vintyl: %s</b> (masz %s)."
 
 msgid ""
 "<b>Mirror on.</b> The vinyl's shiny side (the carrier) down, the matt "
@@ -265,6 +265,9 @@ msgstr "Jak w systemie"
 msgid "Asks GitHub; nothing about you is sent."
 msgstr "Pyta GitHub; nic o Tobie nie jest wysyłane."
 
+msgid "Authors"
+msgstr "Autorzy"
+
 msgid "Away"
 msgstr "Odstęp"
 
@@ -291,6 +294,9 @@ msgstr "Dolne krawędzie"
 
 msgid "Bricks"
 msgstr "Cegiełki"
+
+msgid "Built with"
+msgstr "Zbudowany z"
 
 msgid ""
 "Built-in profile: your changes are kept as your own copy; \"Restore "
@@ -353,6 +359,9 @@ msgstr "Koło"
 msgid "Circles"
 msgstr "Okręgi"
 
+msgid "Close"
+msgstr "Zamknij"
+
 msgid "Closed shapes are cut this far past their start, so the cut closes cleanly"
 msgstr ""
 "Kształty zamknięte są cięte o tyle dalej za punkt startu, żeby cięcie "
@@ -364,8 +373,8 @@ msgstr "Kolumny (w poprzek)"
 msgid "Comes in a later step of Vintyl"
 msgstr "Będzie w kolejnym kroku Vintyl"
 
-msgid "Command"
-msgstr "Polecenie"
+msgid "Command name or key"
+msgstr "Nazwa polecenia albo klawisz"
 
 msgid "Commands"
 msgstr "Polecenia"
@@ -389,6 +398,9 @@ msgstr[0] "Skopiowano %d element."
 msgstr[1] "Skopiowano %d elementy."
 msgstr[2] "Skopiowano %d elementów."
 
+msgid "Copied. Paste them into a terminal."
+msgstr "Skopiowane. Wklej je do terminala."
+
 msgid "Copies"
 msgstr "Kopie"
 
@@ -400,6 +412,9 @@ msgstr "Kopie…"
 
 msgid "Copy"
 msgstr "Kopiuj"
+
+msgid "Copy commands"
+msgstr "Kopiuj polecenia"
 
 msgid ""
 "Copy this and paste it into your report on GitHub. It holds the versions,"
@@ -601,6 +616,13 @@ msgstr "Zrób ponownie to, co zostało cofnięte"
 
 msgid "Do not remind about this version again (a later one is shown)"
 msgstr "Nie przypominaj o tej wersji (późniejsza zostanie pokazana)"
+
+msgid ""
+"Does it work on another cutter for you? Tell us through “Diagnostic "
+"report”; it helps others."
+msgstr ""
+"Działa u Ciebie na innym ploterze? Daj znać przez „Raport diagnostyczny”,"
+" to pomoże innym."
 
 msgid "Don't save"
 msgstr "Nie zapisuj"
@@ -912,6 +934,9 @@ msgstr "Kursywa"
 msgid "Job"
 msgstr "Zadanie"
 
+msgid "Join the group once, in a terminal, then log out and in again:"
+msgstr "Dołącz do grupy raz, w terminalu, potem wyloguj się i zaloguj:"
+
 msgid "Join the selected elements into a group that is selected and moved as one"
 msgstr "Połącz zaznaczone elementy w grupę, zaznaczaną i przesuwaną razem"
 
@@ -930,9 +955,6 @@ msgid ""
 msgstr ""
 "Zachowaj proporcje: szerokość i wysokość zmieniają się razem, w polach i "
 "przy przeciąganiu kwadracików wokół zaznaczenia"
-
-msgid "Key"
-msgstr "Klawisz"
 
 msgid "Keyboard shortcuts"
 msgstr "Skróty klawiszowe"
@@ -977,6 +999,9 @@ msgstr "Długość"
 
 msgid "Length (mm)"
 msgstr "Długość (mm)"
+
+msgid "Licence"
+msgstr "Licencja"
 
 msgid "Light"
 msgstr "Jasny"
@@ -1091,6 +1116,9 @@ msgstr "Nowy materiał"
 msgid "New version"
 msgstr "Nowa wersja"
 
+msgid "No command matches."
+msgstr "Żadne polecenie nie pasuje."
+
 msgid "No line fits between the shapes; try a smaller margin."
 msgstr ""
 "Żadna linia nie mieści się między kształtami; spróbuj mniejszego "
@@ -1160,6 +1188,9 @@ msgstr "Teraz: możesz używać %s."
 msgid "OK"
 msgstr "OK"
 
+msgid "Object"
+msgstr "Obiekt"
+
 msgid ""
 "Off: the cutter takes them from its panel only; Vintyl reminds you of the"
 " material's values before Start."
@@ -1170,39 +1201,15 @@ msgstr ""
 msgid "Offset"
 msgstr "Odsunięcie"
 
+msgid "On Arch and Manjaro: uucp instead of dialout."
+msgstr "W Archu i Manjaro zamiast dialout: uucp."
+
 msgid ""
 "On Linux a cutter is a device file, and only the members of its group may"
-" send to it:\n"
-"\n"
-"• a cutter connected as a USB printer (/dev/usb/lp0, as the VEVOR KI-"
-"375A): the group lp\n"
-"• a serial port or a USB-serial cable (/dev/ttyUSB0, /dev/ttyACM0): the "
-"group dialout (on Arch and Manjaro: uucp)\n"
-"\n"
-"Join the group once, in a terminal:\n"
-"    sudo usermod -aG lp $USER\n"
-"    sudo usermod -aG dialout $USER\n"
-"then log out and in again (a running session keeps its old groups).\n"
-"\n"
-"Vintyl checks the port you choose and says under it which group that "
-"device needs."
+" send to it:"
 msgstr ""
 "W Linuksie ploter to plik urządzenia i wysyłać do niego mogą tylko "
-"członkowie jego grupy:\n"
-"\n"
-"• ploter podłączony jako drukarka USB (/dev/usb/lp0, jak VEVOR KI-375A): "
-"grupa lp\n"
-"• port szeregowy albo kabel USB-szeregowy (/dev/ttyUSB0, /dev/ttyACM0): "
-"grupa dialout (w Archu i Manjaro: uucp)\n"
-"\n"
-"Dołącz do grupy raz, w terminalu:\n"
-"    sudo usermod -aG lp $USER\n"
-"    sudo usermod -aG dialout $USER\n"
-"potem wyloguj się i zaloguj ponownie (trwająca sesja zachowuje stare "
-"grupy).\n"
-"\n"
-"Vintyl sprawdza wybrany port i pisze pod nim, której grupy wymaga to "
-"urządzenie."
+"członkowie jego grupy:"
 
 msgid ""
 "Only for the pen. A solid fill: the spacing a little less than the pen's "
@@ -1324,6 +1331,13 @@ msgid ""
 "it"
 msgstr "Dodaj ten AppImage do menu pulpitu i otwieraj nim projekty .vintyl"
 
+msgid ""
+"Python, Qt 6 (PySide6), pyserial, pyclipper, segno, svgelements, Tabler "
+"Icons. Part of the code comes from Kerfly."
+msgstr ""
+"Python, Qt 6 (PySide6), pyserial, pyclipper, segno, svgelements, Tabler "
+"Icons. Część kodu pochodzi z programu Kerfly."
+
 msgid "QR code"
 msgstr "Kod QR"
 
@@ -1364,11 +1378,11 @@ msgstr "Usuń wypełnienie"
 msgid "Remove the holes inside"
 msgstr "Usuń wewnętrzne otwory"
 
-msgid "Report a problem…"
-msgstr "Zgłoś problem…"
+msgid "Report a problem"
+msgstr "Zgłoś problem"
 
-msgid "Report my cutter…"
-msgstr "Zgłoś mój ploter…"
+msgid "Report my cutter"
+msgstr "Zgłoś mój ploter"
 
 msgid "Restore"
 msgstr "Przywróć"
@@ -1454,6 +1468,9 @@ msgstr "Zapisano %s"
 msgid "Saved %s (%d bytes)"
 msgstr "Zapisano %s (%d bajtów)"
 
+msgid "Search"
+msgstr "Szukaj"
+
 msgid "See the release"
 msgstr "Zobacz wydanie"
 
@@ -1522,6 +1539,9 @@ msgstr ""
 "Wysłano %d bajtów do %s. Ploter tnie ze swojej pamięci z prędkością "
 "ustawioną na panelu."
 
+msgid "Serial port or USB-serial cable (/dev/ttyUSB0, /dev/ttyACM0)"
+msgstr "Port szeregowy albo kabel USB-szeregowy (/dev/ttyUSB0, /dev/ttyACM0)"
+
 msgid "Set on the cutter's panel"
 msgstr "Ustaw na panelu plotera"
 
@@ -1573,6 +1593,9 @@ msgstr "Pomiń tę wersję"
 
 msgid "Snap to other shapes (corners, centres, edges)"
 msgstr "Przyciągaj do innych kształtów (narożniki, środki, krawędzie)"
+
+msgid "Software for cutting plotters, for Linux"
+msgstr "Program do ploterów tnących, dla Linuksa"
 
 msgid "Space between the design and the frame"
 msgstr "Odstęp między projektem a ramką"
@@ -1752,6 +1775,12 @@ msgstr "Język i wygląd zmienią się przy następnym uruchomieniu Vintyla."
 msgid "The lines stop this far from the shapes"
 msgstr "Linie kończą się tak daleko od kształtów"
 
+#, python-format
+msgid ""
+"The list of the libraries and their licences is in THIRD-PARTY-"
+"NOTICES.md: %s"
+msgstr "Lista bibliotek i ich licencji jest w pliku THIRD-PARTY-NOTICES.md: %s"
+
 msgid "The material is under the pinch rollers"
 msgstr "Materiał jest pod rolkami dociskowymi"
 
@@ -1812,6 +1841,9 @@ msgstr "Nie ma nic do cięcia."
 msgid "There is nothing to cut: every path is shorter than one cutter step."
 msgstr "Nie ma nic do cięcia: każda ścieżka jest krótsza niż jeden krok plotera."
 
+msgid "Third-party licences"
+msgstr "Licencje bibliotek"
+
 msgid ""
 "This cutter takes force and speed from its own panel only. Vintyl shows "
 "these values before Start, to set them there."
@@ -1829,6 +1861,9 @@ msgstr "Żeby od razu zatrzymać ploter: Test (pauza) albo Reset na jego panelu.
 
 msgid "Too shallow: more force on the cutter's panel. Marks in the backing: less"
 msgstr "Za płytko: większy nacisk na panelu plotera. Ślady w podkładzie: mniejszy"
+
+msgid "Tools"
+msgstr "Narzędzia"
 
 msgid "Top edges"
 msgstr "Górne krawędzie"
@@ -1864,6 +1899,9 @@ msgstr "Wpisz tekst albo adres, który ma zawierać kod QR."
 msgid "USB printer"
 msgstr "drukarka USB"
 
+msgid "USB printer (/dev/usb/lp0, as the VEVOR KI-375A)"
+msgstr "Drukarka USB (/dev/usb/lp0, jak VEVOR KI-375A)"
+
 msgid "USB printer (/dev/usb/lp…)"
 msgstr "drukarka USB (/dev/usb/lp…)"
 
@@ -1891,21 +1929,25 @@ msgstr "Niezapisane zmiany"
 msgid "Updates"
 msgstr "Aktualizacje"
 
+#, python-format
+msgid "Version %s"
+msgstr "Wersja %s"
+
 msgid "Versions, checks, the cutter and the log, to paste into a report"
 msgstr "Wersje, kontrole, ploter i dziennik, do wklejenia w zgłoszenie"
 
 msgid "View"
 msgstr "Widok"
 
-#, python-format
+msgid "View and program"
+msgstr "Widok i program"
+
 msgid ""
-"Vintyl %s\n"
-"Software for vinyl cutters.\n"
-"GPL-3.0-or-later."
+"Vintyl checks the port you choose and says under it which group that "
+"device needs."
 msgstr ""
-"Vintyl %s\n"
-"Program do ploterów tnących folię.\n"
-"GPL-3.0-or-later."
+"Vintyl sprawdza wybrany port i pisze pod nim, jakiej grupy potrzebuje to "
+"urządzenie."
 
 msgid "Vintyl is in the applications menu (it may need a new login to show)."
 msgstr ""
@@ -1945,6 +1987,9 @@ msgstr "Szer."
 msgid "Waves"
 msgstr "Fale"
 
+msgid "Website"
+msgstr "Strona"
+
 msgid "Weeding lines"
 msgstr "Linie do wybierania"
 
@@ -1957,9 +2002,6 @@ msgid ""
 msgstr ""
 "Co jest w oprawce plotera. Pisak: rysowanie na papierze lub kartonie, bez"
 " przesunięcia noża i nadcięcia; rysowane są też wypełnienia."
-
-msgid "What it does"
-msgstr "Co robi"
 
 msgid ""
 "Where the pen's stroke lies against the line of a closed shape. Outside: "
@@ -2580,4 +2622,76 @@ msgstr "← Y w poprzek, mm"
 #~ "Wstawiane są tylko kształty, które "
 #~ "mieszczą się w całości; są cięte "
 #~ "przed obrysem."
+
+#~ msgid "<b>%s is available</b> (you have %s)."
+#~ msgstr "<b>Jest już %s</b> (masz %s)."
+
+#~ msgid "Command"
+#~ msgstr "Polecenie"
+
+#~ msgid "Key"
+#~ msgstr "Klawisz"
+
+#~ msgid ""
+#~ "On Linux a cutter is a device "
+#~ "file, and only the members of its"
+#~ " group may send to it:\n"
+#~ "\n"
+#~ "• a cutter connected as a USB "
+#~ "printer (/dev/usb/lp0, as the VEVOR "
+#~ "KI-375A): the group lp\n"
+#~ "• a serial port or a USB-"
+#~ "serial cable (/dev/ttyUSB0, /dev/ttyACM0): the"
+#~ " group dialout (on Arch and Manjaro:"
+#~ " uucp)\n"
+#~ "\n"
+#~ "Join the group once, in a terminal:\n"
+#~ "    sudo usermod -aG lp $USER\n"
+#~ "    sudo usermod -aG dialout $USER\n"
+#~ "then log out and in again (a running session keeps its old groups).\n"
+#~ "\n"
+#~ "Vintyl checks the port you choose "
+#~ "and says under it which group that"
+#~ " device needs."
+#~ msgstr ""
+#~ "W Linuksie ploter to plik urządzenia "
+#~ "i wysyłać do niego mogą tylko "
+#~ "członkowie jego grupy:\n"
+#~ "\n"
+#~ "• ploter podłączony jako drukarka USB"
+#~ " (/dev/usb/lp0, jak VEVOR KI-375A): "
+#~ "grupa lp\n"
+#~ "• port szeregowy albo kabel USB-"
+#~ "szeregowy (/dev/ttyUSB0, /dev/ttyACM0): grupa "
+#~ "dialout (w Archu i Manjaro: uucp)\n"
+#~ ""
+#~ "\n"
+#~ "Dołącz do grupy raz, w terminalu:\n"
+#~ "    sudo usermod -aG lp $USER\n"
+#~ "    sudo usermod -aG dialout $USER\n"
+#~ "potem wyloguj się i zaloguj ponownie "
+#~ "(trwająca sesja zachowuje stare grupy).\n"
+#~ ""
+#~ "\n"
+#~ "Vintyl sprawdza wybrany port i pisze "
+#~ "pod nim, której grupy wymaga to "
+#~ "urządzenie."
+
+#~ msgid "Report a problem…"
+#~ msgstr "Zgłoś problem…"
+
+#~ msgid "Report my cutter…"
+#~ msgstr "Zgłoś mój ploter…"
+
+#~ msgid ""
+#~ "Vintyl %s\n"
+#~ "Software for vinyl cutters.\n"
+#~ "GPL-3.0-or-later."
+#~ msgstr ""
+#~ "Vintyl %s\n"
+#~ "Program do ploterów tnących folię.\n"
+#~ "GPL-3.0-or-later."
+
+#~ msgid "What it does"
+#~ msgstr "Co robi"
 

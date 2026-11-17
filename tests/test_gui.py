@@ -1696,3 +1696,51 @@ def test_every_pattern_has_a_picture():
         img = pattern_icon(code, 30).pixmap(30, 30).toImage()
         inked = sum(1 for x in range(30) for y in range(30) if img.pixelColor(x, y).alpha() > 0)
         assert inked > 30, code
+
+
+# ---- the Help menu's windows (UI v2, 5.9 to 5.11) ------------------------------------------------------
+def test_the_shortcuts_are_in_groups_and_can_be_searched(win):
+    groups = dict(win.shortcut_groups())
+    assert list(groups)[:4] == ["Tools", "File", "Edit", "Object"] and "View and program" in groups
+    tools = {name: keys for name, keys, _about in groups["Tools"]}
+    assert tools["Rectangle"] == ["R"] and tools["Fill"] == ["Shift+F"] and tools["Pattern of shapes"]
+    assert ("New", ["Ctrl+N"]) in [(n, k) for n, k, _a in groups["File"]]
+    names = [n for _g, rows in win.shortcut_groups() for n, _k, _a in rows]
+    assert len(names) == len(set(names))                                # each key once
+    dlg = win.show_shortcuts(show=False)
+    assert len(dlg.cards) == len(groups)
+    dlg.search.setText("ctrl+n")
+    assert [c.isHidden() for c in dlg.cards].count(False) == 1          # only File has it
+    dlg.search.setText("nothing like this")
+    assert all(c.isHidden() for c in dlg.cards)
+    dlg.search.setText("")
+    assert not any(c.isHidden() for c in dlg.cards)
+
+
+def test_key_parts_keep_the_plus_key():
+    from vintyl.gui.info_dialogs import key_parts
+    assert key_parts("Ctrl+Shift+G") == ["Ctrl", "Shift", "G"]
+    assert key_parts("Ctrl++") == ["Ctrl", "+"] and key_parts("+") == ["+"]
+
+
+def test_the_about_window(win):
+    from PySide6.QtWidgets import QLabel
+    from vintyl import __version__
+    from vintyl.gui import info_dialogs
+    dlg = win.about(show=False)
+    texts = " ".join(l.text() for l in dlg.findChildren(QLabel))
+    assert __version__ in texts and "GPL-3.0-or-later" in texts and "github.com/cyryllo/vintyl" in texts
+    notices = info_dialogs.notices_dialog(dlg, show=False)
+    assert "Third-party software in Vintyl" in notices.text.toPlainText()
+
+
+def test_the_access_window_says_the_state_and_copies_the_commands(win):
+    from PySide6.QtGui import QGuiApplication
+    from vintyl.gui import info_dialogs
+    dlg = info_dialogs.access_dialog(win, "/dev/usb/lp1", None, show=False)
+    assert dlg.state.objectName() == "state_ok"
+    dlg.copy_button.click()
+    assert QGuiApplication.clipboard().text() == "sudo usermod -aG lp $USER\nsudo usermod -aG dialout $USER"
+    dlg = info_dialogs.access_dialog(win, "/dev/usb/lp1", "you are not in the group lp", show=False)
+    assert dlg.state.objectName() == "warn"
+    assert win.show_access_help(show=False).windowTitle() == "Access to the cutter"
