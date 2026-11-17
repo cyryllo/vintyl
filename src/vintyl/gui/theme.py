@@ -115,7 +115,7 @@ QLabel#card_title { font-weight: 600; color: $ink; }
 QLabel#field_label { color: $ink_2; }
 QFrame#footer { background: $panel; border-top: 1px solid $border; }
 QLineEdit, QAbstractSpinBox, QComboBox {
-    min-height: 28px; padding: 0 6px; border: 1px solid $field_border; border-radius: 6px;
+    min-height: 28px; padding: 0 8px 0 12px; border: 1px solid $field_border; border-radius: 6px;
     background: $panel; color: $ink; }
 QComboBox::drop-down { border: 0; width: 22px; }
 QComboBox::down-arrow { image: url($chevron); width: 12px; height: 12px; }
@@ -234,6 +234,26 @@ def dark_palette():
     return pal
 
 
+FIELD_TEXT_MARGIN_PX = 10      # room between a number field's frame and its text
+
+
+def _pad_number_fields(app):
+    """Number fields (QSpinBox, QDoubleSpinBox) place their inner text field
+    themselves and ignore the style sheet's padding, so their numbers touched
+    the left edge: every number field gets a text margin as it appears."""
+    from PySide6.QtCore import QEvent, QObject
+    from PySide6.QtWidgets import QAbstractSpinBox
+
+    class _Padding(QObject):
+        def eventFilter(self, obj, event):
+            if event.type() == QEvent.Polish and isinstance(obj, QAbstractSpinBox):
+                obj.lineEdit().setTextMargins(FIELD_TEXT_MARGIN_PX + 2, 0, 4, 0)
+            return False
+    if getattr(app, "_vintyl_padding", None) is None:
+        app._vintyl_padding = _Padding(app)
+        app.installEventFilter(app._vintyl_padding)
+
+
 def apply(app, name):
     """Fusion style with the light or dark palette, the style sheet and the
     icons' colour. Call before the window is built (icons are drawn then)."""
@@ -244,4 +264,5 @@ def apply(app, name):
     app.setPalette(dark_palette() if _current == "dark" else app.style().standardPalette())
     icons.set_ink(TOKENS[_current]["ink"])
     app.setStyleSheet(style_sheet())
+    _pad_number_fields(app)
     return _current
