@@ -10,7 +10,7 @@ other_lang: guide.html
 
 Vintyl steruje z Linuksa ploterami tnącymi z nożem wleczonym: układa Twoje
 projekty na obrazie materiału, pozwala je rysować i zmieniać, a potem wysyła
-zadanie do plotera. Instrukcja dotyczy wersji 0.8.0.
+zadanie do plotera. Instrukcja dotyczy wersji 0.8.1.
 
 > Nic nie trafia do plotera, dopóki nie potwierdzisz tego na liście
 > kontrolnej. Przed pierwszym cięciem nowego materiału wytnij test noża.

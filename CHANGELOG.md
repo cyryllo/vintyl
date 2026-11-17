@@ -1,6 +1,8 @@
 # Changes
 
-## Unreleased
+## 0.8.1
+
+Four more languages, and small fixes.
 
 **Languages**
 - German, Spanish, French and Brazilian Portuguese, besides English and Polish (the languages of
