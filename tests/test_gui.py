@@ -1973,3 +1973,30 @@ def test_the_help_menu_opens_its_windows(win, monkeypatch):
         a.trigger()
         assert len(opened) == before + 1, a.text()                # a window was opened (run)
     assert {"About Vintyl", "Keyboard shortcuts", "Access to the cutter", "Diagnostic report"} <= set(opened)
+
+
+def test_the_settings_windows_scroll_instead_of_squeezing_their_cards(win):
+    """Made low, the cutter settings and the materials windows scroll their
+    cards; the cards never lie over each other, nor are cut at the side."""
+    from PySide6.QtTest import QTest
+    from vintyl.core import profile
+    from vintyl.gui.material_editor import MaterialEditor
+    from vintyl.gui.profile_editor import ProfileEditor
+    from vintyl.gui.widgets import Card
+    entry = [e for e in profile.catalogue() if e["profile"]][0]
+    for dlg in (ProfileEditor(entry, win), MaterialEditor(win, "vinyl", None)):
+        dlg.resize(1000, 420)
+        dlg.show()
+        QTest.qWait(30)
+        cards = [c for c in dlg.findChildren(Card) if c.isVisible()]
+        rects = [c.geometry().translated(c.parentWidget().mapTo(dlg, c.parentWidget().rect().topLeft()))
+                 for c in cards]
+        for i, a in enumerate(rects):
+            assert cards[i].height() >= cards[i].minimumSizeHint().height() - 1, cards[i].title_label.text()
+            for b in rects[i + 1:]:
+                assert not a.intersects(b)
+        from PySide6.QtWidgets import QWidget
+        inner = dlg.findChild(QWidget, "plain_scroll_inner")
+        area = inner.parentWidget().parentWidget()
+        assert inner.width() <= area.viewport().width()          # nothing cut at the side
+        dlg.close()

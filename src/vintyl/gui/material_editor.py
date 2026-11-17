@@ -137,8 +137,8 @@ class MaterialEditor(QDialog):
         sl.addLayout(row)
         middle.addWidget(side)
 
-        # -- the chosen material
-        body = QVBoxLayout()
+        # -- the chosen material (scrolling in a small window)
+        body = widgets.scrolling_body(middle)
         body.setContentsMargins(16, 14, 16, 14)
         body.setSpacing(12)
         top = QHBoxLayout()
@@ -161,7 +161,6 @@ class MaterialEditor(QDialog):
         cols.addLayout(left, 1)
         cols.addLayout(right, 1)
         body.addLayout(cols, 1)
-        middle.addLayout(body, 1)
 
         # force and speed, for one cutter at a time
         card = widgets.Card()

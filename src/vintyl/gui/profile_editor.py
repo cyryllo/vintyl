@@ -119,8 +119,8 @@ class ProfileEditor(QDialog):
         sl.addWidget(self.btn_new)
         middle.addWidget(side)
 
-        # -- the chosen cutter's fields, in two columns of cards
-        body = QVBoxLayout()
+        # -- the chosen cutter's fields, in two columns of cards (scrolling in a small window)
+        body = widgets.scrolling_body(middle)
         body.setContentsMargins(16, 14, 16, 14)
         body.setSpacing(12)
         self.note = QLabel()
@@ -137,7 +137,6 @@ class ProfileEditor(QDialog):
         cols.setStretch(0, 1)
         cols.setStretch(1, 1)
         body.addLayout(cols, 1)
-        middle.addLayout(body, 1)
 
         card = widgets.Card(_("Machine"))
         self.name = QLineEdit()

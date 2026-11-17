@@ -262,6 +262,39 @@ def value_of(widget):
     raise TypeError("no value for %r" % (widget,))
 
 
+def scrolling_body(row):
+    """The right part of a settings window (cards of fields) in a scroll area
+    added to `row`; returns its layout. Made lower than the cards need, the
+    window scrolls them: without it Qt squeezed the cards with wrapped text
+    into each other. It scrolls up and down only: its width is the cards'
+    (the window does not get narrower than they are)."""
+    from PySide6.QtWidgets import QScrollArea, QWidget
+
+    class _UpDown(QScrollArea):
+        def _width(self, hint):
+            w = self.widget()
+            return (getattr(w, hint)().width() if w is not None else 0) + self.verticalScrollBar().sizeHint().width()
+
+        def minimumSizeHint(self):
+            return QSize(self._width("minimumSizeHint"), 120)
+
+        def sizeHint(self):
+            w = self.widget()
+            return QSize(self._width("sizeHint"), w.sizeHint().height() if w is not None else 120)
+
+    inner = QWidget()
+    inner.setObjectName("plain_scroll_inner")
+    body = QVBoxLayout(inner)
+    area = _UpDown()
+    area.setObjectName("plain_scroll")
+    area.setWidgetResizable(True)
+    area.setFrameShape(QFrame.NoFrame)
+    area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+    area.setWidget(inner)
+    row.addWidget(area, 1)
+    return body
+
+
 def plain_dialog(parent, title, min_width=560):
     """An empty dialog in the common style: (dialog, outer layout for the
     footer, body layout with the dialog's margins)."""
