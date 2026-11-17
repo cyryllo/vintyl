@@ -20,11 +20,18 @@ software (SignMaster, SignCut), so they can be used on Linux without it.
 
 ![Vintyl's window: a heart with a pattern of stars, a text, a star and a circle on a 780 mm cutter's sheet](docs/screenshots/main-window.png)
 
+The screenshots are made by `tools/readme_shots.py` from the program itself.
+
 ## What it does now
 
 **Cutting**
 - **Start and Stop** from the window, with a short check list before
-  cutting and a progress bar; or **Save .hpgl** to cut it some other way.
+  cutting (the cutter, the tool, the material and its force and speed) and
+  a progress bar; or **Save .hpgl** to cut it some other way.
+- **Materials**: vinyl film, heat transfer vinyl, reflective vinyl, paper
+  and card, and your own. Each keeps its force and speed for each cutter,
+  its blade, knife offset and overcut, the mirror, the weeding frame and a
+  note; choosing one sets the job's switches.
 - **Knife compensation** at the corners only (curves are cut smoothly),
   **overcut** so closed shapes close cleanly, **inside shapes first** so no
   piece comes loose before its holes are cut.
@@ -89,6 +96,10 @@ COM"; Vintyl uses **Printer**. Speed and force are set on the cutter's
 panel (it ignores them from the computer).
 
 ![The cutter settings window](docs/screenshots/cutter-settings.png)
+
+![The materials window: vinyl film with its force, speed and knife](docs/screenshots/materials.png)
+
+![The check list before Start: the material's force and speed in large type, and what to check](docs/screenshots/check-list.png)
 
 ## Download
 

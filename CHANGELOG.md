@@ -1,5 +1,37 @@
 # Changes
 
+## Unreleased
+
+A new look for the whole window (UI v2), and materials.
+
+**Materials**
+- A material keeps how to cut or draw it: the tool, the force and speed for each cutter, the blade,
+  knife offset and overcut, the mirror, the weeding frame and a note. Built in: vinyl film, heat
+  transfer vinyl, reflective vinyl, paper with a fineliner, card with a marker; add your own.
+- Choosing a material sets the job's switches; it is remembered for each cutter and in the project.
+- A cutter that takes force and speed from its panel only gets them shown in large type before Start.
+
+**The window**
+- Light and dark looks in the same style for every window; the cutter, the tool and the material
+  in the left panel, with the cutter's state and what to do when its port cannot be used.
+- The selection bar shows the type and name of what is selected; a text's fields have a second row;
+  the ruler's result is shown in it too. Fits a 1366 × 768 screen in every state.
+- The element list shows the cutting order and scissors to leave an element uncut.
+- The sheet has rulers in mm, sizes beside the selection and zoom buttons.
+- Stop takes Start's place while sending, with the percentage sent.
+- Speeds in mm/s.
+
+**Windows**
+- The check list before Start and the knife test are windows of their own, with the material's
+  values; a yellow warning when the mirror is on.
+- Pattern of shapes and Fill show a preview of the shape in the window; the fill patterns are
+  buttons with their pictures.
+- Ready shapes show their picture beside the fields; questions say what their button does.
+- Settings, cutter settings and materials as cards with switches.
+- About, Keyboard shortcuts (in groups, with a search), Diagnostic report and Access to the cutter
+  (the commands to copy); the new-version bar under the ribbon.
+- `vintyl --self-test` checks the built-in materials too.
+
 ## 0.2.0
 
 The second test version (Linux, AppImage). Still tested on the VEVOR KI-375A
