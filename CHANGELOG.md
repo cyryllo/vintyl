@@ -35,6 +35,10 @@ number jumps from 0.2 to 0.8: the cutters are tested and cut cleanly, and
   (the commands to copy); the new-version bar under the ribbon.
 - `vintyl --self-test` checks the built-in materials too.
 
+**Fixed**
+- Dragging a small square round the selection resizes the shape again: the square lost the drag
+  at the first move, so the shape moved a little and went back to its size.
+
 ## 0.2.0
 
 The second test version (Linux, AppImage). Still tested on the VEVOR KI-375A

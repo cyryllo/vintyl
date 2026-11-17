@@ -344,7 +344,7 @@ class MaterialView(QGraphicsView):
         self._sheet_timer = QTimer(self)
         self._sheet_timer.setSingleShot(True)
         self._sheet_timer.setInterval(60)
-        self._sheet_timer.timeout.connect(self.signals.sheet_changed.emit)
+        self._sheet_timer.timeout.connect(self._sheet_due)
         self.scene().selectionChanged.connect(self._selection_changed)
         self._make_zoom_box()
 
@@ -727,20 +727,34 @@ class MaterialView(QGraphicsView):
         return box
 
     def place_handles(self, box=None):
-        """The eight small squares round the selection (select tool only)."""
-        for h in self._handles + getattr(self, "_size_labels", []):
-            if h.scene() is self.scene():
-                self.scene().removeItem(h)
-        self._handles = []
+        """The eight small squares round the selection (select tool only).
+        box: while a square is dragged, the box it makes."""
+        for label in getattr(self, "_size_labels", []):
+            if label.scene() is self.scene():
+                self.scene().removeItem(label)
         self._size_labels = []
-        if self.tool != "select" or not self._selected_items():
-            return
+        dragged = box is not None and len(self._handles) == len(SizeHandle.PLACES) \
+            and all(h.scene() is self.scene() for h in self._handles)
+        if not dragged:
+            for h in self._handles:
+                if h.scene() is self.scene():
+                    self.scene().removeItem(h)
+            self._handles = []
+            if self.tool != "select" or not self._selected_items():
+                return
         box = box if box is not None else self.selection_box()
-        for place in SizeHandle.PLACES:
-            h = SizeHandle(self, place)
-            h.setPos(box.left() + place[0] * box.width(), box.top() + place[1] * box.height())
-            self.scene().addItem(h)
-            self._handles.append(h)
+        if dragged:
+            # the squares are moved, not made again: the one under the mouse
+            # holds the drag, and taken off the scene it lost it (the shape
+            # moved a little, then stayed as it was)
+            for h in self._handles:
+                h.setPos(box.left() + h.place[0] * box.width(), box.top() + h.place[1] * box.height())
+        else:
+            for place in SizeHandle.PLACES:
+                h = SizeHandle(self, place)
+                h.setPos(box.left() + place[0] * box.width(), box.top() + place[1] * box.height())
+                self.scene().addItem(h)
+                self._handles.append(h)
         # the size beside the frame (UI v2): the width under it, the height at its side
         for text, pos, under in ((self._mm(box.width()), QPointF(box.center().x(), box.bottom()), True),
                                  (self._mm(box.height()), QPointF(box.right(), box.center().y()), False)):
@@ -1333,6 +1347,15 @@ class MaterialView(QGraphicsView):
     def fit_requested(self):
         self._user_zoomed = False
         self.fit_all()
+
+    def _sheet_due(self):
+        """Draw the sheet again for the new size, but not in the middle of a
+        drag: the scene is made again then, and the square or the shape
+        under the mouse lost the drag (it moved a little, then stayed)."""
+        if self.scene().mouseGrabberItem() is not None:
+            self._sheet_timer.start()                 # once the button is let go
+            return
+        self.signals.sheet_changed.emit()
 
     def resizeEvent(self, event):
         super().resizeEvent(event)

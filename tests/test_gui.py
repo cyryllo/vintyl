@@ -1813,3 +1813,42 @@ def test_the_check_list_always_shows_the_cutting_values(win):
     assert [label for label, _v in win.cut_details()] == ["Pen width", "Draw"]
     # the knife test shows the knife's values, also from the pen mode
     assert "Knife offset" in dict(win.cut_details(pen=False))
+
+
+def _drag(view, start, end, steps=5):
+    """Press at start, move in steps, let go at end (view pixels), as a hand does."""
+    from PySide6.QtGui import QMouseEvent
+    from PySide6.QtTest import QTest
+    vp = view.viewport()
+    QTest.mousePress(vp, Qt.LeftButton, Qt.NoModifier, start)
+    for k in range(1, steps + 1):
+        p = start + (end - start) * k / steps
+        QApplication.sendEvent(vp, QMouseEvent(QMouseEvent.MouseMove, QPointF(p), QPointF(vp.mapToGlobal(p)),
+                                               Qt.NoButton, Qt.LeftButton, Qt.NoModifier))
+        QTest.qWait(10)
+    QTest.mouseRelease(vp, Qt.LeftButton, Qt.NoModifier, end)
+    QTest.qWait(20)
+
+
+def test_a_square_dragged_with_the_mouse_makes_the_shape_smaller(win):
+    """The square under the mouse keeps the drag to the end (it was made
+    again at the first move and the shape went back to its size), also when
+    the sheet is drawn again meanwhile."""
+    win.resize(1366, 768)
+    win.show()
+    win._on_drawn("rectangle", QRectF(-300, -200, 100, 60))
+    e = win.selected
+    v = win.view
+    corner = [h for h in v._handles if h.place == (0, 0)][0]
+    a = v.mapFromScene(corner.scenePos())
+    b = v.mapFromScene(corner.scenePos() + QPointF(30, 20))
+    v._sheet_timer.start()                               # the window changes size while dragging
+    _drag(v, a, b)
+    w, h = e.size
+    assert w < 80 and h < 50 and w / h == pytest.approx(100 / 60, rel=0.02)
+    # and back bigger, by a side's square, the proportions unlocked
+    win.opt_lock.setChecked(False)
+    side = [h for h in v._handles if h.place == (0, 0.5)][0]
+    a = v.mapFromScene(side.scenePos())
+    _drag(v, a, v.mapFromScene(side.scenePos() + QPointF(-40, 0)))
+    assert e.size[0] > w + 30 and e.size[1] == pytest.approx(h, abs=0.01)
