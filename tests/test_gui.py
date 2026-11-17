@@ -1493,3 +1493,26 @@ def test_the_zoom_box_zooms_and_fits_again(win):
     assert win.view.zoom_percent() == 125
     win.view.zoom_label.click()                                 # a click on the percentage: fit again
     assert win.view.zoom_percent() == 100
+
+
+def test_the_cutter_settings_list_switches_and_asks_about_changes(win, monkeypatch):
+    """Every cutter on the left; a change and then another cutter: asked
+    (here: Save); the saved copy is marked changed."""
+    from vintyl.gui import widgets
+    from vintyl.gui.profile_editor import ProfileEditor
+    dlg = ProfileEditor(win.profile_entries["vevor-ki-375a"], win)
+    names = [dlg.list.item(i).text().split("\t")[0] for i in range(dlg.list.count())]
+    assert "VEVOR KI-375A" in names and "Seiki SK-870T" in names
+    assert dlg.list.currentItem().data(0x0100) == "vevor-ki-375a"
+    dlg.knife.setValue(0.3)
+    asked = []
+    monkeypatch.setattr(widgets, "ask", lambda *a, **k: asked.append(a[2]) or "save")
+    dlg.list.setCurrentRow(names.index("Seiki SK-870T"))
+    assert asked and dlg.entry["id"] == "seiki-sk-870t" and dlg.name.text() == "Seiki SK-870T"
+    from vintyl.core import profile as profiles
+    saved = {e["id"]: e for e in profiles.catalogue()}["vevor-ki-375a"]
+    assert saved["changed"] and saved["profile"].knife_offset_mm == pytest.approx(0.3)
+    # no change: no question
+    asked.clear()
+    dlg.list.setCurrentRow(names.index("VEVOR KI-375A"))
+    assert not asked and dlg.knife.value() == pytest.approx(0.3)

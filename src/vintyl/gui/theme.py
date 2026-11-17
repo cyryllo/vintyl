@@ -172,6 +172,9 @@ QMenu::item:selected { background: $accent_soft; color: $accent_ink; }
 QMenu::item:disabled { color: $disabled_text; }
 QMenu::separator { height: 1px; background: $border; margin: 4px 6px; }
 QMenu::icon { padding-left: 8px; }
+QWidget#dialog_side { background: $panel; border-right: 1px solid $border; }
+QListWidget#profile_list { background: transparent; border: 0; outline: 0; }
+QListWidget#profile_list::item:selected, QListWidget#profile_list::item:hover { background: transparent; }
 QGroupBox { font-weight: bold; }
 QGroupBox QLabel, QGroupBox QCheckBox { font-weight: normal; }
 """)

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 18:50+0100\n"
+"POT-Creation-Date: 2026-11-17 18:57+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -217,6 +217,9 @@ msgstr ""
 msgid "As the system"
 msgstr ""
 
+msgid "Asks GitHub; nothing about you is sent."
+msgstr ""
+
 msgid "Away"
 msgstr ""
 
@@ -277,9 +280,10 @@ msgstr ""
 msgid "Check for a new version"
 msgstr ""
 
-msgid ""
-"Check once a day for a new version (asks GitHub; nothing about you is "
-"sent)"
+msgid "Check now"
+msgstr ""
+
+msgid "Check once a day for a new version"
 msgstr ""
 
 msgid "Circle"
@@ -438,6 +442,9 @@ msgstr ""
 msgid "Cutter settings…"
 msgstr ""
 
+msgid "Cutters"
+msgstr ""
+
 msgid "Cutting"
 msgstr ""
 
@@ -522,6 +529,9 @@ msgid "Draw"
 msgstr ""
 
 msgid "Draw now?"
+msgstr ""
+
+msgid "Drawing"
 msgstr ""
 
 msgid "Drawn length"
@@ -712,7 +722,7 @@ msgstr ""
 msgid "Hide this until the next check"
 msgstr ""
 
-msgid "Hold Alt to drag without any snapping for a moment"
+msgid "Hold Alt to drag without any snapping for a moment."
 msgstr ""
 
 msgid "Hole (mm)"
@@ -819,6 +829,9 @@ msgid "Knife test"
 msgstr ""
 
 msgid "Language"
+msgstr ""
+
+msgid "Language and look"
 msgstr ""
 
 msgid "Later"
@@ -985,8 +998,8 @@ msgid "OK"
 msgstr ""
 
 msgid ""
-"Off: the cutter takes them from its panel only (as the VEVOR KI-375A); "
-"the speed is then just for the time estimate"
+"Off: the cutter takes them from its panel only; Vintyl reminds you of the"
+" material's values before Start."
 msgstr ""
 
 msgid "Offset"
@@ -1204,6 +1217,10 @@ msgid "Save exactly what would go to the cutter, as a file"
 msgstr ""
 
 msgid "Save project"
+msgstr ""
+
+#, python-format
+msgid "Save the changes to \"%s\" first?"
 msgstr ""
 
 msgid "Save the changes to the project first?"
@@ -1538,6 +1555,9 @@ msgstr ""
 msgid "There is nothing to cut: every path is shorter than one cutter step."
 msgstr ""
 
+msgid "This cutter's own values. A material can have its own offset and overcut."
+msgstr ""
+
 msgid "Top edges"
 msgstr ""
 
@@ -1592,6 +1612,9 @@ msgid "Units per mm"
 msgstr ""
 
 msgid "Unsaved changes"
+msgstr ""
+
+msgid "Updates"
 msgstr ""
 
 msgid "Versions, checks, the cutter and the log, to paste into a report"
@@ -1735,6 +1758,9 @@ msgstr ""
 msgid "both"
 msgstr ""
 
+msgid "built-in"
+msgstr ""
+
 msgid "centimetres"
 msgstr ""
 
@@ -1824,6 +1850,9 @@ msgid "outside the line"
 msgstr ""
 
 msgid "outwards"
+msgstr ""
+
+msgid "own"
 msgstr ""
 
 #, python-format

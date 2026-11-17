@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 18:50+0100\n"
+"POT-Creation-Date: 2026-11-17 18:57+0100\n"
 "PO-Revision-Date: 2026-11-15 17:49+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -240,6 +240,9 @@ msgstr "Tyle kolumn, ile zmieści się w szerokości"
 msgid "As the system"
 msgstr "Jak w systemie"
 
+msgid "Asks GitHub; nothing about you is sent."
+msgstr "Pyta GitHub; nic o Tobie nie jest wysyłane."
+
 msgid "Away"
 msgstr "Odstęp"
 
@@ -304,12 +307,11 @@ msgstr ""
 msgid "Check for a new version"
 msgstr "Sprawdź nową wersję"
 
-msgid ""
-"Check once a day for a new version (asks GitHub; nothing about you is "
-"sent)"
-msgstr ""
-"Sprawdzaj raz dziennie, czy jest nowa wersja (pyta GitHub; nic o Tobie "
-"nie jest wysyłane)"
+msgid "Check now"
+msgstr "Sprawdź teraz"
+
+msgid "Check once a day for a new version"
+msgstr "Sprawdzaj raz dziennie, czy jest nowa wersja"
 
 msgid "Circle"
 msgstr "Koło"
@@ -481,6 +483,9 @@ msgstr "Ustawienia plotera"
 msgid "Cutter settings…"
 msgstr "Ustawienia plotera…"
 
+msgid "Cutters"
+msgstr "Plotery"
+
 msgid "Cutting"
 msgstr "Cięcie"
 
@@ -572,6 +577,9 @@ msgstr "Rysuj"
 
 msgid "Draw now?"
 msgstr "Rysować teraz?"
+
+msgid "Drawing"
+msgstr "Rysowanie"
 
 msgid "Drawn length"
 msgstr "Długość rysowania"
@@ -777,8 +785,8 @@ msgstr "Sześciokąt"
 msgid "Hide this until the next check"
 msgstr "Ukryj do następnego sprawdzenia"
 
-msgid "Hold Alt to drag without any snapping for a moment"
-msgstr "Przytrzymaj Alt, żeby przez chwilę przesuwać bez przyciągania"
+msgid "Hold Alt to drag without any snapping for a moment."
+msgstr "Przytrzymaj Alt, żeby na chwilę przeciągać bez przyciągania."
 
 msgid "Hole (mm)"
 msgstr "Otwór (mm)"
@@ -894,6 +902,9 @@ msgstr "Test noża"
 
 msgid "Language"
 msgstr "Język"
+
+msgid "Language and look"
+msgstr "Język i wygląd"
 
 msgid "Later"
 msgstr "Później"
@@ -1069,11 +1080,11 @@ msgid "OK"
 msgstr "OK"
 
 msgid ""
-"Off: the cutter takes them from its panel only (as the VEVOR KI-375A); "
-"the speed is then just for the time estimate"
+"Off: the cutter takes them from its panel only; Vintyl reminds you of the"
+" material's values before Start."
 msgstr ""
-"Wyłączone: ploter bierze je tylko ze swojego panelu (jak VEVOR KI-375A); "
-"prędkość służy wtedy tylko do oszacowania czasu"
+"Wyłączone: ploter bierze je tylko ze swojego panelu. Wartości dla "
+"materiału Vintyl przypomni przed startem."
 
 msgid "Offset"
 msgstr "Odsunięcie"
@@ -1317,6 +1328,10 @@ msgstr "Zapisz do pliku dokładnie to, co poszłoby do plotera"
 
 msgid "Save project"
 msgstr "Zapisz projekt"
+
+#, python-format
+msgid "Save the changes to \"%s\" first?"
+msgstr "Zapisać najpierw zmiany w „%s”?"
 
 msgid "Save the changes to the project first?"
 msgstr "Zapisać najpierw zmiany w projekcie?"
@@ -1702,6 +1717,11 @@ msgstr "Nie ma nic do cięcia."
 msgid "There is nothing to cut: every path is shorter than one cutter step."
 msgstr "Nie ma nic do cięcia: każda ścieżka jest krótsza niż jeden krok plotera."
 
+msgid "This cutter's own values. A material can have its own offset and overcut."
+msgstr ""
+"Wartości domyślne tego plotera. Materiał może mieć własne przesunięcie i "
+"nadcięcie."
+
 msgid "Top edges"
 msgstr "Górne krawędzie"
 
@@ -1759,6 +1779,9 @@ msgstr "Jednostki na mm"
 
 msgid "Unsaved changes"
 msgstr "Niezapisane zmiany"
+
+msgid "Updates"
+msgstr "Aktualizacje"
 
 msgid "Versions, checks, the cutter and the log, to paste into a report"
 msgstr "Wersje, kontrole, ploter i dziennik, do wklejenia w zgłoszenie"
@@ -1918,6 +1941,9 @@ msgstr "przed punktem zerowym (wzdłuż folii)"
 msgid "both"
 msgstr "oba"
 
+msgid "built-in"
+msgstr "wbudowany"
+
 msgid "centimetres"
 msgstr "centymetry"
 
@@ -2009,6 +2035,9 @@ msgstr "na zewnątrz linii"
 msgid "outwards"
 msgstr "na zewnątrz"
 
+msgid "own"
+msgstr "własny"
+
 #, python-format
 msgid "past the length of %g mm"
 msgstr "poza długość %g mm"
@@ -2017,7 +2046,7 @@ msgid "round"
 msgstr "zaokrąglone"
 
 msgid "sent by the computer"
-msgstr "wysyłane z komputera"
+msgstr "Wysyłane z komputera"
 
 msgid "serial port"
 msgstr "port szeregowy"
@@ -2036,7 +2065,7 @@ msgid "some entities were left out: %s"
 msgstr "część elementów pominięto: %s"
 
 msgid "swap X and Y"
-msgstr "zamień X i Y"
+msgstr "Zamień X i Y"
 
 msgid "up and down"
 msgstr "pionowe"
@@ -2294,4 +2323,27 @@ msgstr "← Y w poprzek, mm"
 #~ "Jaka część kodu może być uszkodzona, "
 #~ "a dalej da się go odczytać; więcej"
 #~ " = więcej kwadracików"
+
+#~ msgid ""
+#~ "Check once a day for a new "
+#~ "version (asks GitHub; nothing about you"
+#~ " is sent)"
+#~ msgstr ""
+#~ "Sprawdzaj raz dziennie, czy jest nowa"
+#~ " wersja (pyta GitHub; nic o Tobie "
+#~ "nie jest wysyłane)"
+
+#~ msgid "Hold Alt to drag without any snapping for a moment"
+#~ msgstr "Przytrzymaj Alt, żeby przez chwilę przesuwać bez przyciągania"
+
+#~ msgid ""
+#~ "Off: the cutter takes them from "
+#~ "its panel only (as the VEVOR "
+#~ "KI-375A); the speed is then just "
+#~ "for the time estimate"
+#~ msgstr ""
+#~ "Wyłączone: ploter bierze je tylko ze "
+#~ "swojego panelu (jak VEVOR KI-375A); "
+#~ "prędkość służy wtedy tylko do "
+#~ "oszacowania czasu"
 
