@@ -51,6 +51,7 @@ number jumps from 0.2 to 0.8: the cutters are tested and cut cleanly, and
   studied (Inkcut, CutScape, RedsailCut) in the README and THIRD-PARTY-NOTICES.md.
 
 **Fixed**
+- Help → About, Keyboard shortcuts and Access to the cutter open again (they were built but not shown).
 - The mouse wheel changes a list or a number field only once it is clicked; scrolling a panel no
   longer changes the values passing under the mouse.
 - Dragging a small square round the selection resizes the shape again: the square lost the drag

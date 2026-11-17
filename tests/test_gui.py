@@ -1956,3 +1956,20 @@ def test_the_set_triangle_only_where_a_set_opens(win):
     assert not b["fill"].has_set and b["shapes"].has_set and not b["pick"].has_set
     win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
     assert b["fill"].has_set
+
+
+def test_the_help_menu_opens_its_windows(win, monkeypatch):
+    """Every Help menu item opens its window: Qt passes "checked" (False)
+    to a triggered action's slot, which windows with show=True took for
+    show=False (built, never opened)."""
+    from PySide6.QtWidgets import QDialog
+    opened = []
+    monkeypatch.setattr(QDialog, "exec", lambda dlg: opened.append(dlg.windowTitle()) or 0)
+    help_menu = win.menus["help"]
+    for a in help_menu.actions():
+        if a.isSeparator() or not a.isVisible() or a.text().startswith("Check for a new"):
+            continue
+        before = len(opened)
+        a.trigger()
+        assert len(opened) == before + 1, a.text()                # a window was opened (run)
+    assert {"About Vintyl", "Keyboard shortcuts", "Access to the cutter", "Diagnostic report"} <= set(opened)

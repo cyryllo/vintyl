@@ -234,7 +234,10 @@ class MainWindow(QMainWindow):
             a.setToolTip(tip)
             a.setStatusTip(tip)
         if slot is not None:
-            a.triggered.connect(slot)
+            # called with no arguments: Qt passes "checked" (False), and a
+            # method such as about(show=True) then took it for show=False and
+            # built its window without opening it (About, Shortcuts, Access)
+            a.triggered.connect(lambda _checked=False, s=slot: s())
         a.setEnabled(enabled)
         return a
 
