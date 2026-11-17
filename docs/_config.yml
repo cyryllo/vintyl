@@ -1,0 +1,17 @@
+# Vintyl's website (GitHub Pages, built from this folder by
+# .github/workflows/pages.yml): https://cyryllo.github.io/vintyl/
+# Pages in English at the top level, Polish in pl/. Made after Kerfly's site.
+title: Vintyl
+description: Free software for vinyl cutters on Linux (VEVOR, Seiki and their clones). Draw, lay out and cut from one window.
+url: "https://cyryllo.github.io"
+baseurl: "/vintyl"
+repo: "https://github.com/cyryllo/vintyl"
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+# the project's own notes, not pages of the website
+exclude:
+  - plan-B-szkic.md
+  - poniedzialek-A4.md
+  - weryfikacja.md

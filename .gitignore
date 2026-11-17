@@ -5,3 +5,7 @@ __pycache__/
 .pytest_cache/
 build/
 dist/
+
+# the website built locally (Jekyll)
+docs/_site/
+docs/.jekyll-cache/
