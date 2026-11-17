@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 18:25+0100\n"
+"POT-Creation-Date: 2026-11-17 18:35+0100\n"
 "PO-Revision-Date: 2026-11-15 17:49+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -648,6 +648,9 @@ msgstr "Szukaj"
 msgid "Fit"
 msgstr "Dopasuj"
 
+msgid "Fit the sheet in the window"
+msgstr "Dopasuj arkusz do okna"
+
 msgid "Flip"
 msgstr "Odwróć"
 
@@ -1121,9 +1124,6 @@ msgstr "Otwórz stronę nowej wersji: co nowego i plik do pobrania"
 #, python-format
 msgid "Opened %s"
 msgstr "Otwarto %s"
-
-msgid "Origin"
-msgstr "Punkt zerowy"
 
 msgid "Outer size (mm)"
 msgstr "Średnica (mm)"
@@ -2006,8 +2006,8 @@ msgstr "zamień X i Y"
 msgid "up and down"
 msgstr "pionowe"
 
-msgid "← Y across"
-msgstr "← Y w poprzek"
+msgid "← Y across, mm"
+msgstr "← Y w poprzek, mm"
 
 #~ msgid "Sending to the cutter comes in a later step"
 #~ msgstr "Wysyłanie do plotera będzie w kolejnym kroku"
@@ -2244,4 +2244,10 @@ msgstr "← Y w poprzek"
 
 #~ msgid "Empty. Open an SVG file or draw a shape."
 #~ msgstr "Pusto. Otwórz plik SVG albo narysuj kształt."
+
+#~ msgid "Origin"
+#~ msgstr "Punkt zerowy"
+
+#~ msgid "← Y across"
+#~ msgstr "← Y w poprzek"
 

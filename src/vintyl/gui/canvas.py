@@ -48,7 +48,10 @@ COLORS = {
     "snap": QColor("#c026d3"),
 }
 MIN_STRIP_LENGTH = 100.0         # mm of material shown at the least (a very flat window)
-FIT_MARGIN_PX = 26               # room round the sheet (for its labels) when it is fitted to the window
+# room round the sheet when it is fitted to the window, in screen px (UI v2):
+# its titles on top, the X ruler's numbers on the right, the Y ruler, its
+# caption and the zoom box under it
+FIT_LEFT_PX, FIT_TOP_PX, FIT_RIGHT_PX, FIT_BOTTOM_PX = 28, 34, 52, 84
 DESIGN_ROOM_MM = 100.0           # material shown above the highest element
 GRID_MM = 50.0
 SNAP_PIXELS = 10                 # snap distance on screen
@@ -317,6 +320,7 @@ class MaterialView(QGraphicsView):
         self.node_editor = NodeEditor(self)
         self.keep_ratio = True           # size handles keep the proportions (the lock in the options bar)
         self._handles = []
+        self._size_labels = []          # the size beside the selection (cleared with the scene)
         self._items = []
         self._knife_items = []
         self._snap_marker = None
@@ -330,6 +334,9 @@ class MaterialView(QGraphicsView):
         self._measure_item = None
         self._panning = None
         self._user_zoomed = False
+        self._fit_scale = 1.0
+        self.zoom_box = None
+        self.zoom_label = None
         self._design_box = None
         self.pen_mode = False            # the cutter holds a pen: fills are drawn, not skipped
         self._preview_item = None        # a dashed preview of shapes about to be added
@@ -339,6 +346,7 @@ class MaterialView(QGraphicsView):
         self._sheet_timer.setInterval(60)
         self._sheet_timer.timeout.connect(self.signals.sheet_changed.emit)
         self.scene().selectionChanged.connect(self._selection_changed)
+        self._make_zoom_box()
 
     # ---- content --------------------------------------------------------------
     def material_rect(self, length):
@@ -356,6 +364,7 @@ class MaterialView(QGraphicsView):
         scene.clear()
         self.node_editor.forget_graphics()      # its marks went with the scene
         self._handles = []
+        self._size_labels = []          # the size beside the selection (cleared with the scene)
         self._items = []
         self._knife_items = []          # cleared with the scene; the window draws them again
         self._frame_item = None
@@ -392,9 +401,8 @@ class MaterialView(QGraphicsView):
         self._label(_("Cutting width %g mm") % w,
                     QPointF(-w, -length - 3), above=True)
         self._label(_("X ↑ along the material"), QPointF(0, -length - 3), above=True, right=True)
-        self._label(_("← Y across"), QPointF(-w, 3))
+        self._rulers(w, length)
         self._origin_marker()
-        self._label(_("Origin"), QPointF(0, 3), right=True)
 
         chosen = None
         wanted = selected if isinstance(selected, (list, tuple)) else ([selected] if selected is not None else [])
@@ -406,7 +414,8 @@ class MaterialView(QGraphicsView):
             if any(e is w for w in wanted):
                 item.setSelected(True)
                 chosen = chosen or item
-        scene.setSceneRect(strip.adjusted(-60, -60, 60, 60))
+        # room round the sheet, so it can be placed off-centre (fit_all) and panned
+        scene.setSceneRect(strip.adjusted(-400, -400, 400, 400))
         scene.blockSignals(False)
         if self.tool == "nodes":
             self._place_nodes(chosen)
@@ -414,7 +423,37 @@ class MaterialView(QGraphicsView):
         if not self._user_zoomed:
             self.fit_all()
 
-    def _label(self, text, pos, above=False, right=False):
+    RULER_STEP_MM = 100.0                # a mark and a number every this many mm
+    TICK_PX = 6
+
+    def _rulers(self, w, length):
+        """Rulers in mm from the origin (UI v2): under the front edge (Y, from
+        right to left) and beside the right edge (X, upwards), a number every
+        100 mm; the marks keep their size on screen whatever the zoom."""
+        from PySide6.QtWidgets import QGraphicsLineItem
+        pen = cosmetic_pen(COLORS["label"], 1.0)
+        k = 0.0
+        while k <= w + 1e-6:                              # across: under the front edge
+            tick = QGraphicsLineItem(0, 0, 0, self.TICK_PX)
+            tick.setPen(pen)
+            tick.setFlag(QGraphicsItem.ItemIgnoresTransformations, True)
+            tick.setPos(-k, 0)
+            self.scene().addItem(tick)
+            self._label("%g" % k, QPointF(-k, 0), centre=True, below_px=self.TICK_PX + 1)
+            k += self.RULER_STEP_MM
+        k = self.RULER_STEP_MM
+        while k <= length + 1e-6:                         # along: beside the right edge
+            tick = QGraphicsLineItem(0, 0, self.TICK_PX, 0)
+            tick.setPen(pen)
+            tick.setFlag(QGraphicsItem.ItemIgnoresTransformations, True)
+            tick.setPos(0, -k)
+            self.scene().addItem(tick)
+            self._label("%g" % k, QPointF(0, -k), beside_px=self.TICK_PX + 3)
+            k += self.RULER_STEP_MM
+        self._label(_("← Y across, mm"), QPointF(-w, 0), below_px=self.TICK_PX + 16)
+
+    def _label(self, text, pos, above=False, right=False, centre=False, below_px=0, beside_px=0):
+        """A small light label on the dark round the sheet; offsets in screen px."""
         item = QGraphicsSimpleTextItem(text)
         item.setBrush(COLORS["label"])
         f = QFont()
@@ -423,8 +462,8 @@ class MaterialView(QGraphicsView):
         item.setFlag(QGraphicsItem.ItemIgnoresTransformations, True)
         r = item.boundingRect()
         item.setPos(pos)
-        dx = -r.width() if right else 0
-        dy = -r.height() if above else 0
+        dx = -r.width() if right else (-r.width() / 2.0 if centre else beside_px)
+        dy = -r.height() if above else (below_px if below_px else (-r.height() / 2.0 if beside_px else 0))
         item.setTransform(item.transform().translate(dx, dy))
         self.scene().addItem(item)
         return item
@@ -689,10 +728,11 @@ class MaterialView(QGraphicsView):
 
     def place_handles(self, box=None):
         """The eight small squares round the selection (select tool only)."""
-        for h in self._handles:
+        for h in self._handles + getattr(self, "_size_labels", []):
             if h.scene() is self.scene():
                 self.scene().removeItem(h)
         self._handles = []
+        self._size_labels = []
         if self.tool != "select" or not self._selected_items():
             return
         box = box if box is not None else self.selection_box()
@@ -701,6 +741,29 @@ class MaterialView(QGraphicsView):
             h.setPos(box.left() + place[0] * box.width(), box.top() + place[1] * box.height())
             self.scene().addItem(h)
             self._handles.append(h)
+        # the size beside the frame (UI v2): the width under it, the height at its side
+        for text, pos, under in ((self._mm(box.width()), QPointF(box.center().x(), box.bottom()), True),
+                                 (self._mm(box.height()), QPointF(box.right(), box.center().y()), False)):
+            label = QGraphicsSimpleTextItem(text)
+            label.setBrush(COLORS["selection"])
+            f = QFont()
+            f.setPointSizeF(9)
+            label.setFont(f)
+            label.setFlag(QGraphicsItem.ItemIgnoresTransformations, True)
+            label.setZValue(60)
+            r = label.boundingRect()
+            label.setPos(pos)
+            label.setTransform(QTransform.fromTranslate(-r.width() / 2.0, 10) if under
+                               else QTransform.fromTranslate(10, -r.height() / 2.0))
+            self.scene().addItem(label)
+            self._size_labels.append(label)
+
+    @staticmethod
+    def _mm(value):
+        """A size as the window writes numbers: one decimal, a comma in Polish."""
+        from vintyl import i18n
+        text = "%.1f" % value
+        return text.replace(".", ",") if i18n.current_language() == "pl" else text
 
     # ---- node tool (vintyl.gui.node_editor) ------------------------------------------
     def _place_nodes(self, item):
@@ -945,6 +1008,7 @@ class MaterialView(QGraphicsView):
         if 0.02 < self.transform().m11() * factor < 400:
             self._user_zoomed = True
             self.scale(factor, factor)
+            self._show_zoom()
 
     def mousePressEvent(self, event):
         if event.button() == Qt.MiddleButton:
@@ -1176,6 +1240,7 @@ class MaterialView(QGraphicsView):
             self.setTransformationAnchor(QGraphicsView.AnchorViewCenter)
             self.scale(factor, factor)
             self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
+            self._show_zoom()
 
     def show_preview(self, paths):
         """A dashed preview of shapes about to be added (curves subpaths, view
@@ -1196,8 +1261,55 @@ class MaterialView(QGraphicsView):
         w = getattr(self, "width_mm", 0.0) or 0.0
         if vw < 50 or vh < 50 or w <= 0:                 # not laid out yet
             return max(MIN_STRIP_LENGTH, w)
-        m = 2 * FIT_MARGIN_PX
-        return max(MIN_STRIP_LENGTH, w * (vh - m) / max(vw - m, 1))
+        mh, mv = FIT_LEFT_PX + FIT_RIGHT_PX, FIT_TOP_PX + FIT_BOTTOM_PX
+        return max(MIN_STRIP_LENGTH, w * (vh - mv) / max(vw - mh, 1))
+
+    def _make_zoom_box(self):
+        """Zoom out, the zoom in percent (a click fits the sheet again), zoom
+        in: in the lower right corner of the view (UI v2). 100 % = the whole
+        sheet in the window."""
+        from PySide6.QtWidgets import QFrame, QHBoxLayout, QToolButton
+        from vintyl.gui import icons
+        box = QFrame(self)
+        box.setObjectName("zoom_box")
+        lay = QHBoxLayout(box)
+        lay.setContentsMargins(4, 2, 4, 2)
+        lay.setSpacing(2)
+        out = QToolButton()
+        out.setIcon(icons.tabler("minus", "#ffffff"))
+        out.setToolTip(_("Zoom out"))
+        out.clicked.connect(lambda: self.zoom_by(1 / 1.25))
+        self.zoom_label = QToolButton()
+        self.zoom_label.setObjectName("zoom_label")
+        self.zoom_label.setToolTip(_("Fit the sheet in the window"))
+        self.zoom_label.clicked.connect(self.fit_requested)
+        into = QToolButton()
+        into.setIcon(icons.tabler("plus", "#ffffff"))
+        into.setToolTip(_("Zoom in"))
+        into.clicked.connect(lambda: self.zoom_by(1.25))
+        for b in (out, self.zoom_label, into):
+            b.setAutoRaise(True)
+            lay.addWidget(b)
+        self.zoom_box = box
+        self._fit_scale = 1.0
+        self._place_zoom_box()
+
+    def _place_zoom_box(self):
+        box = getattr(self, "zoom_box", None)
+        if box is None:
+            return
+        box.adjustSize()
+        vp = self.viewport().geometry()
+        box.move(vp.right() - box.width() - 12, vp.bottom() - box.height() - 12)
+        box.raise_()
+
+    def zoom_percent(self):
+        return round(100.0 * abs(self.transform().m11()) / max(self._fit_scale, 1e-9))
+
+    def _show_zoom(self):
+        if getattr(self, "zoom_label", None) is not None:
+            self.zoom_label.setText("%d%%" % self.zoom_percent())
+            self._place_zoom_box()
 
     def fit_all(self):
         rect = self.material_rect(getattr(self, "length_mm", MIN_STRIP_LENGTH))
@@ -1205,13 +1317,18 @@ class MaterialView(QGraphicsView):
             rect = rect.united(item.sceneBoundingRect())
         # as fitInView, but the room round it is in screen pixels, so a narrow
         # sheet still reaches the window's edges
-        m = 2 * FIT_MARGIN_PX
+        mh, mv = FIT_LEFT_PX + FIT_RIGHT_PX, FIT_TOP_PX + FIT_BOTTOM_PX
         vw, vh = self.viewport().width(), self.viewport().height()
-        if rect.width() <= 0 or rect.height() <= 0 or vw <= m or vh <= m:
+        if rect.width() <= 0 or rect.height() <= 0 or vw <= mh or vh <= mv:
             return
-        k = min((vw - m) / rect.width(), (vh - m) / rect.height())
+        k = min((vw - mh) / rect.width(), (vh - mv) / rect.height())
         self.setTransform(QTransform.fromScale(k, k))
-        self.centerOn(rect.center())
+        # the margins are not the same on each side: the sheet's middle goes to
+        # the middle of the room the margins leave
+        self.centerOn(rect.center().x() + (FIT_RIGHT_PX - FIT_LEFT_PX) / (2 * k),
+                      rect.center().y() + (FIT_BOTTOM_PX - FIT_TOP_PX) / (2 * k))
+        self._fit_scale = k
+        self._show_zoom()
 
     def fit_requested(self):
         self._user_zoomed = False
@@ -1227,6 +1344,7 @@ class MaterialView(QGraphicsView):
             self._sheet_timer.start()
         if not self._user_zoomed:
             self.fit_all()
+        self._place_zoom_box()
 
 
 def shape_icon(subpaths, size=48, color=None):

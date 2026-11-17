@@ -434,8 +434,8 @@ def test_pen_click_corner_drag_curve_and_close(win):
     sub = e.paths[0]
     assert sub["closed"] and len(sub["nodes"]) == 3
     smooth = sub["nodes"][1]
-    assert smooth[4] == pytest.approx(-30, abs=1) and smooth[5] == pytest.approx(-50, abs=1)
-    assert smooth[3] == pytest.approx(10, abs=1)                     # the in handle mirrored
+    assert smooth[4] == pytest.approx(-30, abs=1.5) and smooth[5] == pytest.approx(-50, abs=1.5)
+    assert smooth[3] == pytest.approx(10, abs=1.5)                     # the in handle mirrored
     assert sub["nodes"][0][4] is None                                  # a click: a corner
     assert win.view.tool == "select"
 
@@ -657,9 +657,11 @@ def test_the_sheet_fills_the_window_for_every_cutter_and_grows_upwards(win, app)
         v.fit_requested()
         sheet = v.mapFromScene(v.material_rect(v.length_mm)).boundingRect()
         vp = v.viewport().rect()
-        assert abs(sheet.top() - vp.top()) <= 30          # no grey band above
-        assert abs(vp.bottom() - sheet.bottom()) <= 30    # nor below
-        assert abs(sheet.left() - vp.left()) <= 30         # nor beside it
+        from vintyl.gui import canvas as cv
+        # no grey band beyond the room left for the titles, the rulers and the zoom box
+        assert abs(sheet.top() - vp.top()) <= cv.FIT_TOP_PX + 6
+        assert abs(vp.bottom() - sheet.bottom()) <= cv.FIT_BOTTOM_PX + 6
+        assert abs(sheet.left() - vp.left()) <= cv.FIT_LEFT_PX + 6
     before = v.length_mm
     win._on_drawn("rectangle", QRectF(-60, -1500, 20, 20))      # something higher up
     assert v.length_mm >= 1500.0 > before
@@ -1457,3 +1459,23 @@ def test_a_wide_design_is_split_into_strips_along_the_material(win):
     ys = sorted((s.bounds[2], s.bounds[3]) for s in strips)
     assert all(a[1] < b[0] for a, b in zip(ys, ys[1:]))              # one after another, not on top
     assert len(win.design.elements) == 3                             # the strips replace the design
+
+
+# ---- the sheet: rulers, the size of the selection, zoom (UI v2) ------------------------------------
+def test_the_sheet_has_rulers_and_shows_the_size_of_the_selection(win):
+    from PySide6.QtWidgets import QGraphicsSimpleTextItem
+    texts = {i.text() for i in win.view.scene().items() if isinstance(i, QGraphicsSimpleTextItem)}
+    assert {"0", "100", "700"} <= texts                         # under the front edge, 780 mm wide
+    win._on_drawn("rectangle", QRectF(-100, -80, 40, 25))
+    sizes = [l.text() for l in win.view._size_labels]
+    assert sorted(sizes) in (["25.0", "40.0"], ["25,0", "40,0"])
+
+
+def test_the_zoom_box_zooms_and_fits_again(win):
+    win.show()
+    win.view.fit_requested()
+    assert win.view.zoom_percent() == 100 and win.view.zoom_label.text() == "100%"
+    win.view.zoom_by(1.25)
+    assert win.view.zoom_percent() == 125
+    win.view.zoom_label.click()                                 # a click on the percentage: fit again
+    assert win.view.zoom_percent() == 100

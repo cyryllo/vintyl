@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 18:25+0100\n"
+"POT-Creation-Date: 2026-11-17 18:35+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -593,6 +593,9 @@ msgstr ""
 msgid "Fit"
 msgstr ""
 
+msgid "Fit the sheet in the window"
+msgstr ""
+
 msgid "Flip"
 msgstr ""
 
@@ -1014,9 +1017,6 @@ msgstr ""
 
 #, python-format
 msgid "Opened %s"
-msgstr ""
-
-msgid "Origin"
 msgstr ""
 
 msgid "Outer size (mm)"
@@ -1823,6 +1823,6 @@ msgstr ""
 msgid "up and down"
 msgstr ""
 
-msgid "← Y across"
+msgid "← Y across, mm"
 msgstr ""
 

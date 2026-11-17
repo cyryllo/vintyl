@@ -163,6 +163,9 @@ QScrollBar:vertical { background: transparent; width: 8px; margin: 0; }
 QScrollBar::handle:vertical { background: $field_border; border-radius: 4px; min-height: 24px; }
 QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0; }
 QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: transparent; }
+QFrame#zoom_box { background: rgba(31, 36, 48, 215); border-radius: 8px; }
+QFrame#zoom_box QToolButton { color: #ffffff; border: 0; padding: 2px 6px; min-height: 26px; }
+QToolButton#zoom_label { min-width: 48px; font-weight: 600; }
 QGroupBox { font-weight: bold; }
 QGroupBox QLabel, QGroupBox QCheckBox { font-weight: normal; }
 """)
