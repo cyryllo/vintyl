@@ -45,6 +45,11 @@ number jumps from 0.2 to 0.8: the cutters are tested and cut cleanly, and
   (the commands to copy); the new-version bar under the ribbon.
 - `vintyl --self-test` checks the built-in materials too.
 
+**Website and guide**
+- A website with a user guide, in English and Polish: https://cyryllo.github.io/vintyl/
+- The README rewritten; credits for the code from Kerfly and K40 Whisperer and for the programs
+  studied (Inkcut, CutScape, RedsailCut) in the README and THIRD-PARTY-NOTICES.md.
+
 **Fixed**
 - The mouse wheel changes a list or a number field only once it is clicked; scrolling a panel no
   longer changes the values passing under the mouse.
