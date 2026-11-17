@@ -1,8 +1,10 @@
 # Changes
 
-## Unreleased
+## 0.8.0
 
-A new look for the whole window (UI v2), and materials.
+A new look for the whole window (UI v2), and materials. A big step, so the
+number jumps from 0.2 to 0.8: the cutters are tested and cut cleanly, and
+1.0 is near.
 
 **Materials**
 - A material keeps how to cut or draw it: the tool, the force and speed for each cutter, the blade,
@@ -18,7 +20,8 @@ A new look for the whole window (UI v2), and materials.
   the ruler's result is shown in it too. Fits a 1366 × 768 screen in every state.
 - The element list shows the cutting order and scissors to leave an element uncut.
 - The sheet has rulers in mm, sizes beside the selection and zoom buttons.
-- Stop takes Start's place while sending, with the percentage sent.
+- Start, Save .hpgl and the knife test stay at the bottom of the left panel, always in sight;
+  Stop takes Start's place while sending, with the percentage sent.
 - Speeds in mm/s.
 
 **Windows**
