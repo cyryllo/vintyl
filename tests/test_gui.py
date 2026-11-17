@@ -1857,3 +1857,24 @@ def test_a_square_dragged_with_the_mouse_makes_the_shape_smaller(win):
     a = v.mapFromScene(side.scenePos())
     _drag(v, a, v.mapFromScene(side.scenePos() + QPointF(-40, 0)))
     assert e.size[0] > w + 30 and e.size[1] == pytest.approx(h, abs=0.01)
+
+
+def test_the_wheel_over_the_left_panel_does_not_change_its_fields(win):
+    """Scrolling the left panel with the wheel leaves the material and the
+    pen's width as they were (they take the wheel only once clicked)."""
+    from PySide6.QtCore import QPoint
+    from PySide6.QtGui import QWheelEvent
+    from PySide6.QtTest import QTest
+    from vintyl.gui import theme
+    theme.apply(QApplication.instance(), "light")
+    win.resize(1366, 600)
+    win.show()
+    win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
+    win.view.setFocus()
+    QTest.qWait(20)
+    material, width = win.material_box.currentIndex(), win.pen_width.value()
+    for w in (win.material_box, win.pen_width):
+        c = w.rect().center()
+        QApplication.sendEvent(w, QWheelEvent(QPointF(c), QPointF(w.mapToGlobal(c)), QPoint(0, 0), QPoint(0, -120),
+                                              Qt.NoButton, Qt.NoModifier, Qt.NoScrollPhase, False))
+    assert win.material_box.currentIndex() == material and win.pen_width.value() == width

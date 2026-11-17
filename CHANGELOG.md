@@ -39,6 +39,8 @@ number jumps from 0.2 to 0.8: the cutters are tested and cut cleanly, and
 - `vintyl --self-test` checks the built-in materials too.
 
 **Fixed**
+- The mouse wheel changes a list or a number field only once it is clicked; scrolling a panel no
+  longer changes the values passing under the mouse.
 - Dragging a small square round the selection resizes the shape again: the square lost the drag
   at the first move, so the shape moved a little and went back to its size.
 

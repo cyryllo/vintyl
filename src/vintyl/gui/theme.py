@@ -256,21 +256,46 @@ def dark_palette():
 FIELD_TEXT_MARGIN_PX = 10      # room between a number field's frame and its text
 
 
-def _pad_number_fields(app):
-    """Number fields (QSpinBox, QDoubleSpinBox) place their inner text field
-    themselves and ignore the style sheet's padding, so their numbers touched
-    the left edge: every number field gets a text margin as it appears."""
-    from PySide6.QtCore import QEvent, QObject
-    from PySide6.QtWidgets import QAbstractSpinBox
+def _field_manners(app):
+    """Two things done for every field of the program as it appears:
 
-    class _Padding(QObject):
+    - number fields (QSpinBox, QDoubleSpinBox) place their inner text field
+      themselves and ignore the style sheet's padding, so their numbers
+      touched the left edge: they get a text margin;
+    - the mouse wheel changes a list (QComboBox) or a number field only once
+      it is clicked (has the focus). Before, scrolling the left panel or a
+      window changed every value that passed under the mouse; now the wheel
+      goes on to what is under the field (the panel scrolls)."""
+    from PySide6.QtCore import QEvent, QObject, QPointF, Qt
+    from PySide6.QtGui import QWheelEvent
+    from PySide6.QtWidgets import QAbstractSpinBox, QApplication, QComboBox
+
+    class _Manners(QObject):
         def eventFilter(self, obj, event):
-            if event.type() == QEvent.Polish and isinstance(obj, QAbstractSpinBox):
-                obj.lineEdit().setTextMargins(FIELD_TEXT_MARGIN_PX + 2, 0, 4, 0)
+            kind = event.type()
+            if kind == QEvent.Polish and isinstance(obj, (QAbstractSpinBox, QComboBox)):
+                if isinstance(obj, QAbstractSpinBox):
+                    obj.lineEdit().setTextMargins(FIELD_TEXT_MARGIN_PX + 2, 0, 4, 0)
+                # the wheel does not give them the focus (Qt's default does)
+                obj.setFocusPolicy(Qt.StrongFocus)
+            elif kind == QEvent.Wheel and isinstance(obj, (QAbstractSpinBox, QComboBox)) \
+                    and not obj.hasFocus():
+                # up the parents until one takes it (the panel's scroll area)
+                w, pos = obj, event.position()
+                while w.parentWidget() is not None:
+                    pos = QPointF(w.mapToParent(pos.toPoint()))
+                    w = w.parentWidget()
+                    up = QWheelEvent(pos, event.globalPosition(), event.pixelDelta(), event.angleDelta(),
+                                     event.buttons(), event.modifiers(), event.phase(), event.inverted())
+                    up.ignore()
+                    QApplication.sendEvent(w, up)
+                    if up.isAccepted():
+                        break
+                return True
             return False
-    if getattr(app, "_vintyl_padding", None) is None:
-        app._vintyl_padding = _Padding(app)
-        app.installEventFilter(app._vintyl_padding)
+    if getattr(app, "_vintyl_manners", None) is None:
+        app._vintyl_manners = _Manners(app)
+        app.installEventFilter(app._vintyl_manners)
 
 
 def apply(app, name):
@@ -283,5 +308,5 @@ def apply(app, name):
     app.setPalette(dark_palette() if _current == "dark" else app.style().standardPalette())
     icons.set_ink(TOKENS[_current]["ink"])
     app.setStyleSheet(style_sheet())
-    _pad_number_fields(app)
+    _field_manners(app)
     return _current

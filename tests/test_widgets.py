@@ -195,3 +195,50 @@ def test_switches_and_segments_work_from_the_keyboard(app):
     QTest.keyClick(seg.button(1), Qt.Key_Space)
     assert seg.currentData() == "in"
     box.close()
+
+
+def _wheel(widget, steps=-1):
+    """One turn of the mouse wheel over the middle of `widget` (minus = down)."""
+    from PySide6.QtCore import QPoint, QPointF
+    from PySide6.QtGui import QWheelEvent
+    pos = QPointF(widget.rect().center())
+    event = QWheelEvent(pos, QPointF(widget.mapToGlobal(widget.rect().center())), QPoint(0, 0),
+                        QPoint(0, 120 * steps), Qt.NoButton, Qt.NoModifier, Qt.NoScrollPhase, False)
+    QApplication.sendEvent(widget, event)
+
+
+def test_the_wheel_changes_a_field_only_once_it_is_clicked(app):
+    """Scrolling a panel must not change the lists and numbers passing under
+    the mouse: the wheel goes on to the panel; a clicked field takes it."""
+    from PySide6.QtWidgets import QScrollArea, QVBoxLayout, QWidget
+    theme.apply(app, "light")
+    inner = QWidget()
+    lay = QVBoxLayout(inner)
+    combo = QComboBox()
+    for k in range(5):
+        combo.addItem("item %d" % k)
+    combo.setCurrentIndex(2)
+    spin = QDoubleSpinBox()
+    spin.setValue(5.0)
+    lay.addWidget(combo)
+    lay.addWidget(spin)
+    edits = [QLineEdit() for _k in range(30)]               # something to scroll
+    for e in edits:
+        lay.addWidget(e)
+    area = QScrollArea()
+    area.setWidget(inner)
+    area.resize(300, 200)
+    area.show()
+    QTest.qWait(20)
+    edits[0].setFocus()                                     # the focus is elsewhere (Qt gave it to the list)
+    QTest.qWait(10)
+    assert combo.focusPolicy() == Qt.StrongFocus and spin.focusPolicy() == Qt.StrongFocus
+    _wheel(combo)
+    _wheel(spin)
+    assert combo.currentIndex() == 2 and spin.value() == 5.0             # nothing changed ...
+    assert area.verticalScrollBar().value() > 0                           # ... the panel scrolled
+    spin.setFocus()
+    QTest.qWait(10)
+    _wheel(spin, 1)
+    assert spin.value() == 6.0                                            # a clicked field takes the wheel
+    area.close()
