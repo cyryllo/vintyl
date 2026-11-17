@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 18:14+0100\n"
+"POT-Creation-Date: 2026-11-17 18:25+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,11 @@ msgstr ""
 "Generated-By: Babel 2.18.0\n"
 
 #, python-format
-msgid "%.1f × %.1f mm"
+msgid "%.0f × %.0f mm"
+msgstr ""
+
+#, python-format
+msgid "%.2f m"
 msgstr ""
 
 #, python-format
@@ -305,6 +309,9 @@ msgstr ""
 msgid "Connects as"
 msgstr ""
 
+msgid "Content"
+msgstr ""
+
 #, python-format
 msgid "Copied %d element."
 msgid_plural "Copied %d elements."
@@ -351,6 +358,10 @@ msgstr ""
 msgid "Cross-hatch"
 msgstr ""
 
+#, python-format
+msgid "Cursor: %.1f / %.1f mm"
+msgstr ""
+
 msgid "Curve"
 msgstr ""
 
@@ -378,8 +389,7 @@ msgstr ""
 msgid "Cut later (down the list)"
 msgstr ""
 
-#, python-format
-msgid "Cut length: %.2f m · travel: %.2f m"
+msgid "Cut length"
 msgstr ""
 
 msgid "Cut now?"
@@ -502,8 +512,7 @@ msgstr ""
 msgid "Draw now?"
 msgstr ""
 
-#, python-format
-msgid "Drawn length: %.2f m · travel: %.2f m"
+msgid "Drawn length"
 msgstr ""
 
 msgid "Drop"
@@ -524,13 +533,16 @@ msgstr ""
 msgid "Element"
 msgstr ""
 
+msgid "Elements"
+msgstr ""
+
 msgid "Ellipse"
 msgstr ""
 
 msgid "Ellipse: drag the box it fits in"
 msgstr ""
 
-msgid "Empty. Open an SVG file or draw a shape."
+msgid "Empty"
 msgstr ""
 
 msgid "Error correction"
@@ -656,6 +668,9 @@ msgid_plural "Grouped %d elements."
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "H."
+msgstr ""
+
 msgid "HPGL: 40 units per mm on most cutters. Check with a 20 mm square."
 msgstr ""
 
@@ -706,6 +721,9 @@ msgstr ""
 msgid ""
 "How much of the code may be damaged and it still reads; more = more "
 "modules"
+msgstr ""
+
+msgid "How to do it"
 msgstr ""
 
 msgid "How wide (or long) each strip is, with its overlap"
@@ -841,6 +859,9 @@ msgstr ""
 msgid "Margin"
 msgstr ""
 
+msgid "Marker pen"
+msgstr ""
+
 #, python-format
 msgid "Measured: %.2f mm (across %.2f mm, along %.2f mm)"
 msgstr ""
@@ -908,6 +929,9 @@ msgid "No shape fits inside: make them smaller or the margin narrower."
 msgstr ""
 
 msgid "Nodes"
+msgstr ""
+
+msgid "Not plugged in"
 msgstr ""
 
 msgid "Not plugged in now (or switched off)."
@@ -982,6 +1006,9 @@ msgstr ""
 msgid "Open a Vintyl project, or add the shapes of an SVG file to the design"
 msgstr ""
 
+msgid "Open an SVG or DXF file, or draw a shape with the tools on the right."
+msgstr ""
+
 msgid "Open the page of the new version: what is new and the file to download"
 msgstr ""
 
@@ -1013,9 +1040,6 @@ msgstr ""
 msgid "Pen"
 msgstr ""
 
-msgid "Pen / pencil"
-msgstr ""
-
 msgid "Pen path"
 msgstr ""
 
@@ -1025,10 +1049,6 @@ msgstr ""
 msgid ""
 "Pen: click = corner, press and drag = smooth curve; the first node closes"
 " it, double-click or Enter leaves it open"
-msgstr ""
-
-#, python-format
-msgid "Pointer: %.1f / %.1f mm"
 msgstr ""
 
 msgid "Polygon"
@@ -1048,9 +1068,6 @@ msgstr ""
 msgid "Port speed (baud)"
 msgstr ""
 
-msgid "Project"
-msgstr ""
-
 msgid "Put the copied elements back, 5 mm beside where they were"
 msgstr ""
 
@@ -1066,6 +1083,9 @@ msgid "Quit"
 msgstr ""
 
 msgid "Ready"
+msgstr ""
+
+msgid "Ready to cut"
 msgstr ""
 
 msgid "Rectangle"
@@ -1189,6 +1209,9 @@ msgstr ""
 msgid "Select all"
 msgstr ""
 
+msgid "Select an element to change its place and size"
+msgstr ""
+
 msgid "Select and move"
 msgstr ""
 
@@ -1213,6 +1236,10 @@ msgid "Select two or more shapes to align them to each other."
 msgstr ""
 
 msgid "Select two or more shapes with closed outlines."
+msgstr ""
+
+#, python-format
+msgid "Selected: %s"
 msgstr ""
 
 #, python-format
@@ -1246,6 +1273,9 @@ msgstr ""
 
 #, python-format
 msgid "Sending failed: %s"
+msgstr ""
+
+msgid "Sending to the cutter"
 msgstr ""
 
 #, python-format
@@ -1449,6 +1479,9 @@ msgstr ""
 msgid "The report is copied."
 msgstr ""
 
+msgid "The scissors: cut, or only shown (not cut)."
+msgstr ""
+
 msgid "The strips cover this much of each other, for laying them together"
 msgstr ""
 
@@ -1473,16 +1506,13 @@ msgstr ""
 msgid "There is nothing to cut: every path is shorter than one cutter step."
 msgstr ""
 
-msgid "Ticked: cut. Not ticked: shown only."
-msgstr ""
-
-msgid "Tool"
-msgstr ""
-
 msgid "Top edges"
 msgstr ""
 
 msgid "Transform"
+msgstr ""
+
+msgid "Travel"
 msgstr ""
 
 msgid "Triangle"
@@ -1560,6 +1590,9 @@ msgid "Vinyl left between the copies"
 msgstr ""
 
 msgid "Vinyl left between the shapes; below about 1.5 mm it tears when weeding"
+msgstr ""
+
+msgid "W."
 msgstr ""
 
 msgid "Waves"

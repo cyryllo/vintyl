@@ -17,7 +17,7 @@ Copyright (C) 2026 Vintyl contributors
 Licensed under the GNU General Public License v3 or later. See LICENSE.
 """
 from PySide6.QtCore import QRectF, QSize, Qt, Signal
-from PySide6.QtGui import QColor, QFontMetrics, QPainter, QPen
+from PySide6.QtGui import QColor, QFontMetrics, QIcon, QPainter, QPen
 from PySide6.QtWidgets import (QAbstractSpinBox, QButtonGroup, QCheckBox, QComboBox, QDialog, QFrame,
                                QGridLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QToolButton,
                                QVBoxLayout, QWidget)
@@ -286,3 +286,119 @@ def form_dialog(parent, title, rows, action=None, hint=None, extra=None, left=No
     if dlg.exec() != QDialog.Accepted:
         return None
     return {key: value_of(widget) for key, _label, widget in rows if key}
+
+
+# ---- the element list's rows ---------------------------------------------------------------------
+from PySide6.QtWidgets import QStyle, QStyledItemDelegate  # noqa: E402
+
+ICON_ROLE = Qt.UserRole + 1           # an item's type icon (a QIcon)
+
+
+class ElementRowDelegate(QStyledItemDelegate):
+    """A row of the element list (UI v2): the cutting order's number, the
+    type's icon, the name, and scissors on the right. The cut / not cut state
+    is still the item's check state (so the list works as before); the
+    scissors show it and a click on them changes it. A row not cut is grey
+    and its name crossed out."""
+
+    ROW_H = 40
+    SCISSORS = 28
+
+    def sizeHint(self, option, index):
+        return QSize(option.rect.width(), self.ROW_H)
+
+    def _scissors_rect(self, rect):
+        return QRectF(rect.right() - self.SCISSORS - 6, rect.center().y() - self.SCISSORS / 2 + 1,
+                      self.SCISSORS, self.SCISSORS)
+
+    @staticmethod
+    def is_cut(index):
+        # the check state comes back as a number from the model
+        state = index.data(Qt.CheckStateRole)
+        return state is not None and Qt.CheckState(state) == Qt.Checked
+
+    def paint(self, p, option, index):
+        # drawn between save() and restore() whatever happens: an error half-way
+        # through must not leave the painter unbalanced (Qt then crashes)
+        p.save()
+        try:
+            self._paint(p, option, index)
+        finally:
+            p.restore()
+
+    def _paint(self, p, option, index):
+        from vintyl.gui import icons
+        r = option.rect
+        selected = bool(option.state & QStyle.State_Selected)
+        cut = self.is_cut(index)
+        if selected:
+            p.setRenderHint(QPainter.Antialiasing, True)
+            p.setPen(Qt.NoPen)
+            p.setBrush(QColor(theme.token("accent_soft")))
+            p.drawRoundedRect(QRectF(r).adjusted(2, 2, -2, -2), 8, 8)
+        muted = QColor(theme.token("muted"))
+        ink = QColor(theme.token("ink") if cut else theme.token("disabled_text"))
+        p.setPen(muted)
+        p.drawText(QRectF(r.left() + 8, r.top(), 22, r.height()), Qt.AlignVCenter | Qt.AlignRight,
+                   str(index.row() + 1))
+        icon = index.data(ICON_ROLE)
+        if icon is not None:
+            mode = QIcon.Mode.Normal if cut else QIcon.Mode.Disabled
+            icon.paint(p, r.left() + 38, r.top() + (r.height() - 20) // 2, 20, 20, Qt.AlignCenter, mode)
+        font = p.font()
+        font.setBold(selected)
+        font.setStrikeOut(not cut)
+        p.setFont(font)
+        p.setPen(QColor(theme.token("accent_ink")) if selected and cut else ink)
+        name_rect = QRectF(r.left() + 66, r.top(), r.width() - 66 - self.SCISSORS - 14, r.height())
+        p.drawText(name_rect, Qt.AlignVCenter | Qt.AlignLeft,
+                   QFontMetrics(font).elidedText(index.data(Qt.DisplayRole) or "", Qt.ElideRight,
+                                                 int(name_rect.width())))
+        icons.tabler("scissors", theme.token("accent") if cut else theme.token("disabled_icon")).paint(
+            p, self._scissors_rect(r).adjusted(4, 4, -4, -4).toRect())
+
+    def editorEvent(self, event, model, option, index):
+        # a click on the scissors: cut / not cut (the item's check state, as before)
+        from PySide6.QtCore import QEvent
+        if event.type() == QEvent.MouseButtonRelease and event.button() == Qt.LeftButton \
+                and self._scissors_rect(option.rect).contains(event.position()):
+            state = Qt.Unchecked if self.is_cut(index) else Qt.Checked
+            model.setData(index, state, Qt.CheckStateRole)
+            return True
+        return super().editorEvent(event, model, option, index)
+
+
+class ToolTile(QToolButton):
+    """A button of the tool strip and of a tool set (UI v2): the icon over the
+    name; `has_set` draws a small triangle in the lower left corner (the
+    category opens a set), `hint` a shortcut in small type under the name."""
+
+    def __init__(self, parent=None, has_set=False, hint=""):
+        super().__init__(parent)
+        self.has_set = has_set
+        self.hint = hint
+        self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+        self.setAutoRaise(True)
+
+    def paintEvent(self, event):
+        super().paintEvent(event)
+        if not (self.has_set or self.hint):
+            return
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing, True)
+        color = QColor(theme.token("accent_ink") if self.isChecked() else theme.token("muted"))
+        if self.has_set:
+            from PySide6.QtGui import QPolygonF
+            from PySide6.QtCore import QPointF
+            r = self.rect()
+            p.setPen(Qt.NoPen)
+            p.setBrush(color)
+            p.drawPolygon(QPolygonF([QPointF(r.left() + 5, r.bottom() - 4), QPointF(r.left() + 10, r.bottom() - 4),
+                                     QPointF(r.left() + 5, r.bottom() - 9)]))
+        if self.hint:
+            font = self.font()
+            font.setPointSizeF(max(6.0, font.pointSizeF() * 0.8))
+            p.setFont(font)
+            p.setPen(color)
+            p.drawText(self.rect().adjusted(0, 0, 0, -4), Qt.AlignHCenter | Qt.AlignBottom, self.hint)
+        p.end()

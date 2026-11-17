@@ -963,12 +963,11 @@ def test_qr_code_is_inserted_as_cut_outlines(win):
 
 # ---- knife or pen ------------------------------------------------------------------------------------
 def test_the_pen_switch_shows_its_own_settings_and_hides_the_knifes(win):
-    form = win.cutter_form
-    assert not form.isRowVisible(win.pen_width) and not win.inside_first.isHidden()
+    assert win.pen_fields.isHidden() and not win.inside_first.isHidden()
     win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
     assert win.is_pen()
     assert win.inside_first.isHidden()
-    assert form.isRowVisible(win.pen_width) and form.isRowVisible(win.pen_place)
+    assert not win.pen_fields.isHidden() and not win.pen_note.isHidden()
     assert win.frame_row.isHidden()
     assert win.job_profile().knife_offset_mm == 0 and win.job_profile().overcut_mm == 0
     win.tool_box.setCurrentIndex(win.tool_box.findData("knife"))
@@ -990,7 +989,7 @@ def test_a_pen_job_has_no_offset_no_overcut_no_frame(win):
     win.pen_place.setCurrentIndex(win.pen_place.findData("outside"))
     import math                                                     # half the pen width out,
     assert win.build().cut_mm == pytest.approx(80.0 + math.pi * 1.0, abs=0.1)   # round corners
-    assert "Drawn length" in win.job_label.text() or "rysowania" in win.job_label.text()
+    assert "Drawn length" in win.stat_cut_title.text() or "rysowania" in win.stat_cut_title.text()
 
 
 def test_the_tool_is_remembered_for_each_cutter(win):
@@ -1013,7 +1012,7 @@ def test_a_fill_is_offered_and_drawn_only_with_the_pen(win):
     assert win.fill_selected(lines) == [] and win.design.elements[0].fill is None
     win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
     assert win.act_fill.isVisible()
-    assert win.cutter_form.isRowVisible(win.pen_note)
+    assert not win.pen_note.isHidden()
     filled = win.fill_selected(lines)
     assert filled and filled[0].fill["pattern"] == "lines"
     win.tool_box.setCurrentIndex(win.tool_box.findData("knife"))
@@ -1152,10 +1151,11 @@ def test_the_left_panel_never_squeezes_its_boxes_into_each_other(win):
     """A low window: the project list gives way, the Cutter and Job boxes keep
     their rows; lower still, the panel scrolls (it once overlapped)."""
     from PySide6.QtTest import QTest
-    from PySide6.QtWidgets import QGroupBox
+    from PySide6.QtWidgets import QWidget
     win.show()
     win._on_drawn("rectangle", QRectF(-60, -40, 20, 20))
-    boxes = win.left_scroll.widget().findChildren(QGroupBox)
+    boxes = [w for w in win.left_scroll.widget().findChildren(QWidget) if w.objectName() == "panel_section"]
+    assert len(boxes) == 3
     for tool in ("knife", "pen"):
         win.tool_box.setCurrentIndex(win.tool_box.findData(tool))
         for h in (1000, 900, 700):
@@ -1247,7 +1247,7 @@ def test_a_new_cutter_appears_in_the_list_and_can_be_deleted(win):
 def test_the_machine_line_says_when_the_port_is_missing(win, tmp_path):
     win.use_profile_values(port=str(tmp_path / "lp9"))
     win.refresh_job()
-    assert win.cutter_form.isRowVisible(win.port_problem) and "not there" in win.port_problem.text()
+    assert not win.port_warning.isHidden() and "not there" in win.port_problem.text()
 
 
 # ---- text on a path, rounded rectangles, any angle, the right-click menu -------------------------------

@@ -61,7 +61,7 @@ def test_window_in_polish():
         w = MainWindow()
         assert w.btn_save.text() == "Zapisz .hpgl"
         assert w.inside_first.text() == "Najpierw kształty wewnętrzne"
-        assert w.summary.text().startswith("Pusto.")
+        assert w.summary.text().startswith("Pusto")
         w.close()
     finally:
         i18n.setup("en")

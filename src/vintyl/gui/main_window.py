@@ -15,7 +15,7 @@ import dataclasses
 import os
 
 from PySide6.QtCore import QSize, Qt
-from PySide6.QtGui import QAction, QActionGroup, QKeySequence
+from PySide6.QtGui import QAction, QActionGroup, QColor, QKeySequence
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QDoubleSpinBox, QFileDialog, QFontComboBox, QFormLayout,
                                QFrame, QLineEdit, QMenu, QScrollArea,
                                QProgressBar, QSpinBox, QToolButton,
@@ -40,6 +40,7 @@ from vintyl.gui import theme
 from vintyl.gui.canvas import MaterialView, shape_icon
 from vintyl.gui.sender import SendWorker
 from vintyl.gui import text as texts
+from vintyl.gui.widgets import ICON_ROLE, Switch, ToolTile
 
 LATER = N_("Comes in a later step of Vintyl")   # translated where it is shown
 PLACE_MARGIN_MM = 10.0        # a new file is placed this far from the origin
@@ -84,9 +85,9 @@ class _SideScroll(QScrollArea):
 
     @staticmethod
     def _least_height(panel):
-        """The least height the panel's boxes need. A box with wrapped text
-        (the port's message) needs its height at this width, which Qt's
-        minimum leaves out, so it was squeezed."""
+        """The least height the panel needs: the sections that keep their
+        height at their full height (with wrapped text at this width), the
+        one that gives way (the element list) at its minimum."""
         col = panel.layout()
         m = col.contentsMargins()
         width = panel.width() - m.left() - m.right()
@@ -95,7 +96,8 @@ class _SideScroll(QScrollArea):
             w = col.itemAt(i).widget()
             if w is None or w.isHidden():
                 continue
-            h = w.minimumSizeHint().height()
+            fixed = w.sizePolicy().verticalPolicy() == QSizePolicy.Fixed
+            h = (w.sizeHint() if fixed else w.minimumSizeHint()).height()
             if w.hasHeightForWidth():
                 h = max(h, w.heightForWidth(width))
             total += h
@@ -153,18 +155,9 @@ class MainWindow(QMainWindow):
         outer = QVBoxLayout(central)
         outer.setContentsMargins(0, 0, 0, 0)
         outer.setSpacing(0)
-        # the options bar scrolls sideways when it is wider than the window,
-        # so it never makes the window wider than the screen (as in Kerfly)
-        bar = self._make_options_bar()
-        bar_scroll = QScrollArea()
-        bar_scroll.setObjectName("options_scroll")
-        bar_scroll.setWidget(bar)
-        bar_scroll.setWidgetResizable(True)
-        bar_scroll.setFrameShape(QFrame.NoFrame)
-        bar_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        bar_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        bar_scroll.setFixedHeight(bar.sizeHint().height() + bar_scroll.horizontalScrollBar().sizeHint().height())
-        outer.addWidget(bar_scroll)
+        # the selection bar: two rows (the second only for a text), so it never
+        # scrolls sideways (UI v2)
+        outer.addWidget(self._make_options_bar())
         # "a new version is available" (hidden until a check finds one)
         from vintyl.gui.update_check import UpdateBar
         self.update_bar = UpdateBar(self)
@@ -183,8 +176,10 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central)
 
         self.cursor_label = QLabel()
+        self.selected_label = QLabel()                 # "Selected: <name>" (UI v2)
         self.profile_label = QLabel()
         self.statusBar().addWidget(self.cursor_label)
+        self.statusBar().addWidget(self.selected_label)
         self.statusBar().addPermanentWidget(self.profile_label)
 
         s = self.view.signals
@@ -205,7 +200,7 @@ class MainWindow(QMainWindow):
         s.edit_nodes.connect(self._on_edit_nodes)
         s.cancel_tool.connect(lambda: self.set_tool("select"))
         s.node_selection.connect(self._on_node_selection)
-        s.cursor.connect(lambda x, y: self.cursor_label.setText(_("Pointer: %.1f / %.1f mm") % (x, y)))
+        s.cursor.connect(lambda x, y: self.cursor_label.setText(_("Cursor: %.1f / %.1f mm") % (x, y)))
         self.resize(1440, 900)
         # the cutter used last time, not always the first one
         self.reload_profiles(self.settings.value("cutter/profile", ""), apply=False)
@@ -400,29 +395,36 @@ class MainWindow(QMainWindow):
         m.addAction(self._action(_("About Vintyl"), self.about))
 
     def _make_ribbon(self):
-        """The ribbon: groups with a caption under them; big buttons with a label,
-        or small icon-only buttons in two rows where a group has many
-        (the layout of Kerfly's ribbon, kerfly/gui/main_window.py, commit cf48565)."""
+        """The ribbon (UI v2): groups with a caption under them. File, Edit and
+        View: big buttons with the label under the icon; Element and Shapes:
+        small buttons with the label beside the icon, in two rows; Transform
+        and Align: icons only, in two rows, with tooltips. A button that is on
+        (Grid, Knife path) has the accent's soft background. The groups that
+        work on a selection are greyed out while nothing is selected (their
+        actions are disabled, see _enable_selection_actions). After Kerfly's
+        ribbon (kerfly/gui/main_window.py, commit cf48565)."""
+        big, beside, icons_only = "big", "beside", "icons"
         groups = [
-            (_("File"), [(self.act_new, _("New")), (self.act_open, _("Open")), (self.act_save, _("Save")),
-                         (self.act_save_cut, _("Save .hpgl"))]),
-            (_("Edit"), [(self.act_undo, _("Undo")), (self.act_redo, _("Redo"))]),
-            (_("Element"), "grid", [self.act_duplicate, self.act_delete]),
-            (_("Transform"), "grid", [self.act_rot_left, self.act_rot_right,
-                                      self.act_mirror_h, self.act_mirror_v]),
-            (_("Align"), "grid", [self.act_align["left"], self.act_align["centre"], self.act_align["right"],
-                                  self.act_distribute_across, self.act_align["top"], self.act_align["middle"],
-                                  self.act_align["bottom"], self.act_distribute_up]),
-            (_("Shapes"), "grid", [self.act_group, self.act_boolean["union"], self.act_boolean["difference"],
-                                   self.act_ungroup, self.act_boolean["intersection"],
-                                   self.act_boolean["exclusion"]]),
-            (_("View"), [(self.act_fit, _("Fit")), (self.act_knife, _("Knife path")), (self.act_grid, _("Grid"))]),
+            (_("File"), big, [(self.act_new, _("New")), (self.act_open, _("Open")), (self.act_save, _("Save")),
+                              (self.act_save_cut, _("Save .hpgl"))]),
+            (_("Edit"), big, [(self.act_undo, _("Undo")), (self.act_redo, _("Redo"))]),
+            (_("Element"), beside, [(self.act_duplicate, _("Duplicate")), (self.act_delete, _("Delete"))]),
+            (_("Transform"), icons_only, [self.act_rot_left, self.act_rot_right,
+                                          self.act_mirror_h, self.act_mirror_v]),
+            (_("Align"), icons_only, [self.act_align["left"], self.act_align["centre"], self.act_align["right"],
+                                      self.act_distribute_across, self.act_align["top"], self.act_align["middle"],
+                                      self.act_align["bottom"], self.act_distribute_up]),
+            (_("Shapes"), beside, [(self.act_group, _("Group")), (self.act_boolean["union"], None),
+                                   (self.act_boolean["difference"], None), (self.act_ungroup, _("Ungroup")),
+                                   (self.act_boolean["intersection"], None), (self.act_boolean["exclusion"], None)]),
+            (_("View"), big, [(self.act_fit, _("Fit")), (self.act_knife, _("Knife path")),
+                              (self.act_grid, _("Grid"))]),
         ]
         tb = QToolBar(_("Main"))
         tb.setObjectName("main_toolbar")
         tb.setMovable(False)
-        for i, group_def in enumerate(groups):
-            title, entries = group_def[0], group_def[-1]
+        self.ribbon_groups = {}
+        for i, (title, kind, entries) in enumerate(groups):
             if i:
                 line = QFrame()
                 line.setFrameShape(QFrame.VLine)
@@ -430,40 +432,53 @@ class MainWindow(QMainWindow):
                 tb.addWidget(line)
             group = QWidget()
             v = QVBoxLayout(group)
-            v.setContentsMargins(1, 2, 1, 0)
+            v.setContentsMargins(4, 2, 4, 0)
             v.setSpacing(0)
-            if len(group_def) == 3:                       # small icon-only buttons in two rows
-                grid = QGridLayout()
-                grid.setSpacing(0)
-                per_row = (len(entries) + 1) // 2
-                for n, action in enumerate(entries):
-                    button = QToolButton()
-                    button.setDefaultAction(action)
-                    button.setToolButtonStyle(Qt.ToolButtonIconOnly)
-                    button.setIconSize(QSize(20, 20))
-                    button.setAutoRaise(True)
-                    button.setFixedSize(28, 28)
-                    grid.addWidget(button, n // per_row, n % per_row)
-                v.addLayout(grid)
-                v.addStretch(1)
-            else:
+            if kind == big:
                 row = QHBoxLayout()
-                row.setSpacing(0)
+                row.setSpacing(2)
                 for action, short in entries:
                     action.setIconText(short)
                     button = QToolButton()
                     button.setDefaultAction(action)
                     button.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-                    button.setIconSize(QSize(24, 24))
+                    button.setIconSize(QSize(22, 22))
                     button.setAutoRaise(True)
-                    button.setFixedHeight(52)
+                    button.setFixedHeight(54)
+                    button.setMinimumWidth(52)
                     row.addWidget(button, 0, Qt.AlignTop)
                 v.addLayout(row)
+            else:
+                grid = QGridLayout()
+                grid.setHorizontalSpacing(4 if kind == beside else 2)
+                grid.setVerticalSpacing(2)
+                per_row = (len(entries) + 1) // 2
+                for n, entry in enumerate(entries):
+                    button = QToolButton()
+                    button.setAutoRaise(True)
+                    if kind == beside:
+                        action, short = entry
+                        if short:
+                            action.setIconText(short)
+                        button.setDefaultAction(action)
+                        button.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+                        button.setIconSize(QSize(18, 18))
+                        button.setFixedHeight(26)
+                        button.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+                    else:
+                        button.setDefaultAction(entry)
+                        button.setToolButtonStyle(Qt.ToolButtonIconOnly)
+                        button.setIconSize(QSize(20, 20))
+                        button.setFixedSize(34, 26)
+                    grid.addWidget(button, n // per_row, n % per_row)
+                v.addLayout(grid)
+                v.addStretch(1)
             caption = QLabel(title)
             caption.setObjectName("ribbon_caption")
             caption.setAlignment(Qt.AlignHCenter)
             v.addWidget(caption)
             tb.addWidget(group)
+            self.ribbon_groups[title] = group
         self.addToolBar(Qt.TopToolBarArea, tb)
 
     # the right-hand bar: a button per category; a click opens a square of
@@ -494,9 +509,6 @@ class MainWindow(QMainWindow):
             ("tool", "freehand", N_("Freehand"), N_("Freehand: draw with the button held; ending at the start "
                                                     "closes it"), "scribble"),
         ]),
-        ("measure", N_("Ruler"), "ruler-measure", [
-            ("tool", "measure", N_("Ruler"), N_("Ruler: drag between two points to measure"), "ruler-measure"),
-        ]),
         ("text", N_("Text"), "typography", [
             ("tool", "text", N_("Text"), N_("Text: click where it should start"), "typography"),
             ("act", "act_text_path", N_("Text on a path")),
@@ -508,15 +520,21 @@ class MainWindow(QMainWindow):
             ("act", "act_tile", N_("Pattern of shapes")),
             ("act", "act_fill", N_("Fill")),
         ]),
+        ("measure", N_("Ruler"), "ruler-measure", [
+            ("tool", "measure", N_("Ruler"), N_("Ruler: drag between two points to measure"), "ruler-measure"),
+        ]),
     ]
+    PANEL_BREAKS = ("offset", "measure")      # a line before these categories (UI v2)
 
     def _make_tool_strip(self):
         from PySide6.QtWidgets import QButtonGroup
         panel = QWidget()
         panel.setObjectName("tool_panel")
+        panel.setAttribute(Qt.WA_StyledBackground, True)
+        panel.setFixedWidth(76)
         col = QVBoxLayout(panel)
-        col.setContentsMargins(4, 6, 4, 6)
-        col.setSpacing(2)
+        col.setContentsMargins(5, 8, 5, 8)
+        col.setSpacing(4)
         group = QActionGroup(self)
         cat_group = QButtonGroup(self)
         cat_group.setExclusive(True)
@@ -534,12 +552,16 @@ class MainWindow(QMainWindow):
                     group.addAction(a)
                     self.tool_actions[key] = a
                     self._category_of[key] = cat
-            cb = QToolButton()
-            cb.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-            cb.setIconSize(QSize(26, 26))
-            cb.setAutoRaise(True)
-            cb.setFixedSize(72, 58)
-            cb.setIcon(icons.tabler(icon) if icon else shape_icon(ready.make("star")))
+            if cat in self.PANEL_BREAKS:
+                line = QFrame()
+                line.setFrameShape(QFrame.HLine)
+                line.setObjectName("panel_line")
+                col.addWidget(line)
+            cb = ToolTile(has_set=len(entries) > 1)
+            cb.setObjectName("tool_tile")
+            cb.setIconSize(QSize(22, 22))
+            cb.setFixedSize(66, 54)
+            cb.setIcon(icons.tabler(icon) if icon else icons.tabler("star"))
             cb.setText(_(title))
             cb.setCheckable(True)
             cb.clicked.connect(lambda _c=False, c=cat: self.show_category(c))
@@ -573,19 +595,36 @@ class MainWindow(QMainWindow):
             getattr(self, entries[0][1]).trigger()
             self.category_buttons[self._category_of[self.view.tool]].setChecked(True)
             return None
-        popup = QFrame(self, Qt.Popup)
-        popup.setObjectName("tool_popup")
-        popup.setFrameShape(QFrame.StyledPanel)
-        grid = QGridLayout(popup)
-        grid.setContentsMargins(6, 6, 6, 6)
-        grid.setSpacing(2)
-        per_row = 4 if len(entries) > 6 else (3 if len(entries) > 2 else len(entries))
+        # the set: a white card with a shadow, each tool with its name and its key
+        from PySide6.QtWidgets import QGraphicsDropShadowEffect
+        popup = QFrame(self, Qt.Popup | Qt.FramelessWindowHint)
+        popup.setAttribute(Qt.WA_TranslucentBackground, True)
+        holder = QVBoxLayout(popup)
+        holder.setContentsMargins(10, 10, 10, 10)
+        card = QFrame()
+        card.setObjectName("tool_popup")
+        shadow = QGraphicsDropShadowEffect(card)
+        shadow.setBlurRadius(18)
+        shadow.setOffset(0, 3)
+        shadow.setColor(QColor(0, 0, 0, 60))
+        card.setGraphicsEffect(shadow)
+        holder.addWidget(card)
+        grid = QGridLayout(card)
+        grid.setContentsMargins(8, 8, 8, 8)
+        grid.setSpacing(4)
+        per_row = 4 if len(entries) > 6 else (2 if len(entries) > 1 else 1)
         for n, entry in enumerate(entries):
-            b = QToolButton()
-            b.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-            b.setIconSize(QSize(24, 24))
-            b.setAutoRaise(True)
-            b.setFixedSize(76, 54)
+            key_name = ""
+            if entry[0] == "tool":
+                seq = self.tool_actions[entry[1]].shortcut()
+                key_name = seq.toString(QKeySequence.NativeText) if not seq.isEmpty() else ""
+            elif entry[0] == "act":
+                seq = getattr(self, entry[1]).shortcut()
+                key_name = seq.toString(QKeySequence.NativeText) if not seq.isEmpty() else ""
+            b = ToolTile(hint=key_name)
+            b.setObjectName("tool_tile")
+            b.setIconSize(QSize(22, 22))
+            b.setFixedSize(96, 70 if key_name else 60)
             if entry[0] == "tool":
                 a = self.tool_actions[entry[1]]
                 b.setIcon(a.icon())
@@ -612,7 +651,7 @@ class MainWindow(QMainWindow):
         button = self.category_buttons[cat]
         popup.adjustSize()
         top_left = button.mapToGlobal(button.rect().topLeft())
-        popup.move(top_left.x() - popup.width() - 2, top_left.y())
+        popup.move(top_left.x() - popup.width() + 6, top_left.y() - 10)
         popup.show()
         self.tool_popup = popup
         # the category of the tool in use stays marked meanwhile
@@ -754,58 +793,75 @@ class MainWindow(QMainWindow):
         self._show_polygon_options()
 
     # ---- options bar: the selected element ------------------------------------
+    def _bar_separator(self, row):
+        line = QFrame()
+        line.setFrameShape(QFrame.VLine)
+        line.setObjectName("bar_separator")
+        row.addWidget(line)
+        return line
+
     def _make_options_bar(self):
+        """The selection bar (UI v2): the selected element's type and name,
+        its place and size, the angle, the fields of its kind, and "Cut this
+        element"; a second row for a text. With nothing selected: a hint."""
         bar = QWidget()
         bar.setObjectName("options_bar")
-        row = QHBoxLayout(bar)
-        row.setContentsMargins(10, 4, 10, 4)
+        bar.setAttribute(Qt.WA_StyledBackground, True)
+        rows = QVBoxLayout(bar)
+        rows.setContentsMargins(12, 6, 12, 6)
+        rows.setSpacing(6)
+        row = QHBoxLayout()
+        row.setSpacing(8)
+        rows.addLayout(row)
+        # what is selected: its type's icon and its name
+        self.sel_icon = QLabel()
+        self.sel_name = QLabel()
+        self.sel_name.setObjectName("sel_name")
+        self.sel_name.setMinimumWidth(110)
+        row.addWidget(self.sel_icon)
+        row.addWidget(self.sel_name)
+        self.sel_hint = QLabel(_("Select an element to change its place and size"))
+        self.sel_hint.setObjectName("sel_hint")
+        self.sel_hint.setMinimumHeight(30)            # the bar keeps its height with nothing selected
+        row.addWidget(self.sel_hint)
         self.opt_x, self.opt_y = _spin(), _spin()
         self.opt_w, self.opt_h = _spin(minimum=0.0), _spin(minimum=0.0)
         # the lock: width and height change together (also with the small squares)
         self.opt_lock = QToolButton()
+        self.opt_lock.setObjectName("lock")
         self.opt_lock.setCheckable(True)
         self.opt_lock.setToolTip(_("Keep the proportions: width and height change together, "
                                    "in the fields and with the small squares round the selection"))
         self.opt_lock.setAccessibleName(_("Keep the proportions"))
         self.opt_lock.toggled.connect(self._lock_toggled)
+        self.place_widgets = []
         for label, spin, tip in ((_("X"), self.opt_x, _("Bottom edge: how far up from the origin, along the material")),
                                  (_("Y"), self.opt_y, _("Right edge: how far left from the origin, across the material")),
-                                 (_("Width"), self.opt_w, None), (None, self.opt_lock, None),
-                                 (_("Height"), self.opt_h, None)):
+                                 ("|", None, None),
+                                 (_("W."), self.opt_w, _("Width")), (None, self.opt_lock, None),
+                                 (_("H."), self.opt_h, _("Height"))):
+            if label == "|":
+                self.place_widgets.append(self._bar_separator(row))
+                continue
             if label is not None:
                 lab = QLabel(label)
+                lab.setObjectName("bar_label")
                 lab.setBuddy(spin)
                 row.addWidget(lab)
+                self.place_widgets.append(lab)
             if tip:
                 spin.setToolTip(tip)
+            spin.setFixedWidth(104) if spin is not self.opt_lock else None
             row.addWidget(spin)
+            self.place_widgets.append(spin)
             if spin is not self.opt_lock:
                 spin.valueChanged.connect(self._options_changed)
-        self.opt_cut = QCheckBox(_("Cut this element"))
-        self.opt_cut.toggled.connect(self._options_changed)
-        row.addSpacing(16)
-        row.addWidget(self.opt_cut)
-        row.addSpacing(16)
-        self.sides_label = QLabel(_("Sides"))
-        self.opt_sides = QSpinBox()
-        self.opt_sides.setRange(3, 64)
-        self.opt_sides.setValue(self.view.polygon_sides)
-        self.opt_sides.valueChanged.connect(self._sides_changed)
-        self.sides_label.setBuddy(self.opt_sides)
-        row.addWidget(self.sides_label)
-        row.addWidget(self.opt_sides)
-        # a rectangle's round corners: for new rectangles and the selected one
-        self.radius_label = QLabel(_("Corner radius"))
-        self.opt_radius = _spin(1000.0, 1, minimum=0.0)
-        self.opt_radius.setValue(float(self.settings.value("draw/corner_radius", 0.0)))
-        self.opt_radius.setToolTip(_("Round corners of the rectangle (0 = sharp)"))
-        self.opt_radius.valueChanged.connect(self._radius_changed)
-        self.radius_label.setBuddy(self.opt_radius)
-        row.addWidget(self.radius_label)
-        row.addWidget(self.opt_radius)
         # turn the selection by any angle (the buttons on the ribbon turn by 90°)
+        self.place_widgets.append(self._bar_separator(row))
         self.angle_label = QLabel(_("Angle"))
+        self.angle_label.setObjectName("bar_label")
         self.opt_angle = _spin(360.0, 1, "°", minimum=-360.0)
+        self.opt_angle.setFixedWidth(80)
         self.opt_angle.setValue(float(self.settings.value("draw/rotate_by", 15.0)))
         self.opt_angle.setToolTip(_("Turn the selection by this angle: plus = counter-clockwise"))
         self.btn_rotate = QToolButton()
@@ -817,6 +873,26 @@ class MainWindow(QMainWindow):
         row.addWidget(self.angle_label)
         row.addWidget(self.opt_angle)
         row.addWidget(self.btn_rotate)
+        # the fields of the kind: a polygon's sides, a rectangle's corners, the node tool's keys
+        self.kind_separator = self._bar_separator(row)
+        self.sides_label = QLabel(_("Sides"))
+        self.opt_sides = QSpinBox()
+        self.opt_sides.setRange(3, 64)
+        self.opt_sides.setValue(self.view.polygon_sides)
+        self.opt_sides.valueChanged.connect(self._sides_changed)
+        self.sides_label.setBuddy(self.opt_sides)
+        row.addWidget(self.sides_label)
+        row.addWidget(self.opt_sides)
+        # a rectangle's round corners: for new rectangles and the selected one
+        self.radius_label = QLabel(_("Corner radius"))
+        self.opt_radius = _spin(1000.0, 1, minimum=0.0)
+        self.opt_radius.setFixedWidth(96)
+        self.opt_radius.setValue(float(self.settings.value("draw/corner_radius", 0.0)))
+        self.opt_radius.setToolTip(_("Round corners of the rectangle (0 = sharp)"))
+        self.opt_radius.valueChanged.connect(self._radius_changed)
+        self.radius_label.setBuddy(self.opt_radius)
+        row.addWidget(self.radius_label)
+        row.addWidget(self.opt_radius)
         self.node_hint = QLabel(_("Drag nodes and handles · double-click a side: add a node · "
                                   "D delete · L line · C curve · O smooth · Z close/open · B break"))
         self.node_hint.setObjectName("node_hint")
@@ -826,55 +902,80 @@ class MainWindow(QMainWindow):
         row.addWidget(self.node_hint, 1)
         for w in (self.sides_label, self.opt_sides, self.node_hint, self.radius_label, self.opt_radius):
             w.setVisible(False)
-        # text: the text itself, font, size (em height), bold, italic, letter spacing
+        row.addStretch(1)
+        self.opt_cut = Switch(_("Cut this element"))
+        self.opt_cut.toggled.connect(self._options_changed)
+        row.addWidget(self.opt_cut)
+
+        # the second row: a text
+        self.text_row = QWidget()
+        trow = QHBoxLayout(self.text_row)
+        trow.setContentsMargins(0, 0, 0, 0)
+        trow.setSpacing(8)
+        rows.addWidget(self.text_row)
         self.text_defaults = dict(texts.DEFAULTS)
         self.opt_text = QLineEdit(self.text_defaults["text"])
-        self.opt_text.setFixedWidth(140)
+        self.opt_text.setFixedWidth(180)
         self.opt_text.setToolTip(_("The text; Enter applies it"))
         self.opt_font = QFontComboBox()
         self.opt_font.setFixedWidth(170)
         self.opt_font.setCurrentFont(self.opt_font.currentFont().__class__(self.text_defaults["family"]))
         self.opt_size = _spin(1000.0, 1, minimum=1.0)
+        self.opt_size.setFixedWidth(90)
         self.opt_size.setValue(self.text_defaults["size"])
         self.opt_size.setToolTip(_("Font size: the height of the font's em in mm"))
         self.opt_bold = QToolButton()
+        self.opt_bold.setObjectName("toggle")
         self.opt_bold.setIcon(icons.tabler("bold"))
         self.opt_bold.setCheckable(True)
         self.opt_bold.setChecked(self.text_defaults["bold"])
         self.opt_bold.setToolTip(_("Bold"))
         self.opt_italic = QToolButton()
+        self.opt_italic.setObjectName("toggle")
         self.opt_italic.setIcon(icons.tabler("italic"))
         self.opt_italic.setCheckable(True)
         self.opt_italic.setToolTip(_("Italic"))
         self.opt_spacing = _spin(100.0, 2, minimum=-20.0)
+        self.opt_spacing.setFixedWidth(90)
         self.opt_spacing.setToolTip(_("Extra space between letters, mm"))
         self.text_widgets = [self.opt_text, self.opt_font, self.opt_size, self.opt_bold, self.opt_italic,
                              self.opt_spacing]
         self.text_labels = []
-        for label, w in ((_("Text"), self.opt_text), (_("Font"), self.opt_font), (_("Size"), self.opt_size),
+        for label, w in ((_("Content"), self.opt_text), (_("Font"), self.opt_font), (_("Size"), self.opt_size),
                          (None, self.opt_bold), (None, self.opt_italic), (_("Spacing"), self.opt_spacing)):
             if label:
                 lab = QLabel(label)
+                lab.setObjectName("bar_label")
                 lab.setBuddy(w)
-                row.addWidget(lab)
+                trow.addWidget(lab)
                 self.text_labels.append(lab)
-            row.addWidget(w)
+            trow.addWidget(w)
+        self._bar_separator(trow)
+        self.btn_text_path = QToolButton()
+        self.btn_text_path.setDefaultAction(self.act_text_path)
+        self.btn_text_path.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+        self.btn_text_path.setObjectName("bar_button")
+        trow.addWidget(self.btn_text_path)
         # a text on a path: where along the path, how far from it, which side
         self.opt_path_offset = _spin(100000.0, 1, minimum=-100000.0)
+        self.opt_path_offset.setFixedWidth(96)
         self.opt_path_offset.setToolTip(_("Where the text starts along its path, mm"))
         self.opt_path_distance = _spin(1000.0, 1, minimum=-1000.0)
+        self.opt_path_distance.setFixedWidth(90)
         self.opt_path_distance.setToolTip(_("How far the letters stand from the path, mm"))
-        self.opt_path_flip = QCheckBox(_("other side"))
+        self.opt_path_flip = Switch(_("other side"))
         self.opt_path_flip.setToolTip(_("The text on the other side of the path (inside a circle), still readable"))
         self.path_widgets, self.path_labels = [self.opt_path_offset, self.opt_path_distance, self.opt_path_flip], []
         for label, w in ((_("Along"), self.opt_path_offset), (_("Away"), self.opt_path_distance),
                          (None, self.opt_path_flip)):
             if label:
                 lab = QLabel(label)
+                lab.setObjectName("bar_label")
                 lab.setBuddy(w)
-                row.addWidget(lab)
+                trow.addWidget(lab)
                 self.path_labels.append(lab)
-            row.addWidget(w)
+            trow.addWidget(w)
+        trow.addStretch(1)
         for w in self.path_widgets + self.path_labels:
             w.setVisible(False)
         for w in (self.opt_path_offset, self.opt_path_distance):
@@ -888,19 +989,46 @@ class MainWindow(QMainWindow):
             w.toggled.connect(lambda _v: self._text_changed())
         for w in self.text_widgets + self.text_labels:
             w.setVisible(False)
-        row.addStretch(1)
+        self.text_row.setVisible(False)
         self.options_widgets = (self.opt_x, self.opt_y, self.opt_w, self.opt_h, self.opt_cut)
         locked = str(self.settings.value("view/keep_ratio", "true")).lower() == "true"
         self.opt_lock.setChecked(locked)
         self._lock_toggled(locked)
+        self.options_bar = bar
         return bar
+
+    # the icon of an element's type (the selection bar and the element list)
+    KIND_ICONS = {"text": "typography", "rectangle": "square", "polygon": "polygon", "ready": "star",
+                  "ellipse": "circle", "weeding": "slash", "pattern": "rosette", "line": "line"}
+
+    def kind_icon(self, e):
+        kind = (e.spec or {}).get("kind") if e is not None else None
+        if kind in self.KIND_ICONS:
+            return icons.tabler(self.KIND_ICONS[kind])
+        if e is not None and e.fill:
+            return icons.tabler("bucket-droplet")
+        if e is not None and not any(sub["closed"] for sub in e.paths):
+            return icons.tabler("vector-spline")
+        return icons.tabler("vector-bezier-2")
 
     def _show_options(self):
         self._updating = True
         e = self.selected
+        has = e is not None
         for w in self.options_widgets:
-            w.setEnabled(e is not None)
-        if e is not None:
+            w.setEnabled(has)
+        n_sel = len(self.selection) if self.selection else (1 if has else 0)
+        self.selected_label.setText("" if not has else _("Selected: %s") % (
+            e.name if n_sel <= 1 else ngettext("%d element", "%d elements", n_sel) % n_sel))
+        # nothing selected: a hint instead of greyed-out fields
+        for w in self.place_widgets + [self.angle_label, self.opt_angle, self.btn_rotate, self.opt_cut,
+                                       self.sel_icon, self.sel_name]:
+            w.setVisible(has)
+        self.sel_hint.setVisible(not has)
+        if has:
+            n = len(self.selection) if self.selection else 1
+            self.sel_icon.setPixmap(self.kind_icon(e).pixmap(18, 18))
+            self.sel_name.setText(e.name if n <= 1 else ngettext("%d element", "%d elements", n) % n)
             xmin, xmax, ymin, ymax = e.bounds
             self.opt_x.setValue(-ymax)            # bottom edge: along the material from the origin
             self.opt_y.setValue(-xmax)            # right edge: across the material from the origin
@@ -910,6 +1038,9 @@ class MainWindow(QMainWindow):
         self._updating = False
         self._show_text_options()
         self._show_polygon_options()
+        kind = self.sides_label.isVisibleTo(self.options_bar) or self.radius_label.isVisibleTo(self.options_bar) \
+            or self.node_hint.isVisibleTo(self.options_bar)
+        self.kind_separator.setVisible(kind)
 
     def _lock_toggled(self, on):
         self.opt_lock.setIcon(icons.tabler("link" if on else "link-off"))
@@ -951,91 +1082,133 @@ class MainWindow(QMainWindow):
         self.refresh()
 
     # ---- left panel: project, cutter, job --------------------------------------
+    def _section(self, col, title, stretch=0):
+        """A section of the left panel: a title, then its rows (UI v2: one white
+        column, the sections divided by a line, no frames)."""
+        if col.count():
+            line = QFrame()
+            line.setFrameShape(QFrame.HLine)
+            line.setObjectName("panel_line")
+            col.addWidget(line)
+        box = QWidget()
+        box.setObjectName("panel_section")
+        lay = QVBoxLayout(box)
+        lay.setContentsMargins(16, 14, 16, 14)
+        lay.setSpacing(10)
+        head = QHBoxLayout()
+        head.setSpacing(6)
+        label = QLabel(title)
+        label.setObjectName("section_title")
+        head.addWidget(label)
+        head.addStretch(1)
+        lay.addLayout(head)
+        col.addWidget(box, stretch)
+        # only the element list gives way on a low window; the other sections
+        # keep the height of what they show
+        box.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding if stretch else QSizePolicy.Fixed)
+        box.head = head
+        return box, lay
+
     def _make_left_panel(self):
+        """The left panel (UI v2): Elements, Cutter, Job."""
+        from vintyl.gui.widgets import ElementRowDelegate, Segmented
         panel = QWidget()
         panel.setObjectName("job_panel")
-        panel.setFixedWidth(340)
+        panel.setAttribute(Qt.WA_StyledBackground, True)
+        panel.setFixedWidth(330)
         col = QVBoxLayout(panel)
-        col.setContentsMargins(10, 10, 10, 10)
-        col.setSpacing(10)
+        col.setContentsMargins(0, 0, 0, 0)
+        col.setSpacing(0)
 
-        box = QGroupBox(_("Project"))
-        lay = QVBoxLayout(box)
+        # ---- Elements: the cutting order, each row with its number, type, name, scissors
+        box, lay = self._section(col, _("Elements"), 1)
+        self.elements_box = box
         self.summary = QLabel()
+        self.summary.setObjectName("muted")
         # one line, not wrapped: a wrapped label makes Qt treat the whole box as
-        # rigid (height for width), and the column then squeezed the Cutter box
-        # until its rows ran into the Job box
+        # rigid (height for width) and the column then squeezed the others
         self.summary.setWordWrap(False)
-        lay.addWidget(self.summary)
-        self.element_list = QListWidget()
-        self.element_list.itemChanged.connect(self._list_item_changed)
-        self.element_list.currentRowChanged.connect(self._list_row_changed)
-        lay.addWidget(self.element_list)
-        btns = QHBoxLayout()
-        self.btn_up = QPushButton(icons.tabler("arrow-up"), "")
+        box.head.addWidget(self.summary)
+        self.btn_up = QToolButton()
+        self.btn_up.setIcon(icons.tabler("arrow-up"))
         self.btn_up.setToolTip(_("Cut earlier"))
         self.btn_up.setAccessibleName(_("Move up"))
-        self.btn_down = QPushButton(icons.tabler("arrow-down"), "")
+        self.btn_down = QToolButton()
+        self.btn_down.setIcon(icons.tabler("arrow-down"))
         self.btn_down.setToolTip(_("Cut later"))
         self.btn_down.setAccessibleName(_("Move down"))
+        for b in (self.btn_up, self.btn_down):
+            b.setAutoRaise(True)
+            box.head.addWidget(b)
         self.btn_up.clicked.connect(lambda: self.move_selected(-1))
         self.btn_down.clicked.connect(lambda: self.move_selected(1))
-        btns.addWidget(self.btn_up)
-        btns.addWidget(self.btn_down)
-        btns.addStretch(1)
-        lay.addLayout(btns)
-        col.addWidget(box, 1)
+        self.element_list = QListWidget()
+        self.element_list.setObjectName("element_list")
+        self.element_list.setItemDelegate(ElementRowDelegate(self.element_list))
+        self.element_list.setFrameShape(QFrame.NoFrame)
+        self.element_list.setMinimumHeight(90)
+        self.element_list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.element_list.itemChanged.connect(self._list_item_changed)
+        self.element_list.currentRowChanged.connect(self._list_row_changed)
+        lay.addWidget(self.element_list, 1)
+        self.empty_hint = QLabel(_("Open an SVG or DXF file, or draw a shape with the tools on the right."))
+        self.empty_hint.setObjectName("hint")
+        self.empty_hint.setWordWrap(True)
+        lay.addWidget(self.empty_hint)
 
-        box = QGroupBox(_("Cutter"))
+        # ---- Cutter: the machine, its state, the tool
+        box, lay = self._section(col, _("Cutter"))
         self.cutter_box = box
-        form = QFormLayout(box)
-        # only the machine is chosen here; its port, knife and speed are in its settings
         self.profile_box = QComboBox()
         self.profile_box.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
         self.profile_box.setMinimumContentsLength(10)
         self.profile_box.currentIndexChanged.connect(self._profile_changed)
         self.btn_profile = QToolButton()
+        self.btn_profile.setObjectName("square")
         self.btn_profile.setDefaultAction(self.act_profile)
         self.btn_profile.setToolButtonStyle(Qt.ToolButtonIconOnly)
-        machine = QWidget()
-        ml = QHBoxLayout(machine)
-        ml.setContentsMargins(0, 0, 0, 0)
-        ml.addWidget(self.profile_box, 1)
-        ml.addWidget(self.btn_profile)
-        form.addRow(_("Machine"), machine)
-        # what the machine is set to: its port and width, in one line
+        machine = QHBoxLayout()
+        machine.setSpacing(8)
+        machine.addWidget(self.profile_box, 1)
+        machine.addWidget(self.btn_profile)
+        lay.addLayout(machine)
+        # one line of state with a dot: green ready, grey not plugged in
         self.cutter_info = QLabel()
-        self.cutter_info.setWordWrap(False)
-        self.cutter_info.setObjectName("muted")
-        form.addRow(self.cutter_info)
-        # no permission for the port (or it is not plugged in): what to do, right under it
+        self.cutter_info.setObjectName("cutter_state")
+        self.cutter_info.setWordWrap(True)
+        self.cutter_info.setTextFormat(Qt.RichText)
+        lay.addWidget(self.cutter_info)
+        # a problem with the port: a yellow frame with what to do and a link to the help
+        self.port_warning = QFrame()
+        self.port_warning.setObjectName("warn")
+        wl = QHBoxLayout(self.port_warning)
+        wl.setContentsMargins(10, 8, 10, 8)
+        wl.setSpacing(8)
+        warn_icon = QLabel()
+        warn_icon.setPixmap(icons.tabler("alert-triangle", theme.token("warn_ink")).pixmap(18, 18))
+        wl.addWidget(warn_icon, 0, Qt.AlignTop)
         self.port_problem = QLabel()
         self.port_problem.setWordWrap(True)
-        self.port_problem.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        form.addRow(self.port_problem)
-        self.cutter_form = form
+        self.port_problem.setTextInteractionFlags(Qt.TextSelectableByMouse | Qt.LinksAccessibleByMouse)
+        self.port_problem.linkActivated.connect(lambda _l: self.show_access_help())
+        wl.addWidget(self.port_problem, 1)
+        self.port_warning.setVisible(False)
+        lay.addWidget(self.port_warning)
         # what is in the holder: the knife cuts, a pen (or a pencil) draws
-        self.tool_box = QComboBox()
-        self.tool_box.addItem(icons.own("drag-knife"), _("Knife"), "knife")
-        self.tool_box.addItem(icons.tabler("pencil"), _("Pen / pencil"), "pen")
+        self.tool_box = Segmented(icon_size=22)
+        self.tool_box.setObjectName("segmented")
+        self.tool_box.addItem(_("Knife"), "knife", icons.own("drag-knife"))
+        self.tool_box.addItem(_("Marker pen"), "pen", icons.tabler("pencil"))
         self.tool_box.setToolTip(_("What is in the cutter's holder. Pen: drawing on paper or card, "
                                    "with no knife offset or overcut; fill patterns are drawn too."))
-        # bigger than the other fields: the knife or the pen is seen at a glance
-        self.tool_box.setObjectName("tool_box")
-        self.tool_box.setIconSize(QSize(30, 30))
-        self.tool_box.setFixedHeight(46)
-        big = self.tool_box.font()
-        big.setPointSizeF(big.pointSizeF() * 1.2)
-        self.tool_box.setFont(big)
-        self.tool_box.view().setFont(big)
+        for k in range(self.tool_box.count()):
+            self.tool_box.button(k).setMinimumHeight(40)
         self.tool_box.currentIndexChanged.connect(lambda _i: self._tool_changed())
-        tool_label = QLabel(_("Tool"))
-        tool_label.setFixedHeight(46)
-        tool_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        form.addRow(tool_label, self.tool_box)
+        lay.addWidget(self.tool_box)
         self.pen_note = QLabel(_("For drawing on paper or card, not for vinyl. To cut vinyl, choose the knife."))
+        self.pen_note.setObjectName("muted")
         self.pen_note.setWordWrap(True)
-        form.addRow(self.pen_note)
+        lay.addWidget(self.pen_note)
         self.pen_width = _spin(5, 2, " mm", minimum=0.05)
         self.pen_width.setSingleStep(0.05)
         self.pen_width.setValue(pens.DEFAULT_WIDTH_MM)
@@ -1047,76 +1220,123 @@ class MainWindow(QMainWindow):
         self.pen_place.setToolTip(_("Where the pen's stroke lies against the line of a closed shape. "
                                     "Outside: the shape keeps its exact size inside the stroke; inside: "
                                     "the stroke stays within the shape. Open lines are drawn on the line."))
-        for w in (self.pen_width, self.pen_place):
-            (w.valueChanged if w is self.pen_width else w.currentIndexChanged).connect(
-                lambda _v: self._tool_changed())
-        form.addRow(_("Pen width"), self.pen_width)
-        form.addRow(_("Draw"), self.pen_place)
-        col.addWidget(box)
+        self.pen_width.valueChanged.connect(lambda _v: self._tool_changed())
+        self.pen_place.currentIndexChanged.connect(lambda _v: self._tool_changed())
+        # the pen's two fields side by side, their labels above them
+        self.pen_fields = QWidget()
+        pg = QGridLayout(self.pen_fields)
+        pg.setContentsMargins(0, 0, 0, 0)
+        pg.setHorizontalSpacing(10)
+        pg.setVerticalSpacing(4)
+        for c, (label, w) in enumerate(((_("Pen width"), self.pen_width), (_("Draw"), self.pen_place))):
+            lab = QLabel(label)
+            lab.setObjectName("field_label")
+            lab.setBuddy(w)
+            pg.addWidget(lab, 0, c)
+            pg.addWidget(w, 1, c)
+        lay.addWidget(self.pen_fields)
 
-        box = QGroupBox(_("Job"))
+        # ---- Job: two tiles of numbers, the switches, Start
+        box, lay = self._section(col, _("Job"))
         self.job_box = box
-        lay = QVBoxLayout(box)
+        tiles = QHBoxLayout()
+        tiles.setSpacing(10)
+        self.stat_cut, self.stat_cut_title = self._stat_tile(tiles, _("Cut length"))
+        self.stat_travel, _t = self._stat_tile(tiles, _("Travel"))
+        lay.addLayout(tiles)
         self.job_label = QLabel()
+        self.job_label.setObjectName("muted")
         self.job_label.setWordWrap(True)
         lay.addWidget(self.job_label)
-        self.inside_first = QCheckBox(_("Inside shapes first"))
+        self.inside_first = Switch(_("Inside shapes first"))
         self.inside_first.setChecked(True)
         self.inside_first.setToolTip(_("Holes and shapes inside others are cut before them, so a piece "
                                        "is never cut free while its holes are still to be cut. "
                                        "Off: exactly the order of the list."))
         self.inside_first.toggled.connect(lambda _v: self.refresh_job())
         lay.addWidget(self.inside_first)
-        self.mirror_job = QCheckBox(_("Mirror (heat transfer vinyl)"))
+        self.mirror_job = Switch(_("Mirror (heat transfer vinyl)"))
         self.mirror_job.setToolTip(_("For vinyl ironed onto fabric: it is cut from the back, so the cut is "
                                      "mirrored. The design on the screen stays as it will look on the shirt."))
         self.mirror_job.toggled.connect(lambda _v: self.refresh_job())
         lay.addWidget(self.mirror_job)
-        # a frame round the whole design, cut last, for weeding
+        # a frame round the whole design, cut last, for weeding: its margin before the switch
         frame_row = QHBoxLayout()
-        self.weed_frame = QCheckBox(_("Frame round the design"))
+        frame_row.setContentsMargins(0, 0, 0, 0)
+        frame_row.setSpacing(10)
+        self.weed_frame = Switch(_("Frame round the design"))
         self.weed_frame.setToolTip(_("A rectangle round everything that is cut, cut last: "
                                      "the waste vinyl inside it peels off in one piece"))
         self.weed_margin = _spin(100.0, 1, minimum=0.5)
         self.weed_margin.setValue(5.0)
+        self.weed_margin.setFixedWidth(84)
         self.weed_margin.setToolTip(_("Space between the design and the frame"))
         self.weed_frame.toggled.connect(lambda _v: self.refresh_job())
         self.weed_margin.valueChanged.connect(lambda _v: self.refresh_job())
-        frame_row.addWidget(self.weed_frame)
+        frame_label = QLabel(_("Frame round the design"))
+        frame_label.setBuddy(self.weed_frame)
+        frame_label.mousePressEvent = lambda _e: self.weed_frame.toggle()
+        self.weed_frame.setText("")                     # its label is beside the margin field
+        self.weed_frame.setAccessibleName(_("Frame round the design"))
+        frame_row.addWidget(frame_label, 1)
         frame_row.addWidget(self.weed_margin)
+        frame_row.addWidget(self.weed_frame)
         self.frame_row = QWidget()
         self.frame_row.setLayout(frame_row)
-        frame_row.setContentsMargins(0, 0, 0, 0)
         lay.addWidget(self.frame_row)
+        # sending: what is sent, how much of it; Stop in the place of Start
+        self.send_label = QLabel()
+        self.send_label.setObjectName("field_label")
         self.progress = QProgressBar()
-        self.progress.setVisible(False)
-        lay.addWidget(self.progress)
-        grid = QGridLayout()
-        self.btn_save = QPushButton(icons.tabler("device-floppy"), _("Save .hpgl"))
-        self.btn_save.clicked.connect(lambda: self.save_cutter_file())
-        self.btn_start = QPushButton(icons.tabler("player-play"), _("Start"))
+        self.progress.setTextVisible(False)
+        self.progress.setFixedHeight(8)
+        for w in (self.send_label, self.progress):
+            w.setVisible(False)
+            lay.addWidget(w)
+        self.btn_start = QPushButton(icons.tabler("player-play", "#ffffff"), _("Start"))
         self.btn_start.setObjectName("start")
         self.btn_start.setToolTip(_("Cut the design (after a short check list)"))
         self.btn_start.clicked.connect(self.start)
-        self.btn_stop = QPushButton(icons.tabler("player-stop"), _("Stop"))
+        self.btn_stop = QPushButton(icons.tabler("player-stop", "#ffffff"), _("Stop"))
+        self.btn_stop.setObjectName("stop")
         self.btn_stop.setToolTip(_("Stop sending and lift the knife. What the cutter already has "
                                    "is stopped with Test or Reset on its panel."))
         self.btn_stop.setEnabled(False)
+        self.btn_stop.setVisible(False)
         self.btn_stop.clicked.connect(self.stop)
+        for b in (self.btn_start, self.btn_stop):
+            b.setMinimumHeight(48)
+            b.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            lay.addWidget(b)
+        self.btn_save = QPushButton(icons.tabler("file-export"), _("Save .hpgl"))
+        self.btn_save.clicked.connect(lambda: self.save_cutter_file())
         self.btn_test = QPushButton(icons.own("drag-knife"), _("Knife test"))
         self.btn_test.setToolTip(_("Cut a small square with a triangle to check the knife's force"))
         self.btn_test.clicked.connect(lambda: self.knife_test())
-        # Save and the knife test on a row, Start and Stop under them (the knife path is on the ribbon)
-        for b, r, c, span in ((self.btn_save, 0, 0, 1), (self.btn_test, 0, 1, 1), (self.btn_start, 1, 0, 1),
-                              (self.btn_stop, 1, 1, 1)):
-            b.setMinimumHeight(40)
+        small = QHBoxLayout()
+        small.setSpacing(10)
+        for b in (self.btn_save, self.btn_test):
             b.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-            grid.addWidget(b, r, c, 1, span)
-        lay.addLayout(grid)
-        col.addWidget(box)
+            small.addWidget(b)
+        lay.addLayout(small)
         return panel
 
-    # ---- the machine ----------------------------------------------------------------
+    def _stat_tile(self, row, title):
+        """A tile with a number (the job's lengths): a small title, a big value."""
+        tile = QFrame()
+        tile.setObjectName("stat")
+        v = QVBoxLayout(tile)
+        v.setContentsMargins(12, 8, 12, 8)
+        v.setSpacing(0)
+        head = QLabel(title)
+        head.setObjectName("stat_title")
+        value = QLabel("–")
+        value.setObjectName("stat_value")
+        v.addWidget(head)
+        v.addWidget(value)
+        row.addWidget(tile, 1)
+        return value, head
+
     def reload_profiles(self, select=None, apply=True):
         """Fill the machine list from the profiles (built-in and the user's);
         choose `select` (an id), else the one chosen now, else the first."""
@@ -1185,11 +1405,9 @@ class MainWindow(QMainWindow):
         """Knife or pen: show the settings that matter for it, hide the others,
         and remember the choice for this cutter."""
         pen = self.is_pen()
-        form = self.cutter_form
         self.inside_first.setVisible(not pen)
-        for w in (self.pen_width, self.pen_place):
-            form.setRowVisible(w, pen)
-        form.setRowVisible(self.pen_note, pen)
+        self.pen_fields.setVisible(pen)
+        self.pen_note.setVisible(pen)
         self.frame_row.setVisible(not pen)
         # the fill is for drawing: with the knife it is not offered (it would cut the vinyl into strips)
         self.act_fill.setVisible(pen)
@@ -1443,6 +1661,8 @@ class MainWindow(QMainWindow):
                 "polygon": (lambda *r: shapes.polygon(*r, sides=self.opt_sides.value()), _("Polygon"))}[tool]
         paths = make[0](rect.left(), rect.top(), rect.right(), rect.bottom())
         e = Element(self._name(make[1]), paths)
+        if tool == "ellipse":
+            e.spec = {"kind": "ellipse"}             # for its icon in the list and the selection bar
         if tool == "polygon":
             # remember how it was drawn, so its number of sides can be changed later:
             # the rectangle it was drawn in, relative to the polygon's own box
@@ -1585,6 +1805,7 @@ class MainWindow(QMainWindow):
         show = self.view.tool == "text" or self._is_text(e)
         for w in self.text_widgets + self.text_labels:
             w.setVisible(show)
+        self.text_row.setVisible(show)                 # the second row of the selection bar
         on_path = self._is_text(e) and bool(e.spec.get("path"))
         for w in self.path_widgets + self.path_labels:
             w.setVisible(on_path)
@@ -1839,7 +2060,7 @@ class MainWindow(QMainWindow):
         gid = chosen[0].group or uuid.uuid4().hex[:8]
         for e in chosen:                          # the pattern moves with its shape
             e.group = gid
-        new = Element(self._name(_("Pattern")), paths, chosen[0].cut, group=gid)
+        new = Element(self._name(_("Pattern")), paths, chosen[0].cut, group=gid, spec={"kind": "pattern"})
         i = max(self.design.elements.index(e) for e in chosen)
         self.design.elements.insert(i, new)        # in the list before its shape: cut before it
         self.selected = new
@@ -2456,7 +2677,8 @@ class MainWindow(QMainWindow):
             item = QListWidgetItem(e.name)
             item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
             item.setCheckState(Qt.Checked if e.cut else Qt.Unchecked)
-            item.setToolTip(_("Ticked: cut. Not ticked: shown only."))
+            item.setData(ICON_ROLE, self.kind_icon(e))
+            item.setToolTip(_("The scissors: cut, or only shown (not cut)."))
             lst.addItem(item)
         if self.selected in self.design.elements:
             lst.setCurrentRow(self.design.elements.index(self.selected))
@@ -2523,11 +2745,12 @@ class MainWindow(QMainWindow):
         self._show_options()
         box = self.design.bounds()
         n = len(self.design.elements)
+        # the header's short line (UI v2: "5 · 680 × 286 mm"); empty: a word, and a hint in the list
         if box is None:
-            self.summary.setText(_("Empty. Open an SVG file or draw a shape."))
+            self.summary.setText(_("Empty"))
         else:
-            self.summary.setText(ngettext("%d element", "%d elements", n) % n
-                                 + " · " + _("%.1f × %.1f mm") % (box[1] - box[0], box[3] - box[2]))
+            self.summary.setText("%d · %s" % (n, _("%.0f × %.0f mm") % (box[1] - box[0], box[3] - box[2])))
+        self.empty_hint.setVisible(box is None)
         self._enable_selection_actions()
         self.act_undo.setEnabled(bool(self._undo))
         self.act_redo.setEnabled(bool(self._redo))
@@ -2538,7 +2761,12 @@ class MainWindow(QMainWindow):
         """The machine's line under its name: connection, port, width."""
         p = self.profile
         conn = _("USB printer") if p.connection == "usb-printer" else _("serial port")
-        self.cutter_info.setText("%s · %s · %s" % (conn, p.port or _("no port"), _("cuts %g mm") % p.width_mm))
+        line = "%s · %s · %s" % (conn, p.port or _("no port"), _("cuts %g mm") % p.width_mm)
+        ready = bool(p.port) and os.path.exists(p.port) and transport.access_problem(p.port) is None
+        state = _("Ready to cut") if ready else _("Not plugged in")
+        dot = theme.token("ok") if ready else theme.token("disabled_icon")
+        self.cutter_info.setText('<span style="color:%s">&#9679;</span>&nbsp; %s · %s'
+                                 % (dot, state, line.replace("<", "&lt;")))
         self.cutter_info.setToolTip(_("Knife offset %(k).2f mm, overcut %(o).2f mm, %(lang)s. "
                                       "Change them in the cutter's settings (the button beside it).")
                                     % {"k": p.knife_offset_mm, "o": p.overcut_mm, "lang": p.language.upper()})
@@ -2550,15 +2778,16 @@ class MainWindow(QMainWindow):
         port = self.profile.port
         problem = transport.access_problem(port)
         if problem:
-            text, color = problem, theme.token("error")
+            text = problem
         elif port and not os.path.exists(port):
-            text, color = _("%s is not there now: plug the cutter in and switch it on, or choose "
-                            "its port in the cutter's settings.") % port, theme.token("muted")
+            text = _("%s is not there now: plug the cutter in and switch it on, or choose "
+                     "its port in the cutter's settings.") % port
         else:
-            text, color = "", theme.token("muted")
-        self.port_problem.setText(text)
-        self.port_problem.setStyleSheet("color: %s" % color)
-        self.cutter_form.setRowVisible(self.port_problem, bool(text))
+            text = ""
+        # the yellow frame: what is wrong, and a link to the help on Linux groups
+        self.port_problem.setText(text.replace("\n", "<br>") + (' <a href="help">%s</a>' % _("How to do it")
+                                                                if problem else ""))
+        self.port_warning.setVisible(bool(text))
         return problem
 
     def show_access_help(self):
@@ -2592,7 +2821,10 @@ class MainWindow(QMainWindow):
         try:
             self.last_job = self.build()
         except (JobError, ProfileError) as e:
+            self.stat_cut.setText("–")
+            self.stat_travel.setText("–")
             self.job_label.setText(str(e))
+            self.job_label.setVisible(True)
             self.job_label.setStyleSheet("color: %s" % theme.token("error"))
             for w in (self.btn_save, self.act_save_cut, self.btn_start):
                 w.setEnabled(False)
@@ -2600,14 +2832,18 @@ class MainWindow(QMainWindow):
             return
         self.view.show_knife(self.last_job.knife_paths if self.act_knife.isChecked() else None)
         j = self.last_job
-        text = (_("Drawn length: %.2f m · travel: %.2f m") if self.is_pen() else
-                _("Cut length: %.2f m · travel: %.2f m")) % (j.cut_mm / 1000.0, j.travel_mm / 1000.0)
+        # the two tiles: the length cut (or drawn) and the travel, in metres
+        self.stat_cut_title.setText(_("Drawn length") if self.is_pen() else _("Cut length"))
+        self.stat_cut.setText(_("%.2f m") % (j.cut_mm / 1000.0))
+        self.stat_travel.setText(_("%.2f m") % (j.travel_mm / 1000.0))
+        text = []
         if self.mirror_job.isChecked():
-            text += " · " + _("MIRRORED")
+            text.append(_("MIRRORED"))
         if p.speed_cm_s:
             minutes = (j.cut_mm + j.travel_mm) / (p.speed_cm_s * 10.0) / 60.0
-            text += "\n" + _("About %.1f min at %g cm/s") % (minutes, p.speed_cm_s)
-        self.job_label.setText(text)
+            text.append(_("About %.1f min at %g cm/s") % (minutes, p.speed_cm_s))
+        self.job_label.setText(" · ".join(text))
+        self.job_label.setVisible(bool(text))
         self.job_label.setStyleSheet("")
         for w in (self.btn_save, self.act_save_cut, self.btn_start):
             w.setEnabled(not busy)
@@ -2688,6 +2924,7 @@ class MainWindow(QMainWindow):
     def _send_progress(self, sent, total):
         self.progress.setMaximum(total)
         self.progress.setValue(sent)
+        self.send_label.setText("%s  %d%%" % (_("Sending to the cutter"), round(100.0 * sent / max(total, 1))))
 
     # ---- copies, weeding lines, strips ------------------------------------------------------------
     def _ask(self, title, rows, extra=None):
@@ -2958,7 +3195,11 @@ class MainWindow(QMainWindow):
         """While sending: Stop works, nothing else that would change the job."""
         self.sending = on
         self.progress.setVisible(on)
+        self.send_label.setVisible(on)
+        self.send_label.setText(_("Sending to the cutter"))
         self.btn_stop.setEnabled(on)
+        self.btn_stop.setVisible(on)                   # Stop takes Start's place
+        self.btn_start.setVisible(not on)
         for w in (self.btn_start, self.btn_save, self.btn_test, self.act_save_cut, self.profile_box, self.act_profile,
                   self.view):
             w.setEnabled(not on)

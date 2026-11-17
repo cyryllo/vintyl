@@ -89,13 +89,25 @@ STYLE = Template("""
 QWidget { font-size: 13px; }
 QDialog { background: $window; }
 QToolBar#main_toolbar { background: $panel; border-bottom: 1px solid $border; spacing: 1px; padding: 2px; }
-QToolBar#main_toolbar QToolButton { padding: 2px 3px; font-size: 11px; }
+QToolBar#main_toolbar QToolButton { padding: 2px 4px; font-size: 11px; border: 0; border-radius: 6px; color: $ink; }
+QToolBar#main_toolbar QToolButton[toolButtonStyle="2"] { font-size: 13px; }
+QToolBar#main_toolbar QToolButton:hover { background: $well; }
+QToolBar#main_toolbar QToolButton:checked { background: $accent_soft; color: $accent_ink; }
+QToolBar#main_toolbar QToolButton:disabled { color: $disabled_text; }
 QLabel#ribbon_caption { color: $muted; font-size: 11px; padding-bottom: 1px; }
 QFrame#ribbon_separator { color: $border; margin: 4px 2px; }
 QWidget#options_bar { background: $bar; border-bottom: 1px solid $border; }
 QFrame#update_bar { background: $info_bg; border-bottom: 1px solid $update_border; }
 QFrame#update_bar QLabel { color: $info_ink; }
-QLabel#node_hint, QLabel#muted, QLabel#hint { color: $muted; }
+QLabel#node_hint, QLabel#muted, QLabel#hint, QLabel#sel_hint { color: $muted; }
+QLabel#sel_name { font-weight: 600; color: $ink; }
+QLabel#bar_label { color: $muted; }
+QFrame#bar_separator { color: $border; max-width: 1px; margin: 2px 4px; }
+QToolButton#lock, QToolButton#toggle, QToolButton#bar_button {
+    min-height: 28px; min-width: 28px; border: 1px solid $field_border; border-radius: 6px;
+    background: $panel; color: $ink; padding: 0 6px; }
+QToolButton#lock:checked, QToolButton#toggle:checked { background: $accent_soft; border-color: $accent;
+    color: $accent_ink; }
 QLabel#hint { font-size: 12px; }
 QFrame#card { background: $panel; border: 1px solid $border; border-radius: 8px; }
 QFrame#card QLabel { background: transparent; }
@@ -123,6 +135,34 @@ QWidget#segmented QToolButton { border: 1px solid transparent; border-radius: 6p
 QWidget#segmented QToolButton:checked { background: $panel; border: 1px solid $accent; color: $accent_ink;
     font-weight: 600; }
 QWidget#segmented QToolButton:focus { border: 1px dashed $accent; }
+QWidget#job_panel { background: $panel; border-right: 1px solid $border; }
+QFrame#panel_line { color: $border; max-height: 1px; border: 0; background: $border; }
+QLabel#section_title { font-weight: 600; font-size: 14px; color: $ink; }
+QLabel#cutter_state { color: $muted; }
+QListWidget#element_list { background: transparent; border: 0; outline: 0; }
+QListWidget#element_list::item:selected, QListWidget#element_list::item:hover { background: transparent; }
+QFrame#warn { background: $warn_bg; border-radius: 8px; }
+QFrame#warn QLabel { color: $warn_ink; }
+QFrame#info { background: $info_bg; border-radius: 8px; }
+QFrame#info QLabel { color: $info_ink; }
+QFrame#stat { background: $stat; border-radius: 8px; }
+QLabel#stat_title { color: $muted; font-size: 12px; }
+QLabel#stat_value { color: $ink; font-size: 18px; font-weight: 700; }
+QToolButton#square { min-height: 28px; min-width: 28px; border: 1px solid $field_border; border-radius: 6px;
+    background: $panel; }
+QProgressBar { border: 0; border-radius: 4px; background: $well; }
+QProgressBar::chunk { border-radius: 4px; background: $accent; }
+QWidget#tool_panel { background: $panel; border-left: 1px solid $border; }
+QToolButton#tool_tile { border: 0; border-radius: 8px; font-size: 11px; color: $ink; padding-top: 4px; }
+QToolButton#tool_tile:hover { background: $well; }
+QToolButton#tool_tile:checked { background: $accent_soft; color: $accent_ink; font-weight: 600; }
+QFrame#tool_popup { background: $panel; border: 1px solid $border; border-radius: 10px; }
+QStatusBar { background: $panel; border-top: 1px solid $border; color: $muted; }
+QStatusBar QLabel { color: $muted; padding: 0 8px; }
+QScrollBar:vertical { background: transparent; width: 8px; margin: 0; }
+QScrollBar::handle:vertical { background: $field_border; border-radius: 4px; min-height: 24px; }
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0; }
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: transparent; }
 QGroupBox { font-weight: bold; }
 QGroupBox QLabel, QGroupBox QCheckBox { font-weight: normal; }
 """)

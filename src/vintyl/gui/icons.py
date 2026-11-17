@@ -37,25 +37,43 @@ def own(name, color=None):
 
 
 def _drawn(path, color=None):
+    """The icon in `color` (default: the ink), with an "on" state in the
+    theme's accent ink (a ribbon button that is on, a chosen tool) and a
+    "disabled" state in the theme's disabled colour."""
     from PySide6.QtSvg import QSvgRenderer
     color = color or INK
-    key = (path, color)
+    on_color, off_color = _state_colors()
+    key = (path, color, on_color, off_color)
     if key in _cache:
         return _cache[key]
     with open(path, encoding="utf-8") as f:
-        svg = f.read().replace("currentColor", color)
-    renderer = QSvgRenderer(QByteArray(svg.encode("utf-8")))
+        source = f.read()
     icon = QIcon()
-    for size in (24, 32, 48, 64):
-        pm = QPixmap(size, size)
-        pm.fill(Qt.transparent)
-        p = QPainter(pm)
-        p.setRenderHint(QPainter.Antialiasing, True)
-        renderer.render(p, QRectF(0, 0, size, size))
-        p.end()
-        icon.addPixmap(pm)
+    for ink, mode, state in ((color, QIcon.Normal, QIcon.Off), (on_color, QIcon.Normal, QIcon.On),
+                             (on_color, QIcon.Active, QIcon.On), (off_color, QIcon.Disabled, QIcon.Off),
+                             (off_color, QIcon.Disabled, QIcon.On)):
+        if ink is None:
+            continue
+        renderer = QSvgRenderer(QByteArray(source.replace("currentColor", ink).encode("utf-8")))
+        for size in (16, 20, 22, 24, 32, 48, 64):
+            pm = QPixmap(size, size)
+            pm.fill(Qt.transparent)
+            p = QPainter(pm)
+            p.setRenderHint(QPainter.Antialiasing, True)
+            renderer.render(p, QRectF(0, 0, size, size))
+            p.end()
+            icon.addPixmap(pm, mode, state)
     _cache[key] = icon
     return icon
+
+
+def _state_colors():
+    """(on, disabled) colours of the theme in use; (None, None) before it is known."""
+    try:
+        from vintyl.gui import theme
+        return theme.token("accent_ink"), theme.token("disabled_icon")
+    except Exception:
+        return None, None
 
 
 def app_icon():

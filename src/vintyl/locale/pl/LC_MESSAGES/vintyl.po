@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 18:14+0100\n"
+"POT-Creation-Date: 2026-11-17 18:25+0100\n"
 "PO-Revision-Date: 2026-11-15 17:49+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -20,8 +20,12 @@ msgstr ""
 "Generated-By: Babel 2.18.0\n"
 
 #, python-format
-msgid "%.1f × %.1f mm"
-msgstr "%.1f × %.1f mm"
+msgid "%.0f × %.0f mm"
+msgstr "%.0f × %.0f mm"
+
+#, python-format
+msgid "%.2f m"
+msgstr "%.2f m"
 
 #, python-format
 msgid "%d copy made."
@@ -336,6 +340,9 @@ msgstr "Połączenie"
 msgid "Connects as"
 msgstr "Łączy się jako"
 
+msgid "Content"
+msgstr "Treść"
+
 #, python-format
 msgid "Copied %d element."
 msgid_plural "Copied %d elements."
@@ -386,6 +393,10 @@ msgstr "Krzyżyk"
 msgid "Cross-hatch"
 msgstr "Kratka"
 
+#, python-format
+msgid "Cursor: %.1f / %.1f mm"
+msgstr "Kursor: %.1f / %.1f mm"
+
 msgid "Curve"
 msgstr "Krzywa"
 
@@ -413,9 +424,8 @@ msgstr "Tnij później"
 msgid "Cut later (down the list)"
 msgstr "Tnij później (niżej na liście)"
 
-#, python-format
-msgid "Cut length: %.2f m · travel: %.2f m"
-msgstr "Długość cięcia: %.2f m · przejazdy: %.2f m"
+msgid "Cut length"
+msgstr "Długość cięcia"
 
 msgid "Cut now?"
 msgstr "Ciąć teraz?"
@@ -551,9 +561,8 @@ msgstr "Rysuj"
 msgid "Draw now?"
 msgstr "Rysować teraz?"
 
-#, python-format
-msgid "Drawn length: %.2f m · travel: %.2f m"
-msgstr "Długość rysowania: %.2f m · przejazdy: %.2f m"
+msgid "Drawn length"
+msgstr "Długość rysowania"
 
 msgid "Drop"
 msgstr "Kropla"
@@ -573,14 +582,17 @@ msgstr "Edycja węzłów (albo dwuklik na elemencie)"
 msgid "Element"
 msgstr "Element"
 
+msgid "Elements"
+msgstr "Elementy"
+
 msgid "Ellipse"
 msgstr "Elipsa"
 
 msgid "Ellipse: drag the box it fits in"
 msgstr "Elipsa: przeciągnij prostokąt, w który ma się wpisać"
 
-msgid "Empty. Open an SVG file or draw a shape."
-msgstr "Pusto. Otwórz plik SVG albo narysuj kształt."
+msgid "Empty"
+msgstr "Pusto"
 
 msgid "Error correction"
 msgstr "Korekcja błędów"
@@ -719,6 +731,9 @@ msgstr[0] "Zgrupowano %d element."
 msgstr[1] "Zgrupowano %d elementy."
 msgstr[2] "Zgrupowano %d elementów."
 
+msgid "H."
+msgstr "Wys."
+
 msgid "HPGL: 40 units per mm on most cutters. Check with a 20 mm square."
 msgstr "HPGL: w większości ploterów 40 jednostek na mm. Sprawdź kwadratem 20 mm."
 
@@ -775,6 +790,9 @@ msgid ""
 msgstr ""
 "Jaka część kodu może być uszkodzona, a dalej da się go odczytać; więcej ="
 " więcej kwadracików"
+
+msgid "How to do it"
+msgstr "Jak to zrobić"
 
 msgid "How wide (or long) each strip is, with its overlap"
 msgstr "Jak szeroki (albo długi) jest każdy pas, z zakładką"
@@ -917,6 +935,9 @@ msgstr "Wiele kopii zaznaczenia w rzędach i kolumnach, z odstępem"
 msgid "Margin"
 msgstr "Margines"
 
+msgid "Marker pen"
+msgstr "Pisak"
+
 #, python-format
 msgid "Measured: %.2f mm (across %.2f mm, along %.2f mm)"
 msgstr "Zmierzono: %.2f mm (w poprzek %.2f mm, wzdłuż %.2f mm)"
@@ -993,6 +1014,9 @@ msgstr "Żaden kształt się nie mieści: zmniejsz je albo zwęź margines."
 
 msgid "Nodes"
 msgstr "Węzły"
+
+msgid "Not plugged in"
+msgstr "Niepodłączony"
 
 msgid "Not plugged in now (or switched off)."
 msgstr "Teraz niepodłączony (albo wyłączony)."
@@ -1088,6 +1112,9 @@ msgstr "Otwórz SVG"
 msgid "Open a Vintyl project, or add the shapes of an SVG file to the design"
 msgstr "Otwórz projekt Vintyl albo dodaj do projektu kształty z pliku SVG"
 
+msgid "Open an SVG or DXF file, or draw a shape with the tools on the right."
+msgstr "Otwórz plik SVG lub DXF albo narysuj kształt narzędziami po prawej."
+
 msgid "Open the page of the new version: what is new and the file to download"
 msgstr "Otwórz stronę nowej wersji: co nowego i plik do pobrania"
 
@@ -1119,9 +1146,6 @@ msgstr "Wzór z kształtów"
 msgid "Pen"
 msgstr "Pióro"
 
-msgid "Pen / pencil"
-msgstr "Pisak / ołówek"
-
 msgid "Pen path"
 msgstr "Ścieżka pisaka"
 
@@ -1134,10 +1158,6 @@ msgid ""
 msgstr ""
 "Pióro: klik = narożnik, wciśnij i przeciągnij = gładka krzywa; pierwszy "
 "węzeł zamyka kształt, dwuklik lub Enter zostawia go otwartym"
-
-#, python-format
-msgid "Pointer: %.1f / %.1f mm"
-msgstr "Kursor: %.1f / %.1f mm"
 
 msgid "Polygon"
 msgstr "Wielokąt"
@@ -1158,9 +1178,6 @@ msgstr "Port"
 msgid "Port speed (baud)"
 msgstr "Prędkość portu (bod)"
 
-msgid "Project"
-msgstr "Projekt"
-
 msgid "Put the copied elements back, 5 mm beside where they were"
 msgstr "Wstaw skopiowane elementy z powrotem, 5 mm obok miejsca, w którym były"
 
@@ -1177,6 +1194,9 @@ msgstr "Zakończ"
 
 msgid "Ready"
 msgstr "Gotowe"
+
+msgid "Ready to cut"
+msgstr "Gotowy"
 
 msgid "Rectangle"
 msgstr "Prostokąt"
@@ -1301,6 +1321,9 @@ msgstr "Zaznacz zamknięty kształt do wypełnienia."
 msgid "Select all"
 msgstr "Zaznacz wszystko"
 
+msgid "Select an element to change its place and size"
+msgstr "Zaznacz element, żeby zmienić jego położenie i wymiary"
+
 msgid "Select and move"
 msgstr "Zaznaczanie i przesuwanie"
 
@@ -1328,6 +1351,10 @@ msgstr "Zaznacz dwa lub więcej kształtów, żeby wyrównać je do siebie."
 
 msgid "Select two or more shapes with closed outlines."
 msgstr "Zaznacz dwa lub więcej kształtów z zamkniętymi konturami."
+
+#, python-format
+msgid "Selected: %s"
+msgstr "Zaznaczono: %s"
 
 #, python-format
 msgid ""
@@ -1381,6 +1408,9 @@ msgstr "Wysyłanie"
 #, python-format
 msgid "Sending failed: %s"
 msgstr "Wysyłanie nie powiodło się: %s"
+
+msgid "Sending to the cutter"
+msgstr "Wysyłanie do plotera"
 
 #, python-format
 msgid ""
@@ -1611,6 +1641,9 @@ msgstr "Prędkość portu musi być liczbą całkowitą."
 msgid "The report is copied."
 msgstr "Raport skopiowany."
 
+msgid "The scissors: cut, or only shown (not cut)."
+msgstr "Nożyczki: cięty albo tylko pokazany (nie cięty)."
+
 msgid "The strips cover this much of each other, for laying them together"
 msgstr "O tyle pasy na siebie zachodzą, żeby je złożyć"
 
@@ -1637,17 +1670,14 @@ msgstr "Nie ma nic do cięcia."
 msgid "There is nothing to cut: every path is shorter than one cutter step."
 msgstr "Nie ma nic do cięcia: każda ścieżka jest krótsza niż jeden krok plotera."
 
-msgid "Ticked: cut. Not ticked: shown only."
-msgstr "Zaznaczone: tnij. Niezaznaczone: tylko widoczne."
-
-msgid "Tool"
-msgstr "Narzędzie"
-
 msgid "Top edges"
 msgstr "Górne krawędzie"
 
 msgid "Transform"
 msgstr "Przekształć"
+
+msgid "Travel"
+msgstr "Przejazdy"
 
 msgid "Triangle"
 msgstr "Trójkąt"
@@ -1736,6 +1766,9 @@ msgid "Vinyl left between the shapes; below about 1.5 mm it tears when weeding"
 msgstr ""
 "Folia zostawiona między kształtami; poniżej ok. 1,5 mm rwie się przy "
 "wybieraniu"
+
+msgid "W."
+msgstr "Szer."
 
 msgid "Waves"
 msgstr "Fale"
@@ -2184,4 +2217,31 @@ msgstr "← Y w poprzek"
 #~ "Podzielono na %d pasy ułożone jeden "
 #~ "za drugim; wytnij je, potem złóż "
 #~ "na zakładkach."
+
+#~ msgid "Cut length: %.2f m · travel: %.2f m"
+#~ msgstr "Długość cięcia: %.2f m · przejazdy: %.2f m"
+
+#~ msgid "Drawn length: %.2f m · travel: %.2f m"
+#~ msgstr "Długość rysowania: %.2f m · przejazdy: %.2f m"
+
+#~ msgid "Pointer: %.1f / %.1f mm"
+#~ msgstr "Kursor: %.1f / %.1f mm"
+
+#~ msgid "Project"
+#~ msgstr "Projekt"
+
+#~ msgid "Ticked: cut. Not ticked: shown only."
+#~ msgstr "Zaznaczone: tnij. Niezaznaczone: tylko widoczne."
+
+#~ msgid "Tool"
+#~ msgstr "Narzędzie"
+
+#~ msgid "Pen / pencil"
+#~ msgstr "Pisak / ołówek"
+
+#~ msgid "%.1f × %.1f mm"
+#~ msgstr "%.1f × %.1f mm"
+
+#~ msgid "Empty. Open an SVG file or draw a shape."
+#~ msgstr "Pusto. Otwórz plik SVG albo narysuj kształt."
 
