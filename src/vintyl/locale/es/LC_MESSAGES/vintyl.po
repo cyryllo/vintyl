@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 22:19+0100\n"
+"POT-Creation-Date: 2026-11-17 22:28+0100\n"
 "PO-Revision-Date: 2026-11-17 21:27+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es\n"
@@ -25,6 +25,12 @@ msgstr "%.0f × %.0f mm"
 #, python-format
 msgid "%.2f m"
 msgstr "%.2f m"
+
+#, python-format
+msgid "%d colour"
+msgid_plural "%d colours"
+msgstr[0] "%d color"
+msgstr[1] "%d colores"
 
 #, python-format
 msgid "%d copy made."
@@ -376,6 +382,12 @@ msgstr ""
 "Las formas cerradas se cortan esta distancia más allá de su inicio, para "
 "que el corte se cierre limpio"
 
+msgid "Colour"
+msgstr "Color"
+
+msgid "Colours"
+msgstr "Colores"
+
 msgid "Columns (across)"
 msgstr "Columnas (a lo ancho)"
 
@@ -563,6 +575,9 @@ msgstr "Modo DMPL"
 msgid "Dark"
 msgstr "Oscuro"
 
+msgid "Dark grey"
+msgstr "Gris oscuro"
+
 msgid "Delete"
 msgstr "Eliminar"
 
@@ -660,6 +675,12 @@ msgstr "Dibujar"
 
 msgid "Draw now?"
 msgstr "¿Dibujar ahora?"
+
+msgid "Draw this colour earlier"
+msgstr "Dibujar este color antes"
+
+msgid "Draw this colour later"
+msgstr "Dibujar este color después"
 
 msgid "Drawing"
 msgstr "Dibujo"
@@ -1091,6 +1112,9 @@ msgstr "Claro"
 msgid "Light blue"
 msgstr "Celeste"
 
+msgid "Light grey"
+msgstr "Gris claro"
+
 msgid "Line"
 msgstr "Línea"
 
@@ -1207,6 +1231,12 @@ msgstr "Nuevo"
 msgctxt "ribbon"
 msgid "New"
 msgstr "Nuevo"
+
+msgid "New colour"
+msgstr "Nuevo color"
+
+msgid "New colour…"
+msgstr "Nuevo color…"
 
 msgid "New cutter"
 msgstr "Nuevo plóter"
@@ -1921,6 +1951,13 @@ msgstr "Texto: haz clic donde debe empezar"
 msgid "The chosen cutter's port, connection, knife and speed; new cutters"
 msgstr "Puerto, conexión, cuchilla y velocidad del plóter elegido; plóteres nuevos"
 
+msgid ""
+"The colours, drawn (cut) one after another in this order; untick one to "
+"leave it out. A click selects its elements."
+msgstr ""
+"Los colores, dibujados (cortados) uno tras otro en este orden; desmarca "
+"uno para omitirlo. Un clic selecciona sus elementos."
+
 #, python-format
 msgid ""
 "The cutter has taken no data for %d s. Is it online (not Leave) and is "
@@ -1998,6 +2035,13 @@ msgstr ""
 "El rotulador (no la cuchilla) está en el portacuchillas, con la punta "
 "justo encima del papel"
 
+msgid ""
+"The pen's values are used when the tool is the marker pen; empty: as in "
+"the window."
+msgstr ""
+"Los valores del rotulador se usan cuando la herramienta es el rotulador; "
+"vacío: como en la ventana."
+
 msgid "The port speed must be a whole number."
 msgstr "La velocidad del puerto debe ser un número entero."
 
@@ -2044,6 +2088,9 @@ msgstr "No hay nada que cortar: cada trazado es más corto que un paso del plót
 
 msgid "Third-party licences"
 msgstr "Licencias de las bibliotecas"
+
+msgid "This colour's name, colour and pen"
+msgstr "Nombre, color y rotulador de este color"
 
 msgid ""
 "This cutter takes force and speed from its own panel only. Vintyl shows "

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 22:19+0100\n"
+"POT-Creation-Date: 2026-11-17 22:28+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,6 +24,12 @@ msgstr ""
 #, python-format
 msgid "%.2f m"
 msgstr ""
+
+#, python-format
+msgid "%d colour"
+msgid_plural "%d colours"
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "%d copy made."
@@ -349,6 +355,12 @@ msgstr ""
 msgid "Closed shapes are cut this far past their start, so the cut closes cleanly"
 msgstr ""
 
+msgid "Colour"
+msgstr ""
+
+msgid "Colours"
+msgstr ""
+
 msgid "Columns (across)"
 msgstr ""
 
@@ -527,6 +539,9 @@ msgstr ""
 msgid "Dark"
 msgstr ""
 
+msgid "Dark grey"
+msgstr ""
+
 msgid "Delete"
 msgstr ""
 
@@ -615,6 +630,12 @@ msgid "Draw"
 msgstr ""
 
 msgid "Draw now?"
+msgstr ""
+
+msgid "Draw this colour earlier"
+msgstr ""
+
+msgid "Draw this colour later"
 msgstr ""
 
 msgid "Drawing"
@@ -1008,6 +1029,9 @@ msgstr ""
 msgid "Light blue"
 msgstr ""
 
+msgid "Light grey"
+msgstr ""
+
 msgid "Line"
 msgstr ""
 
@@ -1120,6 +1144,12 @@ msgstr ""
 
 msgctxt "ribbon"
 msgid "New"
+msgstr ""
+
+msgid "New colour"
+msgstr ""
+
+msgid "New colour…"
 msgstr ""
 
 msgid "New cutter"
@@ -1774,6 +1804,11 @@ msgstr ""
 msgid "The chosen cutter's port, connection, knife and speed; new cutters"
 msgstr ""
 
+msgid ""
+"The colours, drawn (cut) one after another in this order; untick one to "
+"leave it out. A click selects its elements."
+msgstr ""
+
 #, python-format
 msgid ""
 "The cutter has taken no data for %d s. Is it online (not Leave) and is "
@@ -1840,6 +1875,11 @@ msgstr ""
 msgid "The pen (not the knife) is in the holder, its tip just above the paper"
 msgstr ""
 
+msgid ""
+"The pen's values are used when the tool is the marker pen; empty: as in "
+"the window."
+msgstr ""
+
 msgid "The port speed must be a whole number."
 msgstr ""
 
@@ -1880,6 +1920,9 @@ msgid "There is nothing to cut: every path is shorter than one cutter step."
 msgstr ""
 
 msgid "Third-party licences"
+msgstr ""
+
+msgid "This colour's name, colour and pen"
 msgstr ""
 
 msgid ""

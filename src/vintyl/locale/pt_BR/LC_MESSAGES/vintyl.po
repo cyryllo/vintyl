@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 22:19+0100\n"
+"POT-Creation-Date: 2026-11-17 22:28+0100\n"
 "PO-Revision-Date: 2026-11-17 21:27+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pt_BR\n"
@@ -25,6 +25,12 @@ msgstr "%.0f × %.0f mm"
 #, python-format
 msgid "%.2f m"
 msgstr "%.2f m"
+
+#, python-format
+msgid "%d colour"
+msgid_plural "%d colours"
+msgstr[0] "%d cor"
+msgstr[1] "%d cores"
 
 #, python-format
 msgid "%d copy made."
@@ -372,6 +378,12 @@ msgstr ""
 "As formas fechadas são recortadas essa distância além do início, para o "
 "corte fechar bem"
 
+msgid "Colour"
+msgstr "Cor"
+
+msgid "Colours"
+msgstr "Cores"
+
 msgid "Columns (across)"
 msgstr "Colunas (na largura)"
 
@@ -559,6 +571,9 @@ msgstr "Modo DMPL"
 msgid "Dark"
 msgstr "Escuro"
 
+msgid "Dark grey"
+msgstr "Cinza-escuro"
+
 msgid "Delete"
 msgstr "Excluir"
 
@@ -656,6 +671,12 @@ msgstr "Desenhar"
 
 msgid "Draw now?"
 msgstr "Desenhar agora?"
+
+msgid "Draw this colour earlier"
+msgstr "Desenhar esta cor antes"
+
+msgid "Draw this colour later"
+msgstr "Desenhar esta cor depois"
 
 msgid "Drawing"
 msgstr "Desenho"
@@ -1085,6 +1106,9 @@ msgstr "Claro"
 msgid "Light blue"
 msgstr "Azul-claro"
 
+msgid "Light grey"
+msgstr "Cinza-claro"
+
 msgid "Line"
 msgstr "Linha"
 
@@ -1201,6 +1225,12 @@ msgstr "Novo"
 msgctxt "ribbon"
 msgid "New"
 msgstr "Novo"
+
+msgid "New colour"
+msgstr "Nova cor"
+
+msgid "New colour…"
+msgstr "Nova cor…"
 
 msgid "New cutter"
 msgstr "Nova plotter"
@@ -1914,6 +1944,13 @@ msgstr "Texto: clique onde ele deve começar"
 msgid "The chosen cutter's port, connection, knife and speed; new cutters"
 msgstr "Porta, conexão, lâmina e velocidade da plotter escolhida; novas plotters"
 
+msgid ""
+"The colours, drawn (cut) one after another in this order; untick one to "
+"leave it out. A click selects its elements."
+msgstr ""
+"As cores, desenhadas (recortadas) uma após a outra nesta ordem; desmarque"
+" uma para pulá-la. Um clique seleciona seus elementos."
+
 #, python-format
 msgid ""
 "The cutter has taken no data for %d s. Is it online (not Leave) and is "
@@ -1990,6 +2027,13 @@ msgstr ""
 "A caneta (não a lâmina) está no porta-lâmina, com a ponta logo acima do "
 "papel"
 
+msgid ""
+"The pen's values are used when the tool is the marker pen; empty: as in "
+"the window."
+msgstr ""
+"Os valores da caneta valem quando a ferramenta é a caneta; vazio: como na"
+" janela."
+
 msgid "The port speed must be a whole number."
 msgstr "A velocidade da porta deve ser um número inteiro."
 
@@ -2038,6 +2082,9 @@ msgstr ""
 
 msgid "Third-party licences"
 msgstr "Licenças das bibliotecas"
+
+msgid "This colour's name, colour and pen"
+msgstr "Nome, cor e caneta desta cor"
 
 msgid ""
 "This cutter takes force and speed from its own panel only. Vintyl shows "

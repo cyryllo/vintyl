@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 22:19+0100\n"
+"POT-Creation-Date: 2026-11-17 22:28+0100\n"
 "PO-Revision-Date: 2026-11-15 17:49+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -26,6 +26,13 @@ msgstr "%.0f × %.0f mm"
 #, python-format
 msgid "%.2f m"
 msgstr "%.2f m"
+
+#, python-format
+msgid "%d colour"
+msgid_plural "%d colours"
+msgstr[0] "%d kolor"
+msgstr[1] "%d kolory"
+msgstr[2] "%d kolorów"
 
 #, python-format
 msgid "%d copy made."
@@ -380,6 +387,12 @@ msgstr ""
 "Kształty zamknięte są cięte o tyle dalej za punkt startu, żeby cięcie "
 "dobrze się domknęło"
 
+msgid "Colour"
+msgstr "Kolor"
+
+msgid "Colours"
+msgstr "Kolory"
+
 msgid "Columns (across)"
 msgstr "Kolumny (w poprzek)"
 
@@ -566,6 +579,9 @@ msgstr "Tryb DMPL"
 msgid "Dark"
 msgstr "Ciemny"
 
+msgid "Dark grey"
+msgstr "Ciemnoszary"
+
 msgid "Delete"
 msgstr "Usuń"
 
@@ -663,6 +679,12 @@ msgstr "Rysuj"
 
 msgid "Draw now?"
 msgstr "Rysować teraz?"
+
+msgid "Draw this colour earlier"
+msgstr "Rysuj ten kolor wcześniej"
+
+msgid "Draw this colour later"
+msgstr "Rysuj ten kolor później"
 
 msgid "Drawing"
 msgstr "Rysowanie"
@@ -1082,6 +1104,9 @@ msgstr "Jasny"
 msgid "Light blue"
 msgstr "Błękitny"
 
+msgid "Light grey"
+msgstr "Jasnoszary"
+
 msgid "Line"
 msgstr "Linia"
 
@@ -1197,6 +1222,12 @@ msgstr "Nowy"
 msgctxt "ribbon"
 msgid "New"
 msgstr "Nowy"
+
+msgid "New colour"
+msgstr "Nowy kolor"
+
+msgid "New colour…"
+msgstr "Nowy kolor…"
 
 msgid "New cutter"
 msgstr "Nowy ploter"
@@ -1900,6 +1931,13 @@ msgstr "Tekst: kliknij, gdzie ma się zaczynać"
 msgid "The chosen cutter's port, connection, knife and speed; new cutters"
 msgstr "Port, połączenie, nóż i prędkość wybranego plotera; nowe plotery"
 
+msgid ""
+"The colours, drawn (cut) one after another in this order; untick one to "
+"leave it out. A click selects its elements."
+msgstr ""
+"Kolory, rysowane (cięte) jeden po drugim w tej kolejności; odznacz kolor,"
+" żeby go pominąć. Kliknięcie zaznacza jego elementy."
+
 #, python-format
 msgid ""
 "The cutter has taken no data for %d s. Is it online (not Leave) and is "
@@ -1976,6 +2014,11 @@ msgstr "Papier jest pod rolkami dociskowymi"
 msgid "The pen (not the knife) is in the holder, its tip just above the paper"
 msgstr "W oprawce jest pisak (nie nóż), jego czubek tuż nad papierem"
 
+msgid ""
+"The pen's values are used when the tool is the marker pen; empty: as in "
+"the window."
+msgstr "Wartości pisaka działają, gdy narzędziem jest pisak; puste: jak w oknie."
+
 msgid "The port speed must be a whole number."
 msgstr "Prędkość portu musi być liczbą całkowitą."
 
@@ -2022,6 +2065,9 @@ msgstr "Nie ma nic do cięcia: każda ścieżka jest krótsza niż jeden krok pl
 
 msgid "Third-party licences"
 msgstr "Licencje bibliotek"
+
+msgid "This colour's name, colour and pen"
+msgstr "Nazwa, kolor i pisak tego koloru"
 
 msgid ""
 "This cutter takes force and speed from its own panel only. Vintyl shows "

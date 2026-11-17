@@ -107,18 +107,31 @@ class CanvasSignals(QObject):
     resized = Signal(list, QRectF, QRectF)    # elements, their box before and after (view mm)
 
 
+def screen_color(color):
+    """A layer's colour as drawn on the light sheet: a very light one (white,
+    pale yellow) is darkened until it can be seen; the colour stays the same
+    hue. Only the screen: the layer keeps its colour."""
+    c = QColor(color)
+    h, s, l, a = c.getHslF()
+    if l > 0.72:
+        c = QColor.fromHslF(max(h, 0.0), s, 0.72, a)
+    return c
+
+
 class ElementItem(QGraphicsPathItem):
     """One element. Its paths are already in scene coordinates; a drag moves
     the item and, when the mouse is released, the element's nodes."""
 
-    def __init__(self, element, view):
+    def __init__(self, element, view, color=None):
         super().__init__(painter_path(element.paths))
         self.element = element
         self.view = view
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
-        self.setPen(cosmetic_pen(COLORS["cut"] if element.cut else COLORS["skip"], 1.6,
+        # its colour layer's colour (a design of several colours), else the accent
+        self.color = QColor(color) if color else QColor(COLORS["cut"])
+        self.setPen(cosmetic_pen(self.color if element.cut else COLORS["skip"], 1.6,
                                  Qt.SolidLine if element.cut else Qt.DashLine))
         self._press = None
         self._dragging = False
@@ -143,7 +156,7 @@ class ElementItem(QGraphicsPathItem):
     def paint(self, painter, option, widget=None):
         painter.setBrush(Qt.NoBrush)
         if not self.fill_path.isEmpty() and self.view.pen_mode:      # a knife has no fill: not shown
-            color = QColor(COLORS["cut"] if self.element.cut else COLORS["skip"])
+            color = QColor(self.color if self.element.cut else COLORS["skip"])
             color.setAlpha(170)
             painter.setPen(cosmetic_pen(color, 1.0))
             painter.drawPath(self.fill_path)
@@ -406,8 +419,11 @@ class MaterialView(QGraphicsView):
 
         chosen = None
         wanted = selected if isinstance(selected, (list, tuple)) else ([selected] if selected is not None else [])
+        # several colour layers: each element in its layer's colour (one layer:
+        # the accent, as always)
+        layered = len(getattr(design, "layers", ())) > 1
         for e in design.elements:
-            item = ElementItem(e, self)
+            item = ElementItem(e, self, screen_color(design.layer_of(e).color) if layered else None)
             scene.addItem(item)
             item.setFlag(QGraphicsItem.ItemIsMovable, self.tool == "select")
             self._items.append(item)

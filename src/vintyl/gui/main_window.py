@@ -32,7 +32,7 @@ from vintyl.core import ready
 from vintyl.core import transport
 from vintyl.core.design import Design, Element
 from vintyl.core.job import JobError, build_job
-from vintyl.core.loaders import LoadError, load_svg
+from vintyl.core.loaders import LoadError, load_svg, load_svg_colors
 from vintyl.core.profile import ProfileError
 from vintyl.gui import N_, NP_, _, ngettext, pgettext
 from vintyl.gui import icons
@@ -41,7 +41,7 @@ from vintyl.gui import widgets
 from vintyl.gui.canvas import MaterialView, painter_path, shape_icon
 from vintyl.gui.sender import SendWorker
 from vintyl.gui import text as texts
-from vintyl.gui.widgets import ICON_ROLE, Segmented, Switch, ToolTile
+from vintyl.gui.widgets import COLOR_ROLE, ICON_ROLE, Segmented, Switch, ToolTile
 
 LATER = N_("Comes in a later step of Vintyl")   # translated where it is shown
 PLACE_MARGIN_MM = 10.0        # a new file is placed this far from the origin
@@ -1211,12 +1211,14 @@ class MainWindow(QMainWindow):
     def _section(self, col, title, stretch=0):
         """A section of the left panel: a title, then its rows (UI v2: one white
         column, the sections divided by a line, no frames)."""
+        line = None
         if col.count():
             line = QFrame()
             line.setFrameShape(QFrame.HLine)
             line.setObjectName("panel_line")
             col.addWidget(line)
         box = QWidget()
+        box.line = line                     # hidden with its section (Colours, one colour)
         box.setObjectName("panel_section")
         lay = QVBoxLayout(box)
         lay.setContentsMargins(16, 14, 16, 14)
@@ -1284,6 +1286,41 @@ class MainWindow(QMainWindow):
         self.empty_hint.setObjectName("hint")
         self.empty_hint.setWordWrap(True)
         lay.addWidget(self.empty_hint)
+
+        # ---- Colours: the colour layers, drawn (cut) one after another (only
+        # shown for a design of several colours)
+        box, lay = self._section(col, _("Colours"))
+        self.colours_box = box
+        self.layer_summary = QLabel()
+        self.layer_summary.setObjectName("muted")
+        box.head.addWidget(self.layer_summary)
+        self.btn_layer_up = QToolButton()
+        self.btn_layer_up.setIcon(icons.tabler("arrow-up"))
+        self.btn_layer_up.setToolTip(_("Draw this colour earlier"))
+        self.btn_layer_up.clicked.connect(lambda: self.move_layer(-1))
+        self.btn_layer_down = QToolButton()
+        self.btn_layer_down.setIcon(icons.tabler("arrow-down"))
+        self.btn_layer_down.setToolTip(_("Draw this colour later"))
+        self.btn_layer_down.clicked.connect(lambda: self.move_layer(1))
+        self.btn_layer_edit = QToolButton()
+        self.btn_layer_edit.setIcon(icons.tabler("settings"))
+        self.btn_layer_edit.setToolTip(_("This colour's name, colour and pen"))
+        self.btn_layer_edit.clicked.connect(lambda: self.edit_layer())
+        for b in (self.btn_layer_up, self.btn_layer_down, self.btn_layer_edit):
+            box.head.addWidget(b)
+        self.layer_list = QListWidget()
+        self.layer_list.setObjectName("layer_list")
+        self.layer_list.setFrameShape(QFrame.NoFrame)
+        self.layer_list.setIconSize(QSize(16, 16))
+        self.layer_list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.layer_list.setToolTip(_("The colours, drawn (cut) one after another in this order; untick one "
+                                     "to leave it out. A click selects its elements."))
+        self.layer_list.itemChanged.connect(self._layer_item_changed)
+        self.layer_list.itemClicked.connect(self._layer_clicked)
+        self.layer_list.itemDoubleClicked.connect(lambda _i: self.edit_layer())
+        lay.addWidget(self.layer_list)
+        box.setVisible(False)
+        box.line.setVisible(False)
 
         # ---- Cutter: the machine, its state, the tool
         box, lay = self._section(col, _("Cutter"))
@@ -1970,16 +2007,65 @@ class MainWindow(QMainWindow):
             if not path:
                 return None
         try:
-            e = load_svg(path)
+            groups = load_svg_colors(path)
         except LoadError as err:
             widgets.warn(self, _("Open SVG"), str(err))
             return None
-        # place it on the material, PLACE_MARGIN_MM from the origin (lower right) both ways
-        w, h = e.size
-        e.move_to(-PLACE_MARGIN_MM - w, -PLACE_MARGIN_MM - h)
-        self.add_element(e)
+        self._checkpoint()
+        elements = self._colour_elements(path, groups)
+        # place them on the material, together, PLACE_MARGIN_MM from the origin (lower right) both ways
+        boxes = [e.bounds for e in elements]
+        x0, x1 = min(b[0] for b in boxes), max(b[1] for b in boxes)
+        y0, y1 = min(b[2] for b in boxes), max(b[3] for b in boxes)
+        for e in elements:
+            e.move_by(-PLACE_MARGIN_MM - x1, -PLACE_MARGIN_MM - y1)
+        self.design.elements.extend(elements)
+        self.selected, self.selection = elements[0], list(elements)
+        self.refresh()
         self.statusBar().showMessage(_("Opened %s") % os.path.basename(path), 5000)
-        return e
+        return elements[0]
+
+    # default fill of a shape that is filled with a colour in the file (drawn by a pen)
+    IMPORT_FILL = {"pattern": "lines", "spacing": 1.0, "angle": 45.0, "margin": 0.0}
+
+    def _colour_elements(self, path, groups):
+        """The elements of an SVG read by colour (vintyl.core.loaders.
+        load_svg_colors), in the colour layers, similar colours merged;
+        grouped, so they move as one. A drawing of several colours (for
+        pens): one element per colour and kind, its filled shapes with a
+        fill pattern; a drawing of one colour (a sticker): one element, no
+        fill. A design with only its empty first layer gets the file's
+        colours instead of it."""
+        import uuid
+        from vintyl.core import layers as lay
+        design = self.design
+        first = design.layers[0]
+        if len(design.layers) == 1 and not design.elements_of(first) and first.id == lay.DEFAULT_ID:
+            design.layers = []                 # the empty black layer of a new design: the file's colours instead
+        counts = {}
+        for (color, _filled), subpaths in groups.items():
+            counts[color] = counts.get(color, 0) + len(subpaths)
+        to_layer = lay.assign(counts, design.layers, merge=True, name=lambda c: _(lay.color_name(c)))
+        name = os.path.splitext(os.path.basename(path))[0]
+        group = uuid.uuid4().hex[:8] if len(groups) > 1 else ""
+        several = len({layer.id for layer in to_layer.values()}) > 1
+        merged = {}
+        for (color, filled), subpaths in groups.items():     # the merged colours: one element per layer (and kind)
+            merged.setdefault((to_layer[color].id, filled and several), []).extend(subpaths)
+        out = []
+        for layer in design.layers:
+            for filled in (True, False):
+                subpaths = merged.get((layer.id, filled))
+                if not subpaths:
+                    continue
+                e = Element(name if len(merged) == 1 else "%s – %s" % (name, layer.name), subpaths, source=path,
+                            group=group, layer=layer.id)
+                if filled:
+                    e.fill = dict(self.IMPORT_FILL)        # drawn with a pen; a knife cuts the outline only
+                    if layer.fill is None:
+                        layer.fill = dict(self.IMPORT_FILL)
+                out.append(e)
+        return out
 
     def _on_drawn(self, tool, rect):
         make = {"rectangle": (lambda *r: shapes.rounded_rectangle(*r, self.opt_radius.value()), _("Rectangle")),
@@ -3041,6 +3127,7 @@ class MainWindow(QMainWindow):
             menu.addSeparator()
             for a in (self.act_rot_left, self.act_rot_right, self.act_mirror_h, self.act_to_origin):
                 menu.addAction(a)
+            self._colour_menu(menu)
             menu.addAction(icons.tabler("vector-bezier-2"), _("Edit nodes"), lambda: self._on_edit_nodes(element))
             cut = menu.addAction(icons.tabler("check"), _("Cut this element"))
             cut.setIconVisibleInMenu(False)            # the check mark of a checkable item shows it
@@ -3086,11 +3173,170 @@ class MainWindow(QMainWindow):
             item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
             item.setCheckState(Qt.Checked if e.cut else Qt.Unchecked)
             item.setData(ICON_ROLE, self.kind_icon(e))
+            if len(self.design.layers) > 1:
+                item.setData(COLOR_ROLE, self.design.layer_of(e).color)
             item.setToolTip(_("The scissors: cut, or only shown (not cut)."))
             lst.addItem(item)
+        self._show_layers()
         if self.selected in self.design.elements:
             lst.setCurrentRow(self.design.elements.index(self.selected))
         self._updating = False
+
+    # ---- colour layers (0.9) ---------------------------------------------------------------------
+    @staticmethod
+    def color_icon(color, size=16):
+        """A round swatch of a colour, with a thin edge (white shows on white)."""
+        from PySide6.QtGui import QPainter, QPen, QPixmap
+        pm = QPixmap(size, size)
+        pm.fill(Qt.transparent)
+        p = QPainter(pm)
+        p.setRenderHint(QPainter.Antialiasing, True)
+        p.setPen(QPen(QColor(theme.token("field_border")), 1))
+        p.setBrush(QColor(color))
+        p.drawEllipse(1, 1, size - 2, size - 2)
+        p.end()
+        from PySide6.QtGui import QIcon
+        return QIcon(pm)
+
+    def _layer(self):
+        """The layer chosen in the Colours list (or the first)."""
+        row = self.layer_list.currentRow()
+        layers = self.design.layers
+        return layers[row] if 0 <= row < len(layers) else layers[0]
+
+    def _show_layers(self):
+        """The Colours section: shown for a design of several colours."""
+        layers = self.design.layers
+        several = len(layers) > 1
+        self.colours_box.setVisible(several)
+        self.colours_box.line.setVisible(several)
+        if not several:
+            return
+        was = self.layer_list.currentRow()
+        self.layer_list.blockSignals(True)
+        self.layer_list.clear()
+        for layer in layers:
+            n = len(self.design.elements_of(layer))
+            item = QListWidgetItem(self.color_icon(layer.color), "%s  ·  %d" % (layer.name, n))
+            item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
+            item.setCheckState(Qt.Checked if layer.enabled else Qt.Unchecked)
+            self.layer_list.addItem(item)
+        self.layer_list.setCurrentRow(min(max(was, 0), len(layers) - 1))
+        self.layer_list.blockSignals(False)
+        # as high as its rows (it does not scroll with a few colours)
+        rows = min(len(layers), 6)
+        self.layer_list.setFixedHeight(rows * self.layer_list.sizeHintForRow(0) + 4)
+        self.layer_summary.setText(ngettext("%d colour", "%d colours", len(layers)) % len(layers))
+
+    def _layer_item_changed(self, item):
+        layer = self.design.layers[self.layer_list.row(item)]
+        on = item.checkState() == Qt.Checked
+        if layer.enabled != on:
+            self._checkpoint()
+            layer.enabled = on
+            self.refresh()
+
+    def _layer_clicked(self, item):
+        """A click on a colour selects its elements on the sheet."""
+        layer = self.design.layers[self.layer_list.row(item)]
+        els = self.design.elements_of(layer)
+        if els:
+            self.view.select_many(els)
+            self.selection, self.selected = list(els), els[0]
+            self._show_options()
+
+    def move_layer(self, step):
+        """Draw the chosen colour earlier (-1) or later (+1)."""
+        layers = self.design.layers
+        i = self.layer_list.currentRow()
+        j = i + step
+        if not (0 <= i < len(layers) and 0 <= j < len(layers)):
+            return
+        self._checkpoint()
+        layers[i], layers[j] = layers[j], layers[i]
+        self.layer_list.setCurrentRow(j)
+        self.refresh()
+        self.layer_list.setCurrentRow(j)
+
+    def edit_layer(self, layer=None, values=None):
+        """A colour's name, colour, and its pen (width, where the stroke lies;
+        empty: as in the window). values: {"name", "color", "pen_width_mm",
+        "pen_place"} without asking (tests); None asks. Returns the values."""
+        layer = layer or self._layer()
+        if values is None:
+            from PySide6.QtWidgets import QColorDialog
+            name = QLineEdit(layer.name)
+            color = QPushButton(layer.color)
+            color.setIcon(self.color_icon(layer.color))
+            picked = [layer.color]
+
+            def pick():
+                c = QColorDialog.getColor(QColor(picked[0]), self, _("Colour"))
+                if c.isValid():
+                    picked[0] = c.name()
+                    color.setText(picked[0])
+                    color.setIcon(self.color_icon(picked[0]))
+            color.clicked.connect(pick)
+            width = _spin(5.0, 2, " mm", minimum=0.0)
+            width.setSpecialValueText(_("as in the window"))
+            width.setValue(layer.pen_width_mm or 0.0)
+            place = QComboBox()
+            place.addItem(_("as in the window"), None)
+            for code, label in (("on", N_("on the line")), ("outside", N_("outside the line")),
+                                ("inside", N_("inside the line"))):
+                place.addItem(_(label), code)
+            place.setCurrentIndex(max(0, place.findData(layer.pen_place)))
+            got = self._ask(_("Colour"), [("name", _("Name"), name), ("color", _("Colour"), color),
+                                          ("pen_width_mm", _("Pen width"), width), ("pen_place", _("Draw"), place)],
+                            hint=_("The pen's values are used when the tool is the marker pen; empty: as in "
+                                   "the window."))
+            if got is None:
+                return None
+            values = {"name": name.text().strip() or layer.name, "color": picked[0],
+                      "pen_width_mm": width.value() or None, "pen_place": place.currentData()}
+        self._checkpoint()
+        layer.name = values.get("name", layer.name)
+        layer.color = values.get("color", layer.color)
+        layer.pen_width_mm = values.get("pen_width_mm", layer.pen_width_mm)
+        layer.pen_place = values.get("pen_place", layer.pen_place)
+        self.refresh()
+        return values
+
+    def move_to_layer(self, layer):
+        """The selected elements into a colour layer."""
+        chosen = self._chosen()
+        if not chosen:
+            return
+        self._checkpoint()
+        for e in chosen:
+            e.layer = layer.id
+        self.refresh()
+
+    def new_layer_for_selection(self, color=None, name=None):
+        """A new colour for the selected elements (color None asks for it).
+        Returns the new layer."""
+        from vintyl.core import layers as lay
+        if color is None:
+            from PySide6.QtWidgets import QColorDialog
+            c = QColorDialog.getColor(QColor("#e11d48"), self, _("New colour"))
+            if not c.isValid():
+                return None
+            color = c.name()
+        layer = lay.Layer(lay.new_id(self.design.layers),
+                          lay.unique_name(name or _(lay.color_name(color)), self.design.layers), color)
+        self.design.layers.append(layer)
+        self.move_to_layer(layer)
+        return layer
+
+    def _colour_menu(self, menu):
+        """The right-click menu's "Colour" part: move the selection into a layer."""
+        sub = menu.addMenu(icons.tabler("palette"), _("Colour"))
+        for layer in self.design.layers:
+            a = sub.addAction(self.color_icon(layer.color), layer.name)
+            a.triggered.connect(lambda _c=False, ly=layer: self.move_to_layer(ly))
+        sub.addSeparator()
+        sub.addAction(_("New colour…"), lambda: self.new_layer_for_selection())
+        return sub
 
     def _list_item_changed(self, item):
         if self._updating:
@@ -3129,11 +3375,13 @@ class MainWindow(QMainWindow):
 
     def _snapshot(self):
         els = self.design.elements
-        return ([e.copy() for e in els], els.index(self.selected) if self.selected in els else None)
+        return ([e.copy() for e in els], els.index(self.selected) if self.selected in els else None,
+                [layer.copy() for layer in self.design.layers])
 
     def _restore(self, snap):
-        elements, index = snap
+        elements, index, layers = snap
         self.design.elements = elements
+        self.design.layers = layers
         self.selected = elements[index] if index is not None else None
         self.refresh()
 

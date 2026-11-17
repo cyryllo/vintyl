@@ -142,6 +142,13 @@ QLabel#section_title { font-weight: 600; font-size: 14px; color: $ink; }
 QLabel#cutter_state { color: $muted; }
 QListWidget#element_list { background: transparent; border: 0; outline: 0; }
 QListWidget#element_list::item:selected, QListWidget#element_list::item:hover { background: transparent; }
+QListWidget#layer_list { background: transparent; border: 0; outline: 0; color: $ink; }
+QListWidget#layer_list::item { padding: 3px 4px; border-radius: 6px; }
+QListWidget#layer_list::item:hover { background: $well; }
+QListWidget#layer_list::item:selected { background: $accent_soft; color: $accent_ink; }
+QListWidget#layer_list::indicator { width: 14px; height: 14px; border: 1px solid $field_border; border-radius: 4px;
+    background: $panel; }
+QListWidget#layer_list::indicator:checked { background: $accent; border-color: $accent; image: url($check); }
 QFrame#warn { background: $warn_bg; border-radius: 8px; }
 QFrame#warn QLabel { color: $warn_ink; }
 QScrollArea#plain_scroll, QWidget#plain_scroll_inner { background: $window; border: none; }
@@ -228,8 +235,10 @@ def style_sheet(resolved=None):
     import os
     look = resolved or _current
     # the drop-down arrow is a file (style sheets take images by path), one per look
-    chevron = os.path.join(os.path.dirname(os.path.abspath(__file__)), "icons", "chevron-down-%s.svg" % look)
-    return STYLE.substitute(TOKENS[look], chevron=chevron.replace("\\", "/"))
+    here = os.path.join(os.path.dirname(os.path.abspath(__file__)), "icons")
+    chevron = os.path.join(here, "chevron-down-%s.svg" % look)
+    check = os.path.join(here, "check-on.svg")             # white: on the accent in both looks
+    return STYLE.substitute(TOKENS[look], chevron=chevron.replace("\\", "/"), check=check.replace("\\", "/"))
 
 
 def dark_palette():

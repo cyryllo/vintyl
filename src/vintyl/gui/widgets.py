@@ -360,6 +360,7 @@ def form_dialog(parent, title, rows, action=None, hint=None, extra=None, left=No
 from PySide6.QtWidgets import QStyle, QStyledItemDelegate  # noqa: E402
 
 ICON_ROLE = Qt.UserRole + 1           # an item's type icon (a QIcon)
+COLOR_ROLE = Qt.UserRole + 2          # an element's colour layer's colour ("#rrggbb"; none: one layer)
 
 
 class ElementRowDelegate(QStyledItemDelegate):
@@ -418,12 +419,21 @@ class ElementRowDelegate(QStyledItemDelegate):
         font.setStrikeOut(not cut)
         p.setFont(font)
         p.setPen(QColor(theme.token("accent_ink")) if selected and cut else ink)
-        name_rect = QRectF(r.left() + 66, r.top(), r.width() - 66 - self.SCISSORS - 14, r.height())
+        dot = 16 if index.data(COLOR_ROLE) else 0
+        name_rect = QRectF(r.left() + 66, r.top(), r.width() - 66 - self.SCISSORS - 14 - dot, r.height())
         p.drawText(name_rect, Qt.AlignVCenter | Qt.AlignLeft,
                    QFontMetrics(font).elidedText(index.data(Qt.DisplayRole) or "", Qt.ElideRight,
                                                  int(name_rect.width())))
         icons.tabler("scissors", theme.token("accent") if cut else theme.token("disabled_icon")).paint(
             p, self._scissors_rect(r).adjusted(4, 4, -4, -4).toRect())
+        # the colour layer's dot, before the scissors (a design of several colours)
+        color = index.data(COLOR_ROLE)
+        if color:
+            p.setRenderHint(QPainter.Antialiasing, True)
+            p.setPen(QPen(QColor(theme.token("border")), 1))
+            p.setBrush(QColor(color))
+            s = self._scissors_rect(r)
+            p.drawEllipse(QRectF(s.left() - 14, s.center().y() - 5, 10, 10))
 
     def editorEvent(self, event, model, option, index):
         # a click on the scissors: cut / not cut (the item's check state, as before)

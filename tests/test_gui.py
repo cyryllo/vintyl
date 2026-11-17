@@ -21,7 +21,7 @@ from vintyl.gui.main_window import MainWindow
 
 SQUARE_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="60mm" height="40mm" viewBox="0 0 60 40">
   <rect x="10" y="10" width="20" height="20" fill="#000"/>
-  <circle cx="45" cy="20" r="8" fill="none" stroke="#123456"/>
+  <circle cx="45" cy="20" r="8" fill="none" stroke="#000"/>
   <rect x="0" y="0" width="5" height="5" fill="none" stroke="none"/>
   <rect x="50" y="30" width="5" height="5" fill="#000" style="display:none"/>
 </svg>
@@ -1186,7 +1186,8 @@ def test_the_left_panel_never_squeezes_its_boxes_into_each_other(win):
     from PySide6.QtWidgets import QWidget
     win.show()
     win._on_drawn("rectangle", QRectF(-60, -40, 20, 20))
-    boxes = [w for w in win.left_scroll.widget().findChildren(QWidget) if w.objectName() == "panel_section"]
+    boxes = [w for w in win.left_scroll.widget().findChildren(QWidget)
+             if w.objectName() == "panel_section" and not w.isHidden()]      # Colours: only with several
     assert len(boxes) == 3
     for tool in ("knife", "pen"):
         win.tool_box.setCurrentIndex(win.tool_box.findData(tool))
@@ -2040,3 +2041,62 @@ def test_the_window_fits_a_1366_screen_in_every_language(app, lang):
     finally:
         w.close()
         i18n.setup("en")
+
+
+# ---- colour layers (0.9) ------------------------------------------------------------------------------
+DEMO_SVG = os.path.join(os.path.dirname(__file__), "..", "docs", "demo", "vintyl-demo.svg")
+from vintyl.gui.widgets import COLOR_ROLE as COLOR_ROLE_FOR_TESTS  # noqa: E402
+
+
+def test_a_colour_drawing_is_imported_by_colour(win):
+    """Vintyl's demo logo: its colours become layers (similar ones merged),
+    one element per colour and kind, grouped; filled shapes get a fill for
+    the pen; undo takes the layers back too."""
+    first = win.import_svg(DEMO_SVG)
+    d = win.design
+    names = [layer.name for layer in d.layers]
+    assert names[:2] == ["Black", "Pink"] and "Green" in names and "Black 2" not in names   # no empty black left
+    assert len(d.layers) == 5
+    assert len({e.group for e in d.elements}) == 1 and first in d.elements                 # moved as one
+    pink = d.layers[1]
+    kinds = {(d.layer_of(e) is pink, e.fill is not None) for e in d.elements if d.layer_of(e) is pink}
+    assert kinds == {(True, True), (True, False)}            # the filled V and the underline (a stroke only)
+    # the sheet draws each element in its layer's colour
+    item = [i for i in win.view._items if i.element.fill is not None and d.layer_of(i.element) is pink][0]
+    assert item.color.name() == pink.color
+    win.undo()
+    assert d is win.design and not win.design.elements and [layer.id for layer in win.design.layers] == ["black"]
+
+
+def test_the_colours_section_lists_the_layers_and_changes_them(win):
+    win.show()
+    assert win.colours_box.isHidden()                                  # one colour: no section
+    win.import_svg(DEMO_SVG)
+    d = win.design
+    assert not win.colours_box.isHidden() and win.layer_list.count() == len(d.layers)
+    assert win.layer_list.item(1).text().startswith("Pink")
+    assert win.element_list.model().index(0, 0).data(COLOR_ROLE_FOR_TESTS) == d.layer_of(d.elements[0]).color
+    # untick a colour: it is left out
+    win.layer_list.item(1).setCheckState(Qt.Unchecked)
+    assert not d.layers[1].enabled
+    # a click selects its elements
+    win._layer_clicked(win.layer_list.item(2))
+    assert set(map(id, win.selection)) == set(map(id, d.elements_of(d.layers[2])))
+    # the order of drawing
+    win.layer_list.setCurrentRow(2)
+    third = d.layers[2]
+    win.move_layer(-1)
+    assert d.layers[1] is third and win.layer_list.currentRow() == 1
+    # a colour's name, colour and pen
+    win.edit_layer(third, {"name": "Steel", "color": "#445566", "pen_width_mm": 0.8, "pen_place": "outside"})
+    assert (third.name, third.color, third.pen_width_mm, third.pen_place) == ("Steel", "#445566", 0.8, "outside")
+    # elements into another colour, or a new one
+    e = d.elements[0]
+    win.selected, win.selection = e, [e]
+    win.move_to_layer(third)
+    assert d.layer_of(e) is third
+    new = win.new_layer_for_selection("#00aa00")
+    assert d.layer_of(e) is new and new.name == "Green 2"
+    menu = win.show_context_menu(e, None, show=False)
+    colour = [a.menu() for a in menu.actions() if a.menu() is not None and a.text() == "Colour"][0]
+    assert [a.text() for a in colour.actions() if a.text()][:2] == [d.layers[0].name, d.layers[1].name]
