@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 19:58+0100\n"
+"POT-Creation-Date: 2026-11-17 20:09+0100\n"
 "PO-Revision-Date: 2026-11-15 17:49+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -1100,8 +1100,18 @@ msgstr "Przesuń w dół"
 msgid "Move the origin on, so the design is not cut over the test"
 msgstr "Przesuń punkt zerowy dalej, żeby projekt nie wypadł na teście"
 
+msgid "Move to the origin"
+msgstr "Dosuń do punktu 0,0"
+
 msgid "Move up"
 msgstr "Przesuń w górę"
+
+#, python-format
+msgid "Moved to the origin (%s mm from it)."
+msgstr "Dosunięto do punktu 0,0 (%s mm od niego)."
+
+msgid "Moved to the origin."
+msgstr "Dosunięto do punktu 0,0."
 
 msgid "Name"
 msgstr "Nazwa"
@@ -1181,6 +1191,9 @@ msgstr "Po odsunięciu nic nie zostaje (kształt jest cieńszy niż ta odległo�
 
 msgid "Nothing is left of the shapes after this operation."
 msgstr "Po tej operacji z kształtów nic nie zostaje."
+
+msgid "Nothing to move: the design is empty."
+msgstr "Nie ma czego przesuwać: projekt jest pusty."
 
 msgid "Nothing to split: one outline, no group."
 msgstr "Nie ma czego rozdzielać: jeden kontur, bez grupy."
@@ -1842,6 +1855,15 @@ msgstr "Raport skopiowany."
 msgid "The scissors: cut, or only shown (not cut)."
 msgstr "Nożyczki: cięty albo tylko pokazany (nie cięty)."
 
+msgid ""
+"The selected elements, or the whole design when nothing is selected, "
+"together up to the origin (0, 0): no vinyl wasted before them. Room is "
+"left for the weeding frame and the knife"
+msgstr ""
+"Zaznaczone elementy albo, gdy nic nie zaznaczono, cały projekt razem do "
+"punktu zerowego (0, 0): bez marnowania folii przed nimi. Zostaje miejsce "
+"na ramkę do wybierania i nóż"
+
 msgid "The strips cover this much of each other, for laying them together"
 msgstr "O tyle pasy na siebie zachodzą, żeby je złożyć"
 
@@ -1882,6 +1904,9 @@ msgid "This cutter's own values. A material can have its own offset and overcut.
 msgstr ""
 "Wartości domyślne tego plotera. Materiał może mieć własne przesunięcie i "
 "nadcięcie."
+
+msgid "To 0,0"
+msgstr "Do 0,0"
 
 msgid "To stop the cutter at once: Test (pause) or Reset on its panel."
 msgstr "Żeby od razu zatrzymać ploter: Test (pauza) albo Reset na jego panelu."

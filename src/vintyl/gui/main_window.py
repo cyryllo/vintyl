@@ -293,6 +293,13 @@ class MainWindow(QMainWindow):
                                               "layout-distribute-horizontal", None,
                                               _("Spread three or more shapes evenly up and down: "
                                                 "equal gaps, the outermost stay"))
+        # as Kerfly's "design to the head": here the head starts at the origin
+        # (set with the cutter's Origin key), so the design goes there
+        self.act_to_origin = self._action(_("Move to the origin"), lambda: self.move_to_origin(),
+                                          "arrow-down-right", "Ctrl+Home",
+                                          _("The selected elements, or the whole design when nothing is "
+                                            "selected, together up to the origin (0, 0): no vinyl wasted "
+                                            "before them. Room is left for the weeding frame and the knife"))
         self.act_qr = self._action(_("QR code"), lambda: self.insert_qr(), "qrcode", None,
                                    _("A QR code to cut: an address or a text"))
         # group / ungroup and combining shapes, as in Kerfly (and Inkscape's keys)
@@ -379,7 +386,8 @@ class MainWindow(QMainWindow):
         self.menus["object"] = m
         for a in [self.act_group, self.act_ungroup, None] + list(self.act_boolean.values()) + [None] + \
                 [self.act_rot_left, self.act_rot_right, self.act_mirror_h, self.act_mirror_v, None] + \
-                list(self.act_align.values()) + [None, self.act_offset, self.act_tile, self.act_fill,
+                list(self.act_align.values()) + [self.act_to_origin, None, self.act_offset, self.act_tile,
+                                                 self.act_fill,
                                                  self.act_text_path, None, self.act_copies, self.act_panels,
                                                  self.act_weed_lines]:
             m.addSeparator() if a is None else m.addAction(a)
@@ -436,7 +444,8 @@ class MainWindow(QMainWindow):
             (_("Shapes"), beside, [(self.act_group, _("Group")), (self.act_boolean["union"], None),
                                    (self.act_boolean["difference"], None), (self.act_ungroup, _("Ungroup")),
                                    (self.act_boolean["intersection"], None), (self.act_boolean["exclusion"], None)]),
-            (_("View"), big, [(self.act_fit, _("Fit")), (self.act_knife, _("Knife path")),
+            (_("View"), big, [(self.act_to_origin, _("To 0,0")), (self.act_fit, _("Fit")),
+                              (self.act_knife, _("Knife path")),
                               (self.act_grid, _("Grid"))]),
         ]
         tb = QToolBar(_("Main"))
@@ -741,6 +750,42 @@ class MainWindow(QMainWindow):
         e.move_to(-PLACE_MARGIN_MM - w, -PLACE_MARGIN_MM - h)
         self.add_element(e)
         return e
+
+    def move_to_origin(self):
+        """The selected elements, or the whole design when nothing is selected,
+        moved together (as they are laid out) so their corner is at the origin
+        (0, 0): the cutter's head starts there, no vinyl is wasted before them.
+        What the knife cuts beyond the shapes needs room: the weeding frame
+        (its margin), the knife offset and the overcut; the least room with
+        which the job can be made is kept. Returns how far from the origin (mm)."""
+        chosen = self._chosen() or list(self.design.elements)
+        if not chosen:
+            self.statusBar().showMessage(_("Nothing to move: the design is empty."), 6000)
+            return None
+        self._checkpoint()
+        # the bottom right corner of their box (the origin's corner) onto 0, 0
+        boxes = [e.bounds for e in chosen]
+        xmax, ymax = max(b[1] for b in boxes), max(b[3] for b in boxes)
+        for e in chosen:
+            e.move_by(-xmax, -ymax)
+        p = self.job_profile()
+        knife = p.knife_offset_mm + p.overcut_mm
+        frame = self.weed_margin.value() if self.weed_frame.isChecked() and not self.is_pen() else 0.0
+        tries = [0.0] if frame == 0 and knife == 0 else [frame, frame + knife, frame + knife + 1.0]
+        moved = 0.0
+        for gap in tries + [frame + knife]:
+            for e in chosen:
+                e.move_by(moved - gap, moved - gap)
+            moved = gap
+            try:
+                self.build()
+                break                                   # this close the job can be made
+            except (JobError, ProfileError):
+                continue                                # (the last: the room it needs, for another error)
+        self.refresh()
+        self.statusBar().showMessage(_("Moved to the origin (%s mm from it).") % MaterialView._mm(moved)
+                                     if moved else _("Moved to the origin."), 6000)
+        return moved
 
     def distribute_selected(self, across=True):
         from vintyl.core.design import distribute
@@ -2934,7 +2979,7 @@ class MainWindow(QMainWindow):
         (paste, select all). Returns the menu (shown at pos unless show is False)."""
         menu = QMenu(self)
         if element is None:
-            for a in (self.act_paste, self.act_select_all):
+            for a in (self.act_paste, self.act_select_all, self.act_to_origin):
                 menu.addAction(a)
         else:
             for a in (self.act_copy, self.act_cut, self.act_paste, self.act_duplicate, self.act_delete):
@@ -2949,7 +2994,7 @@ class MainWindow(QMainWindow):
             order.addAction(_("Cut first"), lambda: self.move_selected_to(0))
             order.addAction(_("Cut last"), lambda: self.move_selected_to(-1))
             menu.addSeparator()
-            for a in (self.act_rot_left, self.act_rot_right, self.act_mirror_h):
+            for a in (self.act_rot_left, self.act_rot_right, self.act_mirror_h, self.act_to_origin):
                 menu.addAction(a)
             menu.addAction(icons.tabler("vector-bezier-2"), _("Edit nodes"), lambda: self._on_edit_nodes(element))
             cut = menu.addAction(icons.tabler("check"), _("Cut this element"))

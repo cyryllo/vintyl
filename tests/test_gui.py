@@ -1361,7 +1361,7 @@ def test_the_right_click_menu_for_an_element_and_for_the_sheet(win):
     cut.setChecked(False)
     assert not b.cut
     empty = win.show_context_menu(None, None, show=False)
-    assert [x.text().replace("&", "") for x in empty.actions()] == ["Paste", "Select all"]
+    assert [x.text().replace("&", "") for x in empty.actions()] == ["Paste", "Select all", "Move to the origin"]
 
 
 def test_open_a_dxf_from_the_window(win, tmp_path):
@@ -1878,3 +1878,47 @@ def test_the_wheel_over_the_left_panel_does_not_change_its_fields(win):
         QApplication.sendEvent(w, QWheelEvent(QPointF(c), QPointF(w.mapToGlobal(c)), QPoint(0, 0), QPoint(0, -120),
                                               Qt.NoButton, Qt.NoModifier, Qt.NoScrollPhase, False))
     assert win.material_box.currentIndex() == material and win.pen_width.value() == width
+
+
+# ---- to the origin (as Kerfly's "design to the head") --------------------------------------------------
+def test_the_whole_design_moves_to_the_origin_as_it_is_laid_out(win):
+    win._on_drawn("ellipse", QRectF(-300, -250, 60, 40))
+    win._on_drawn("rectangle", QRectF(-420, -330, 50, 50))
+    a, b = win.design.elements
+    gap_before = (a.bounds[0] - b.bounds[0], a.bounds[2] - b.bounds[2])
+    win.view.select_many([])
+    win.selected, win.selection = None, []
+    undo = len(win._undo)
+    assert win.move_to_origin() == 0.0                          # no frame: right up to the origin
+    boxes = [e.bounds for e in win.design.elements]
+    assert max(bx[1] for bx in boxes) == pytest.approx(0.0) and max(bx[3] for bx in boxes) == pytest.approx(0.0)
+    assert (a.bounds[0] - b.bounds[0], a.bounds[2] - b.bounds[2]) == pytest.approx(gap_before)   # laid out as before
+    assert len(win._undo) == undo + 1 and win.build().cut_mm > 0  # one step to undo; it cuts
+
+
+def test_only_the_selected_go_to_the_origin_and_room_is_left_for_the_frame(win):
+    win._on_drawn("ellipse", QRectF(-300, -250, 60, 40))
+    stays = win.selected
+    where = stays.bounds
+    win._on_drawn("rectangle", QRectF(-420, -330, 50, 50))
+    goes = win.selected
+    win.weed_frame.setChecked(True)
+    win.weed_margin.setValue(5.0)
+    moved = win.move_to_origin()
+    assert stays.bounds == pytest.approx(where)                 # not selected: stays
+    assert 5.0 <= moved <= 5.0 + 1.5                            # the frame's margin and the knife's room
+    assert goes.bounds[1] == pytest.approx(-moved) and goes.bounds[3] == pytest.approx(-moved)
+    win.build()                                                  # the job can be made (nothing below zero)
+
+
+def test_to_the_origin_is_in_the_menus_and_on_the_ribbon(win):
+    from PySide6.QtGui import QKeySequence
+    assert win.act_to_origin.shortcut() == QKeySequence("Ctrl+Home")
+    assert win.act_to_origin in win.show_context_menu(None, None, show=False).actions()
+    win._on_drawn("rectangle", QRectF(-420, -330, 50, 50))
+    assert win.act_to_origin in win.show_context_menu(win.selected, None, show=False).actions()
+    assert any(win.act_to_origin in [b.defaultAction() for b in g.findChildren(QToolButton)]
+               for g in win.ribbon_groups.values())
+    win.design.elements.clear()
+    win.refresh()
+    assert win.move_to_origin() is None                         # an empty design: nothing to move

@@ -53,7 +53,8 @@ The screenshots are made by `tools/readme_shots.py` from the program itself.
   drop, gear (sizes keep their proportions), and **QR codes**.
 - Open **SVG** and **DXF** files; save and open **projects** (.vintyl).
 - Move, resize with handles (proportions locked or not), rotate (by any
-  angle), mirror,
+  angle), mirror, **move to the origin** (the selection or the whole design,
+  no vinyl wasted),
   align, distribute, group, **union / difference / intersection /
   exclusion**, **offset** (with "remove the holes inside" for a backing
   under a text), node editing, ruler, grid, snapping, undo.

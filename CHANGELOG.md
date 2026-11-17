@@ -27,6 +27,11 @@ number jumps from 0.2 to 0.8: the cutters are tested and cut cleanly, and
   Stop takes Start's place while sending, with the percentage sent.
 - Speeds in mm/s.
 
+**Placing**
+- To 0,0 (Ctrl+Home, as Kerfly's "design to the head"): the selected elements, or the whole design
+  as it is laid out, go together up to the origin, where the cutter's head starts; room is left for
+  the weeding frame and the knife.
+
 **Windows**
 - The check list before Start and the knife test are windows of their own, with the material's
   values; a yellow warning when the mirror is on.

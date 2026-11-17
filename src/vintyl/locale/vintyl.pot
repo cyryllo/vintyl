@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 19:58+0100\n"
+"POT-Creation-Date: 2026-11-17 20:09+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1024,7 +1024,17 @@ msgstr ""
 msgid "Move the origin on, so the design is not cut over the test"
 msgstr ""
 
+msgid "Move to the origin"
+msgstr ""
+
 msgid "Move up"
+msgstr ""
+
+#, python-format
+msgid "Moved to the origin (%s mm from it)."
+msgstr ""
+
+msgid "Moved to the origin."
 msgstr ""
 
 msgid "Name"
@@ -1098,6 +1108,9 @@ msgid "Nothing is left after the offset (the shape is thinner than that)."
 msgstr ""
 
 msgid "Nothing is left of the shapes after this operation."
+msgstr ""
+
+msgid "Nothing to move: the design is empty."
 msgstr ""
 
 msgid "Nothing to split: one outline, no group."
@@ -1706,6 +1719,12 @@ msgstr ""
 msgid "The scissors: cut, or only shown (not cut)."
 msgstr ""
 
+msgid ""
+"The selected elements, or the whole design when nothing is selected, "
+"together up to the origin (0, 0): no vinyl wasted before them. Room is "
+"left for the weeding frame and the knife"
+msgstr ""
+
 msgid "The strips cover this much of each other, for laying them together"
 msgstr ""
 
@@ -1739,6 +1758,9 @@ msgid ""
 msgstr ""
 
 msgid "This cutter's own values. A material can have its own offset and overcut."
+msgstr ""
+
+msgid "To 0,0"
 msgstr ""
 
 msgid "To stop the cutter at once: Test (pause) or Reset on its panel."
