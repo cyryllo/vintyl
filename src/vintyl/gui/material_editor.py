@@ -179,7 +179,8 @@ class MaterialEditor(QDialog):
         self.force.setRange(0, 2000)
         self.force.setSuffix(" g")
         self.force.setSpecialValueText(_("not set"))
-        self.speed = _spin(200.0, 1, " cm/s", _("not set"))
+        # speeds are shown in mm/s; kept in cm/s (the cutters' HPGL VS and the profile files)
+        self.speed = _spin(2000.0, 0, " mm/s", _("not set"))
         card.add_row(_("Force"), self.force)
         card.add_row(_("Speed"), self.speed)
         self.panel_note = QFrame()
@@ -327,6 +328,7 @@ class MaterialEditor(QDialog):
             return
         force = float(self.force.value()) if self.force.value() > 0 else None
         speed = _get(self.speed)
+        speed = speed / 10.0 if speed is not None else None          # mm/s on screen, cm/s kept
         values = {k: v for k, v in (("force_g", force), ("speed_cm_s", speed)) if v is not None}
         if values:
             self._per_cutter[pid] = values
@@ -338,7 +340,8 @@ class MaterialEditor(QDialog):
         self._shown_pid = None
         values = self._per_cutter.get(pid, {})
         self.force.setValue(int(values.get("force_g") or 0))
-        _set(self.speed, values.get("speed_cm_s"))
+        cm = values.get("speed_cm_s")
+        _set(self.speed, cm * 10.0 if cm is not None else None)
         self._shown_pid = pid
         cutter = next((c["profile"] for c in self.cutters if c["id"] == pid), None)
         self.panel_note.setVisible(cutter is not None and not cutter.send_speed_force)

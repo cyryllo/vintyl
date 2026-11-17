@@ -193,7 +193,8 @@ class ProfileEditor(QDialog):
 
         card = widgets.Card(_("Speed and force"))
         self.send_sf = widgets.Switch(_("sent by the computer"))
-        self.speed = _dspin(200.0, 1, " cm/s")
+        # mm/s on screen; the profile keeps cm/s (the cutters' HPGL VS and the profile files)
+        self.speed = _dspin(2000.0, 0, " mm/s")
         self.speed.setSpecialValueText(_("from the panel"))
         self.force = QSpinBox()
         self.force.setRange(0, 2000)
@@ -295,7 +296,7 @@ class ProfileEditor(QDialog):
         self.overcut.setValue(p.overcut_mm)
         self.corner.setValue(p.corner_deg)
         self.send_sf.setChecked(p.send_speed_force)
-        self.speed.setValue(p.speed_cm_s or 0.0)
+        self.speed.setValue((p.speed_cm_s or 0.0) * 10.0)
         self.force.setValue(int(p.force_g or 0))
         self.pacing.setCurrentIndex(max(0, self.pacing.findData(p.pacing)))
         if entry["builtin"]:
@@ -390,7 +391,7 @@ class ProfileEditor(QDialog):
             dmpl_mode=self.dmpl_mode.currentData(), units_per_mm=self.units.value(),
             swap_xy=self.swap.isChecked(), invert_x=self.inv_x.isChecked(), invert_y=self.inv_y.isChecked(),
             knife_offset_mm=self.knife.value(), overcut_mm=self.overcut.value(), corner_deg=self.corner.value(),
-            send_speed_force=self.send_sf.isChecked(), speed_cm_s=self.speed.value() or None,
+            send_speed_force=self.send_sf.isChecked(), speed_cm_s=(self.speed.value() / 10.0) or None,
             force_g=float(self.force.value()) if self.force.value() else None, pacing=self.pacing.currentData())
         if not new.name:
             raise profiles.ProfileError(_("Give the cutter a name."))

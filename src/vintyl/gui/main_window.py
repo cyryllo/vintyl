@@ -1533,7 +1533,7 @@ class MainWindow(QMainWindow):
         self.refresh_job()
 
     def material_values_text(self, material=None):
-        """("Set on the cutter's panel" / "Vintyl sends", "force 90 g · speed 30 cm/s"),
+        """("Set on the cutter's panel" / "Vintyl sends", "force 90 g · speed 300 mm/s"),
         or None when the material has no force or speed for this cutter."""
         m = material if material is not None else self.material()
         if m is None:
@@ -1543,7 +1543,7 @@ class MainWindow(QMainWindow):
         if force is not None:
             parts.append(_("force %g g") % force)
         if speed is not None:
-            parts.append(_("speed %g cm/s") % speed)
+            parts.append(_("speed %g mm/s") % round(speed * 10.0, 1))         # kept in cm/s
         if not parts:
             return None
         title = _("Vintyl sends to the cutter") if self.profile.send_speed_force else _("Set on the cutter's panel")
@@ -3001,7 +3001,7 @@ class MainWindow(QMainWindow):
             text.append(_("MIRRORED"))
         if p.speed_cm_s:
             minutes = (j.cut_mm + j.travel_mm) / (p.speed_cm_s * 10.0) / 60.0
-            text.append(_("About %.1f min at %g cm/s") % (minutes, p.speed_cm_s))
+            text.append(_("About %.1f min at %g mm/s") % (minutes, round(p.speed_cm_s * 10.0, 1)))
         self.job_label.setText(" · ".join(text))
         self.job_label.setVisible(bool(text))
         self.job_label.setStyleSheet("")

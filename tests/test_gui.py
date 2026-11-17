@@ -161,7 +161,7 @@ def test_speed_on_the_panel_only_or_sent(win, svg_file):
     assert not win.profile.send_speed_force
     win.use_profile_values(speed_cm_s=20.0)            # the panel's speed, written in its settings
     assert "VS" not in win.build().text                # not sent ...
-    assert "min at 20 cm/s" in win.job_label.text()     # ... but used for the time estimate
+    assert "min at 200 mm/s" in win.job_label.text()    # ... but used for the time estimate (in mm/s)
     # a cutter that takes them from the computer gets them
     win.profile = dataclasses.replace(win.profile, send_speed_force=True)
     assert "VS20;" in win.build().text
@@ -1581,7 +1581,7 @@ def test_the_materials_window_keeps_values_for_each_cutter(win, tmp_path, monkey
     monkeypatch.setenv("VINTYL_MATERIALS", str(tmp_path / "m"))
     dlg = MaterialEditor(win, "vinyl", "vevor-ki-375a")
     dlg.force.setValue(90)
-    dlg.speed.setValue(30.0)
+    dlg.speed.setValue(300.0)                                        # mm/s on screen: 30 cm/s kept
     dlg.for_cutter.setCurrentIndex(dlg.for_cutter.findData("seiki-sk-870t"))
     assert dlg.force.value() == 0                                    # the other cutter: not set yet
     dlg.force.setValue(110)
@@ -1591,3 +1591,16 @@ def test_the_materials_window_keeps_values_for_each_cutter(win, tmp_path, monkey
     assert m["changed"] and m["material"].for_cutter("vevor-ki-375a") == (90.0, 30.0)
     assert m["material"].for_cutter("seiki-sk-870t") == (110.0, None)
     assert dlg.chosen == "vinyl"
+
+
+def test_speeds_are_shown_in_mm_per_second(win):
+    """mm/s on screen; the profile keeps cm/s (the cutters' VS command)."""
+    from vintyl.core import profile as profiles
+    from vintyl.gui.profile_editor import ProfileEditor
+    dlg = ProfileEditor(win.profile_entries["vevor-ki-375a"], win)
+    assert dlg.speed.suffix() == " mm/s"
+    dlg.speed.setValue(300.0)
+    dlg.save()
+    saved = {e["id"]: e for e in profiles.catalogue()}["vevor-ki-375a"]["profile"]
+    assert saved.speed_cm_s == pytest.approx(30.0)
+    assert ProfileEditor({**win.profile_entries["vevor-ki-375a"], "profile": saved}, win).speed.value() == 300.0

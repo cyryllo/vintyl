@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 19:01+0100\n"
+"POT-Creation-Date: 2026-11-17 19:04+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -175,7 +175,7 @@ msgid ""
 msgstr ""
 
 #, python-format
-msgid "About %.1f min at %g cm/s"
+msgid "About %.1f min at %g mm/s"
 msgstr ""
 
 msgid "About Vintyl"
@@ -1988,7 +1988,7 @@ msgid "some entities were left out: %s"
 msgstr ""
 
 #, python-format
-msgid "speed %g cm/s"
+msgid "speed %g mm/s"
 msgstr ""
 
 msgid "swap X and Y"

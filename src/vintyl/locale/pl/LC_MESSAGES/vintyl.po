@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 19:01+0100\n"
+"POT-Creation-Date: 2026-11-17 19:04+0100\n"
 "PO-Revision-Date: 2026-11-15 17:49+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -196,8 +196,8 @@ msgstr ""
 "niepotrzebną folię w środku zdejmiesz w jednym kawałku"
 
 #, python-format
-msgid "About %.1f min at %g cm/s"
-msgstr "Około %.1f min przy %g cm/s"
+msgid "About %.1f min at %g mm/s"
+msgstr "Około %.1f min przy %g mm/s"
 
 msgid "About Vintyl"
 msgstr "O programie Vintyl"
@@ -2173,8 +2173,8 @@ msgid "some entities were left out: %s"
 msgstr "część elementów pominięto: %s"
 
 #, python-format
-msgid "speed %g cm/s"
-msgstr "prędkość %g cm/s"
+msgid "speed %g mm/s"
+msgstr "prędkość %g mm/s"
 
 msgid "swap X and Y"
 msgstr "Zamień X i Y"
@@ -2458,4 +2458,10 @@ msgstr "← Y w poprzek, mm"
 #~ "swojego panelu (jak VEVOR KI-375A); "
 #~ "prędkość służy wtedy tylko do "
 #~ "oszacowania czasu"
+
+#~ msgid "About %.1f min at %g cm/s"
+#~ msgstr "Około %.1f min przy %g cm/s"
+
+#~ msgid "speed %g cm/s"
+#~ msgstr "prędkość %g cm/s"
 
