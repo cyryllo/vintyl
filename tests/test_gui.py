@@ -1943,3 +1943,13 @@ def test_the_element_list_has_the_right_click_menu(win):
     menu = win.list_context_menu(lst.visualItemRect(lst.item(0)).center(), show=False)
     [a for a in menu.actions() if a.text().replace("&", "") == "Delete"][0].trigger()
     assert first not in win.design.elements and len(win.design.elements) == 2
+
+
+def test_the_set_triangle_only_where_a_set_opens(win):
+    """With the knife Fill opens no set (it goes to the pattern of shapes):
+    no triangle there; with the pen it opens one: the triangle is back."""
+    b = win.category_buttons
+    win.tool_box.setCurrentIndex(win.tool_box.findData("knife"))
+    assert not b["fill"].has_set and b["shapes"].has_set and not b["pick"].has_set
+    win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
+    assert b["fill"].has_set

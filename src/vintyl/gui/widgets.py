@@ -428,8 +428,9 @@ class ToolTile(QToolButton):
             r = self.rect()
             p.setPen(Qt.NoPen)
             p.setBrush(color)
-            p.drawPolygon(QPolygonF([QPointF(r.left() + 5, r.bottom() - 4), QPointF(r.left() + 10, r.bottom() - 4),
-                                     QPointF(r.left() + 5, r.bottom() - 9)]))
+            # small, in the very corner: clear of a long name ("Wypełnienie")
+            p.drawPolygon(QPolygonF([QPointF(r.left() + 3, r.bottom() - 2), QPointF(r.left() + 7, r.bottom() - 2),
+                                     QPointF(r.left() + 3, r.bottom() - 6)]))
         if self.hint:
             font = self.font()
             font.setPointSizeF(max(6.0, font.pointSizeF() * 0.8))

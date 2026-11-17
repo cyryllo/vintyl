@@ -611,11 +611,22 @@ class MainWindow(QMainWindow):
         self.tool_actions["select"].setChecked(True)
         self.category_buttons["pick"].setChecked(True)
 
+    def _offered(self, cat):
+        """The entries of a category offered now (the pen's fill not with the knife)."""
+        return [e for e in self.category_entries[cat] if e[0] != "act" or getattr(self, e[1]).isVisible()]
+
+    def _mark_sets(self):
+        """The small triangle only on a category whose click opens a set now
+        (with the knife Fill goes straight to the pattern of shapes)."""
+        for cat, button in self.category_buttons.items():
+            button.has_set = len(self._offered(cat)) > 1
+            button.update()
+
     def show_category(self, cat):
         """A click on a category: one tool takes it at once; more open a square
         of icons beside the button. Returns the square (or None)."""
         # an action not offered now (the pen's fill with the knife) is left out
-        entries = [e for e in self.category_entries[cat] if e[0] != "act" or getattr(self, e[1]).isVisible()]
+        entries = self._offered(cat)
         if len(entries) == 1 and entries[0][0] == "tool":
             self.set_tool(entries[0][1])
             return None
@@ -1535,6 +1546,7 @@ class MainWindow(QMainWindow):
         self.frame_row.setVisible(not pen)
         # the fill is for drawing: with the knife it is not offered (it would cut the vinyl into strips)
         self.act_fill.setVisible(pen)
+        self._mark_sets()
         self.view.pen_mode = pen
         self.act_knife.setText(_("Pen path") if pen else _("Knife path"))
         self.act_knife.setIconText(self.act_knife.text())

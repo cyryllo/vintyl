@@ -169,7 +169,7 @@ QToolButton#square { min-height: 28px; min-width: 28px; border: 1px solid $field
 QProgressBar { border: 0; border-radius: 4px; background: $well; }
 QProgressBar::chunk { border-radius: 4px; background: $accent; }
 QWidget#tool_panel { background: $panel; border-left: 1px solid $border; }
-QToolButton#tool_tile { border: 0; border-radius: 8px; font-size: 11px; color: $ink; padding-top: 4px; }
+QToolButton#tool_tile { border: 0; border-radius: 8px; font-size: 10px; color: $ink; padding-top: 4px; }
 QToolButton#tool_tile:hover { background: $well; }
 QToolButton#tool_tile:checked { background: $accent_soft; color: $accent_ink; font-weight: 600; }
 QFrame#tool_popup { background: $panel; border: 1px solid $border; border-radius: 10px; }
