@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 18:57+0100\n"
+"POT-Creation-Date: 2026-11-17 19:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -124,6 +124,15 @@ msgstr ""
 msgid "&View"
 msgstr ""
 
+msgid "30° (thin materials)"
+msgstr ""
+
+msgid "45° (standard)"
+msgstr ""
+
+msgid "60° (thick materials)"
+msgstr ""
+
 #, python-format
 msgid "<b>%s is available</b> (you have %s)."
 msgstr ""
@@ -199,6 +208,9 @@ msgstr ""
 msgid "Along"
 msgstr ""
 
+msgid "An empty field means the value from the cutter's settings."
+msgstr ""
+
 msgid "Angle"
 msgstr ""
 
@@ -230,6 +242,9 @@ msgid "Axle hole (mm)"
 msgstr ""
 
 msgid "Bar width (%)"
+msgstr ""
+
+msgid "Blade"
 msgstr ""
 
 msgid "Bold"
@@ -268,6 +283,9 @@ msgstr ""
 msgid "Cannot work it out: %s"
 msgstr ""
 
+msgid "Card, marker"
+msgstr ""
+
 msgid "Centres across"
 msgstr ""
 
@@ -284,6 +302,9 @@ msgid "Check now"
 msgstr ""
 
 msgid "Check once a day for a new version"
+msgstr ""
+
+msgid "Choosing this material sets these switches in the Job panel."
 msgstr ""
 
 msgid "Circle"
@@ -467,8 +488,15 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
+msgid "Delete material"
+msgstr ""
+
 #, python-format
 msgid "Delete the cutter profile \"%s\"?"
+msgstr ""
+
+#, python-format
+msgid "Delete the material \"%s\"?"
 msgstr ""
 
 msgid "Delete the selected element"
@@ -541,6 +569,11 @@ msgid "Drop"
 msgstr ""
 
 msgid "Duplicate"
+msgstr ""
+
+msgid ""
+"E.g. how far the blade sticks out, which roll, what to check before "
+"cutting"
 msgstr ""
 
 msgid "Edit"
@@ -651,6 +684,9 @@ msgstr ""
 msgid "Force"
 msgstr ""
 
+msgid "Force and speed"
+msgstr ""
+
 #, python-format
 msgid "Forget your changes of \"%s\" and use the settings it came with?"
 msgstr ""
@@ -708,6 +744,9 @@ msgid "Head length (%)"
 msgstr ""
 
 msgid "Heart"
+msgstr ""
+
+msgid "Heat transfer vinyl (flex)"
 msgstr ""
 
 msgid "Height"
@@ -828,6 +867,9 @@ msgstr ""
 msgid "Knife test"
 msgstr ""
 
+msgid "Knife test with these values"
+msgstr ""
+
 msgid "Language"
 msgstr ""
 
@@ -896,6 +938,18 @@ msgstr ""
 msgid "Marker pen"
 msgstr ""
 
+msgid "Material"
+msgstr ""
+
+msgid "Materials"
+msgstr ""
+
+msgid "Materials: cutting and drawing settings"
+msgstr ""
+
+msgid "Materials: force, speed, knife and pen values"
+msgstr ""
+
 #, python-format
 msgid "Measured: %.2f mm (across %.2f mm, along %.2f mm)"
 msgstr ""
@@ -929,6 +983,9 @@ msgstr ""
 msgid "Name of the new cutter:"
 msgstr ""
 
+msgid "Name of the new material:"
+msgstr ""
+
 msgid "New"
 msgstr ""
 
@@ -936,6 +993,9 @@ msgid "New cutter"
 msgstr ""
 
 msgid "New cutter (a copy)"
+msgstr ""
+
+msgid "New material"
 msgstr ""
 
 msgid "New version"
@@ -972,6 +1032,9 @@ msgid "Not plugged in"
 msgstr ""
 
 msgid "Not plugged in now (or switched off)."
+msgstr ""
+
+msgid "Note"
 msgstr ""
 
 msgid "Nothing is left after the offset (the shape is thinner than that)."
@@ -1067,6 +1130,9 @@ msgid ""
 "together."
 msgstr ""
 
+msgid "Paper, fineliner"
+msgstr ""
+
 msgid "Paste"
 msgstr ""
 
@@ -1134,6 +1200,9 @@ msgid "Rectangle: drag from corner to corner"
 msgstr ""
 
 msgid "Redo"
+msgstr ""
+
+msgid "Reflective vinyl"
 msgstr ""
 
 msgid ""
@@ -1330,6 +1399,9 @@ msgid ""
 " on its panel."
 msgstr ""
 
+msgid "Set on the cutter's panel"
+msgstr ""
+
 msgid ""
 "Set the selected text along the selected shape (a line, a curve, a "
 "circle...): select the text and the shape"
@@ -1348,6 +1420,9 @@ msgid "Shape"
 msgstr ""
 
 msgid "Shapes"
+msgstr ""
+
+msgid "Shiny side (the carrier) down, the matt side up to the knife."
 msgstr ""
 
 msgid "Show exactly where the knife goes: cuts, travels and their order"
@@ -1522,6 +1597,9 @@ msgstr ""
 msgid "The new language or look shows at the next start of Vintyl."
 msgstr ""
 
+msgid "The note shows on the check list before Start."
+msgstr ""
+
 msgid "The port speed must be a whole number."
 msgstr ""
 
@@ -1553,6 +1631,11 @@ msgid "There is nothing to cut."
 msgstr ""
 
 msgid "There is nothing to cut: every path is shorter than one cutter step."
+msgstr ""
+
+msgid ""
+"This cutter takes force and speed from its own panel only. Vintyl shows "
+"these values before Start, to set them there."
 msgstr ""
 
 msgid "This cutter's own values. A material can have its own offset and overcut."
@@ -1639,6 +1722,12 @@ msgstr ""
 msgid ""
 "Vintyl projects and drawings (*.vintyl *.svg *.dxf);;Vintyl projects "
 "(*.vintyl);;SVG files (*.svg);;DXF files (*.dxf)"
+msgstr ""
+
+msgid "Vintyl sends to the cutter"
+msgstr ""
+
+msgid "Vinyl film"
 msgstr ""
 
 msgid "Vinyl kept between the shapes and the outline"
@@ -1749,6 +1838,9 @@ msgstr ""
 msgid "as fast as it cuts"
 msgstr ""
 
+msgid "as in the window"
+msgstr ""
+
 msgid "as the system"
 msgstr ""
 
@@ -1781,6 +1873,17 @@ msgid "everything at once"
 msgstr ""
 
 msgid "feet"
+msgstr ""
+
+#, python-format
+msgid "for: %s"
+msgstr ""
+
+#, python-format
+msgid "force %g g"
+msgstr ""
+
+msgid "from the cutter"
 msgstr ""
 
 msgid "from the panel"
@@ -1837,6 +1940,9 @@ msgstr ""
 msgid "none"
 msgstr ""
 
+msgid "not set"
+msgstr ""
+
 msgid "on line"
 msgstr ""
 
@@ -1879,6 +1985,10 @@ msgstr ""
 
 #, python-format
 msgid "some entities were left out: %s"
+msgstr ""
+
+#, python-format
+msgid "speed %g cm/s"
 msgstr ""
 
 msgid "swap X and Y"

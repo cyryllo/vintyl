@@ -1516,3 +1516,78 @@ def test_the_cutter_settings_list_switches_and_asks_about_changes(win, monkeypat
     asked.clear()
     dlg.list.setCurrentRow(names.index("VEVOR KI-375A"))
     assert not asked and dlg.knife.value() == pytest.approx(0.3)
+
+
+# ---- materials (UI v2, 6.1) --------------------------------------------------------------------------
+def _choose_material(win, mid):
+    win.material_box.setCurrentIndex(win.material_box.findData(mid))
+
+
+def test_choosing_a_material_sets_the_tool_and_the_switches(win):
+    _choose_material(win, "vinyl")
+    win.weed_frame.setChecked(False)
+    _choose_material(win, "htv")
+    assert not win.is_pen() and win.mirror_job.isChecked() and win.weed_frame.isChecked()
+    _choose_material(win, "paper")
+    assert win.is_pen() and win.pen_width.value() == pytest.approx(0.4) and not win.mirror_job.isChecked()
+    assert win.settings.value("cutter/material/" + win.profile_box.currentData()) == "paper"
+    win.mirror_job.setChecked(True)                                  # changed by hand afterwards: kept
+    assert win.mirror_job.isChecked()
+
+
+def test_a_materials_values_come_before_the_cutters(win, tmp_path, monkeypatch):
+    import dataclasses
+    from vintyl.core import material as mats
+    monkeypatch.setenv("VINTYL_MATERIALS", str(tmp_path / "m"))
+    pid = win.profile_box.currentData()
+    m = dataclasses.replace(mats.load_builtin("vinyl"), name="Thick", knife_offset_mm=0.4,
+                            per_cutter={pid: {"force_g": 120.0, "speed_cm_s": 20.0}})
+    mats.save_user("thick", m)
+    win.reload_materials("thick")
+    p = win.job_profile()
+    assert p.knife_offset_mm == pytest.approx(0.4) and p.overcut_mm == pytest.approx(win.profile.overcut_mm)
+    assert p.force_g == 120.0 and p.speed_cm_s == 20.0
+    # a cutter set on its panel: shown, not sent
+    assert not win.profile.send_speed_force
+    assert "120" in win.material_hint.text() and not win.material_hint.isHidden()
+    win._on_drawn("rectangle", QRectF(-60, -40, 20, 20))
+    assert "FS" not in win.build().text and "VS" not in win.build().text
+    win.use_profile_values(send_speed_force=True)
+    assert "VS20" in win.build().text and "FS120" in win.build().text
+
+
+def test_a_project_keeps_its_material_and_an_old_one_opens(win, tmp_path, app):
+    _choose_material(win, "reflective")
+    win._on_drawn("rectangle", QRectF(-60, -40, 20, 20))
+    path = win.save_project(str(tmp_path / "m.vintyl"))
+    from vintyl.core import project
+    _design, st = project.load(path)
+    assert st["material"] == "reflective"
+    w2 = MainWindow()
+    _choose_material(w2, "vinyl")
+    assert w2.open_file(path) is not None and w2.material_box.currentData() == "reflective"
+    # an older project, without a material: the current one stays
+    st.pop("material")
+    project.save(str(tmp_path / "old.vintyl"), _design, st)
+    _choose_material(w2, "vinyl")
+    assert w2.open_file(str(tmp_path / "old.vintyl")) is not None and w2.material_box.currentData() == "vinyl"
+    w2.modified = False
+    w2.close()
+
+
+def test_the_materials_window_keeps_values_for_each_cutter(win, tmp_path, monkeypatch):
+    from vintyl.core import material as mats
+    from vintyl.gui.material_editor import MaterialEditor
+    monkeypatch.setenv("VINTYL_MATERIALS", str(tmp_path / "m"))
+    dlg = MaterialEditor(win, "vinyl", "vevor-ki-375a")
+    dlg.force.setValue(90)
+    dlg.speed.setValue(30.0)
+    dlg.for_cutter.setCurrentIndex(dlg.for_cutter.findData("seiki-sk-870t"))
+    assert dlg.force.value() == 0                                    # the other cutter: not set yet
+    dlg.force.setValue(110)
+    assert not dlg.panel_note.isHidden()                              # it takes them from its panel
+    dlg.save()
+    m = {e["id"]: e for e in mats.catalogue()}["vinyl"]
+    assert m["changed"] and m["material"].for_cutter("vevor-ki-375a") == (90.0, 30.0)
+    assert m["material"].for_cutter("seiki-sk-870t") == (110.0, None)
+    assert dlg.chosen == "vinyl"

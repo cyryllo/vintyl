@@ -1,0 +1,5 @@
+# Card with a marker in the holder.
+name = "Card, marker"
+tool = "pen"
+pen_width_mm = 1.0
+pen_place = "on"

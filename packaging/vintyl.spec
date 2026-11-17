@@ -26,6 +26,7 @@ def files(pattern):
 
 datas = (files("vintyl/locale/*/LC_MESSAGES/*.mo")
          + files("vintyl/core/profiles/*.toml")
+         + files("vintyl/core/materials/*.toml")
          + files("vintyl/gui/icons/*.svg")
          + files("vintyl/gui/icons/*.png")
          + files("vintyl/gui/icons/tabler/*.svg")

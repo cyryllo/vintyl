@@ -1,0 +1,5 @@
+# Vinyl film for signs and stickers. Force and speed: set your own (per cutter).
+name = "Vinyl film"
+tool = "knife"
+blade = "45"
+weed_frame = true

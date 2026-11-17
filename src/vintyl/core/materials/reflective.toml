@@ -1,0 +1,5 @@
+# Reflective vinyl: thicker than plain vinyl.
+name = "Reflective vinyl"
+tool = "knife"
+blade = "60"
+weed_frame = true

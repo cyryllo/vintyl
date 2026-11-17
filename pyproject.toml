@@ -25,7 +25,7 @@ vintyl = "vintyl.gui.app:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-"vintyl.core" = ["profiles/*.toml"]
+"vintyl.core" = ["profiles/*.toml", "materials/*.toml"]
 "vintyl.gui" = ["icons/*.svg", "icons/*.png", "icons/tabler/*.svg", "icons/tabler/LICENSE"]
 "vintyl" = ["locale/*/LC_MESSAGES/*.mo"]
 

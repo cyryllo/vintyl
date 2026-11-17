@@ -1,0 +1,5 @@
+# Paper with a fineliner in the holder.
+name = "Paper, fineliner"
+tool = "pen"
+pen_width_mm = 0.4
+pen_place = "on"

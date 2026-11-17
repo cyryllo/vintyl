@@ -1,0 +1,7 @@
+# Heat transfer vinyl (flex), ironed onto fabric: cut from the back, mirrored.
+name = "Heat transfer vinyl (flex)"
+tool = "knife"
+blade = "45"
+mirror = true
+weed_frame = true
+note = "Shiny side (the carrier) down, the matt side up to the knife."

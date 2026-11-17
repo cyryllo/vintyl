@@ -203,7 +203,9 @@ class MainWindow(QMainWindow):
         s.node_selection.connect(self._on_node_selection)
         s.cursor.connect(lambda x, y: self.cursor_label.setText(_("Cursor: %.1f / %.1f mm") % (x, y)))
         self.resize(1440, 900)
-        # the cutter used last time, not always the first one
+        # the materials, then the cutter used last time (not always the first one)
+        self.material_entries = {}
+        self.reload_materials()
         self.reload_profiles(self.settings.value("cutter/profile", ""), apply=False)
         self.grid_step = float(self.settings.value("view/grid_step", 10.0))
         self.view.snap_objects = str(self.settings.value("view/snap_objects", "true")).lower() == "true"
@@ -1209,6 +1211,29 @@ class MainWindow(QMainWindow):
             self.tool_box.button(k).setMinimumHeight(40)
         self.tool_box.currentIndexChanged.connect(lambda _i: self._tool_changed())
         lay.addWidget(self.tool_box)
+        # the material: choosing it sets the tool, the job's switches and the pen's values;
+        # its force and speed for this cutter are shown under it
+        self.material_box = QComboBox()
+        self.material_box.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
+        self.material_box.setMinimumContentsLength(10)
+        self.material_box.currentIndexChanged.connect(self._material_changed)
+        self.btn_material = QToolButton()
+        self.btn_material.setObjectName("square")
+        self.btn_material.setIcon(icons.tabler("settings-2"))
+        self.btn_material.setToolTip(_("Materials: force, speed, knife and pen values"))
+        self.btn_material.clicked.connect(lambda: self.edit_material())
+        mrow = QHBoxLayout()
+        mrow.setSpacing(8)
+        mlabel = QLabel(_("Material"))
+        mlabel.setObjectName("field_label")
+        mrow.addWidget(mlabel)
+        mrow.addWidget(self.material_box, 1)
+        mrow.addWidget(self.btn_material)
+        lay.addLayout(mrow)
+        self.material_hint = QLabel()
+        self.material_hint.setObjectName("muted")
+        self.material_hint.setWordWrap(True)
+        lay.addWidget(self.material_hint)
         self.pen_note = QLabel(_("For drawing on paper or card, not for vinyl. To cut vinyl, choose the knife."))
         self.pen_note.setObjectName("muted")
         self.pen_note.setWordWrap(True)
@@ -1400,6 +1425,7 @@ class MainWindow(QMainWindow):
             self.settings.value("cutter/pen_place/" + pid, "on"))))
         self._loading_tool = False
         self._tool_changed(refresh=False)
+        self._select_material(self.settings.value("cutter/material/" + pid, ""), apply=False)
         self.refresh()
 
     def is_pen(self):
@@ -1426,12 +1452,122 @@ class MainWindow(QMainWindow):
         if refresh and not getattr(self, "_loading_tool", False):
             self.refresh()
 
-    def job_profile(self):
-        """The chosen machine's profile; with the pen: no knife offset and no
-        overcut (no blade trails behind, nothing to close)."""
+    def job_profile(self, material=None):
+        """The chosen machine's profile with the material's values: its knife
+        offset and overcut before the cutter's own, its force and speed for
+        this cutter (sent only to a cutter that takes them from the computer;
+        the speed also gives the time estimate). With the pen: no knife offset
+        and no overcut (no blade trails behind, nothing to close)."""
+        p = self.profile
+        m = material if material is not None else self.material()
+        if m is not None:
+            changes = {}
+            if m.knife_offset_mm is not None:
+                changes["knife_offset_mm"] = m.knife_offset_mm
+            if m.overcut_mm is not None:
+                changes["overcut_mm"] = m.overcut_mm
+            force, speed = m.for_cutter(self.profile_box.currentData())
+            if force is not None:
+                changes["force_g"] = force
+            if speed is not None:
+                changes["speed_cm_s"] = speed
+            if changes:
+                p = dataclasses.replace(p, **changes)
         if self.is_pen():
-            return dataclasses.replace(self.profile, knife_offset_mm=0.0, overcut_mm=0.0)
-        return self.profile
+            return dataclasses.replace(p, knife_offset_mm=0.0, overcut_mm=0.0)
+        return p
+
+    # ---- materials --------------------------------------------------------------------------
+    def reload_materials(self, select=None):
+        """Fill the material list; choose `select` (an id), else the one chosen now."""
+        from vintyl.core import material as mats
+        from vintyl.gui.material_editor import display_name
+        entries = [e for e in mats.catalogue() if e["material"] is not None]
+        self.material_entries = {e["id"]: e for e in entries}
+        want = select if select in self.material_entries else self.material_box.currentData()
+        self.material_box.blockSignals(True)
+        self.material_box.clear()
+        for e in entries:
+            icon = icons.own("drag-knife") if e["material"].tool == "knife" else icons.tabler("pencil")
+            self.material_box.addItem(icon, display_name(e), e["id"])
+        self.material_box.setCurrentIndex(max(0, self.material_box.findData(want)))
+        self.material_box.blockSignals(False)
+        self._show_material_hint()
+
+    def material(self):
+        """The chosen material (or None when there is none)."""
+        e = self.material_entries.get(self.material_box.currentData())
+        return e["material"] if e else None
+
+    def _select_material(self, mid, apply=True):
+        index = self.material_box.findData(mid)
+        if index < 0:
+            self._show_material_hint()
+            return
+        self.material_box.blockSignals(not apply)
+        self.material_box.setCurrentIndex(index)
+        self.material_box.blockSignals(False)
+        self._show_material_hint()
+
+    def _material_changed(self, _index):
+        """A material chosen: it sets the tool, the mirror, the weeding frame and
+        the pen's values (changed by hand afterwards if wanted), and is
+        remembered for this cutter."""
+        m = self.material()
+        pid = self.profile_box.currentData()
+        if m is not None:
+            self._loading_tool = True
+            self.tool_box.setCurrentIndex(self.tool_box.findData(m.tool))
+            if m.pen_width_mm is not None:
+                self.pen_width.setValue(m.pen_width_mm)
+            self.pen_place.setCurrentIndex(max(0, self.pen_place.findData(m.pen_place)))
+            self._loading_tool = False
+            self._tool_changed(refresh=False)
+            for box, on in ((self.mirror_job, m.mirror), (self.weed_frame, m.weed_frame)):
+                box.blockSignals(True)
+                box.setChecked(on)
+                box.blockSignals(False)
+            if pid:
+                self.settings.setValue("cutter/material/" + pid, self.material_box.currentData())
+        self._show_material_hint()
+        self.refresh_job()
+
+    def material_values_text(self, material=None):
+        """("Set on the cutter's panel" / "Vintyl sends", "force 90 g · speed 30 cm/s"),
+        or None when the material has no force or speed for this cutter."""
+        m = material if material is not None else self.material()
+        if m is None:
+            return None
+        force, speed = m.for_cutter(self.profile_box.currentData())
+        parts = []
+        if force is not None:
+            parts.append(_("force %g g") % force)
+        if speed is not None:
+            parts.append(_("speed %g cm/s") % speed)
+        if not parts:
+            return None
+        title = _("Vintyl sends to the cutter") if self.profile.send_speed_force else _("Set on the cutter's panel")
+        return title, " · ".join(parts)
+
+    def _show_material_hint(self):
+        if not hasattr(self, "material_hint"):
+            return
+        values = self.material_values_text() if hasattr(self, "profile_box") else None
+        self.material_hint.setText("%s: %s" % values if values else "")
+        self.material_hint.setVisible(bool(values))
+
+    def edit_material(self):
+        """The materials window; saved: use what it says; "Knife test with these
+        values": cut the knife test with them."""
+        from vintyl.gui.material_editor import MaterialEditor
+        dlg = MaterialEditor(self, self.material_box.currentData(), self.profile_box.currentData())
+        dlg.exec()
+        if dlg.chosen is not None:
+            self.reload_materials(dlg.chosen)
+            self._material_changed(self.material_box.currentIndex())
+        if dlg.test_material is not None:
+            return self.knife_test(material=dlg.test_material)
+        return dlg
 
     def build(self):
         """The job as it would go to the cutter now (raises JobError / ProfileError)."""
@@ -1515,12 +1651,16 @@ class MainWindow(QMainWindow):
                 "weed_frame": self.weed_frame.isChecked(), "weed_margin_mm": self.weed_margin.value(),
                 "mirror": self.mirror_job.isChecked(),
                 "tool": self.tool_box.currentData(), "pen_width_mm": self.pen_width.value(),
+                "material": self.material_box.currentData(),
                 "pen_place": self.pen_place.currentData()}
 
     def _apply_project_settings(self, st):
         # the machine (its knife and port are its own settings, not the project's)
         if st.get("profile") in self.profile_names:
             self.profile_box.setCurrentIndex(self.profile_names.index(st["profile"]))
+        # the material of the project (older projects have none: the current one stays)
+        if st.get("material") in getattr(self, "material_entries", {}):
+            self._select_material(st["material"], apply=False)
         if st.get("tool") in ("knife", "pen"):
             self.tool_box.setCurrentIndex(self.tool_box.findData(st["tool"]))
         if st.get("pen_place") in pens.PLACES:
@@ -3159,7 +3299,7 @@ class MainWindow(QMainWindow):
     KNIFE_TEST_MM = 15.0
     KNIFE_TEST_FROM_ORIGIN_MM = 5.0
 
-    def knife_test_job(self):
+    def knife_test_job(self, material=None):
         """The job of the knife test alone: a 15 mm square with a triangle,
         5 mm from the origin (raises JobError / ProfileError)."""
         from vintyl.core import weeding
@@ -3167,17 +3307,17 @@ class MainWindow(QMainWindow):
         d = self.KNIFE_TEST_FROM_ORIGIN_MM
         test = _El("knife test", weeding.knife_test(self.KNIFE_TEST_MM, right=-d, bottom=-d))
         polys, groups = Design([test]).material_paths()
-        return build_job(polys, self.job_profile(), groups, True)
+        return build_job(polys, self.job_profile(material), groups, True)
 
-    def knife_test(self):
+    def knife_test(self, material=None):
         """Cut the knife test (after a check list): the triangle must peel off
         cleanly and the backing must stay whole. Returns the sending (or None)."""
         try:
-            job = self.knife_test_job()
+            job = self.knife_test_job(material)
         except (JobError, ProfileError) as e:
             widgets.warn(self, _("Knife test"), str(e))
             return None
-        p = self.job_profile()
+        p = self.job_profile(material)
         if widgets.ask(
                 self, _("Knife test"),
                 _("Cut the knife test on %s: a %g mm square with a triangle, %g mm from the origin?\n\n"

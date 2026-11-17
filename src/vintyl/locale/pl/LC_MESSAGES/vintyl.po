@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 18:57+0100\n"
+"POT-Creation-Date: 2026-11-17 19:01+0100\n"
 "PO-Revision-Date: 2026-11-15 17:49+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -137,6 +137,15 @@ msgstr "&Ustawienia"
 msgid "&View"
 msgstr "&Widok"
 
+msgid "30° (thin materials)"
+msgstr "30° (cienkie materiały)"
+
+msgid "45° (standard)"
+msgstr "45° (standardowe)"
+
+msgid "60° (thick materials)"
+msgstr "60° (grube materiały)"
+
 #, python-format
 msgid "<b>%s is available</b> (you have %s)."
 msgstr "<b>Jest już %s</b> (masz %s)."
@@ -222,6 +231,9 @@ msgstr "Wyrównaj zaznaczone kształty do siebie: %s"
 msgid "Along"
 msgstr "Wzdłuż"
 
+msgid "An empty field means the value from the cutter's settings."
+msgstr "Puste pole oznacza wartość z ustawień plotera."
+
 msgid "Angle"
 msgstr "Kąt"
 
@@ -254,6 +266,9 @@ msgstr "Otwór na oś (mm)"
 
 msgid "Bar width (%)"
 msgstr "Szerokość ramion (%)"
+
+msgid "Blade"
+msgstr "Ostrze"
 
 msgid "Bold"
 msgstr "Pogrubienie"
@@ -293,6 +308,9 @@ msgstr "Nie można zapisać %s: %s"
 msgid "Cannot work it out: %s"
 msgstr "Nie da się tego policzyć: %s"
 
+msgid "Card, marker"
+msgstr "Karton, marker"
+
 msgid "Centres across"
 msgstr "Środki w poziomie"
 
@@ -312,6 +330,9 @@ msgstr "Sprawdź teraz"
 
 msgid "Check once a day for a new version"
 msgstr "Sprawdzaj raz dziennie, czy jest nowa wersja"
+
+msgid "Choosing this material sets these switches in the Job panel."
+msgstr "Wybranie tego materiału ustawi te przełączniki w panelu Zadanie."
 
 msgid "Circle"
 msgstr "Koło"
@@ -508,9 +529,16 @@ msgstr "Ciemny"
 msgid "Delete"
 msgstr "Usuń"
 
+msgid "Delete material"
+msgstr "Usuń materiał"
+
 #, python-format
 msgid "Delete the cutter profile \"%s\"?"
 msgstr "Usunąć profil plotera „%s”?"
+
+#, python-format
+msgid "Delete the material \"%s\"?"
+msgstr "Usunąć materiał „%s”?"
 
 msgid "Delete the selected element"
 msgstr "Usuń zaznaczony element"
@@ -589,6 +617,11 @@ msgstr "Kropla"
 
 msgid "Duplicate"
 msgstr "Duplikuj"
+
+msgid ""
+"E.g. how far the blade sticks out, which roll, what to check before "
+"cutting"
+msgstr "Np. jak wysunąć ostrze, z której rolki, co sprawdzić przed cięciem"
 
 msgid "Edit"
 msgstr "Edycja"
@@ -711,6 +744,9 @@ msgstr ""
 msgid "Force"
 msgstr "Nacisk"
 
+msgid "Force and speed"
+msgstr "Nacisk i prędkość"
+
 #, python-format
 msgid "Forget your changes of \"%s\" and use the settings it came with?"
 msgstr "Zapomnieć zmiany w „%s” i użyć ustawień fabrycznych?"
@@ -772,6 +808,9 @@ msgstr "Długość grotu (%)"
 
 msgid "Heart"
 msgstr "Serce"
+
+msgid "Heat transfer vinyl (flex)"
+msgstr "Folia termotransferowa (flex)"
 
 msgid "Height"
 msgstr "Wysokość"
@@ -900,6 +939,9 @@ msgstr "Ścieżka noża"
 msgid "Knife test"
 msgstr "Test noża"
 
+msgid "Knife test with these values"
+msgstr "Test noża z tymi wartościami"
+
 msgid "Language"
 msgstr "Język"
 
@@ -970,6 +1012,18 @@ msgstr "Margines: linie kończą się tak daleko od kształtów."
 msgid "Marker pen"
 msgstr "Pisak"
 
+msgid "Material"
+msgstr "Materiał"
+
+msgid "Materials"
+msgstr "Materiały"
+
+msgid "Materials: cutting and drawing settings"
+msgstr "Materiały: parametry cięcia i rysowania"
+
+msgid "Materials: force, speed, knife and pen values"
+msgstr "Materiały: nacisk, prędkość, nóż i pisak"
+
 #, python-format
 msgid "Measured: %.2f mm (across %.2f mm, along %.2f mm)"
 msgstr "Zmierzono: %.2f mm (w poprzek %.2f mm, wzdłuż %.2f mm)"
@@ -1005,6 +1059,9 @@ msgstr "Nazwa"
 msgid "Name of the new cutter:"
 msgstr "Nazwa nowego plotera:"
 
+msgid "Name of the new material:"
+msgstr "Nazwa nowego materiału:"
+
 msgid "New"
 msgstr "Nowy"
 
@@ -1013,6 +1070,9 @@ msgstr "Nowy ploter"
 
 msgid "New cutter (a copy)"
 msgstr "Nowy ploter (kopia)"
+
+msgid "New material"
+msgstr "Nowy materiał"
 
 msgid "New version"
 msgstr "Nowa wersja"
@@ -1055,6 +1115,9 @@ msgstr "Niepodłączony"
 
 msgid "Not plugged in now (or switched off)."
 msgstr "Teraz niepodłączony (albo wyłączony)."
+
+msgid "Note"
+msgstr "Notatka"
 
 msgid "Nothing is left after the offset (the shape is thinner than that)."
 msgstr "Po odsunięciu nic nie zostaje (kształt jest cieńszy niż ta odległość)."
@@ -1171,6 +1234,9 @@ msgid ""
 "together."
 msgstr "Zakładka: o tyle pasy na siebie zachodzą, żeby je złożyć."
 
+msgid "Paper, fineliner"
+msgstr "Papier, cienkopis"
+
 msgid "Paste"
 msgstr "Wklej"
 
@@ -1243,6 +1309,9 @@ msgstr "Prostokąt: przeciągnij od narożnika do narożnika"
 
 msgid "Redo"
 msgstr "Ponów"
+
+msgid "Reflective vinyl"
+msgstr "Folia odblaskowa"
 
 msgid ""
 "Regular polygon: drag the box it fits in; the number of sides is in the "
@@ -1464,6 +1533,9 @@ msgstr ""
 "Wysłano %d bajtów do %s. Ploter tnie ze swojej pamięci z prędkością "
 "ustawioną na panelu."
 
+msgid "Set on the cutter's panel"
+msgstr "Ustaw na panelu plotera"
+
 msgid ""
 "Set the selected text along the selected shape (a line, a curve, a "
 "circle...): select the text and the shape"
@@ -1485,6 +1557,9 @@ msgstr "Kształt"
 
 msgid "Shapes"
 msgstr "Kształty"
+
+msgid "Shiny side (the carrier) down, the matt side up to the knife."
+msgstr "Błyszcząca strona (nośnik) do dołu, matowa do góry, do noża."
 
 msgid "Show exactly where the knife goes: cuts, travels and their order"
 msgstr "Pokaż dokładnie, gdzie pojedzie nóż: cięcia, przejazdy i ich kolejność"
@@ -1682,6 +1757,9 @@ msgstr "Linie kończą się tak daleko od kształtów"
 msgid "The new language or look shows at the next start of Vintyl."
 msgstr "Nowy język lub wygląd pojawi się przy następnym uruchomieniu Vintyla."
 
+msgid "The note shows on the check list before Start."
+msgstr "Notatka pokaże się na liście kontrolnej przed startem."
+
 msgid "The port speed must be a whole number."
 msgstr "Prędkość portu musi być liczbą całkowitą."
 
@@ -1716,6 +1794,13 @@ msgstr "Nie ma nic do cięcia."
 
 msgid "There is nothing to cut: every path is shorter than one cutter step."
 msgstr "Nie ma nic do cięcia: każda ścieżka jest krótsza niż jeden krok plotera."
+
+msgid ""
+"This cutter takes force and speed from its own panel only. Vintyl shows "
+"these values before Start, to set them there."
+msgstr ""
+"Ten ploter bierze nacisk i prędkość tylko ze swojego panelu. Vintyl "
+"pokaże te wartości przed startem, żeby je tam ustawić."
 
 msgid "This cutter's own values. A material can have its own offset and overcut."
 msgstr ""
@@ -1813,6 +1898,12 @@ msgid ""
 msgstr ""
 "Projekty Vintyl i rysunki (*.vintyl *.svg *.dxf);;Projekty Vintyl "
 "(*.vintyl);;Pliki SVG (*.svg);;Pliki DXF (*.dxf)"
+
+msgid "Vintyl sends to the cutter"
+msgstr "Vintyl wyśle do plotera"
+
+msgid "Vinyl film"
+msgstr "Folia winylowa"
 
 msgid "Vinyl kept between the shapes and the outline"
 msgstr "Folia zostawiona między kształtami a obrysem"
@@ -1932,6 +2023,9 @@ msgstr "wzdłuż: dłuższy niż arkusz"
 msgid "as fast as it cuts"
 msgstr "tak szybko, jak tnie"
 
+msgid "as in the window"
+msgstr "jak w oknie"
+
 msgid "as the system"
 msgstr "jak w systemie"
 
@@ -1965,6 +2059,17 @@ msgstr "wszystko naraz"
 
 msgid "feet"
 msgstr "stopy"
+
+#, python-format
+msgid "for: %s"
+msgstr "dla: %s"
+
+#, python-format
+msgid "force %g g"
+msgstr "nacisk %g g"
+
+msgid "from the cutter"
+msgstr "z plotera"
 
 msgid "from the panel"
 msgstr "z panelu"
@@ -2020,6 +2125,9 @@ msgstr "brak portu"
 msgid "none"
 msgstr "brak"
 
+msgid "not set"
+msgstr "nie ustawiono"
+
 msgid "on line"
 msgstr "na linii"
 
@@ -2063,6 +2171,10 @@ msgstr "programowa (XON/XOFF)"
 #, python-format
 msgid "some entities were left out: %s"
 msgstr "część elementów pominięto: %s"
+
+#, python-format
+msgid "speed %g cm/s"
+msgstr "prędkość %g cm/s"
 
 msgid "swap X and Y"
 msgstr "Zamień X i Y"
