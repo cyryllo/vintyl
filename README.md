@@ -55,7 +55,8 @@ Windows-only software such as SignMaster, so they can be used on Linux.
 **Pens**: switch the tool to the marker pen to draw on paper or card, with
 the stroke on, outside or inside the line and nine fill patterns.
 
-**And**: English and Polish; a light and a dark look; keyboard shortcuts for
+**And**: English, Polish, German, Spanish, French and Brazilian Portuguese; a
+light and a dark look; keyboard shortcuts for
 everything common (Help → Keyboard shortcuts); Help → Diagnostic report for
 bug reports and to tell us how Vintyl works on your cutter; it tells you
 when a new version is out; `vintyl --self-test` checks that everything it

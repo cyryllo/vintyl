@@ -330,7 +330,8 @@ ustaw odstęp trochę mniejszy niż grubość pisaka.
 
 Ustawienia (Ctrl+,):
 - **Rysowanie**: odstęp siatki, przyciąganie do innych kształtów.
-- **Język i wygląd**: polski albo angielski (albo jak w systemie), wygląd
+- **Język i wygląd**: polski, angielski, niemiecki, hiszpański, francuski
+  albo portugalski brazylijski (albo jak w systemie), wygląd
   jasny, ciemny albo jak w systemie; zmieniają się przy następnym
   uruchomieniu.
 - **Aktualizacje**: sprawdzaj raz dziennie, czy jest nowa wersja (pytany

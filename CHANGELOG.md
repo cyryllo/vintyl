@@ -1,5 +1,25 @@
 # Changes
 
+## Unreleased
+
+**Languages**
+- German, Spanish, French and Brazilian Portuguese, besides English and Polish (the languages of
+  Kerfly, and Portuguese for Brazil). A system in Portuguese gets the Brazilian translation. Numbers
+  are written with a decimal comma where the language does.
+- The window fits a 1366 px screen in every language: the ribbon and the tool strip may use shorter
+  words than the menus.
+
+**Materials**
+- Reflective vinyl: the 60° blade with its 0.50 mm knife offset (Roland's blade guide).
+
+**Fixed**
+- The cutter settings and materials windows scroll their cards when made low, instead of squeezing
+  them over each other.
+
+**For developers**
+- Tests on GitHub after every push (Linux, Python 3.11 and 3.13): the self-test, all the tests and
+  the translations' check.
+
 ## 0.8.0
 
 A new look for the whole window (UI v2), and materials. A big step, so the
@@ -15,7 +35,7 @@ number jumps from 0.2 to 0.8: the cutters are tested and cut cleanly, and
 - Starting force and speed in the built-in materials for the cutters with the XILI board (VEVOR,
   Seiki), all at 300 mm/s. The big 870 mm cutters: vinyl 80 g, heat transfer vinyl 120 g, reflective
   80 g, pens 70 g; the small KI-375A (and another model) presses harder: half (vinyl 50 g). Check
-  them with the knife test. Reflective vinyl: the 60° blade with its 0.50 mm knife offset.
+  them with the knife test.
 
 **The window**
 - Light and dark looks in the same style for every window; the cutter, the tool and the material
@@ -51,8 +71,6 @@ number jumps from 0.2 to 0.8: the cutters are tested and cut cleanly, and
   studied (Inkcut, CutScape, RedsailCut) in the README and THIRD-PARTY-NOTICES.md.
 
 **Fixed**
-- The cutter settings and materials windows scroll their cards when made low, instead of squeezing
-  them over each other.
 - Help → About, Keyboard shortcuts and Access to the cutter open again (they were built but not shown).
 - The mouse wheel changes a list or a number field only once it is clicked; scrolling a panel no
   longer changes the values passing under the mouse.

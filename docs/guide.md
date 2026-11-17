@@ -327,7 +327,8 @@ spacing a little less than the pen's width.
 
 Settings (Ctrl+,):
 - **Drawing**: the grid's step, snapping to other shapes.
-- **Language and look**: English or Polish (or the system's), light, dark
+- **Language and look**: English, Polish, German, Spanish, French or
+  Brazilian Portuguese (or the system's), light, dark
   or the system's look; they change at the next start.
 - **Updates**: check once a day for a new version (only GitHub is asked,
   nothing about you is sent), or **Check now**. A new version shows in a bar
