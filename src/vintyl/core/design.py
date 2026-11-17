@@ -21,6 +21,7 @@ from collections import OrderedDict
 from dataclasses import dataclass, field
 
 from . import curves
+from .layers import default_layer
 
 
 @dataclass
@@ -37,11 +38,13 @@ class Element:
     # a fill pattern inside the closed outlines, drawn with a pen (a knife skips it):
     # {"pattern": "lines", "spacing": mm, "angle": degrees, "margin": mm}; None = no fill
     fill: dict = None
+    # the colour layer it belongs to (vintyl.core.layers); "" = the design's first
+    layer: str = ""
 
     def copy(self):
         return Element(self.name, curves.copy_path(self.paths), self.cut, self.source,
                        dict(self.spec) if self.spec else None, self.group,
-                       dict(self.fill) if self.fill else None)
+                       dict(self.fill) if self.fill else None, self.layer)
 
     def fill_lines(self, tol=curves.FLATNESS_MM):
         """The fill pattern's lines (view mm), [] without a fill or closed outlines.
@@ -134,6 +137,20 @@ class Element:
 @dataclass
 class Design:
     elements: list = field(default_factory=list)
+    # the colour layers, in the order they are drawn (cut); never empty
+    layers: list = field(default_factory=lambda: [default_layer()])
+
+    def layer_of(self, element):
+        """The layer an element belongs to: its own, or the first one when it
+        names none (or one that is gone)."""
+        for layer in self.layers:
+            if layer.id == element.layer:
+                return layer
+        return self.layers[0]
+
+    def elements_of(self, layer):
+        """The elements of a layer, in list order."""
+        return [e for e in self.elements if self.layer_of(e) is layer]
 
     def bounds(self, only_cut=False):
         els = [e for e in self.elements if e.cut or not only_cut]
@@ -148,24 +165,26 @@ class Design:
         as polylines in material coordinates (see view_to_material)."""
         return self.material_paths(tol)[0]
 
-    def material_paths(self, tol=curves.FLATNESS_MM):
+    def material_paths(self, tol=curves.FLATNESS_MM, layer=None):
         """(polylines, groups): as material_polylines, plus the element number
-        of each polyline, so the job keeps the user's element order."""
+        of each polyline, so the job keeps the user's element order. layer:
+        only that layer's elements (one pen, one colour of vinyl)."""
         out, groups = [], []
         for k, e in enumerate(self.elements):
-            if not e.cut:
+            if not e.cut or (layer is not None and self.layer_of(e) is not layer):
                 continue
             for poly in curves.flatten(e.paths, tol):
                 out.append([view_to_material(x, y) for x, y in poly])
                 groups.append(k)
         return out, groups
 
-    def material_fills(self, tol=curves.FLATNESS_MM):
+    def material_fills(self, tol=curves.FLATNESS_MM, layer=None):
         """(polylines, groups) of the fill patterns of the elements marked
-        "cut" (for the pen; material coordinates, as material_paths)."""
+        "cut" (for the pen; material coordinates, as material_paths); layer:
+        only that layer's."""
         out, groups = [], []
         for k, e in enumerate(self.elements):
-            if not e.cut or not e.fill:
+            if not e.cut or not e.fill or (layer is not None and self.layer_of(e) is not layer):
                 continue
             for line in e.fill_lines(tol):
                 out.append([view_to_material(x, y) for x, y in line])

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 21:40+0100\n"
+"POT-Creation-Date: 2026-11-17 22:19+0100\n"
 "PO-Revision-Date: 2026-11-17 21:27+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -75,6 +75,10 @@ msgstr "%s n'indique pas ses unités. Ce sont :"
 #, python-format
 msgid "%s has no visible shapes to cut."
 msgstr "%s n'a aucune forme visible à découper."
+
+#, python-format
+msgid "%s is damaged: a colour layer cannot be read."
+msgstr "%s est endommagé : un calque de couleur est illisible."
 
 #, python-format
 msgid "%s is damaged: an element cannot be read."
@@ -277,8 +281,14 @@ msgstr "Trou d'axe (mm)"
 msgid "Bar width (%)"
 msgstr "Largeur des branches (%)"
 
+msgid "Black"
+msgstr "Noir"
+
 msgid "Blade"
 msgstr "Lame"
+
+msgid "Blue"
+msgstr "Bleu"
 
 msgid "Bold"
 msgstr "Gras"
@@ -293,6 +303,9 @@ msgstr "Bords inférieurs"
 
 msgid "Bricks"
 msgstr "Briques"
+
+msgid "Brown"
+msgstr "Marron"
 
 msgid "Built with"
 msgstr "Réalisé avec"
@@ -840,6 +853,12 @@ msgstr "Engrenage"
 msgid "Give the cutter a name."
 msgstr "Donnez un nom au plotter."
 
+msgid "Green"
+msgstr "Vert"
+
+msgid "Grey"
+msgstr "Gris"
+
 msgid "Grid"
 msgstr "Grille"
 
@@ -1064,6 +1083,9 @@ msgstr "Licence"
 
 msgid "Light"
 msgstr "Clair"
+
+msgid "Light blue"
+msgstr "Bleu clair"
 
 msgid "Line"
 msgstr "Ligne"
@@ -1350,6 +1372,9 @@ msgstr ""
 msgid "Opened %s"
 msgstr "%s ouvert"
 
+msgid "Orange"
+msgstr "Orange"
+
 msgid "Outer size (mm)"
 msgstr "Taille extérieure (mm)"
 
@@ -1403,6 +1428,9 @@ msgstr ""
 "Plume : clic = angle, cliquer-glisser = courbe lisse ; le premier nœud la"
 " ferme, double-clic ou Entrée la laisse ouverte"
 
+msgid "Pink"
+msgstr "Rose"
+
 msgid "Polygon"
 msgstr "Polygone"
 
@@ -1424,6 +1452,9 @@ msgstr "Vitesse du port (bauds)"
 
 msgid "Preview of your shape"
 msgstr "Aperçu de votre forme"
+
+msgid "Purple"
+msgstr "Violet"
 
 msgid "Put the copied elements back, 5 mm beside where they were"
 msgstr "Remettre les éléments copiés, à 5 mm de leur place"
@@ -1460,6 +1491,9 @@ msgstr "Rectangle"
 
 msgid "Rectangle: drag from corner to corner"
 msgstr "Rectangle : glissez d'un coin à l'autre"
+
+msgid "Red"
+msgstr "Rouge"
 
 msgid "Redo"
 msgstr "Rétablir"
@@ -2203,6 +2237,9 @@ msgstr ""
 msgid "Where the text starts along its path, mm"
 msgstr "Où le texte commence le long de son tracé, mm"
 
+msgid "White"
+msgstr "Blanc"
+
 msgid "Width"
 msgstr "Largeur"
 
@@ -2236,6 +2273,9 @@ msgstr "Y"
 
 msgid "Y the other way"
 msgstr "Y inversé"
+
+msgid "Yellow"
+msgstr "Jaune"
 
 #, python-format
 msgid ""

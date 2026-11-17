@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 21:40+0100\n"
+"POT-Creation-Date: 2026-11-17 22:19+0100\n"
 "PO-Revision-Date: 2026-11-17 21:27+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pt_BR\n"
@@ -75,6 +75,10 @@ msgstr "%s não informa suas unidades. São:"
 #, python-format
 msgid "%s has no visible shapes to cut."
 msgstr "%s não tem formas visíveis para recortar."
+
+#, python-format
+msgid "%s is damaged: a colour layer cannot be read."
+msgstr "%s está danificado: uma camada de cor não pode ser lida."
 
 #, python-format
 msgid "%s is damaged: an element cannot be read."
@@ -274,8 +278,14 @@ msgstr "Furo do eixo (mm)"
 msgid "Bar width (%)"
 msgstr "Largura dos braços (%)"
 
+msgid "Black"
+msgstr "Preto"
+
 msgid "Blade"
 msgstr "Lâmina"
+
+msgid "Blue"
+msgstr "Azul"
 
 msgid "Bold"
 msgstr "Negrito"
@@ -288,6 +298,9 @@ msgstr "Bordas inferiores"
 
 msgid "Bricks"
 msgstr "Tijolos"
+
+msgid "Brown"
+msgstr "Marrom"
 
 msgid "Built with"
 msgstr "Feito com"
@@ -836,6 +849,12 @@ msgstr "Engrenagem"
 msgid "Give the cutter a name."
 msgstr "Dê um nome à plotter."
 
+msgid "Green"
+msgstr "Verde"
+
+msgid "Grey"
+msgstr "Cinza"
+
 msgid "Grid"
 msgstr "Grade"
 
@@ -1062,6 +1081,9 @@ msgstr "Licença"
 
 msgid "Light"
 msgstr "Claro"
+
+msgid "Light blue"
+msgstr "Azul-claro"
 
 msgid "Line"
 msgstr "Linha"
@@ -1348,6 +1370,9 @@ msgstr "Abrir a página da nova versão: as novidades e o arquivo para baixar"
 msgid "Opened %s"
 msgstr "Aberto: %s"
 
+msgid "Orange"
+msgstr "Laranja"
+
 msgid "Outer size (mm)"
 msgstr "Tamanho externo (mm)"
 
@@ -1401,6 +1426,9 @@ msgstr ""
 "Caneta Bézier: clique = canto, pressionar e arrastar = curva suave; o "
 "primeiro nó fecha, clique duplo ou Enter deixa aberta"
 
+msgid "Pink"
+msgstr "Rosa"
+
 msgid "Polygon"
 msgstr "Polígono"
 
@@ -1422,6 +1450,9 @@ msgstr "Velocidade da porta (baud)"
 
 msgid "Preview of your shape"
 msgstr "Prévia da sua forma"
+
+msgid "Purple"
+msgstr "Roxo"
 
 msgid "Put the copied elements back, 5 mm beside where they were"
 msgstr "Colocar de volta os elementos copiados, 5 mm ao lado de onde estavam"
@@ -1458,6 +1489,9 @@ msgstr "Retângulo"
 
 msgid "Rectangle: drag from corner to corner"
 msgstr "Retângulo: arraste de canto a canto"
+
+msgid "Red"
+msgstr "Vermelho"
 
 msgid "Redo"
 msgstr "Refazer"
@@ -2191,6 +2225,9 @@ msgstr ""
 msgid "Where the text starts along its path, mm"
 msgstr "Onde o texto começa ao longo do caminho, mm"
 
+msgid "White"
+msgstr "Branco"
+
 msgid "Width"
 msgstr "Largura"
 
@@ -2224,6 +2261,9 @@ msgstr "Y"
 
 msgid "Y the other way"
 msgstr "Y invertido"
+
+msgid "Yellow"
+msgstr "Amarelo"
 
 #, python-format
 msgid ""

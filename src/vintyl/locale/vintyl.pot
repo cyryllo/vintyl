@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 21:40+0100\n"
+"POT-Creation-Date: 2026-11-17 22:19+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -71,6 +71,10 @@ msgstr ""
 
 #, python-format
 msgid "%s has no visible shapes to cut."
+msgstr ""
+
+#, python-format
+msgid "%s is damaged: a colour layer cannot be read."
 msgstr ""
 
 #, python-format
@@ -255,7 +259,13 @@ msgstr ""
 msgid "Bar width (%)"
 msgstr ""
 
+msgid "Black"
+msgstr ""
+
 msgid "Blade"
+msgstr ""
+
+msgid "Blue"
 msgstr ""
 
 msgid "Bold"
@@ -268,6 +278,9 @@ msgid "Bottom edges"
 msgstr ""
 
 msgid "Bricks"
+msgstr ""
+
+msgid "Brown"
 msgstr ""
 
 msgid "Built with"
@@ -780,6 +793,12 @@ msgstr ""
 msgid "Give the cutter a name."
 msgstr ""
 
+msgid "Green"
+msgstr ""
+
+msgid "Grey"
+msgstr ""
+
 msgid "Grid"
 msgstr ""
 
@@ -984,6 +1003,9 @@ msgid "Licence"
 msgstr ""
 
 msgid "Light"
+msgstr ""
+
+msgid "Light blue"
 msgstr ""
 
 msgid "Line"
@@ -1249,6 +1271,9 @@ msgstr ""
 msgid "Opened %s"
 msgstr ""
 
+msgid "Orange"
+msgstr ""
+
 msgid "Outer size (mm)"
 msgstr ""
 
@@ -1298,6 +1323,9 @@ msgid ""
 " it, double-click or Enter leaves it open"
 msgstr ""
 
+msgid "Pink"
+msgstr ""
+
 msgid "Polygon"
 msgstr ""
 
@@ -1316,6 +1344,9 @@ msgid "Port speed (baud)"
 msgstr ""
 
 msgid "Preview of your shape"
+msgstr ""
+
+msgid "Purple"
 msgstr ""
 
 msgid "Put the copied elements back, 5 mm beside where they were"
@@ -1348,6 +1379,9 @@ msgid "Rectangle"
 msgstr ""
 
 msgid "Rectangle: drag from corner to corner"
+msgstr ""
+
+msgid "Red"
 msgstr ""
 
 msgid "Redo"
@@ -2016,6 +2050,9 @@ msgstr ""
 msgid "Where the text starts along its path, mm"
 msgstr ""
 
+msgid "White"
+msgstr ""
+
 msgid "Width"
 msgstr ""
 
@@ -2048,6 +2085,9 @@ msgid "Y"
 msgstr ""
 
 msgid "Y the other way"
+msgstr ""
+
+msgid "Yellow"
 msgstr ""
 
 #, python-format
