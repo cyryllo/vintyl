@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 19:15+0100\n"
+"POT-Creation-Date: 2026-11-17 19:21+0100\n"
 "PO-Revision-Date: 2026-11-15 17:49+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -700,6 +700,9 @@ msgstr "Plik"
 msgid "Fill"
 msgstr "Wypełnienie"
 
+msgid "Fill it"
+msgstr "Wypełnij"
+
 msgid ""
 "Fill the selected closed shape with rows of small shapes (dots, stars, "
 "hearts...), each one whole, to be cut out as holes"
@@ -886,6 +889,9 @@ msgstr "Wcięcie (%)"
 
 msgid "Insert"
 msgstr "Wstaw"
+
+msgid "Insert the pattern"
+msgstr "Wstaw wzór"
 
 #, python-format
 msgid "Insert: %s"
@@ -1198,10 +1204,19 @@ msgstr ""
 "Vintyl sprawdza wybrany port i pisze pod nim, której grupy wymaga to "
 "urządzenie."
 
-msgid "Only shapes that fit whole are placed; they are cut before the outline."
+msgid ""
+"Only for the pen. A solid fill: the spacing a little less than the pen's "
+"width."
+msgstr ""
+"Tylko dla pisaka. Pełne zamalowanie: odstęp trochę mniejszy niż grubość "
+"pisaka."
+
+msgid ""
+"Only shapes that fit whole are placed; they are cut before the outline. A"
+" gap below about 1.5 mm tears when weeding."
 msgstr ""
 "Wstawiane są tylko kształty, które mieszczą się w całości; są cięte przed"
-" obrysem."
+" obrysem. Odstęp poniżej ok. 1,5 mm rwie się przy wybieraniu."
 
 msgid ""
 "Only the outer outline stays, with no holes (in O, A, a ring): a solid "
@@ -1297,6 +1312,9 @@ msgstr "Port"
 
 msgid "Port speed (baud)"
 msgstr "Prędkość portu (bod)"
+
+msgid "Preview of your shape"
+msgstr "Podgląd Twojego kształtu"
 
 msgid "Put the copied elements back, 5 mm beside where they were"
 msgstr "Wstaw skopiowane elementy z powrotem, 5 mm obok miejsca, w którym były"
@@ -2556,4 +2574,10 @@ msgstr "← Y w poprzek, mm"
 #~ "rysunek\n"
 #~ "\n"
 #~ "Żeby od razu zatrzymać ploter: Test (pauza) albo Reset na jego panelu."
+
+#~ msgid "Only shapes that fit whole are placed; they are cut before the outline."
+#~ msgstr ""
+#~ "Wstawiane są tylko kształty, które "
+#~ "mieszczą się w całości; są cięte "
+#~ "przed obrysem."
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 19:15+0100\n"
+"POT-Creation-Date: 2026-11-17 19:21+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -651,6 +651,9 @@ msgstr ""
 msgid "Fill"
 msgstr ""
 
+msgid "Fill it"
+msgstr ""
+
 msgid ""
 "Fill the selected closed shape with rows of small shapes (dots, stars, "
 "hearts...), each one whole, to be cut out as holes"
@@ -819,6 +822,9 @@ msgid "Inner corners (%)"
 msgstr ""
 
 msgid "Insert"
+msgstr ""
+
+msgid "Insert the pattern"
 msgstr ""
 
 #, python-format
@@ -1102,7 +1108,14 @@ msgid ""
 "device needs."
 msgstr ""
 
-msgid "Only shapes that fit whole are placed; they are cut before the outline."
+msgid ""
+"Only for the pen. A solid fill: the spacing a little less than the pen's "
+"width."
+msgstr ""
+
+msgid ""
+"Only shapes that fit whole are placed; they are cut before the outline. A"
+" gap below about 1.5 mm tears when weeding."
 msgstr ""
 
 msgid ""
@@ -1192,6 +1205,9 @@ msgid "Port"
 msgstr ""
 
 msgid "Port speed (baud)"
+msgstr ""
+
+msgid "Preview of your shape"
 msgstr ""
 
 msgid "Put the copied elements back, 5 mm beside where they were"

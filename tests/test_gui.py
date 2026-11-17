@@ -1138,15 +1138,13 @@ def test_the_pattern_of_shapes_is_previewed_and_cancel_leaves_nothing(win, app):
 
 
 def test_the_fill_is_previewed_and_cancel_puts_it_back(win, app):
-    from PySide6.QtWidgets import QComboBox
     win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
     win._on_drawn("rectangle", QRectF(-120, -80, 100, 60))
     box = win.selected
     seen = {}
 
     def steps(dlg):
-        combo = dlg.findChildren(QComboBox)[0]
-        combo.setCurrentIndex(combo.findData("honeycomb"))
+        dlg.pattern.setCurrentIndex(dlg.pattern.findData("honeycomb"))     # the 3 x 3 grid of pictures
         assert _wait_for(lambda: box.fill is not None and box.fill["pattern"] == "honeycomb")
         seen["ok"] = True
         dlg.reject()
@@ -1644,3 +1642,57 @@ def test_the_knife_test_window_has_the_tests_picture(win):
     texts = [l.text() for l in dlg.findChildren(QLabel)]
     assert "90 g" in texts and "–" in texts and any(t.startswith("not in the material") for t in texts)
     assert "Seiki SK-870T" in " ".join(l.text() for l in labels) and dlg.go_button.text() == "Cut the test"
+
+
+# ---- the pattern windows' own preview (UI v2, 5.8) -----------------------------------------------------
+def test_the_pattern_window_draws_the_shapes_in_its_preview(win):
+    from PySide6.QtWidgets import QDoubleSpinBox
+    from vintyl.gui.widgets import Switch
+    win._on_drawn("ellipse", QRectF(-120, -110, 100, 100))
+    dlg = win._ask_tile([win.selected], show=False)
+    assert dlg.main_button.text() == "Insert the pattern" and dlg.preview.width() == 200
+    assert dlg.findChildren(Switch)                                        # "every second row" is a switch
+    assert _wait_for(lambda: not dlg.preview._pattern.isEmpty())
+    first = dlg.preview._pattern.elementCount()
+    assert "shapes fit" in dlg.status.text()
+    dlg.findChildren(QDoubleSpinBox)[0].setValue(15.0)                    # bigger shapes: fewer
+    assert _wait_for(lambda: dlg.preview._pattern.elementCount() < first)
+    assert not dlg.preview.grab().isNull()
+    dlg.previewer.wait()
+    win.view.show_preview(None)
+
+
+def test_the_fill_window_has_nine_pictures_and_a_preview(win):
+    from PySide6.QtGui import QIcon
+    win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
+    win._on_drawn("rectangle", QRectF(-120, -80, 100, 60))
+    box = win.selected
+    dlg = win._ask_fill([box], show=False)
+    seg = dlg.pattern
+    assert seg.count() == 9 and seg.layout().rowCount() == 3 and seg.layout().columnCount() == 3
+    for i in range(9):
+        icon = seg.button(i).icon()
+        assert not icon.isNull()
+        assert icon.pixmap(30, 30, QIcon.Normal, QIcon.Off).toImage() != icon.pixmap(
+            30, 30, QIcon.Normal, QIcon.On).toImage()                    # chosen: in the accent
+    assert dlg.main_button.text() == "Fill it" and not dlg.remove_button.isEnabled()   # nothing to remove yet
+    seg.setCurrentIndex(seg.findData("cross"))
+    assert _wait_for(lambda: not dlg.preview._pattern.isEmpty() and box.fill and box.fill["pattern"] == "cross")
+    dlg.previewer.wait()
+    box.fill = {"pattern": "lines", "spacing": 2.0, "angle": 0.0, "margin": 0.0}
+    dlg = win._ask_fill([box], show=False)
+    assert dlg.remove_button.isEnabled() and dlg.pattern.currentData() == "lines"
+    dlg.previewer.wait()
+
+
+def test_every_pattern_has_a_picture():
+    from vintyl.gui.main_window import MainWindow
+    from vintyl.gui.previews import pattern_icon
+    for code, _label in MainWindow.FILL_PATTERNS:
+        if code == "concentric":
+            from vintyl.core import offset
+            if not offset.available():
+                continue
+        img = pattern_icon(code, 30).pixmap(30, 30).toImage()
+        inked = sum(1 for x in range(30) for y in range(30) if img.pixelColor(x, y).alpha() > 0)
+        assert inked > 30, code

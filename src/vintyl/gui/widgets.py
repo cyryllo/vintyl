@@ -129,6 +129,11 @@ class Segmented(QWidget):
         self._data.append(data)
         if self._columns:
             self._grid.addWidget(b, index // self._columns, index % self._columns)
+            # a grid of equal cells, as wide as the widest name
+            widest = max(x.sizeHint().width() for x in self._buttons)
+            for c in range(self._columns):
+                self._grid.setColumnMinimumWidth(c, widest)
+                self._grid.setColumnStretch(c, 1)
         else:
             self._grid.addWidget(b, 0, index)
         if index == 0:
@@ -246,11 +251,13 @@ def value_of(widget):
     raise TypeError("no value for %r" % (widget,))
 
 
-def form_dialog(parent, title, rows, action=None, hint=None, extra=None, left=None, show=True):
+def form_dialog(parent, title, rows, action=None, hint=None, extra=None, left=None, show=True,
+                buttons_left=()):
     """A dialog of fields. rows: [(key, label, widget)], label None = the
     widget across the dialog; action: the main button's text (what it does;
     default "OK"); hint: a line under the fields; extra(layout): more widgets
-    under the fields; left: a widget left of the fields (a preview).
+    under the fields; left: a widget left of the fields (a preview);
+    buttons_left: buttons at the footer's left (the caller connects them).
     Returns {key: value} or None (cancelled). show=False returns the dialog
     instead, not run (for tests and for callers that run it themselves)."""
     dlg = QDialog(parent)
@@ -278,7 +285,7 @@ def form_dialog(parent, title, rows, action=None, hint=None, extra=None, left=No
     main.setDefault(True)
     cancel.clicked.connect(dlg.reject)
     main.clicked.connect(dlg.accept)
-    footer(outer, [cancel, main])
+    footer(outer, [cancel, main], buttons_left)
     dlg.main_button = main
     dlg.rows = rows
     if not show:

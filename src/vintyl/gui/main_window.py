@@ -38,10 +38,10 @@ from vintyl.gui import N_, _, ngettext
 from vintyl.gui import icons
 from vintyl.gui import theme
 from vintyl.gui import widgets
-from vintyl.gui.canvas import MaterialView, shape_icon
+from vintyl.gui.canvas import MaterialView, painter_path, shape_icon
 from vintyl.gui.sender import SendWorker
 from vintyl.gui import text as texts
-from vintyl.gui.widgets import ICON_ROLE, Switch, ToolTile
+from vintyl.gui.widgets import ICON_ROLE, Segmented, Switch, ToolTile
 
 LATER = N_("Comes in a later step of Vintyl")   # translated where it is shown
 PLACE_MARGIN_MM = 10.0        # a new file is placed this far from the origin
@@ -2224,13 +2224,42 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage(ngettext("%d shape placed.", "%d shapes placed.", count) % count, 6000)
         return new
 
-    def _ask_tile(self, chosen):
-        from PySide6.QtWidgets import QDialog, QDialogButtonBox
+    def _preview_column(self):
+        """Left of the pattern windows: the 200 px picture, its caption and a
+        line of status (how many shapes fit, "working it out")."""
+        from vintyl.gui.previews import ShapePreview
+        column = QWidget()
+        lay = QVBoxLayout(column)
+        lay.setContentsMargins(0, 0, 0, 0)
+        lay.setSpacing(6)
+        preview = ShapePreview(200)
+        caption = QLabel(_("Preview of your shape"))
+        caption.setObjectName("preview_caption")
+        caption.setAlignment(Qt.AlignCenter)
+        status = QLabel()
+        status.setObjectName("preview_caption")
+        status.setAlignment(Qt.AlignCenter)
+        status.setWordWrap(True)
+        status.setFixedWidth(200)
+        lay.addWidget(preview)
+        lay.addWidget(caption)
+        lay.addWidget(status)
+        return column, preview, status
+
+    def _run_preview_dialog(self, dlg, prev):
+        """Run a pattern window beside the sheet; True when accepted."""
+        from PySide6.QtWidgets import QDialog
+        self._place_beside(dlg)
+        accepted = dlg.exec() == QDialog.Accepted
+        prev.wait()
+        return accepted
+
+    def _ask_tile(self, chosen, show=True):
+        """The Pattern of shapes window (UI v2, 5.8): the preview left, the
+        fields right, "Insert the pattern". show=False returns the window, not
+        run (for tests), with .values_now() and .preview."""
         from vintyl.core import tile
         from vintyl.gui.previewer import Previewer
-        dlg = QDialog(self)
-        dlg.setWindowTitle(_("Pattern of shapes"))
-        form = QFormLayout(dlg)
         st = self.settings
         motif = QComboBox()
         motif.setIconSize(QSize(22, 22))
@@ -2247,29 +2276,25 @@ class MainWindow(QMainWindow):
         margin = _spin(100.0, 1, " mm", minimum=0.0)
         margin.setValue(float(st.value("tile/margin", 2.0)))
         margin.setToolTip(_("Vinyl kept between the shapes and the outline"))
-        stagger = QCheckBox(_("Every second row shifted"))
+        stagger = Switch(_("Every second row shifted"))
         stagger.setChecked(st.value("tile/stagger", "true") == "true")
-        form.addRow(_("Shape"), motif)
-        form.addRow(_("Size"), size)
-        form.addRow(_("Gap"), gap)
-        form.addRow(_("Margin"), margin)
-        form.addRow(stagger)
-        note = QLabel(_("Only shapes that fit whole are placed; they are cut before the outline."))
-        note.setWordWrap(True)
-        form.addRow(note)
-        status = QLabel()
-        form.addRow(status)
-        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-        buttons.accepted.connect(dlg.accept)
-        buttons.rejected.connect(dlg.reject)
-        form.addRow(buttons)
+        column, preview, status = self._preview_column()
+        rows = [("motif", _("Shape"), motif), ("size", _("Size"), size), ("gap", _("Gap"), gap),
+                ("margin", _("Margin"), margin), ("stagger", None, stagger)]
+        dlg = widgets.form_dialog(self, _("Pattern of shapes"), rows, action=_("Insert the pattern"),
+                                  hint=_("Only shapes that fit whole are placed; they are cut before the "
+                                         "outline. A gap below about 1.5 mm tears when weeding."),
+                                  left=column, show=False)
 
         def values_now():
             return {"motif": motif.currentData(), "size": size.value(), "gap": gap.value(),
                     "margin": margin.value(), "stagger": stagger.isChecked()}
 
-        # the live preview: dashed on the sheet, worked out in the background
+        # the live preview: in the window and dashed on the sheet, worked out
+        # in the background
         outline = [sub for e in chosen for sub in e.paths]
+        outline_path = painter_path(outline)
+        preview.set_paths(outline_path)
         prev = Previewer(dlg)
 
         def ask_preview(*_a):
@@ -2277,25 +2302,28 @@ class MainWindow(QMainWindow):
             m = tile.motif(v["motif"])
             prev.request(lambda: tile.tile(outline, m, v["size"], v["gap"], v["stagger"], v["margin"]))
 
-        def show(result):
+        def show_result(result):
             if isinstance(result, Exception):
                 self.view.show_preview(None)
+                preview.set_paths(outline_path)
                 status.setText(_("Cannot work it out: %s") % result)
                 return
             paths, count = result
             self.view.show_preview(paths)
+            preview.set_paths(outline_path, painter_path(paths))
             status.setText(ngettext("%d shape fits.", "%d shapes fit.", count) % count if count else
                            _("No shape fits inside: make them smaller or the margin narrower."))
-        prev.ready.connect(show)
+        prev.ready.connect(show_result)
         prev.busy.connect(lambda b: b and status.setText(_("Working it out…")))
         motif.currentIndexChanged.connect(ask_preview)
         for w in (size, gap, margin):
             w.valueChanged.connect(ask_preview)
         stagger.toggled.connect(ask_preview)
         ask_preview()
-        self._place_beside(dlg)
-        accepted = dlg.exec() == QDialog.Accepted
-        prev.wait()
+        dlg.values_now, dlg.preview, dlg.previewer, dlg.status = values_now, preview, prev, status
+        if not show:
+            return dlg
+        accepted = self._run_preview_dialog(dlg, prev)
         self.view.show_preview(None)
         if not accepted:
             return None
@@ -2304,17 +2332,18 @@ class MainWindow(QMainWindow):
             st.setValue("tile/" + k, str(v).lower() if isinstance(v, bool) else v)
         return values
 
-    def _ask_fill(self, chosen):
-        from PySide6.QtWidgets import QDialog, QDialogButtonBox
+    def _ask_fill(self, chosen, show=True):
+        """The Fill window (UI v2, 5.8): the preview left; the nine patterns as
+        pictures in a 3 x 3 grid, Spacing, Angle, Margin; "Remove the fill"
+        left, Cancel, "Fill". The shapes on the sheet show the fill too.
+        show=False returns the window, not run (for tests)."""
         from vintyl.gui.previewer import Previewer
+        from vintyl.gui.previews import pattern_icon, polyline_path
         current = chosen[0].fill
-        dlg = QDialog(self)
-        dlg.setWindowTitle(_("Fill"))
-        form = QFormLayout(dlg)
-        pattern = QComboBox()
-        for code, label in self.FILL_PATTERNS:
-            pattern.addItem(_(label), code)
         st = self.settings
+        pattern = Segmented(columns=3, icon_size=30)
+        for code, label in self.FILL_PATTERNS:
+            pattern.addItem(_(label), code, pattern_icon(code, 30))
         start = current or {"pattern": st.value("fill/pattern", "lines"),
                             "spacing": st.value("fill/spacing", 1.0), "angle": st.value("fill/angle", 45.0),
                             "margin": st.value("fill/margin", 0.0)}
@@ -2329,27 +2358,28 @@ class MainWindow(QMainWindow):
         margin = _spin(50.0, 2, " mm", minimum=0.0)
         margin.setValue(float(start["margin"]))
         margin.setToolTip(_("Keep the pattern this far from the outline"))
-        form.addRow(_("Pattern"), pattern)
-        form.addRow(_("Spacing"), spacing)
-        form.addRow(_("Angle"), angle)
-        form.addRow(_("Margin"), margin)
-        status = QLabel()
-        form.addRow(status)
-        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-        remove = buttons.addButton(_("Remove the fill"), QDialogButtonBox.DestructiveRole)
+        column, preview, status = self._preview_column()
+        remove = QPushButton(_("Remove the fill"))
+        remove.setEnabled(bool(current))
+        rows = [("pattern", None, pattern), ("spacing", _("Spacing"), spacing), ("angle", _("Angle"), angle),
+                ("margin", _("Margin"), margin)]
+        # "Fill it": the button's verb ("Fill" is the window's name, "Wypełnienie")
+        dlg = widgets.form_dialog(self, _("Fill"), rows, action=_("Fill it"),
+                                  hint=_("Only for the pen. A solid fill: the spacing a little less than "
+                                         "the pen's width."),
+                                  left=column, show=False, buttons_left=[remove])
         removed = []
         remove.clicked.connect(lambda: (removed.append(True), dlg.accept()))
-        remove.setEnabled(bool(current))
-        buttons.accepted.connect(dlg.accept)
-        buttons.rejected.connect(dlg.reject)
-        form.addRow(buttons)
 
         def values_now():
             return {"pattern": pattern.currentData(), "spacing": spacing.value(), "angle": angle.value(),
                     "margin": margin.value()}
 
-        # the live preview: the shapes show the fill as it would be; worked out in
-        # the background (into the fill cache), then drawn
+        # the live preview: in the window, and the shapes on the sheet show the
+        # fill as it would be; worked out in the background (into the fill
+        # cache), then drawn
+        outline_path = painter_path([sub for e in chosen for sub in e.paths])
+        preview.set_paths(outline_path)
         prev = Previewer(dlg)
 
         def ask_preview(*_a):
@@ -2357,30 +2387,34 @@ class MainWindow(QMainWindow):
             copies = [e.copy() for e in chosen]
 
             def work():
+                lines = []
                 for c in copies:
                     c.fill = spec
-                    c.fill_lines()
-                return spec
+                    lines += c.fill_lines()
+                return spec, lines
             prev.request(work)
 
-        def show(result):
+        def show_result(result):
             if isinstance(result, Exception):
                 status.setText(_("Cannot work it out: %s") % result)
                 return
+            spec, lines = result
             status.setText("")
+            preview.set_paths(outline_path, polyline_path(lines))
             for e in chosen:
-                e.fill = dict(result)
+                e.fill = dict(spec)
             self.refresh()
-        prev.ready.connect(show)
+        prev.ready.connect(show_result)
         prev.busy.connect(lambda b: b and status.setText(_("Working it out…")))
         pattern.currentIndexChanged.connect(ask_preview)
         for w in (spacing, angle, margin):
             w.valueChanged.connect(ask_preview)
         ask_preview()
-        self._place_beside(dlg)
-        accepted = dlg.exec() == QDialog.Accepted
-        prev.wait()
-        if not accepted:
+        dlg.values_now, dlg.preview, dlg.previewer, dlg.status = values_now, preview, prev, status
+        dlg.pattern, dlg.remove_button = pattern, remove
+        if not show:
+            return dlg
+        if not self._run_preview_dialog(dlg, prev):
             return None
         if removed:
             return {"pattern": None}

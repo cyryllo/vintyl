@@ -143,6 +143,8 @@ QListWidget#element_list { background: transparent; border: 0; outline: 0; }
 QListWidget#element_list::item:selected, QListWidget#element_list::item:hover { background: transparent; }
 QFrame#warn { background: $warn_bg; border-radius: 8px; }
 QFrame#warn QLabel { color: $warn_ink; }
+QFrame#preview_box { background: $sheet; border: 1px solid $border; border-radius: 8px; }
+QLabel#preview_caption { color: $muted; }
 QFrame#info { background: $info_bg; border: 1px solid $info_border; border-radius: 8px; }
 QFrame#info QLabel { color: $info_ink; }
 QLabel#info_title { font-weight: 600; font-size: 14px; }
