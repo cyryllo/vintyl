@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 20:17+0100\n"
+"POT-Creation-Date: 2026-11-17 21:40+0100\n"
 "PO-Revision-Date: 2026-11-15 17:49+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -556,6 +556,10 @@ msgstr "Ciemny"
 msgid "Delete"
 msgstr "Usuń"
 
+msgctxt "ribbon"
+msgid "Delete"
+msgstr "Usuń"
+
 msgid "Delete material"
 msgstr "Usuń materiał"
 
@@ -582,6 +586,10 @@ msgstr "Raport diagnostyczny…"
 msgid "Diamonds"
 msgstr "Romby"
 
+msgid "Difference"
+msgstr "Różnica"
+
+msgctxt "ribbon"
 msgid "Difference"
 msgstr "Różnica"
 
@@ -655,6 +663,10 @@ msgstr "Kropla"
 msgid "Duplicate"
 msgstr "Duplikuj"
 
+msgctxt "ribbon"
+msgid "Duplicate"
+msgstr "Duplikuj"
+
 msgid ""
 "E.g. how far the blade sticks out, which roll, what to check before "
 "cutting"
@@ -713,6 +725,10 @@ msgstr ""
 msgid "Exclusion"
 msgstr "Wykluczenie"
 
+msgctxt "ribbon"
+msgid "Exclusion"
+msgstr "Wykluczenie"
+
 msgid "Exclusion: keep where the shapes do not overlap"
 msgstr "Wykluczenie: zostaw to, gdzie kształty się nie nakładają"
 
@@ -722,6 +738,10 @@ msgstr "Dodatkowy odstęp między literami, mm"
 msgid "File"
 msgstr "Plik"
 
+msgid "Fill"
+msgstr "Wypełnienie"
+
+msgctxt "tool strip"
 msgid "Fill"
 msgstr "Wypełnienie"
 
@@ -745,6 +765,10 @@ msgstr ""
 msgid "Find"
 msgstr "Szukaj"
 
+msgid "Fit"
+msgstr "Dopasuj"
+
+msgctxt "ribbon"
 msgid "Fit"
 msgstr "Dopasuj"
 
@@ -821,12 +845,20 @@ msgstr "Nadaj ploterowi nazwę."
 msgid "Grid"
 msgstr "Siatka"
 
+msgctxt "ribbon"
+msgid "Grid"
+msgstr "Siatka"
+
 msgid "Grid step"
 msgstr "Odstęp siatki"
 
 msgid "Grid step, snapping"
 msgstr "Odstęp siatki, przyciąganie"
 
+msgid "Group"
+msgstr "Grupuj"
+
+msgctxt "ribbon"
 msgid "Group"
 msgstr "Grupuj"
 
@@ -931,6 +963,10 @@ msgstr "Najpierw kształty wewnętrzne"
 msgid "Intersection"
 msgstr "Część wspólna"
 
+msgctxt "ribbon"
+msgid "Intersection"
+msgstr "Część wspólna"
+
 msgid "Intersection: keep only where the selected shapes overlap"
 msgstr "Część wspólna: zostaw tylko to, gdzie kształty się nakładają"
 
@@ -982,6 +1018,10 @@ msgstr ""
 msgid "Knife path"
 msgstr "Ścieżka noża"
 
+msgctxt "ribbon"
+msgid "Knife path"
+msgstr "Ścieżka noża"
+
 msgid "Knife test"
 msgstr "Test noża"
 
@@ -1026,6 +1066,10 @@ msgstr "Linia"
 msgid "Line: drag from end to end"
 msgstr "Linia: przeciągnij od końca do końca"
 
+msgid "Lines"
+msgstr "Linie"
+
+msgctxt "tool strip"
 msgid "Lines"
 msgstr "Linie"
 
@@ -1128,6 +1172,10 @@ msgstr "Nazwa nowego materiału:"
 msgid "New"
 msgstr "Nowy"
 
+msgctxt "ribbon"
+msgid "New"
+msgstr "Nowy"
+
 msgid "New cutter"
 msgstr "Nowy ploter"
 
@@ -1170,6 +1218,10 @@ msgstr "Nie ustawiono portu. Wybierz port plotera w panelu."
 msgid "No shape fits inside: make them smaller or the margin narrower."
 msgstr "Żaden kształt się nie mieści: zmniejsz je albo zwęź margines."
 
+msgid "Nodes"
+msgstr "Węzły"
+
+msgctxt "tool strip"
 msgid "Nodes"
 msgstr "Węzły"
 
@@ -1228,6 +1280,10 @@ msgstr ""
 msgid "Offset"
 msgstr "Odsunięcie"
 
+msgctxt "tool strip"
+msgid "Offset"
+msgstr "Odsunięcie"
+
 msgid "On Arch and Manjaro: uucp instead of dialout."
 msgstr "W Archu i Manjaro zamiast dialout: uucp."
 
@@ -1259,6 +1315,10 @@ msgstr ""
 "Zostaje tylko zewnętrzny obrys, bez otworów (w O, A, pierścieniu): pełny "
 "podkład pod napis w innym kolorze"
 
+msgid "Open"
+msgstr "Otwórz"
+
+msgctxt "ribbon"
 msgid "Open"
 msgstr "Otwórz"
 
@@ -1318,6 +1378,10 @@ msgstr "Pióro"
 msgid "Pen path"
 msgstr "Ścieżka pisaka"
 
+msgctxt "ribbon"
+msgid "Pen path"
+msgstr "Ścieżka pisaka"
+
 msgid "Pen width"
 msgstr "Grubość pisaka"
 
@@ -1371,6 +1435,7 @@ msgstr "Kod QR"
 msgid "Quit"
 msgstr "Zakończ"
 
+msgctxt "tool strip"
 msgid "Ready"
 msgstr "Gotowe"
 
@@ -1383,6 +1448,10 @@ msgstr "Prostokąt"
 msgid "Rectangle: drag from corner to corner"
 msgstr "Prostokąt: przeciągnij od narożnika do narożnika"
 
+msgid "Redo"
+msgstr "Ponów"
+
+msgctxt "ribbon"
 msgid "Redo"
 msgstr "Ponów"
 
@@ -1450,6 +1519,10 @@ msgstr "Rzędy (wzdłuż)"
 msgid "Ruler"
 msgstr "Miarka"
 
+msgctxt "tool strip"
+msgid "Ruler"
+msgstr "Miarka"
+
 msgid "Ruler: drag between two points to measure"
 msgstr "Miarka: przeciągnij między dwoma punktami, żeby zmierzyć"
 
@@ -1459,6 +1532,14 @@ msgstr "Pliki SVG (*.svg)"
 msgid "Save"
 msgstr "Zapisz"
 
+msgctxt "ribbon"
+msgid "Save"
+msgstr "Zapisz"
+
+msgid "Save .hpgl"
+msgstr "Zapisz .hpgl"
+
+msgctxt "ribbon"
 msgid "Save .hpgl"
 msgstr "Zapisz .hpgl"
 
@@ -1501,6 +1582,10 @@ msgstr "Szukaj"
 msgid "See the release"
 msgstr "Zobacz wydanie"
 
+msgid "Select"
+msgstr "Zaznacz"
+
+msgctxt "tool strip"
 msgid "Select"
 msgstr "Zaznacz"
 
@@ -1594,6 +1679,10 @@ msgstr "Szerokość trzonu (%)"
 msgid "Shape"
 msgstr "Kształt"
 
+msgid "Shapes"
+msgstr "Kształty"
+
+msgctxt "tool strip"
 msgid "Shapes"
 msgstr "Kształty"
 
@@ -1761,6 +1850,10 @@ msgstr ""
 msgid "Text"
 msgstr "Tekst"
 
+msgctxt "tool strip"
+msgid "Text"
+msgstr "Tekst"
+
 msgid "Text on a path"
 msgstr "Tekst po ścieżce"
 
@@ -1908,6 +2001,7 @@ msgstr ""
 "Wartości domyślne tego plotera. Materiał może mieć własne przesunięcie i "
 "nadcięcie."
 
+msgctxt "ribbon"
 msgid "To 0,0"
 msgstr "Do 0,0"
 
@@ -1963,9 +2057,21 @@ msgstr "drukarka USB (/dev/usb/lp…)"
 msgid "Undo"
 msgstr "Cofnij"
 
+msgctxt "ribbon"
+msgid "Undo"
+msgstr "Cofnij"
+
 msgid "Ungroup"
 msgstr "Rozgrupuj"
 
+msgctxt "ribbon"
+msgid "Ungroup"
+msgstr "Rozgrupuj"
+
+msgid "Union"
+msgstr "Suma"
+
+msgctxt "ribbon"
 msgid "Union"
 msgstr "Suma"
 
@@ -2763,4 +2869,10 @@ msgstr "← Y w poprzek, mm"
 #~ " them in the material (the button "
 #~ "beside Material) and they show here."
 #~ msgstr ""
+
+#~ msgid "To 0,0"
+#~ msgstr "Do 0,0"
+
+#~ msgid "Ready"
+#~ msgstr "Gotowe"
 

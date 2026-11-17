@@ -2000,3 +2000,43 @@ def test_the_settings_windows_scroll_instead_of_squeezing_their_cards(win):
         area = inner.parentWidget().parentWidget()
         assert inner.width() <= area.viewport().width()          # nothing cut at the side
         dlg.close()
+
+
+@pytest.mark.parametrize("lang", ["en", "pl", "de", "es", "fr", "pt_BR"])
+def test_the_window_fits_a_1366_screen_in_every_language(app, lang):
+    """Longer words must not widen the selection bar past a 1366 px screen
+    (Spanish and Portuguese did, with a text on a path), nor the ribbon
+    (German needed 1549 px: it was squeezed and its labels cut), nor cut
+    the names in the tool strip ("Desplazamiento" in a 66 px tile)."""
+    from PySide6.QtGui import QFont, QFontMetrics
+    from PySide6.QtTest import QTest
+    from PySide6.QtWidgets import QToolBar
+    from vintyl import i18n
+    i18n.setup(lang)
+    w = MainWindow()
+    try:
+        w.resize(1366, 768)
+        w.show()
+        assert w.findChild(QToolBar).sizeHint().width() <= 1366 - 10, "ribbon"
+        tile_font = QFont(QApplication.font())
+        tile_font.setPixelSize(10)                       # as the style sheet has it, bold when chosen
+        tile_font.setWeight(QFont.DemiBold)
+        for b in w.category_buttons.values():
+            assert QFontMetrics(tile_font).horizontalAdvance(b.text()) <= b.width() - 6, b.text()
+
+        def fits():
+            QTest.qWait(20)
+            return w.width() == 1366 and w.minimumSizeHint().width() <= 1366 - 24
+        w._on_drawn("rectangle", QRectF(-160, -120, 90, 60))
+        assert fits(), "rectangle"
+        w._on_text_clicked(QPointF(-260, -260))
+        text = w.selected
+        w._on_drawn("ellipse", QRectF(-200, -330, 120, 120))
+        w.selection, w.selected = [text, w.selected], text
+        w.put_text_on_path()
+        w.selection = [w.selected]
+        w._show_options()
+        assert fits(), "text on a path"
+    finally:
+        w.close()
+        i18n.setup("en")

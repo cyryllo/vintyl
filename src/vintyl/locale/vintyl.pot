@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 20:17+0100\n"
+"POT-Creation-Date: 2026-11-17 21:40+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -517,6 +517,10 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
+msgctxt "ribbon"
+msgid "Delete"
+msgstr ""
+
 msgid "Delete material"
 msgstr ""
 
@@ -543,6 +547,10 @@ msgstr ""
 msgid "Diamonds"
 msgstr ""
 
+msgid "Difference"
+msgstr ""
+
+msgctxt "ribbon"
 msgid "Difference"
 msgstr ""
 
@@ -608,6 +616,10 @@ msgstr ""
 msgid "Duplicate"
 msgstr ""
 
+msgctxt "ribbon"
+msgid "Duplicate"
+msgstr ""
+
 msgid ""
 "E.g. how far the blade sticks out, which roll, what to check before "
 "cutting"
@@ -662,6 +674,10 @@ msgstr ""
 msgid "Exclusion"
 msgstr ""
 
+msgctxt "ribbon"
+msgid "Exclusion"
+msgstr ""
+
 msgid "Exclusion: keep where the shapes do not overlap"
 msgstr ""
 
@@ -671,6 +687,10 @@ msgstr ""
 msgid "File"
 msgstr ""
 
+msgid "Fill"
+msgstr ""
+
+msgctxt "tool strip"
 msgid "Fill"
 msgstr ""
 
@@ -690,6 +710,10 @@ msgstr ""
 msgid "Find"
 msgstr ""
 
+msgid "Fit"
+msgstr ""
+
+msgctxt "ribbon"
 msgid "Fit"
 msgstr ""
 
@@ -759,12 +783,20 @@ msgstr ""
 msgid "Grid"
 msgstr ""
 
+msgctxt "ribbon"
+msgid "Grid"
+msgstr ""
+
 msgid "Grid step"
 msgstr ""
 
 msgid "Grid step, snapping"
 msgstr ""
 
+msgid "Group"
+msgstr ""
+
+msgctxt "ribbon"
 msgid "Group"
 msgstr ""
 
@@ -863,6 +895,10 @@ msgstr ""
 msgid "Intersection"
 msgstr ""
 
+msgctxt "ribbon"
+msgid "Intersection"
+msgstr ""
+
 msgid "Intersection: keep only where the selected shapes overlap"
 msgstr ""
 
@@ -910,6 +946,10 @@ msgstr ""
 msgid "Knife path"
 msgstr ""
 
+msgctxt "ribbon"
+msgid "Knife path"
+msgstr ""
+
 msgid "Knife test"
 msgstr ""
 
@@ -952,6 +992,10 @@ msgstr ""
 msgid "Line: drag from end to end"
 msgstr ""
 
+msgid "Lines"
+msgstr ""
+
+msgctxt "tool strip"
 msgid "Lines"
 msgstr ""
 
@@ -1052,6 +1096,10 @@ msgstr ""
 msgid "New"
 msgstr ""
 
+msgctxt "ribbon"
+msgid "New"
+msgstr ""
+
 msgid "New cutter"
 msgstr ""
 
@@ -1088,6 +1136,10 @@ msgstr ""
 msgid "No shape fits inside: make them smaller or the margin narrower."
 msgstr ""
 
+msgid "Nodes"
+msgstr ""
+
+msgctxt "tool strip"
 msgid "Nodes"
 msgstr ""
 
@@ -1144,6 +1196,10 @@ msgstr ""
 msgid "Offset"
 msgstr ""
 
+msgctxt "tool strip"
+msgid "Offset"
+msgstr ""
+
 msgid "On Arch and Manjaro: uucp instead of dialout."
 msgstr ""
 
@@ -1167,6 +1223,10 @@ msgid ""
 "backing for a text in another colour"
 msgstr ""
 
+msgid "Open"
+msgstr ""
+
+msgctxt "ribbon"
 msgid "Open"
 msgstr ""
 
@@ -1226,6 +1286,10 @@ msgstr ""
 msgid "Pen path"
 msgstr ""
 
+msgctxt "ribbon"
+msgid "Pen path"
+msgstr ""
+
 msgid "Pen width"
 msgstr ""
 
@@ -1273,6 +1337,7 @@ msgstr ""
 msgid "Quit"
 msgstr ""
 
+msgctxt "tool strip"
 msgid "Ready"
 msgstr ""
 
@@ -1285,6 +1350,10 @@ msgstr ""
 msgid "Rectangle: drag from corner to corner"
 msgstr ""
 
+msgid "Redo"
+msgstr ""
+
+msgctxt "ribbon"
 msgid "Redo"
 msgstr ""
 
@@ -1350,6 +1419,10 @@ msgstr ""
 msgid "Ruler"
 msgstr ""
 
+msgctxt "tool strip"
+msgid "Ruler"
+msgstr ""
+
 msgid "Ruler: drag between two points to measure"
 msgstr ""
 
@@ -1359,6 +1432,14 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
+msgctxt "ribbon"
+msgid "Save"
+msgstr ""
+
+msgid "Save .hpgl"
+msgstr ""
+
+msgctxt "ribbon"
 msgid "Save .hpgl"
 msgstr ""
 
@@ -1401,6 +1482,10 @@ msgstr ""
 msgid "See the release"
 msgstr ""
 
+msgid "Select"
+msgstr ""
+
+msgctxt "tool strip"
 msgid "Select"
 msgstr ""
 
@@ -1488,6 +1573,10 @@ msgstr ""
 msgid "Shape"
 msgstr ""
 
+msgid "Shapes"
+msgstr ""
+
+msgctxt "tool strip"
 msgid "Shapes"
 msgstr ""
 
@@ -1635,6 +1724,10 @@ msgstr ""
 msgid "Text"
 msgstr ""
 
+msgctxt "tool strip"
+msgid "Text"
+msgstr ""
+
 msgid "Text on a path"
 msgstr ""
 
@@ -1763,6 +1856,7 @@ msgstr ""
 msgid "This cutter's own values. A material can have its own offset and overcut."
 msgstr ""
 
+msgctxt "ribbon"
 msgid "To 0,0"
 msgstr ""
 
@@ -1816,9 +1910,21 @@ msgstr ""
 msgid "Undo"
 msgstr ""
 
+msgctxt "ribbon"
+msgid "Undo"
+msgstr ""
+
 msgid "Ungroup"
 msgstr ""
 
+msgctxt "ribbon"
+msgid "Ungroup"
+msgstr ""
+
+msgid "Union"
+msgstr ""
+
+msgctxt "ribbon"
 msgid "Union"
 msgstr ""
 

@@ -27,7 +27,15 @@ LOCALE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "locale")
 LANGUAGES = {
     "en": "English",
     "pl": "Polski",
+    "de": "Deutsch",
+    "es": "Español",
+    "fr": "Français",
+    "pt_BR": "Português (Brasil)",
 }
+# a system in Portuguese gets the Brazilian translation (the only Portuguese one)
+_SAME = {"pt": "pt_BR"}
+# languages that write a decimal comma (1,5 mm)
+DECIMAL_COMMA = ("pl", "de", "es", "fr", "pt_BR")
 
 _translation = gettext.NullTranslations()
 _current = "en"
@@ -41,23 +49,44 @@ def ngettext(singular, plural, n):
     return _translation.ngettext(singular, plural, n)
 
 
+def pgettext(context, message):
+    """A text in a context, translated on its own: pgettext("ribbon",
+    "Save .hpgl") may be shorter than the menu's "Save .hpgl" (the ribbon
+    must fit a 1366 px screen in every language)."""
+    return _translation.pgettext(context, message)
+
+
 def N_(message):
     """Mark a string for translation without translating it yet."""
     return message
 
 
+def NP_(context, message):
+    """Mark a string in a context, translated later with pgettext(context, ...)."""
+    return message
+
+
+def _known(value):
+    """The code of a locale name ("de_DE.UTF-8", "pt_BR", "fr") that Vintyl
+    has, else 'en': the full code first (pt_BR), then the two letters."""
+    name = value.split(":")[0].split(".")[0]
+    if name in LANGUAGES:
+        return name
+    code = name[:2].lower()
+    code = _SAME.get(code, code)
+    return code if code in LANGUAGES else "en"
+
+
 def system_language():
-    """Two-letter code of the system language if Vintyl has it, else 'en'."""
+    """The code of the system language if Vintyl has it, else 'en'."""
     for var in ("LANGUAGE", "LC_ALL", "LC_MESSAGES", "LANG"):
         value = os.environ.get(var)
         if value:
-            code = value.split(":")[0][:2].lower()
-            return code if code in LANGUAGES else "en"
+            return _known(value)
     try:
-        code = (locale.getlocale()[0] or "en")[:2].lower()
+        return _known(locale.getlocale()[0] or "en")
     except ValueError:
-        code = "en"
-    return code if code in LANGUAGES else "en"
+        return "en"
 
 
 def setup(language=""):
@@ -71,3 +100,8 @@ def setup(language=""):
 
 def current_language():
     return _current
+
+
+def decimal(text):
+    """A number written as the language does: 1,5 in Polish, German..."""
+    return text.replace(".", ",") if _current in DECIMAL_COMMA else text

@@ -23,6 +23,10 @@ MIME_XML = """<?xml version="1.0" encoding="UTF-8"?>
   <mime-type type="application/x-vintyl">
     <comment>Vintyl project</comment>
     <comment xml:lang="pl">Projekt Vintyl</comment>
+    <comment xml:lang="de">Vintyl-Projekt</comment>
+    <comment xml:lang="es">Proyecto de Vintyl</comment>
+    <comment xml:lang="fr">Projet Vintyl</comment>
+    <comment xml:lang="pt_BR">Projeto do Vintyl</comment>
     <icon name="vintyl"/>
     <glob pattern="*.vintyl"/>
   </mime-type>
@@ -52,8 +56,16 @@ def desktop_text(program):
         "Name=Vintyl",
         "GenericName=Vinyl cutter",
         "GenericName[pl]=Ploter tnący",
+        "GenericName[de]=Schneideplotter",
+        "GenericName[es]=Plóter de corte",
+        "GenericName[fr]=Plotter de découpe",
+        "GenericName[pt_BR]=Plotter de recorte",
         "Comment=Draw and cut designs on a vinyl cutter",
         "Comment[pl]=Rysowanie i cięcie projektów na ploterze do folii",
+        "Comment[de]=Motive zeichnen und auf dem Schneideplotter schneiden",
+        "Comment[es]=Dibujar y cortar diseños en un plóter de corte de vinilo",
+        "Comment[fr]=Dessiner et découper des motifs sur un plotter de découpe vinyle",
+        "Comment[pt_BR]=Desenhar e recortar projetos na plotter de recorte de vinil",
         "Exec=%s %%F" % quoted,
         "Icon=vintyl",
         "Terminal=false",

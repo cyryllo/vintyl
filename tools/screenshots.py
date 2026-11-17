@@ -4,6 +4,7 @@ program itself:
 
     .venv/bin/python tools/screenshots.py          # English: docs/screenshots/
     .venv/bin/python tools/screenshots.py pl       # Polish:  docs/screenshots/pl/
+    .venv/bin/python tools/screenshots.py de /tmp/shots   # any language, into another folder
 
 The light look, a 1400 x 860 window. It runs offscreen with its own
 settings, cutter profiles and materials in a temporary folder, so it never
@@ -19,7 +20,8 @@ import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 LANG = sys.argv[1] if len(sys.argv) > 1 else "en"
-OUT = os.path.join(HERE, "..", "docs", "screenshots", *([] if LANG == "en" else [LANG]))
+OUT = sys.argv[2] if len(sys.argv) > 2 else \
+    os.path.join(HERE, "..", "docs", "screenshots", *([] if LANG == "en" else [LANG]))
 
 # before anything of Vintyl or Qt is loaded: offscreen, and settings of its own
 TEMP = tempfile.mkdtemp(prefix="vintyl-shots-")

@@ -34,7 +34,7 @@ from vintyl.core.design import Design, Element
 from vintyl.core.job import JobError, build_job
 from vintyl.core.loaders import LoadError, load_svg
 from vintyl.core.profile import ProfileError
-from vintyl.gui import N_, _, ngettext
+from vintyl.gui import N_, NP_, _, ngettext, pgettext
 from vintyl.gui import icons
 from vintyl.gui import theme
 from vintyl.gui import widgets
@@ -434,22 +434,29 @@ class MainWindow(QMainWindow):
         actions are disabled, see _enable_selection_actions). After Kerfly's
         ribbon (kerfly/gui/main_window.py, commit cf48565)."""
         big, beside, icons_only = "big", "beside", "icons"
+        # the labels on the ribbon have their own context: a language may give
+        # them shorter words than the menus have, so the ribbon fits 1366 px
         groups = [
-            (_("File"), big, [(self.act_new, _("New")), (self.act_open, _("Open")), (self.act_save, _("Save")),
-                              (self.act_save_cut, _("Save .hpgl"))]),
-            (_("Edit"), big, [(self.act_undo, _("Undo")), (self.act_redo, _("Redo"))]),
-            (_("Element"), beside, [(self.act_duplicate, _("Duplicate")), (self.act_delete, _("Delete"))]),
+            (_("File"), big, [(self.act_new, pgettext("ribbon", "New")), (self.act_open, pgettext("ribbon", "Open")),
+                              (self.act_save, pgettext("ribbon", "Save")),
+                              (self.act_save_cut, pgettext("ribbon", "Save .hpgl"))]),
+            (_("Edit"), big, [(self.act_undo, pgettext("ribbon", "Undo")), (self.act_redo, pgettext("ribbon", "Redo"))]),
+            (_("Element"), beside, [(self.act_duplicate, pgettext("ribbon", "Duplicate")),
+                                    (self.act_delete, pgettext("ribbon", "Delete"))]),
             (_("Transform"), icons_only, [self.act_rot_left, self.act_rot_right,
                                           self.act_mirror_h, self.act_mirror_v]),
             (_("Align"), icons_only, [self.act_align["left"], self.act_align["centre"], self.act_align["right"],
                                       self.act_distribute_across, self.act_align["top"], self.act_align["middle"],
                                       self.act_align["bottom"], self.act_distribute_up]),
-            (_("Shapes"), beside, [(self.act_group, _("Group")), (self.act_boolean["union"], None),
-                                   (self.act_boolean["difference"], None), (self.act_ungroup, _("Ungroup")),
-                                   (self.act_boolean["intersection"], None), (self.act_boolean["exclusion"], None)]),
-            (_("View"), big, [(self.act_to_origin, _("To 0,0")), (self.act_fit, _("Fit")),
-                              (self.act_knife, _("Knife path")),
-                              (self.act_grid, _("Grid"))]),
+            (_("Shapes"), beside, [(self.act_group, pgettext("ribbon", "Group")),
+                                   (self.act_boolean["union"], pgettext("ribbon", "Union")),
+                                   (self.act_boolean["difference"], pgettext("ribbon", "Difference")),
+                                   (self.act_ungroup, pgettext("ribbon", "Ungroup")),
+                                   (self.act_boolean["intersection"], pgettext("ribbon", "Intersection")),
+                                   (self.act_boolean["exclusion"], pgettext("ribbon", "Exclusion"))]),
+            (_("View"), big, [(self.act_to_origin, pgettext("ribbon", "To 0,0")), (self.act_fit, pgettext("ribbon", "Fit")),
+                              (self.act_knife, pgettext("ribbon", "Knife path")),
+                              (self.act_grid, pgettext("ribbon", "Grid"))]),
         ]
         tb = QToolBar(_("Main"))
         tb.setObjectName("main_toolbar")
@@ -518,20 +525,20 @@ class MainWindow(QMainWindow):
     # (transform, align, duplicate, delete) is not repeated.
     # A tool: ("tool", key, label, tooltip, icon); a ready shape: ("ready", key)
     PANEL = [
-        ("pick", N_("Select"), "pointer", [
+        ("pick", NP_("tool strip", "Select"), "pointer", [
             ("tool", "select", N_("Select"), N_("Select and move"), "pointer"),
         ]),
-        ("nodes", N_("Nodes"), "vector-bezier-2", [
+        ("nodes", NP_("tool strip", "Nodes"), "vector-bezier-2", [
             ("tool", "nodes", N_("Nodes"), N_("Edit nodes (or double-click an element)"), "vector-bezier-2"),
         ]),
-        ("shapes", N_("Shapes"), "square", [
+        ("shapes", NP_("tool strip", "Shapes"), "square", [
             ("tool", "rectangle", N_("Rectangle"), N_("Rectangle: drag from corner to corner"), "square"),
             ("tool", "ellipse", N_("Ellipse"), N_("Ellipse: drag the box it fits in"), "circle"),
             ("tool", "polygon", N_("Polygon"), N_("Regular polygon: drag the box it fits in; the number of "
                                                   "sides is in the options bar"), "polygon"),
         ]),
-        ("ready", N_("Ready"), None, [("ready", k) for k in ready.READY] + [("act", "act_qr", N_("QR code"))]),
-        ("lines", N_("Lines"), "vector", [
+        ("ready", NP_("tool strip", "Ready"), None, [("ready", k) for k in ready.READY] + [("act", "act_qr", N_("QR code"))]),
+        ("lines", NP_("tool strip", "Lines"), "vector", [
             ("tool", "polyline", N_("Polyline"), N_("Polyline: click the corners; the first corner closes it, "
                                                      "double-click or Enter leaves it open"), "vector"),
             ("tool", "line", N_("Line"), N_("Line: drag from end to end"), "line"),
@@ -540,18 +547,18 @@ class MainWindow(QMainWindow):
             ("tool", "freehand", N_("Freehand"), N_("Freehand: draw with the button held; ending at the start "
                                                     "closes it"), "scribble"),
         ]),
-        ("text", N_("Text"), "typography", [
+        ("text", NP_("tool strip", "Text"), "typography", [
             ("tool", "text", N_("Text"), N_("Text: click where it should start"), "typography"),
             ("act", "act_text_path", N_("Text on a path")),
         ]),
-        ("offset", N_("Offset"), "box-padding", [
+        ("offset", NP_("tool strip", "Offset"), "box-padding", [
             ("act", "act_offset", N_("Offset")),
         ]),
-        ("fill", N_("Fill"), "rosette", [
+        ("fill", NP_("tool strip", "Fill"), "rosette", [
             ("act", "act_tile", N_("Pattern of shapes")),
             ("act", "act_fill", N_("Fill")),
         ]),
-        ("measure", N_("Ruler"), "ruler-measure", [
+        ("measure", NP_("tool strip", "Ruler"), "ruler-measure", [
             ("tool", "measure", N_("Ruler"), N_("Ruler: drag between two points to measure"), "ruler-measure"),
         ]),
     ]
@@ -593,7 +600,9 @@ class MainWindow(QMainWindow):
             cb.setIconSize(QSize(22, 22))
             cb.setFixedSize(66, 54)
             cb.setIcon(icons.tabler(icon) if icon else icons.tabler("star"))
-            cb.setText(_(title))
+            # the strip's own words (context "tool strip"): a language may give
+            # a shorter one than its menus, so it fits the 66 px tile
+            cb.setText(pgettext("tool strip", title))
             cb.setCheckable(True)
             cb.clicked.connect(lambda _c=False, c=cat: self.show_category(c))
             cat_group.addButton(cb)
@@ -1552,7 +1561,7 @@ class MainWindow(QMainWindow):
         self._mark_sets()
         self.view.pen_mode = pen
         self.act_knife.setText(_("Pen path") if pen else _("Knife path"))
-        self.act_knife.setIconText(self.act_knife.text())
+        self.act_knife.setIconText(pgettext("ribbon", "Pen path") if pen else pgettext("ribbon", "Knife path"))
         name = self.profile_box.currentData()
         if name and not getattr(self, "_loading_tool", False):
             self.settings.setValue("cutter/tool/" + name, self.tool_box.currentData())
@@ -1664,9 +1673,8 @@ class MainWindow(QMainWindow):
         from vintyl import i18n
         from vintyl.gui.material_editor import BLADE_NAMES
 
-        def mm(v):                                   # as the window writes numbers (a comma in Polish)
-            text = "%g mm" % round(v, 2)
-            return text.replace(".", ",") if i18n.current_language() == "pl" else text
+        def mm(v):                                   # as the window writes numbers (1,5 in Polish)
+            return i18n.decimal("%g mm" % round(v, 2))
         pen = self.is_pen() if pen is None else pen
         if pen:
             return [(_("Worked into the pen's path by Vintyl"),

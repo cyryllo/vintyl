@@ -1,0 +1,2465 @@
+# German translations for Vintyl.
+# Copyright (C) 2026 Vintyl contributors
+# This file is distributed under the same license as the Vintyl project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Vintyl VERSION\n"
+"Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
+"POT-Creation-Date: 2026-11-17 21:40+0100\n"
+"PO-Revision-Date: 2026-11-17 21:27+0100\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#, python-format
+msgid "%.0f × %.0f mm"
+msgstr "%.0f × %.0f mm"
+
+#, python-format
+msgid "%.2f m"
+msgstr "%.2f m"
+
+#, python-format
+msgid "%d copy made."
+msgid_plural "%d copies made."
+msgstr[0] "%d Kopie erstellt."
+msgstr[1] "%d Kopien erstellt."
+
+#, python-format
+msgid "%d element"
+msgid_plural "%d elements"
+msgstr[0] "%d Element"
+msgstr[1] "%d Elemente"
+
+#, python-format
+msgid "%d node selected"
+msgid_plural "%d nodes selected"
+msgstr[0] "%d Knoten ausgewählt"
+msgstr[1] "%d Knoten ausgewählt"
+
+#, python-format
+msgid "%d shape fits."
+msgid_plural "%d shapes fit."
+msgstr[0] "%d Form passt hinein."
+msgstr[1] "%d Formen passen hinein."
+
+#, python-format
+msgid "%d shape placed."
+msgid_plural "%d shapes placed."
+msgstr[0] "%d Form eingefügt."
+msgstr[1] "%d Formen eingefügt."
+
+#, python-format
+msgid "%s (mine)"
+msgstr "%s (meins)"
+
+#, python-format
+msgid ""
+"%s The knife offset and the overcut need %.2f mm of room; move the design"
+" that far from the edge."
+msgstr ""
+"%s Messerversatz und Überschnitt brauchen %.2f mm Platz; das Motiv so "
+"weit vom Rand wegschieben."
+
+#, python-format
+msgid "%s does not say its units. They are:"
+msgstr "%s gibt seine Einheiten nicht an. Sie sind:"
+
+#, python-format
+msgid "%s has no visible shapes to cut."
+msgstr "%s hat keine sichtbaren Formen zum Schneiden."
+
+#, python-format
+msgid "%s is damaged: an element cannot be read."
+msgstr "%s ist beschädigt: ein Element kann nicht gelesen werden."
+
+#, python-format
+msgid "%s is damaged: it is not readable as a project."
+msgstr "%s ist beschädigt: es lässt sich nicht als Projekt lesen."
+
+#, python-format
+msgid "%s is not a Vintyl project."
+msgstr "%s ist kein Vintyl-Projekt."
+
+#, python-format
+msgid ""
+"%s is not there now: plug the cutter in and switch it on, or choose its "
+"port in the cutter's settings."
+msgstr ""
+"%s ist gerade nicht da: den Plotter anschließen und einschalten oder "
+"seinen Anschluss in den Plotter-Einstellungen wählen."
+
+#, python-format
+msgid "%s is not there. Is the cutter connected by USB and switched on?"
+msgstr "%s ist nicht da. Ist der Plotter per USB angeschlossen und eingeschaltet?"
+
+#, python-format
+msgid "%s was saved by a newer Vintyl; please update Vintyl to open it."
+msgstr ""
+"%s wurde mit einem neueren Vintyl gespeichert; bitte Vintyl "
+"aktualisieren, um es zu öffnen."
+
+#, python-format
+msgid "%s: unknown units %s."
+msgstr "%s: unbekannte Einheiten %s."
+
+msgid "&Cutter"
+msgstr "&Plotter"
+
+msgid "&Edit"
+msgstr "&Bearbeiten"
+
+msgid "&File"
+msgstr "&Datei"
+
+msgid "&Help"
+msgstr "&Hilfe"
+
+msgid "&Object"
+msgstr "&Objekt"
+
+msgid "&Settings"
+msgstr "&Einstellungen"
+
+msgid "&View"
+msgstr "&Ansicht"
+
+msgid "30° (thin materials)"
+msgstr "30° (dünne Materialien)"
+
+msgid "45° (standard)"
+msgstr "45° (Standard)"
+
+msgid "60° (thick materials)"
+msgstr "60° (dicke Materialien)"
+
+#, python-format
+msgid "<b>A new version of Vintyl is out: %s</b> (you have %s)."
+msgstr "<b>Eine neue Version von Vintyl ist da: %s</b> (Sie haben %s)."
+
+msgid ""
+"<b>Mirror on.</b> The vinyl's shiny side (the carrier) down, the matt "
+"side up to the knife."
+msgstr ""
+"<b>Spiegeln an.</b> Die glänzende Seite der Folie (der Träger) nach "
+"unten, die matte Seite nach oben zum Messer."
+
+msgid "A QR code to cut: an address or a text"
+msgstr "Ein QR-Code zum Schneiden: eine Adresse oder ein Text"
+
+msgid "A copy of the selected element, a little to the side"
+msgstr "Eine Kopie des ausgewählten Elements, etwas daneben"
+
+#, python-format
+msgid "A cutter profile cannot be read: %s"
+msgstr "Ein Plotterprofil kann nicht gelesen werden: %s"
+
+msgid ""
+"A design wider than the cutter (or longer than the sheet): cut it in "
+"strips that overlap, laid one after another on the material"
+msgstr ""
+"Ein Motiv, breiter als der Plotter (oder länger als der Bogen): in "
+"überlappenden Bahnen schneiden, die nacheinander auf das Material gelegt "
+"werden"
+
+msgid ""
+"A new outline round the selected shapes (or inside them), a set distance "
+"away: an edge round a text, a backing in another colour"
+msgstr ""
+"Ein neuer Umriss um die ausgewählten Formen (oder in ihnen) in festem "
+"Abstand: ein Rand um einen Text, eine Unterlage in anderer Farbe"
+
+msgid "A path has a point that is not a number."
+msgstr "Ein Pfad hat einen Punkt, der keine Zahl ist."
+
+#, python-format
+msgid ""
+"A point would go to the cutter at %d,%d (below zero). Check the axis "
+"settings of the profile."
+msgstr ""
+"Ein Punkt ginge an den Plotter bei %d,%d (unter null). Die "
+"Achseneinstellungen des Profils prüfen."
+
+msgid "A profile of your own, starting from these settings"
+msgstr "Ein eigenes Profil, ausgehend von diesen Einstellungen"
+
+msgid ""
+"A rectangle round everything that is cut, cut last: the waste vinyl "
+"inside it peels off in one piece"
+msgstr ""
+"Ein Rechteck um alles, was geschnitten wird, zuletzt geschnitten: die "
+"Restfolie darin lässt sich in einem Stück abziehen"
+
+#, python-format
+msgid "About %.1f min at %g mm/s"
+msgstr "Etwa %.1f min bei %g mm/s"
+
+msgid "About Vintyl"
+msgstr "Über Vintyl"
+
+msgid "Access to the cutter"
+msgstr "Zugriff auf den Plotter"
+
+msgid "Access to the cutter (Linux groups)"
+msgstr "Zugriff auf den Plotter (Linux-Gruppen)"
+
+msgid "Add Vintyl to the applications menu"
+msgstr "Vintyl zum Anwendungsmenü hinzufügen"
+
+msgid ""
+"Add Vintyl to the applications menu, and open .vintyl projects with it?\n"
+"(Help → Add Vintyl to the applications menu does it later too.)"
+msgstr ""
+"Vintyl zum Anwendungsmenü hinzufügen und .vintyl-Projekte damit öffnen?\n"
+"(Hilfe → Vintyl zum Anwendungsmenü hinzufügen macht das auch später.)"
+
+msgid "Add to the menu"
+msgstr "Zum Menü hinzufügen"
+
+msgid "After cutting"
+msgstr "Nach dem Schneiden"
+
+msgid "Align"
+msgstr "Ausrichten"
+
+#, python-format
+msgid "Align the selected shapes to each other: %s"
+msgstr "Die ausgewählten Formen aneinander ausrichten: %s"
+
+msgid "Along"
+msgstr "Entlang"
+
+msgid "An empty field means the value from the cutter's settings."
+msgstr "Ein leeres Feld bedeutet den Wert aus den Plotter-Einstellungen."
+
+msgid "Angle"
+msgstr "Winkel"
+
+msgid "Applications menu"
+msgstr "Anwendungsmenü"
+
+msgid "Arms"
+msgstr "Zacken"
+
+msgid "Arrow"
+msgstr "Pfeil"
+
+msgid "As many columns as fit in the width"
+msgstr "So viele Spalten, wie in die Breite passen"
+
+msgid "As the system"
+msgstr "Wie das System"
+
+msgid "Asks GitHub; nothing about you is sent."
+msgstr "Fragt GitHub; nichts über Sie wird gesendet."
+
+msgid "Authors"
+msgstr "Autoren"
+
+msgid "Away"
+msgstr "Abstand"
+
+msgid "Axes"
+msgstr "Achsen"
+
+msgid "Axle hole (mm)"
+msgstr "Achsloch (mm)"
+
+msgid "Bar width (%)"
+msgstr "Balkenbreite (%)"
+
+msgid "Blade"
+msgstr "Klinge"
+
+msgid "Bold"
+msgstr "Fett"
+
+msgid "Bottom edge: how far up from the origin, along the material"
+msgstr "Unterkante: wie weit vom Nullpunkt nach oben, entlang des Materials"
+
+msgid "Bottom edges"
+msgstr "Unterkanten"
+
+msgid "Bricks"
+msgstr "Ziegel"
+
+msgid "Built with"
+msgstr "Erstellt mit"
+
+msgid ""
+"Built-in profile: your changes are kept as your own copy; \"Restore "
+"factory settings\" brings back the original."
+msgstr ""
+"Eingebautes Profil: Ihre Änderungen werden als eigene Kopie gespeichert; "
+"„Werkseinstellungen wiederherstellen“ holt das Original zurück."
+
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#, python-format
+msgid "Cannot open %s: %s"
+msgstr "%s kann nicht geöffnet werden: %s"
+
+#, python-format
+msgid "Cannot read %s: %s"
+msgstr "%s kann nicht gelesen werden: %s"
+
+#, python-format
+msgid "Cannot save %s: %s"
+msgstr "%s kann nicht gespeichert werden: %s"
+
+#, python-format
+msgid "Cannot work it out: %s"
+msgstr "Lässt sich nicht berechnen: %s"
+
+msgid "Card, marker"
+msgstr "Karton, Marker"
+
+msgid "Centres across"
+msgstr "Mitten quer"
+
+msgid "Centres up and down"
+msgstr "Mitten auf und ab"
+
+msgid "Change one size and the others follow, so the shape keeps its look"
+msgstr ""
+"Eine Größe ändern und die anderen folgen, damit die Form ihr Aussehen "
+"behält"
+
+msgid "Check before you go on"
+msgstr "Vor dem Weitermachen prüfen"
+
+msgid "Check for a new version"
+msgstr "Nach einer neuen Version suchen"
+
+msgid "Check now"
+msgstr "Jetzt prüfen"
+
+msgid "Check once a day for a new version"
+msgstr "Einmal am Tag nach einer neuen Version suchen"
+
+msgid "Choosing this material sets these switches in the Job panel."
+msgstr "Die Wahl dieses Materials stellt diese Schalter im Bereich Auftrag ein."
+
+msgid "Circle"
+msgstr "Kreis"
+
+msgid "Circles"
+msgstr "Kreise"
+
+msgid "Close"
+msgstr "Schließen"
+
+msgid "Closed shapes are cut this far past their start, so the cut closes cleanly"
+msgstr ""
+"Geschlossene Formen werden so weit über ihren Anfang hinaus geschnitten, "
+"damit sich der Schnitt sauber schließt"
+
+msgid "Columns (across)"
+msgstr "Spalten (quer)"
+
+msgid "Comes in a later step of Vintyl"
+msgstr "Kommt in einem späteren Schritt von Vintyl"
+
+msgid "Command name or key"
+msgstr "Befehlsname oder Taste"
+
+msgid "Commands"
+msgstr "Befehle"
+
+msgid "Concentric"
+msgstr "Konzentrisch"
+
+msgid "Connection"
+msgstr "Verbindung"
+
+msgid "Connects as"
+msgstr "Verbindet sich als"
+
+msgid "Content"
+msgstr "Inhalt"
+
+#, python-format
+msgid "Copied %d element."
+msgid_plural "Copied %d elements."
+msgstr[0] "%d Element kopiert."
+msgstr[1] "%d Elemente kopiert."
+
+msgid "Copied. Paste them into a terminal."
+msgstr "Kopiert. In ein Terminal einfügen."
+
+msgid "Copies"
+msgstr "Kopien"
+
+msgid "Copies the report and opens GitHub's form"
+msgstr "Kopiert den Bericht und öffnet das Formular auf GitHub"
+
+msgid "Copies…"
+msgstr "Kopien…"
+
+msgid "Copy"
+msgstr "Kopieren"
+
+msgid "Copy commands"
+msgstr "Befehle kopieren"
+
+msgid ""
+"Copy this and paste it into your report on GitHub. It holds the versions,"
+" the checks, the chosen cutter and Vintyl's log; no user name, no "
+"designs."
+msgstr ""
+"Kopieren Sie das und fügen Sie es in Ihre Meldung auf GitHub ein. Es "
+"enthält die Versionen, die Prüfungen, den gewählten Plotter und das "
+"Protokoll von Vintyl; keinen Benutzernamen, keine Motive."
+
+msgid "Corner from"
+msgstr "Ecke ab"
+
+msgid "Corner radius"
+msgstr "Eckenradius"
+
+msgid "Corner radius (mm)"
+msgstr "Eckenradius (mm)"
+
+msgid "Corners"
+msgstr "Ecken"
+
+#, python-format
+msgid "Could not ask GitHub (no internet?): %s"
+msgstr "GitHub konnte nicht gefragt werden (kein Internet?): %s"
+
+msgid "Create"
+msgstr "Erstellen"
+
+msgid "Cross"
+msgstr "Kreuz"
+
+msgid "Cross-hatch"
+msgstr "Kreuzschraffur"
+
+#, python-format
+msgid "Cursor: %.1f / %.1f mm"
+msgstr "Cursor: %.1f / %.1f mm"
+
+msgid "Curve"
+msgstr "Kurve"
+
+msgid "Cut"
+msgstr "Ausschneiden"
+
+msgid "Cut a small square with a triangle to check the knife's force"
+msgstr ""
+"Ein kleines Quadrat mit einem Dreieck schneiden, um den Messerdruck zu "
+"prüfen"
+
+msgid "Cut earlier"
+msgstr "Früher schneiden"
+
+msgid "Cut earlier (up the list)"
+msgstr "Früher schneiden (in der Liste nach oben)"
+
+msgid "Cut first"
+msgstr "Zuerst schneiden"
+
+msgid "Cut it"
+msgstr "Schneiden"
+
+msgid "Cut last"
+msgstr "Zuletzt schneiden"
+
+msgid "Cut later"
+msgstr "Später schneiden"
+
+msgid "Cut later (down the list)"
+msgstr "Später schneiden (in der Liste nach unten)"
+
+msgid "Cut length"
+msgstr "Schnittlänge"
+
+msgid "Cut now?"
+msgstr "Jetzt schneiden?"
+
+msgid "Cut the design (after a short check list)"
+msgstr "Das Motiv schneiden (nach einer kurzen Prüfliste)"
+
+#, python-format
+msgid ""
+"Cut the knife test on <b>%(cutter)s</b>: a %(size)g mm square with a "
+"triangle, near the origin?"
+msgstr ""
+"Den Messertest auf <b>%(cutter)s</b> schneiden: ein Quadrat von %(size)g "
+"mm mit einem Dreieck, nahe am Nullpunkt?"
+
+msgid "Cut the test"
+msgstr "Test schneiden"
+
+msgid "Cut this element"
+msgstr "Dieses Element schneiden"
+
+msgid "Cuts through the waste vinyl between the shapes, so it peels off in strips"
+msgstr ""
+"Schneidet durch die Restfolie zwischen den Formen, damit sie sich in "
+"Streifen abziehen lässt"
+
+msgid "Cutter"
+msgstr "Plotter"
+
+#, python-format
+msgid "Cutter files (*%s)"
+msgstr "Plotterdateien (*%s)"
+
+msgid "Cutter settings"
+msgstr "Plotter-Einstellungen"
+
+msgid "Cutter settings…"
+msgstr "Plotter-Einstellungen…"
+
+#, python-format
+msgid ""
+"Cutter: <b>%(cutter)s</b> (%(port)s) &nbsp;&nbsp; Tool: <b>%(tool)s</b> "
+"&nbsp;&nbsp; Material: <b>%(material)s</b>"
+msgstr ""
+"Plotter: <b>%(cutter)s</b> (%(port)s) &nbsp;&nbsp; Werkzeug: "
+"<b>%(tool)s</b> &nbsp;&nbsp; Material: <b>%(material)s</b>"
+
+msgid "Cutters"
+msgstr "Plotter"
+
+msgid "Cutting"
+msgstr "Schneiden"
+
+msgid "Cutting order"
+msgstr "Schnittreihenfolge"
+
+msgid "Cutting width"
+msgstr "Schnittbreite"
+
+#, python-format
+msgid "Cutting width %g mm"
+msgstr "Schnittbreite %g mm"
+
+msgid "DMPL mode"
+msgstr "DMPL-Modus"
+
+msgid "Dark"
+msgstr "Dunkel"
+
+msgid "Delete"
+msgstr "Löschen"
+
+msgctxt "ribbon"
+msgid "Delete"
+msgstr "Löschen"
+
+msgid "Delete material"
+msgstr "Material löschen"
+
+#, python-format
+msgid "Delete the cutter profile \"%s\"?"
+msgstr "Das Plotterprofil „%s“ löschen?"
+
+#, python-format
+msgid "Delete the material \"%s\"?"
+msgstr "Das Material „%s“ löschen?"
+
+msgid "Delete the selected element"
+msgstr "Das ausgewählte Element löschen"
+
+msgid "Delete this cutter"
+msgstr "Diesen Plotter löschen"
+
+msgid "Diagnostic report"
+msgstr "Diagnosebericht"
+
+msgid "Diagnostic report…"
+msgstr "Diagnosebericht…"
+
+msgid "Diamonds"
+msgstr "Rauten"
+
+msgid "Difference"
+msgstr "Differenz"
+
+msgctxt "ribbon"
+msgid "Difference"
+msgstr "Differenz"
+
+msgid "Difference: cut the other selected shapes out of the first one"
+msgstr "Differenz: die anderen ausgewählten Formen aus der ersten ausschneiden"
+
+msgid "Direction"
+msgstr "Richtung"
+
+msgid "Distance"
+msgstr "Abstand"
+
+msgid ""
+"Distance between the grid's lines; drawing and nodes snap to them while "
+"the grid is on"
+msgstr ""
+"Abstand der Rasterlinien; Zeichnen und Knoten rasten daran ein, solange "
+"das Raster an ist"
+
+msgid "Distance between the lines"
+msgstr "Abstand zwischen den Linien"
+
+msgid ""
+"Distance between the lines (the size of one repeat). For a solid fill: a "
+"little less than the pen's width."
+msgstr ""
+"Abstand zwischen den Linien (die Größe einer Wiederholung). Für eine "
+"volle Füllung: etwas weniger als die Stiftbreite."
+
+msgid "Do again what was taken back"
+msgstr "Wiederholen, was zurückgenommen wurde"
+
+msgid "Do not remind about this version again (a later one is shown)"
+msgstr "Nicht mehr an diese Version erinnern (eine spätere wird angezeigt)"
+
+msgid ""
+"Does it work on another cutter for you? Tell us through “Diagnostic "
+"report”; it helps others."
+msgstr ""
+"Läuft es bei Ihnen auf einem anderen Plotter? Sagen Sie es uns über "
+"„Diagnosebericht“; das hilft anderen."
+
+msgid "Don't save"
+msgstr "Nicht speichern"
+
+msgid "Drag between two points to measure"
+msgstr "Zwischen zwei Punkten ziehen, um zu messen"
+
+msgid ""
+"Drag nodes and handles · double-click a side: add a node · D delete · L "
+"line · C curve · O smooth · Z close/open · B break"
+msgstr ""
+"Knoten und Griffe ziehen · Doppelklick auf eine Seite: Knoten hinzufügen "
+"· D löschen · L Linie · C Kurve · O glatt · Z schließen/öffnen · B "
+"auftrennen"
+
+msgid "Draw"
+msgstr "Zeichnen"
+
+msgid "Draw now?"
+msgstr "Jetzt zeichnen?"
+
+msgid "Drawing"
+msgstr "Zeichnen"
+
+msgid "Drawn length"
+msgstr "Gezeichnete Länge"
+
+msgid "Drop"
+msgstr "Tropfen"
+
+msgid "Duplicate"
+msgstr "Duplizieren"
+
+msgctxt "ribbon"
+msgid "Duplicate"
+msgstr "Duplizieren"
+
+msgid ""
+"E.g. how far the blade sticks out, which roll, what to check before "
+"cutting"
+msgstr ""
+"Z. B. wie weit die Klinge herausragt, welche Rolle, was vor dem Schneiden"
+" zu prüfen ist"
+
+msgid "Edit"
+msgstr "Bearbeiten"
+
+msgid "Edit nodes"
+msgstr "Knoten bearbeiten"
+
+msgid "Edit nodes (or double-click an element)"
+msgstr "Knoten bearbeiten (oder Doppelklick auf ein Element)"
+
+msgid "Element"
+msgstr "Element"
+
+msgid "Elements"
+msgstr "Elemente"
+
+msgid "Ellipse"
+msgstr "Ellipse"
+
+msgid "Ellipse: drag the box it fits in"
+msgstr "Ellipse: das Feld aufziehen, in das sie passt"
+
+msgid "Empty"
+msgstr "Leer"
+
+msgid "Error correction"
+msgstr "Fehlerkorrektur"
+
+msgid ""
+"Error correction: how much of the code may be damaged and it still reads;"
+" more = more modules."
+msgstr ""
+"Fehlerkorrektur: wie viel vom Code beschädigt sein darf und er noch "
+"lesbar ist; mehr = mehr Module."
+
+msgid "Every"
+msgstr "Alle"
+
+msgid "Every key in one window"
+msgstr "Alle Tasten in einem Fenster"
+
+msgid "Every second row shifted"
+msgstr "Jede zweite Reihe versetzt"
+
+msgid ""
+"Everything at once: the cutter keeps the job in its memory (the KI-375A)."
+" As fast as it cuts: for cutters with a small memory"
+msgstr ""
+"Alles auf einmal: der Plotter behält den Auftrag im Speicher (der KI-"
+"375A). So schnell, wie er schneidet: für Plotter mit kleinem Speicher"
+
+msgid "Exclusion"
+msgstr "Ausschluss"
+
+msgctxt "ribbon"
+msgid "Exclusion"
+msgstr "Ausschluss"
+
+msgid "Exclusion: keep where the shapes do not overlap"
+msgstr "Ausschluss: behalten, wo sich die Formen nicht überlappen"
+
+msgid "Extra space between letters, mm"
+msgstr "Zusätzlicher Abstand zwischen den Buchstaben, mm"
+
+msgid "File"
+msgstr "Datei"
+
+msgid "Fill"
+msgstr "Füllung"
+
+msgctxt "tool strip"
+msgid "Fill"
+msgstr "Füllung"
+
+msgid "Fill it"
+msgstr "Füllen"
+
+msgid ""
+"Fill the selected closed shape with rows of small shapes (dots, stars, "
+"hearts...), each one whole, to be cut out as holes"
+msgstr ""
+"Die ausgewählte geschlossene Form mit Reihen kleiner Formen füllen "
+"(Punkte, Sterne, Herzen...), jede ganz, als Löcher ausgeschnitten"
+
+msgid ""
+"Fill the selected closed shapes with a pattern of lines, drawn with the "
+"pen (only when the tool is the pen)"
+msgstr ""
+"Die ausgewählten geschlossenen Formen mit einem Linienmuster füllen, mit "
+"dem Stift gezeichnet (nur mit dem Stift als Werkzeug)"
+
+msgid "Find"
+msgstr "Suchen"
+
+msgid "Fit"
+msgstr "Einpassen"
+
+msgctxt "ribbon"
+msgid "Fit"
+msgstr "Ganz"
+
+msgid "Fit the sheet in the window"
+msgstr "Den Bogen ins Fenster einpassen"
+
+msgid "Flip"
+msgstr "Kippen"
+
+msgid "Flip top to bottom"
+msgstr "Von oben nach unten kippen"
+
+msgid "Flow control"
+msgstr "Flusskontrolle"
+
+msgid "Font"
+msgstr "Schrift"
+
+msgid "Font size: the height of the font's em in mm"
+msgstr "Schriftgröße: die Höhe des Gevierts der Schrift in mm"
+
+msgid ""
+"For drawing on paper or card, not for vinyl. To cut vinyl, choose the "
+"knife."
+msgstr ""
+"Zum Zeichnen auf Papier oder Karton, nicht für Folie. Um Folie zu "
+"schneiden, das Messer wählen."
+
+msgid ""
+"For vinyl ironed onto fabric: it is cut from the back, so the cut is "
+"mirrored. The design on the screen stays as it will look on the shirt."
+msgstr ""
+"Für Folie, die auf Stoff gebügelt wird: sie wird von hinten geschnitten, "
+"also gespiegelt. Das Motiv auf dem Bildschirm bleibt so, wie es auf dem "
+"Shirt aussehen wird."
+
+msgid "Force"
+msgstr "Druck"
+
+msgid "Force and speed"
+msgstr "Druck und Geschwindigkeit"
+
+#, python-format
+msgid "Forget your changes of \"%s\" and use the settings it came with?"
+msgstr ""
+"Ihre Änderungen an „%s“ verwerfen und die mitgelieferten Einstellungen "
+"verwenden?"
+
+msgid "Found, and you may use it."
+msgstr "Gefunden, und Sie dürfen ihn benutzen."
+
+#, python-format
+msgid "Found: %s; you may use it."
+msgstr "Gefunden: %s; Sie dürfen ihn benutzen."
+
+msgid "Frame round the design"
+msgstr "Rahmen um das Motiv"
+
+msgid "Freehand"
+msgstr "Freihand"
+
+msgid "Freehand: draw with the button held; ending at the start closes it"
+msgstr ""
+"Freihand: mit gedrückter Taste zeichnen; endet sie am Anfang, schließt "
+"sie sich"
+
+msgid "Gap"
+msgstr "Abstand"
+
+msgid "Gear"
+msgstr "Zahnrad"
+
+msgid "Give the cutter a name."
+msgstr "Geben Sie dem Plotter einen Namen."
+
+msgid "Grid"
+msgstr "Raster"
+
+msgctxt "ribbon"
+msgid "Grid"
+msgstr "Raster"
+
+msgid "Grid step"
+msgstr "Rasterabstand"
+
+msgid "Grid step, snapping"
+msgstr "Rasterabstand, Einrasten"
+
+msgid "Group"
+msgstr "Gruppieren"
+
+msgctxt "ribbon"
+msgid "Group"
+msgstr "Gruppieren"
+
+#, python-format
+msgid "Grouped %d element."
+msgid_plural "Grouped %d elements."
+msgstr[0] "%d Element gruppiert."
+msgstr[1] "%d Elemente gruppiert."
+
+msgid "H."
+msgstr "H."
+
+msgid "HPGL: 40 units per mm on most cutters. Check with a 20 mm square."
+msgstr ""
+"HPGL: auf den meisten Plottern 40 Einheiten pro mm. Mit einem 20-mm-"
+"Quadrat prüfen."
+
+msgid "Head length (%)"
+msgstr "Spitzenlänge (%)"
+
+msgid "Heart"
+msgstr "Herz"
+
+msgid "Heat transfer vinyl (flex)"
+msgstr "Flexfolie (Transferfolie)"
+
+msgid "Height"
+msgstr "Höhe"
+
+msgid "Height (mm)"
+msgstr "Höhe (mm)"
+
+msgid "Hexagon"
+msgstr "Sechseck"
+
+msgid "Hide this until the next check"
+msgstr "Bis zur nächsten Prüfung ausblenden"
+
+msgid "Hold Alt to drag without any snapping for a moment."
+msgstr "Alt gedrückt halten, um kurz ohne Einrasten zu ziehen."
+
+msgid "Hole (mm)"
+msgstr "Loch (mm)"
+
+msgid ""
+"Holes and shapes inside others are cut before them, so a piece is never "
+"cut free while its holes are still to be cut. Off: exactly the order of "
+"the list."
+msgstr ""
+"Löcher und Formen in anderen werden vor diesen geschnitten, damit nie ein"
+" Teil freigeschnitten wird, solange seine Löcher noch fehlen. Aus: genau "
+"die Reihenfolge der Liste."
+
+msgid "Honeycomb"
+msgstr "Waben"
+
+msgid "How big each shape is (its longer side)"
+msgstr "Wie groß jede Form ist (ihre längere Seite)"
+
+msgid ""
+"How far the blade tip trails the holder's axis. A 45° blade: usually "
+"0.20–0.30 mm."
+msgstr ""
+"Wie weit die Klingenspitze der Achse des Halters nachläuft. Eine "
+"45°-Klinge: meist 0,20–0,30 mm."
+
+msgid "How far the letters stand from the path, mm"
+msgstr "Wie weit die Buchstaben vom Pfad entfernt stehen, mm"
+
+msgid "How to do it"
+msgstr "Wie das geht"
+
+msgid "How wide (or long) each strip is, with its overlap"
+msgstr "Wie breit (oder lang) jede Bahn ist, mit ihrer Überlappung"
+
+msgid "How wide a line the pen or pencil draws (a fineliner: 0.3–0.5 mm)"
+msgstr ""
+"Wie breit die Linie ist, die der Stift oder Bleistift zeichnet (ein "
+"Fineliner: 0,3–0,5 mm)"
+
+msgid ""
+"How wide the knife can cut (not how wide the material may be: an \"870 "
+"mm\" cutter cuts about 780 mm)"
+msgstr ""
+"Wie breit das Messer schneiden kann (nicht wie breit das Material sein "
+"darf: ein „870-mm“-Plotter schneidet etwa 780 mm)"
+
+msgid "In the holder"
+msgstr "Im Halter"
+
+msgid "Inner corners (%)"
+msgstr "Innenecken (%)"
+
+msgid "Insert"
+msgstr "Einfügen"
+
+msgid "Insert the pattern"
+msgstr "Muster einfügen"
+
+#, python-format
+msgid "Insert: %s"
+msgstr "Einfügen: %s"
+
+msgid "Inside shapes first"
+msgstr "Innere Formen zuerst"
+
+msgid "Intersection"
+msgstr "Schnittmenge"
+
+msgctxt "ribbon"
+msgid "Intersection"
+msgstr "Schnitt"
+
+msgid "Intersection: keep only where the selected shapes overlap"
+msgstr "Schnittmenge: nur behalten, wo sich die Formen überlappen"
+
+msgid "Italic"
+msgstr "Kursiv"
+
+msgid "Job"
+msgstr "Auftrag"
+
+msgid "Join the group once, in a terminal, then log out and in again:"
+msgstr ""
+"Einmal der Gruppe beitreten, in einem Terminal, dann ab- und wieder "
+"anmelden:"
+
+msgid "Join the selected elements into a group that is selected and moved as one"
+msgstr ""
+"Ausgewählte Elemente zu einer Gruppe verbinden, die als Ganzes ausgewählt"
+" und verschoben wird"
+
+msgid "Keep the original shape"
+msgstr "Ursprüngliche Form behalten"
+
+msgid "Keep the pattern this far from the outline"
+msgstr "Das Muster so weit vom Umriss fernhalten"
+
+msgid "Keep the proportions"
+msgstr "Proportionen beibehalten"
+
+msgid ""
+"Keep the proportions: width and height change together, in the fields and"
+" with the small squares round the selection"
+msgstr ""
+"Proportionen beibehalten: Breite und Höhe ändern sich zusammen, in den "
+"Feldern und mit den kleinen Quadraten um die Auswahl"
+
+msgid "Keyboard shortcuts"
+msgstr "Tastenkürzel"
+
+msgid "Knife"
+msgstr "Messer"
+
+msgid "Knife offset"
+msgstr "Messerversatz"
+
+#, python-format
+msgid ""
+"Knife offset %(k).2f mm, overcut %(o).2f mm, %(lang)s. Change them in the"
+" cutter's settings (the button beside it)."
+msgstr ""
+"Messerversatz %(k).2f mm, Überschnitt %(o).2f mm, %(lang)s. In den "
+"Plotter-Einstellungen ändern (die Schaltfläche daneben)."
+
+msgid "Knife path"
+msgstr "Messerweg"
+
+msgctxt "ribbon"
+msgid "Knife path"
+msgstr "Messerweg"
+
+msgid "Knife test"
+msgstr "Messertest"
+
+msgid "Knife test with these values"
+msgstr "Messertest mit diesen Werten"
+
+msgid "Language"
+msgstr "Sprache"
+
+msgid "Language and look"
+msgstr "Sprache und Aussehen"
+
+msgid "Later"
+msgstr "Später"
+
+msgid "Left edges"
+msgstr "Linke Kanten"
+
+msgid "Length"
+msgstr "Länge"
+
+msgid "Length (mm)"
+msgstr "Länge (mm)"
+
+#, python-format
+msgid ""
+"Length <b>%(length)s mm</b> &nbsp; across %(across)s mm &nbsp; along "
+"%(along)s mm"
+msgstr ""
+"Länge <b>%(length)s mm</b> &nbsp; quer %(across)s mm &nbsp; entlang "
+"%(along)s mm"
+
+msgid "Licence"
+msgstr "Lizenz"
+
+msgid "Light"
+msgstr "Hell"
+
+msgid "Line"
+msgstr "Linie"
+
+msgid "Line: drag from end to end"
+msgstr "Linie: von Ende zu Ende ziehen"
+
+msgid "Lines"
+msgstr "Linien"
+
+msgctxt "tool strip"
+msgid "Lines"
+msgstr "Linien"
+
+msgid "Look"
+msgstr "Aussehen"
+
+msgid "Look again for cutters plugged in"
+msgstr "Erneut nach angeschlossenen Plottern suchen"
+
+msgid "Look closer (the mouse wheel does the same)"
+msgstr "Näher heran (das Mausrad tut dasselbe)"
+
+msgid "Look from further away"
+msgstr "Von weiter weg ansehen"
+
+msgid "MIRRORED"
+msgstr "GESPIEGELT"
+
+msgid "Machine"
+msgstr "Maschine"
+
+msgid "Main"
+msgstr "Haupt"
+
+msgid "Many copies of the selection in rows and columns, a gap apart"
+msgstr "Viele Kopien der Auswahl in Reihen und Spalten, mit Abstand"
+
+msgid "Margin"
+msgstr "Rand"
+
+msgid "Margin: the lines stop this far from the shapes."
+msgstr "Rand: die Linien enden so weit vor den Formen."
+
+msgid "Marker pen"
+msgstr "Stift"
+
+msgid "Material"
+msgstr "Material"
+
+msgid "Materials"
+msgstr "Materialien"
+
+msgid "Materials: cutting and drawing settings"
+msgstr "Materialien: Einstellungen zum Schneiden und Zeichnen"
+
+msgid "Materials: force, speed, knife and pen values"
+msgstr "Materialien: Druck, Geschwindigkeit, Messer- und Stiftwerte"
+
+#, python-format
+msgid "Measured: %.2f mm (across %.2f mm, along %.2f mm)"
+msgstr "Gemessen: %.2f mm (quer %.2f mm, entlang %.2f mm)"
+
+msgid "Mirror"
+msgstr "Spiegeln"
+
+msgid "Mirror (heat transfer vinyl)"
+msgstr "Spiegeln (Flexfolie)"
+
+msgid "Mirror left to right"
+msgstr "Von links nach rechts spiegeln"
+
+msgid "Module (mm)"
+msgstr "Modul (mm)"
+
+msgid ""
+"Mouse: the wheel zooms, the middle button moves the view, Alt turns "
+"snapping off, Shift draws lines in 45° steps, Escape leaves a tool."
+msgstr ""
+"Maus: das Rad zoomt, die mittlere Taste verschiebt die Ansicht, Alt "
+"schaltet das Einrasten aus, Shift zeichnet Linien in 45°-Schritten, Esc "
+"verlässt ein Werkzeug."
+
+msgid "Move down"
+msgstr "Nach unten"
+
+msgid "Move the origin on, so the design is not cut over the test"
+msgstr ""
+"Den Nullpunkt weiterschieben, damit das Motiv nicht über dem Test "
+"geschnitten wird"
+
+msgid "Move to the origin"
+msgstr "Zum Nullpunkt schieben"
+
+msgid "Move up"
+msgstr "Nach oben"
+
+#, python-format
+msgid "Moved to the origin (%s mm from it)."
+msgstr "Zum Nullpunkt geschoben (%s mm davon entfernt)."
+
+msgid "Moved to the origin."
+msgstr "Zum Nullpunkt geschoben."
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Name of the new cutter:"
+msgstr "Name des neuen Plotters:"
+
+msgid "Name of the new material:"
+msgstr "Name des neuen Materials:"
+
+msgid "New"
+msgstr "Neu"
+
+msgctxt "ribbon"
+msgid "New"
+msgstr "Neu"
+
+msgid "New cutter"
+msgstr "Neuer Plotter"
+
+msgid "New cutter (a copy)"
+msgstr "Neuer Plotter (eine Kopie)"
+
+msgid "New material"
+msgstr "Neues Material"
+
+msgid "New version"
+msgstr "Neue Version"
+
+msgid "No command matches."
+msgstr "Kein Befehl passt."
+
+msgid "No line fits between the shapes; try a smaller margin."
+msgstr "Keine Linie passt zwischen die Formen; einen kleineren Rand versuchen."
+
+#, python-format
+msgid ""
+"No permission to use %(port)s: it belongs to the group %(group)s. Join "
+"that group once (in a terminal):\n"
+"  sudo usermod -aG %(group)s $USER\n"
+"then log out and in again."
+msgstr ""
+"Keine Berechtigung für %(port)s: es gehört der Gruppe %(group)s. Einmal "
+"dieser Gruppe beitreten (in einem Terminal):\n"
+"  sudo usermod -aG %(group)s $USER\n"
+"dann ab- und wieder anmelden."
+
+#, python-format
+msgid "No permission to use %s."
+msgstr "Keine Berechtigung für %s."
+
+msgid "No port is set. Choose the cutter's port in the panel."
+msgstr "Kein Anschluss eingestellt. Den Anschluss des Plotters im Bereich wählen."
+
+msgid "No shape fits inside: make them smaller or the margin narrower."
+msgstr "Keine Form passt hinein: sie kleiner oder den Rand schmaler machen."
+
+msgid "Nodes"
+msgstr "Knoten"
+
+msgctxt "tool strip"
+msgid "Nodes"
+msgstr "Knoten"
+
+msgid "Not now"
+msgstr "Nicht jetzt"
+
+msgid "Not plugged in"
+msgstr "Nicht angeschlossen"
+
+msgid "Not plugged in now (or switched off)."
+msgstr "Gerade nicht angeschlossen (oder ausgeschaltet)."
+
+msgid "Note"
+msgstr "Notiz"
+
+#, python-format
+msgid "Note of the material: %s"
+msgstr "Notiz zum Material: %s"
+
+msgid "Nothing is left after the offset (the shape is thinner than that)."
+msgstr "Nach dem Versatz bleibt nichts übrig (die Form ist dünner als das)."
+
+msgid "Nothing is left of the shapes after this operation."
+msgstr "Nach dieser Operation bleibt von den Formen nichts übrig."
+
+msgid "Nothing to move: the design is empty."
+msgstr "Nichts zu verschieben: das Motiv ist leer."
+
+msgid "Nothing to split: one outline, no group."
+msgstr "Nichts zu trennen: ein Umriss, keine Gruppe."
+
+#, python-format
+msgid "Now: %s"
+msgstr "Jetzt: %s"
+
+msgid "Now: no port is chosen."
+msgstr "Jetzt: kein Anschluss gewählt."
+
+#, python-format
+msgid "Now: you may use %s."
+msgstr "Jetzt: Sie dürfen %s benutzen."
+
+msgid "OK"
+msgstr "OK"
+
+msgid "Object"
+msgstr "Objekt"
+
+msgid ""
+"Off: the cutter takes them from its panel only; Vintyl reminds you of the"
+" material's values before Start."
+msgstr ""
+"Aus: der Plotter nimmt sie nur von seinem Bedienfeld; Vintyl erinnert vor"
+" dem Start an die Werte des Materials."
+
+msgid "Offset"
+msgstr "Versatz"
+
+msgctxt "tool strip"
+msgid "Offset"
+msgstr "Versatz"
+
+msgid "On Arch and Manjaro: uucp instead of dialout."
+msgstr "Unter Arch und Manjaro: uucp statt dialout."
+
+msgid ""
+"On Linux a cutter is a device file, and only the members of its group may"
+" send to it:"
+msgstr ""
+"Unter Linux ist ein Plotter eine Gerätedatei, und nur die Mitglieder "
+"seiner Gruppe dürfen an ihn senden:"
+
+msgid ""
+"Only for the pen. A solid fill: the spacing a little less than the pen's "
+"width."
+msgstr ""
+"Nur für den Stift. Eine volle Füllung: der Abstand etwas kleiner als die "
+"Stiftbreite."
+
+msgid ""
+"Only shapes that fit whole are placed; they are cut before the outline. A"
+" gap below about 1.5 mm tears when weeding."
+msgstr ""
+"Nur Formen, die ganz hineinpassen, werden eingefügt; sie werden vor dem "
+"Umriss geschnitten. Ein Abstand unter etwa 1,5 mm reißt beim Entgittern."
+
+msgid ""
+"Only the outer outline stays, with no holes (in O, A, a ring): a solid "
+"backing for a text in another colour"
+msgstr ""
+"Nur der äußere Umriss bleibt, ohne Löcher (in O, A, einem Ring): eine "
+"volle Unterlage für einen Text in anderer Farbe"
+
+msgid "Open"
+msgstr "Öffnen"
+
+msgctxt "ribbon"
+msgid "Open"
+msgstr "Öffnen"
+
+msgid "Open DXF"
+msgstr "DXF öffnen"
+
+msgid "Open SVG"
+msgstr "SVG öffnen"
+
+msgid "Open a Vintyl project, or add the shapes of an SVG file to the design"
+msgstr ""
+"Ein Vintyl-Projekt öffnen oder die Formen einer SVG-Datei zum Motiv "
+"hinzufügen"
+
+msgid "Open an SVG or DXF file, or draw a shape with the tools on the right."
+msgstr ""
+"Eine SVG- oder DXF-Datei öffnen oder mit den Werkzeugen rechts eine Form "
+"zeichnen."
+
+msgid "Open the page of the new version: what is new and the file to download"
+msgstr ""
+"Die Seite der neuen Version öffnen: was neu ist und die Datei zum "
+"Herunterladen"
+
+#, python-format
+msgid "Opened %s"
+msgstr "%s geöffnet"
+
+msgid "Outer size (mm)"
+msgstr "Außengröße (mm)"
+
+msgid "Overcut"
+msgstr "Überschnitt"
+
+msgid "Overlap"
+msgstr "Überlappung"
+
+msgid ""
+"Overlap: the strips cover this much of each other, for laying them "
+"together."
+msgstr "Überlappung: so viel decken sich die Bahnen, um sie aneinanderzulegen."
+
+msgid "Paper, fineliner"
+msgstr "Papier, Fineliner"
+
+msgid "Paste"
+msgstr "Einfügen"
+
+msgid "Pattern"
+msgstr "Muster"
+
+msgid "Pattern of shapes"
+msgstr "Formmuster"
+
+msgid ""
+"Peel the triangle off: it should come away cleanly, and the backing must "
+"not be cut through"
+msgstr ""
+"Das Dreieck abziehen: es soll sich sauber lösen, und der Träger darf "
+"nicht durchgeschnitten sein"
+
+msgid "Pen"
+msgstr "Feder"
+
+msgid "Pen path"
+msgstr "Stiftweg"
+
+msgctxt "ribbon"
+msgid "Pen path"
+msgstr "Stiftweg"
+
+msgid "Pen width"
+msgstr "Stiftbreite"
+
+msgid ""
+"Pen: click = corner, press and drag = smooth curve; the first node closes"
+" it, double-click or Enter leaves it open"
+msgstr ""
+"Feder: Klick = Ecke, drücken und ziehen = glatte Kurve; der erste Knoten "
+"schließt sie, Doppelklick oder Enter lässt sie offen"
+
+msgid "Polygon"
+msgstr "Polygon"
+
+msgid "Polyline"
+msgstr "Linienzug"
+
+msgid ""
+"Polyline: click the corners; the first corner closes it, double-click or "
+"Enter leaves it open"
+msgstr ""
+"Polylinie: die Ecken anklicken; die erste Ecke schließt sie, Doppelklick "
+"oder Enter lässt sie offen"
+
+msgid "Port"
+msgstr "Anschluss"
+
+msgid "Port speed (baud)"
+msgstr "Anschlussgeschwindigkeit (Baud)"
+
+msgid "Preview of your shape"
+msgstr "Vorschau Ihrer Form"
+
+msgid "Put the copied elements back, 5 mm beside where they were"
+msgstr "Die kopierten Elemente zurücklegen, 5 mm neben ihrem Platz"
+
+msgid ""
+"Put this AppImage into the desktop's menu and open .vintyl projects with "
+"it"
+msgstr ""
+"Dieses AppImage ins Menü des Desktops aufnehmen und .vintyl-Projekte "
+"damit öffnen"
+
+msgid ""
+"Python, Qt 6 (PySide6), pyserial, pyclipper, segno, svgelements, Tabler "
+"Icons. Part of the code comes from Kerfly."
+msgstr ""
+"Python, Qt 6 (PySide6), pyserial, pyclipper, segno, svgelements, Tabler "
+"Icons. Ein Teil des Codes stammt aus Kerfly."
+
+msgid "QR code"
+msgstr "QR-Code"
+
+msgid "Quit"
+msgstr "Beenden"
+
+msgctxt "tool strip"
+msgid "Ready"
+msgstr "Vorlagen"
+
+msgid "Ready to cut"
+msgstr "Bereit"
+
+msgid "Rectangle"
+msgstr "Rechteck"
+
+msgid "Rectangle: drag from corner to corner"
+msgstr "Rechteck: von Ecke zu Ecke ziehen"
+
+msgid "Redo"
+msgstr "Wiederholen"
+
+msgctxt "ribbon"
+msgid "Redo"
+msgstr "Wieder"
+
+msgid "Reflective vinyl"
+msgstr "Reflexfolie"
+
+msgid ""
+"Regular polygon: drag the box it fits in; the number of sides is in the "
+"options bar"
+msgstr ""
+"Regelmäßiges Vieleck: das Feld aufziehen, in das es passt; die Anzahl der"
+" Seiten steht in der Optionsleiste"
+
+msgid "Remember the selected elements, to paste them"
+msgstr "Die ausgewählten Elemente merken, um sie einzufügen"
+
+msgid "Remove the fill"
+msgstr "Füllung entfernen"
+
+msgid "Remove the holes inside"
+msgstr "Innere Löcher entfernen"
+
+msgid "Report a problem"
+msgstr "Problem melden"
+
+msgid "Report my cutter"
+msgstr "Meinen Plotter melden"
+
+msgid "Restore"
+msgstr "Wiederherstellen"
+
+msgid "Restore factory settings"
+msgstr "Werkseinstellungen wiederherstellen"
+
+msgid "Right edge: how far left from the origin, across the material"
+msgstr "Rechte Kante: wie weit vom Nullpunkt nach links, quer über das Material"
+
+msgid "Right edges"
+msgstr "Rechte Kanten"
+
+msgid "Ring"
+msgstr "Ring"
+
+msgid "Rotate 90° clockwise"
+msgstr "Um 90° im Uhrzeigersinn drehen"
+
+msgid "Rotate 90° counter-clockwise"
+msgstr "Um 90° gegen den Uhrzeigersinn drehen"
+
+msgid "Rotate left"
+msgstr "Nach links drehen"
+
+msgid "Rotate right"
+msgstr "Nach rechts drehen"
+
+msgid "Round corners of the rectangle (0 = sharp)"
+msgstr "Abgerundete Ecken des Rechtecks (0 = spitz)"
+
+msgid "Rounded rectangle"
+msgstr "Abgerundetes Rechteck"
+
+msgid "Rows (along)"
+msgstr "Reihen (entlang)"
+
+msgid "Ruler"
+msgstr "Lineal"
+
+msgctxt "tool strip"
+msgid "Ruler"
+msgstr "Lineal"
+
+msgid "Ruler: drag between two points to measure"
+msgstr "Lineal: zwischen zwei Punkten ziehen, um zu messen"
+
+msgid "SVG files (*.svg)"
+msgstr "SVG-Dateien (*.svg)"
+
+msgid "Save"
+msgstr "Speichern"
+
+msgctxt "ribbon"
+msgid "Save"
+msgstr "Speichern"
+
+msgid "Save .hpgl"
+msgstr "Als .hpgl speichern"
+
+msgctxt "ribbon"
+msgid "Save .hpgl"
+msgstr ".hpgl"
+
+msgid "Save as…"
+msgstr "Speichern unter…"
+
+msgid "Save cutter file"
+msgstr "Plotterdatei speichern"
+
+msgid "Save exactly what would go to the cutter, as a file"
+msgstr "Genau das als Datei speichern, was an den Plotter ginge"
+
+msgid "Save project"
+msgstr "Projekt speichern"
+
+#, python-format
+msgid "Save the changes to \"%s\" first?"
+msgstr "Die Änderungen an „%s“ zuerst speichern?"
+
+msgid "Save the changes to the project first?"
+msgstr "Änderungen am Projekt zuerst speichern?"
+
+msgid "Save the project (.vintyl): the design and the job's settings"
+msgstr ""
+"Das Projekt speichern (.vintyl): das Motiv und die Einstellungen des "
+"Auftrags"
+
+msgid "Save the project under another name"
+msgstr "Das Projekt unter einem anderen Namen speichern"
+
+#, python-format
+msgid "Saved %s"
+msgstr "%s gespeichert"
+
+#, python-format
+msgid "Saved %s (%d bytes)"
+msgstr "%s gespeichert (%d Bytes)"
+
+msgid "Search"
+msgstr "Suchen"
+
+msgid "See the release"
+msgstr "Version ansehen"
+
+msgid "Select"
+msgstr "Auswählen"
+
+msgctxt "tool strip"
+msgid "Select"
+msgstr "Auswählen"
+
+msgid "Select a closed shape to fill with a pattern of shapes."
+msgstr ""
+"Eine geschlossene Form auswählen, die mit einem Formmuster gefüllt werden"
+" soll."
+
+msgid "Select a closed shape to fill."
+msgstr "Eine geschlossene Form zum Füllen auswählen."
+
+msgid "Select all"
+msgstr "Alles auswählen"
+
+msgid "Select an element to change its place and size"
+msgstr "Ein Element auswählen, um Lage und Größe zu ändern"
+
+msgid "Select and move"
+msgstr "Auswählen und verschieben"
+
+msgid "Select every element"
+msgstr "Alle Elemente auswählen"
+
+msgid "Select one or more shapes with closed outlines first."
+msgstr "Zuerst eine oder mehrere Formen mit geschlossenen Umrissen auswählen."
+
+msgid ""
+"Select one text and one shape (a line, a curve, a circle) for it to run "
+"along."
+msgstr ""
+"Einen Text und eine Form (Linie, Kurve, Kreis) auswählen, an der er "
+"entlanglaufen soll."
+
+msgid "Select three or more shapes to spread them evenly."
+msgstr "Drei oder mehr Formen auswählen, um sie gleichmäßig zu verteilen."
+
+msgid "Select two or more elements to group them."
+msgstr "Wählen Sie zwei oder mehr Elemente aus, um sie zu gruppieren."
+
+msgid "Select two or more shapes to align them to each other."
+msgstr "Zwei oder mehr Formen auswählen, um sie aneinander auszurichten."
+
+msgid "Select two or more shapes with closed outlines."
+msgstr "Wählen Sie zwei oder mehr Formen mit geschlossenen Umrissen aus."
+
+#, python-format
+msgid "Selected: %s"
+msgstr "Ausgewählt: %s"
+
+msgid "Sending"
+msgstr "Senden"
+
+#, python-format
+msgid "Sending failed: %s"
+msgstr "Senden fehlgeschlagen: %s"
+
+msgid "Sending to the cutter"
+msgstr "Senden an den Plotter"
+
+#, python-format
+msgid ""
+"Sent %d bytes to %s. The cutter cuts from its own memory at the speed set"
+" on its panel."
+msgstr ""
+"%d Bytes an %s gesendet. Der Plotter schneidet aus seinem Speicher mit "
+"der Geschwindigkeit, die an seinem Bedienfeld eingestellt ist."
+
+msgid "Sent by the computer"
+msgstr "Vom Computer gesendet"
+
+msgid "Serial port or USB-serial cable (/dev/ttyUSB0, /dev/ttyACM0)"
+msgstr "Serieller Anschluss oder USB-Seriell-Kabel (/dev/ttyUSB0, /dev/ttyACM0)"
+
+msgid "Set on the cutter's panel"
+msgstr "Am Bedienfeld des Plotters einstellen"
+
+msgid ""
+"Set the selected text along the selected shape (a line, a curve, a "
+"circle...): select the text and the shape"
+msgstr ""
+"Den ausgewählten Text an die ausgewählte Form legen (Linie, Kurve, "
+"Kreis...): Text und Form auswählen"
+
+msgid "Settings"
+msgstr "Einstellungen"
+
+msgid "Settings…"
+msgstr "Einstellungen…"
+
+msgid "Shaft width (%)"
+msgstr "Schaftbreite (%)"
+
+msgid "Shape"
+msgstr "Form"
+
+msgid "Shapes"
+msgstr "Formen"
+
+msgctxt "tool strip"
+msgid "Shapes"
+msgstr "Formen"
+
+msgid "Shiny side (the carrier) down, the matt side up to the knife."
+msgstr ""
+"Glänzende Seite (der Träger) nach unten, die matte Seite nach oben zum "
+"Messer."
+
+msgid "Show exactly where the knife goes: cuts, travels and their order"
+msgstr ""
+"Genau zeigen, wo das Messer fährt: Schnitte, Leerfahrten und ihre "
+"Reihenfolge"
+
+msgid "Show the grid and snap to it (its step is in the Settings)"
+msgstr ""
+"Das Raster zeigen und daran einrasten (sein Abstand steht in den "
+"Einstellungen)"
+
+msgid "Show the whole material and design"
+msgstr "Das ganze Material und Motiv zeigen"
+
+msgid "Sides"
+msgstr "Seiten"
+
+msgid "Size"
+msgstr "Größe"
+
+msgid "Size (mm)"
+msgstr "Größe (mm)"
+
+msgid "Skip this version"
+msgstr "Diese Version überspringen"
+
+msgid "Snap to other shapes (corners, centres, edges)"
+msgstr "An anderen Formen einrasten (Ecken, Mitten, Kanten)"
+
+msgid "Software for cutting plotters, for Linux"
+msgstr "Programm für Schneideplotter, für Linux"
+
+msgid "Space between the design and the frame"
+msgstr "Abstand zwischen Motiv und Rahmen"
+
+msgid "Space between the strips on the material"
+msgstr "Abstand zwischen den Bahnen auf dem Material"
+
+msgid "Spacing"
+msgstr "Abstand"
+
+msgid "Speed"
+msgstr "Geschwindigkeit"
+
+msgid "Speed and force"
+msgstr "Geschwindigkeit und Druck"
+
+msgid "Speed and force are set on the cutter's panel"
+msgstr "Geschwindigkeit und Druck sind am Bedienfeld des Plotters eingestellt"
+
+msgid "Split"
+msgstr "Teilen"
+
+#, python-format
+msgid ""
+"Split into %d strip, laid one after another; cut it, then lay it on its "
+"overlap."
+msgid_plural ""
+"Split into %d strips, laid one after another; cut them, then lay them "
+"together on their overlaps."
+msgstr[0] ""
+"In %d Bahn geteilt, nacheinander gelegt; schneiden, dann auf ihre "
+"Überlappung legen."
+msgstr[1] ""
+"In %d Bahnen geteilt, nacheinander gelegt; schneiden, dann auf ihren "
+"Überlappungen zusammenlegen."
+
+msgid "Split into strips"
+msgstr "In Bahnen teilen"
+
+msgid "Split into strips…"
+msgstr "In Bahnen teilen…"
+
+msgid ""
+"Split the selected group into separate elements; a single element with "
+"several outlines is split into one element per outline"
+msgstr ""
+"Die ausgewählte Gruppe in einzelne Elemente teilen; ein Element mit "
+"mehreren Umrissen wird in ein Element pro Umriss geteilt"
+
+msgid "Spread across"
+msgstr "Quer verteilen"
+
+msgid ""
+"Spread three or more shapes evenly from left to right: equal gaps, the "
+"outermost stay"
+msgstr ""
+"Drei oder mehr Formen gleichmäßig von links nach rechts verteilen: "
+"gleiche Abstände, die äußeren bleiben"
+
+msgid ""
+"Spread three or more shapes evenly up and down: equal gaps, the outermost"
+" stay"
+msgstr ""
+"Drei oder mehr Formen gleichmäßig auf und ab verteilen: gleiche Abstände,"
+" die äußeren bleiben"
+
+msgid "Spread up and down"
+msgstr "Auf und ab verteilen"
+
+msgid "Square"
+msgstr "Quadrat"
+
+msgid "Star"
+msgstr "Stern"
+
+msgid "Start"
+msgstr "Start"
+
+msgid "Start an empty design"
+msgstr "Ein leeres Motiv beginnen"
+
+msgid "Starting values: check them with the knife test."
+msgstr "Startwerte: mit dem Messertest prüfen."
+
+msgid "Stop"
+msgstr "Stopp"
+
+msgid ""
+"Stop sending and lift the knife. What the cutter already has is stopped "
+"with Test or Reset on its panel."
+msgstr ""
+"Senden stoppen und das Messer anheben. Was der Plotter schon hat, wird "
+"mit Test oder Reset an seinem Bedienfeld gestoppt."
+
+#, python-format
+msgid ""
+"Stopped after %d bytes; the knife was lifted. The cutter still cuts what "
+"it already has: press Test (pause) or Reset on its panel to stop it at "
+"once."
+msgstr ""
+"Nach %d Bytes gestoppt; das Messer wurde angehoben. Der Plotter schneidet"
+" noch, was er schon hat: Test (Pause) oder Reset an seinem Bedienfeld "
+"drücken, um ihn sofort zu stoppen."
+
+msgid "Stopping: lifting the knife…"
+msgstr "Stoppen: das Messer wird angehoben…"
+
+msgid "Strip"
+msgstr "Bahn"
+
+msgid "Swap X and Y"
+msgstr "X und Y tauschen"
+
+msgid "Take back the last change"
+msgstr "Die letzte Änderung zurücknehmen"
+
+msgid "Take the selected elements away, to paste them elsewhere"
+msgstr "Die ausgewählten Elemente entfernen, um sie woanders einzufügen"
+
+msgid "Teeth"
+msgstr "Zähne"
+
+msgid ""
+"Tell us how Vintyl works on your cutter (copies the report, opens "
+"GitHub's form)"
+msgstr ""
+"Sagen Sie uns, wie Vintyl auf Ihrem Plotter läuft (kopiert den Bericht, "
+"öffnet das Formular auf GitHub)"
+
+msgid "Text"
+msgstr "Text"
+
+msgctxt "tool strip"
+msgid "Text"
+msgstr "Text"
+
+msgid "Text on a path"
+msgstr "Text auf Pfad"
+
+msgid "Text or address"
+msgstr "Text oder Adresse"
+
+msgid "Text: click where it should start"
+msgstr "Text: klicken, wo er beginnen soll"
+
+msgid "The chosen cutter's port, connection, knife and speed; new cutters"
+msgstr ""
+"Anschluss, Verbindung, Messer und Geschwindigkeit des gewählten Plotters;"
+" neue Plotter"
+
+#, python-format
+msgid ""
+"The cutter has taken no data for %d s. Is it online (not Leave) and is "
+"there material in it?"
+msgstr ""
+"Der Plotter hat seit %d s keine Daten angenommen. Ist er online (nicht "
+"Leave) und ist Material eingelegt?"
+
+#, python-format
+msgid ""
+"The cutter has taken no data for %d s. Is it online (not Leave), and do "
+"the port's speed and flow control match its menu?"
+msgstr ""
+"Der Plotter hat seit %d s keine Daten angenommen. Ist er online (nicht "
+"Leave), und passen Geschwindigkeit und Flusskontrolle des Anschlusses zu "
+"seinem Menü?"
+
+#, python-format
+msgid "The design does not fit on the material: it sticks out %s by %.1f mm."
+msgstr "Das Motiv passt nicht auf das Material: es ragt %s um %.1f mm heraus."
+
+msgid "The design fits in one strip; nothing to split."
+msgstr "Das Motiv passt in eine Bahn; nichts zu teilen."
+
+msgid "The force on the cutter's panel is low, for a pen"
+msgstr "Der Druck am Bedienfeld des Plotters ist niedrig, für einen Stift"
+
+msgid "The gap is the vinyl left between the copies."
+msgstr "Der Abstand ist die Folie, die zwischen den Kopien bleibt."
+
+msgid "The knife is in the holder"
+msgstr "Das Messer ist im Halter"
+
+msgid "The language and the look change at the next start of Vintyl."
+msgstr "Sprache und Aussehen ändern sich beim nächsten Start von Vintyl."
+
+msgid "The lines stop this far from the shapes"
+msgstr "Die Linien enden so weit vor den Formen"
+
+#, python-format
+msgid ""
+"The list of the libraries and their licences is in THIRD-PARTY-"
+"NOTICES.md: %s"
+msgstr ""
+"Die Liste der Bibliotheken und ihrer Lizenzen steht in THIRD-PARTY-"
+"NOTICES.md: %s"
+
+msgid ""
+"The material has no force or speed for this cutter yet. Write them in the"
+" material (the button beside Material) and they show here."
+msgstr ""
+"Das Material hat noch keinen Druck und keine Geschwindigkeit für diesen "
+"Plotter. Tragen Sie sie im Material ein (die Schaltfläche neben "
+"Material), dann erscheinen sie hier."
+
+msgid "The material is under the pinch rollers"
+msgstr "Das Material liegt unter den Andruckrollen"
+
+msgid "The new language or look shows at the next start of Vintyl."
+msgstr ""
+"Die neue Sprache oder das neue Aussehen erscheint beim nächsten Start von"
+" Vintyl."
+
+msgid "The note shows on the check list before Start."
+msgstr "Die Notiz erscheint auf der Prüfliste vor dem Start."
+
+msgid "The origin is set (Origin key) where the design should start"
+msgstr "Der Nullpunkt ist gesetzt (Origin-Taste), wo das Motiv beginnen soll"
+
+msgid "The origin is set (Origin key) where the drawing should start"
+msgstr "Der Nullpunkt ist gesetzt (Origin-Taste), wo die Zeichnung beginnen soll"
+
+msgid "The paper is under the pinch rollers"
+msgstr "Das Papier liegt unter den Andruckrollen"
+
+msgid "The pen (not the knife) is in the holder, its tip just above the paper"
+msgstr ""
+"Der Stift (nicht das Messer) ist im Halter, seine Spitze knapp über dem "
+"Papier"
+
+msgid "The port speed must be a whole number."
+msgstr "Die Anschlussgeschwindigkeit muss eine ganze Zahl sein."
+
+msgid "The report is copied."
+msgstr "Der Bericht ist kopiert."
+
+msgid "The scissors: cut, or only shown (not cut)."
+msgstr "Die Schere: schneiden oder nur zeigen (nicht schneiden)."
+
+msgid ""
+"The selected elements, or the whole design when nothing is selected, "
+"together up to the origin (0, 0): no vinyl wasted before them. Room is "
+"left for the weeding frame and the knife"
+msgstr ""
+"Die ausgewählten Elemente, oder das ganze Motiv, wenn nichts ausgewählt "
+"ist, gemeinsam an den Nullpunkt (0, 0): keine Folie davor verschwendet. "
+"Platz bleibt für den Entgitterrahmen und das Messer"
+
+msgid "The strips cover this much of each other, for laying them together"
+msgstr "So weit decken sich die Bahnen, um sie aneinanderzulegen"
+
+msgid "The text on the other side of the path (inside a circle), still readable"
+msgstr ""
+"Der Text auf der anderen Seite des Pfads (innen in einem Kreis), "
+"weiterhin lesbar"
+
+#, python-format
+msgid ""
+"The text runs along \"%s\"; that shape stays as a guide and is not cut "
+"(tick it in the list to cut it too)."
+msgstr ""
+"Der Text läuft an „%s“ entlang; diese Form bleibt als Führung und wird "
+"nicht geschnitten (in der Liste ankreuzen, um sie auch zu schneiden)."
+
+msgid "The text; Enter applies it"
+msgstr "Der Text; Enter übernimmt ihn"
+
+msgid "There is nothing to cut yet."
+msgstr "Es gibt noch nichts zu schneiden."
+
+msgid "There is nothing to cut."
+msgstr "Es gibt nichts zu schneiden."
+
+msgid "There is nothing to cut: every path is shorter than one cutter step."
+msgstr "Es gibt nichts zu schneiden: jeder Pfad ist kürzer als ein Plotterschritt."
+
+msgid "Third-party licences"
+msgstr "Lizenzen der Bibliotheken"
+
+msgid ""
+"This cutter takes force and speed from its own panel only. Vintyl shows "
+"these values before Start, to set them there."
+msgstr ""
+"Dieser Plotter nimmt Druck und Geschwindigkeit nur von seinem eigenen "
+"Bedienfeld. Vintyl zeigt diese Werte vor dem Start, um sie dort "
+"einzustellen."
+
+msgid "This cutter's own values. A material can have its own offset and overcut."
+msgstr ""
+"Die eigenen Werte dieses Plotters. Ein Material kann seinen eigenen "
+"Versatz und Überschnitt haben."
+
+msgctxt "ribbon"
+msgid "To 0,0"
+msgstr "Auf 0,0"
+
+msgid "To stop the cutter at once: Test (pause) or Reset on its panel."
+msgstr ""
+"Um den Plotter sofort zu stoppen: Test (Pause) oder Reset an seinem "
+"Bedienfeld."
+
+msgid "Too shallow: more force on the cutter's panel. Marks in the backing: less"
+msgstr "Zu flach: mehr Druck am Bedienfeld des Plotters. Spuren im Träger: weniger"
+
+msgid "Tools"
+msgstr "Werkzeuge"
+
+msgid "Top edges"
+msgstr "Oberkanten"
+
+msgid "Transform"
+msgstr "Umformen"
+
+msgid "Travel"
+msgstr "Leerfahrt"
+
+msgid "Triangle"
+msgstr "Dreieck"
+
+msgid "Turn the selection by the angle (Enter in the field does the same)"
+msgstr "Die Auswahl um den Winkel drehen (Enter im Feld tut dasselbe)"
+
+msgid "Turn the selection by this angle: plus = counter-clockwise"
+msgstr "Die Auswahl um diesen Winkel drehen: plus = gegen den Uhrzeigersinn"
+
+msgid ""
+"Turns smaller than this count as straight: the knife is turned only at "
+"sharper corners, so curves are cut smoothly"
+msgstr ""
+"Kleinere Richtungswechsel gelten als gerade: das Messer wird nur an "
+"schärferen Ecken gedreht, damit Kurven glatt geschnitten werden"
+
+msgid "Type the text in the options bar first."
+msgstr "Zuerst den Text in der Optionsleiste eingeben."
+
+msgid "Type the text or address the QR code should hold."
+msgstr "Den Text oder die Adresse eingeben, die der QR-Code enthalten soll."
+
+msgid "USB printer"
+msgstr "USB-Drucker"
+
+msgid "USB printer (/dev/usb/lp0, as the VEVOR KI-375A)"
+msgstr "USB-Drucker (/dev/usb/lp0, wie der VEVOR KI-375A)"
+
+msgid "USB printer (/dev/usb/lp…)"
+msgstr "USB-Drucker (/dev/usb/lp…)"
+
+msgid "Undo"
+msgstr "Rückgängig"
+
+msgctxt "ribbon"
+msgid "Undo"
+msgstr "Zurück"
+
+msgid "Ungroup"
+msgstr "Gruppierung aufheben"
+
+msgctxt "ribbon"
+msgid "Ungroup"
+msgstr "Auflösen"
+
+msgid "Union"
+msgstr "Vereinigung"
+
+msgctxt "ribbon"
+msgid "Union"
+msgstr "Vereinen"
+
+msgid "Union: join the selected shapes into one outline"
+msgstr "Vereinigung: ausgewählte Formen zu einem Umriss verbinden"
+
+msgid "Units"
+msgstr "Einheiten"
+
+msgid "Units per mm"
+msgstr "Einheiten pro mm"
+
+msgid "Unsaved changes"
+msgstr "Ungespeicherte Änderungen"
+
+msgid "Updates"
+msgstr "Aktualisierungen"
+
+#, python-format
+msgid "Version %s"
+msgstr "Version %s"
+
+msgid "Versions, checks, the cutter and the log, to paste into a report"
+msgstr ""
+"Versionen, Prüfungen, der Plotter und das Protokoll, zum Einfügen in eine"
+" Meldung"
+
+msgid "View"
+msgstr "Ansicht"
+
+msgid "View and program"
+msgstr "Ansicht und Programm"
+
+msgid ""
+"Vintyl checks the port you choose and says under it which group that "
+"device needs."
+msgstr ""
+"Vintyl prüft den gewählten Anschluss und sagt darunter, welche Gruppe "
+"dieses Gerät braucht."
+
+msgid "Vintyl is in the applications menu (it may need a new login to show)."
+msgstr ""
+"Vintyl ist im Anwendungsmenü (eventuell erst nach einer neuen Anmeldung "
+"sichtbar)."
+
+msgid "Vintyl projects (*.vintyl)"
+msgstr "Vintyl-Projekte (*.vintyl)"
+
+msgid ""
+"Vintyl projects and drawings (*.vintyl *.svg *.dxf);;Vintyl projects "
+"(*.vintyl);;SVG files (*.svg);;DXF files (*.dxf)"
+msgstr ""
+"Vintyl-Projekte und Zeichnungen (*.vintyl *.svg *.dxf);;Vintyl-Projekte "
+"(*.vintyl);;SVG-Dateien (*.svg);;DXF-Dateien (*.dxf)"
+
+msgid "Vintyl sends to the cutter"
+msgstr "Vintyl sendet an den Plotter"
+
+msgid "Vinyl film"
+msgstr "Vinylfolie"
+
+msgid "Vinyl kept between the shapes and the outline"
+msgstr "Folie, die zwischen den Formen und dem Umriss bleibt"
+
+msgid "Vinyl left between the copies"
+msgstr "Folie, die zwischen den Kopien bleibt"
+
+msgid "Vinyl left between the shapes; below about 1.5 mm it tears when weeding"
+msgstr "Folie zwischen den Formen; unter etwa 1,5 mm reißt sie beim Entgittern"
+
+msgid "W."
+msgstr "B."
+
+msgid "Waves"
+msgstr "Wellen"
+
+msgid "Website"
+msgstr "Webseite"
+
+msgid "Weeding lines"
+msgstr "Entgitterlinien"
+
+msgid "Weeding lines…"
+msgstr "Entgitterlinien…"
+
+msgid ""
+"What is in the cutter's holder. Pen: drawing on paper or card, with no "
+"knife offset or overcut; fill patterns are drawn too."
+msgstr ""
+"Was im Halter des Plotters steckt. Stift: Zeichnen auf Papier oder "
+"Karton, ohne Messerversatz und Überschnitt; Füllmuster werden ebenfalls "
+"gezeichnet."
+
+msgid ""
+"Where the pen's stroke lies against the line of a closed shape. Outside: "
+"the shape keeps its exact size inside the stroke; inside: the stroke "
+"stays within the shape. Open lines are drawn on the line."
+msgstr ""
+"Wo der Strich des Stifts an der Linie einer geschlossenen Form liegt. "
+"Außen: die Form behält ihre genaue Größe innerhalb des Strichs; innen: "
+"der Strich bleibt in der Form. Offene Linien werden auf der Linie "
+"gezeichnet."
+
+msgid "Where the text starts along its path, mm"
+msgstr "Wo der Text auf seinem Pfad beginnt, mm"
+
+msgid "Width"
+msgstr "Breite"
+
+msgid "Width (mm)"
+msgstr "Breite (mm)"
+
+msgid "Worked into the knife's path by Vintyl"
+msgstr "Von Vintyl in den Messerweg eingerechnet"
+
+msgid "Worked into the pen's path by Vintyl"
+msgstr "Von Vintyl in den Stiftweg eingerechnet"
+
+msgid "Working it out…"
+msgstr "Wird berechnet…"
+
+#, python-format
+msgid "Writing to %s failed: %s"
+msgstr "Schreiben nach %s fehlgeschlagen: %s"
+
+msgid "X"
+msgstr "X"
+
+msgid "X the other way"
+msgstr "X umgekehrt"
+
+msgid "X ↑ along the material"
+msgstr "X ↑ entlang des Materials"
+
+msgid "Y"
+msgstr "Y"
+
+msgid "Y the other way"
+msgstr "Y umgekehrt"
+
+#, python-format
+msgid ""
+"You are in the group %(group)s, but this session started before you "
+"joined it. Log out and in again (or restart the computer) to use "
+"%(port)s."
+msgstr ""
+"Sie sind in der Gruppe %(group)s, aber diese Sitzung begann, bevor Sie "
+"beigetreten sind. Ab- und wieder anmelden (oder den Computer neu "
+"starten), um %(port)s zu benutzen."
+
+#, python-format
+msgid "You have the newest Vintyl (%s)."
+msgstr "Sie haben das neueste Vintyl (%s)."
+
+msgid "Your own cutter profile."
+msgstr "Ihr eigenes Plotterprofil."
+
+msgid "Zigzag"
+msgstr "Zickzack"
+
+msgid "Zoom in"
+msgstr "Vergrößern"
+
+msgid "Zoom out"
+msgstr "Verkleinern"
+
+msgid "across"
+msgstr "quer"
+
+msgid "across the material, below 0"
+msgstr "quer zum Material, unter 0"
+
+#, python-format
+msgid "across the material, past the cutting width of %g mm"
+msgstr "quer zum Material, über die Schnittbreite von %g mm hinaus"
+
+msgid "across: wider than the cutter"
+msgstr "quer: breiter als der Plotter"
+
+msgid "along: longer than the sheet"
+msgstr "entlang: länger als der Bogen"
+
+msgid "as fast as it cuts"
+msgstr "so schnell, wie er schneidet"
+
+msgid "as in the window"
+msgstr "wie im Fenster"
+
+msgid "as the system"
+msgstr "wie das System"
+
+msgid "before the origin (along the material)"
+msgstr "vor dem Nullpunkt (entlang des Materials)"
+
+msgid "both"
+msgstr "beide"
+
+msgid "built-in"
+msgstr "eingebaut"
+
+msgid "centimetres"
+msgstr "Zentimeter"
+
+msgid "centre"
+msgstr "Mitte"
+
+msgid "corner"
+msgstr "Ecke"
+
+#, python-format
+msgid "cuts %g mm"
+msgstr "schneidet %g mm"
+
+msgid "design"
+msgstr "motiv"
+
+msgid "everything at once"
+msgstr "alles auf einmal"
+
+msgid "feet"
+msgstr "Fuß"
+
+#, python-format
+msgid "for: %s"
+msgstr "für: %s"
+
+#, python-format
+msgid "force %g g"
+msgstr "Druck %g g"
+
+msgid "from the cutter"
+msgstr "vom Plotter"
+
+msgid "from the panel"
+msgstr "vom Bedienfeld"
+
+msgid "hardware (RTS/CTS)"
+msgstr "Hardware (RTS/CTS)"
+
+msgid "high (25%)"
+msgstr "hoch (25 %)"
+
+msgid "highest (30%)"
+msgstr "am höchsten (30 %)"
+
+msgid "in line"
+msgstr "in Linie"
+
+msgid "inches"
+msgstr "Zoll"
+
+msgid "inside the line"
+msgstr "innerhalb der Linie"
+
+msgid "inwards"
+msgstr "nach innen"
+
+msgid "low (7%)"
+msgstr "niedrig (7 %)"
+
+msgid "medium (15%)"
+msgstr "mittel (15 %)"
+
+msgid "metres"
+msgstr "Meter"
+
+msgid "middle"
+msgstr "Seitenmitte"
+
+msgid "millimetres"
+msgstr "Millimeter"
+
+msgid "mils (1/1000 inch)"
+msgstr "Mil (1/1000 Zoll)"
+
+msgid "new project"
+msgstr "neues Projekt"
+
+msgid "no limit (roll)"
+msgstr "ohne Grenze (Rolle)"
+
+msgid "no port"
+msgstr "kein Anschluss"
+
+msgid "none"
+msgstr "keine"
+
+msgid "not in the material: as the cutter has it now"
+msgstr "nicht im Material: wie am Plotter gerade eingestellt"
+
+msgid "not set"
+msgstr "nicht gesetzt"
+
+msgid "on line"
+msgstr "auf Linie"
+
+msgid "on the line"
+msgstr "auf der Linie"
+
+msgid "other side"
+msgstr "andere Seite"
+
+msgid "outside the line"
+msgstr "außerhalb der Linie"
+
+msgid "outwards"
+msgstr "nach außen"
+
+msgid "own"
+msgstr "eigen"
+
+#, python-format
+msgid "past the length of %g mm"
+msgstr "über die Länge von %g mm hinaus"
+
+msgid "round"
+msgstr "abgerundet"
+
+msgid "serial port"
+msgstr "serieller Anschluss"
+
+msgid "serial port (/dev/ttyUSB…, /dev/ttyACM…)"
+msgstr "serieller Anschluss (/dev/ttyUSB…, /dev/ttyACM…)"
+
+msgid "sharp"
+msgstr "spitz"
+
+msgid "software (XON/XOFF)"
+msgstr "Software (XON/XOFF)"
+
+#, python-format
+msgid "some entities were left out: %s"
+msgstr "einige Elemente wurden ausgelassen: %s"
+
+#, python-format
+msgid "speed %g mm/s"
+msgstr "Geschwindigkeit %g mm/s"
+
+msgid "up and down"
+msgstr "auf und ab"
+
+msgid "← Y across, mm"
+msgstr "← Y quer, mm"
+
+#~ msgid "To 0,0"
+#~ msgstr "Auf 0,0"
+
+#~ msgid "Ready"
+#~ msgstr "Vorlagen"
+

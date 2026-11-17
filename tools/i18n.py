@@ -35,7 +35,8 @@ def run(*args):
 
 def extract():
     os.makedirs(LOCALE, exist_ok=True)
-    run("extract", "-k", "_", "-k", "N_", "-k", "ngettext:1,2", "--no-location", "--sort-output",
+    run("extract", "-k", "_", "-k", "N_", "-k", "ngettext:1,2", "-k", "pgettext:1c,2", "-k", "NP_:1c,2", "--no-location",
+        "--sort-output",
         "--project", "Vintyl", "--copyright-holder", "Vintyl contributors",
         "--msgid-bugs-address", "https://github.com/cyryllo/vintyl/issues",
         "-o", POT, os.path.join("src", "vintyl"))

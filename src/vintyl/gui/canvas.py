@@ -774,10 +774,10 @@ class MaterialView(QGraphicsView):
 
     @staticmethod
     def _mm(value):
-        """A size as the window writes numbers: one decimal, a comma in Polish."""
+        """A size as the window writes numbers: one decimal, a decimal comma
+        in the languages that write one."""
         from vintyl import i18n
-        text = "%.1f" % value
-        return text.replace(".", ",") if i18n.current_language() == "pl" else text
+        return i18n.decimal("%.1f" % value)
 
     # ---- node tool (vintyl.gui.node_editor) ------------------------------------------
     def _place_nodes(self, item):
