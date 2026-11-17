@@ -169,9 +169,16 @@ class MainWindow(QMainWindow):
         middle.setContentsMargins(0, 0, 0, 0)
         middle.setSpacing(0)
         # the left panel scrolls when the window is too low for it, instead of
-        # squeezing its rows into each other
+        # squeezing its rows into each other; Start and the rest stay under it
+        left = QWidget()
+        left_col = QVBoxLayout(left)
+        left_col.setContentsMargins(0, 0, 0, 0)
+        left_col.setSpacing(0)
         self.left_scroll = _SideScroll(self._make_left_panel())
-        middle.addWidget(self.left_scroll)
+        left_col.addWidget(self.left_scroll, 1)
+        self.send_footer.setFixedWidth(self.left_scroll.width())
+        left_col.addWidget(self.send_footer)
+        middle.addWidget(left)
         middle.addWidget(self.view, 1)
         middle.addWidget(self.tool_panel)
         outer.addLayout(middle, 1)
@@ -1344,7 +1351,15 @@ class MainWindow(QMainWindow):
         self.frame_row = QWidget()
         self.frame_row.setLayout(frame_row)
         lay.addWidget(self.frame_row)
-        # sending: what is sent, how much of it; Stop in the place of Start
+        # sending: what is sent, how much of it; Stop in the place of Start.
+        # Pinned under the scrolling panel (the owner, 17.11.2026): Start, Save
+        # and the knife test are always in sight, also on a low screen
+        self.send_footer = QWidget()
+        self.send_footer.setObjectName("send_footer")
+        self.send_footer.setAttribute(Qt.WA_StyledBackground, True)
+        lay = QVBoxLayout(self.send_footer)
+        lay.setContentsMargins(16, 12, 16, 14)
+        lay.setSpacing(10)
         self.send_label = QLabel()
         self.send_label.setObjectName("field_label")
         self.progress = QProgressBar()

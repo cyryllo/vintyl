@@ -1778,3 +1778,16 @@ def test_the_window_fits_a_1366_screen_in_every_state_of_the_bar(win):
     assert fits() and not win.opt_path_flip.isHidden()
     win.set_tool("nodes")
     assert fits() and not win.node_hint.isHidden()
+
+
+def test_start_save_and_the_knife_test_are_pinned_under_the_panel(win):
+    """They are not in the scrolling panel: always in sight, also on a low screen."""
+    from PySide6.QtTest import QTest
+    win.resize(1366, 600)
+    win.show()
+    QTest.qWait(30)
+    panel = win.left_scroll.widget()
+    for b in (win.btn_start, win.btn_save, win.btn_test, win.progress):
+        assert not panel.isAncestorOf(b) and win.send_footer.isAncestorOf(b)
+    bottom = win.send_footer.mapTo(win, win.send_footer.rect().bottomLeft()).y()
+    assert win.btn_start.isVisible() and bottom <= win.height()

@@ -136,6 +136,7 @@ QWidget#segmented QToolButton:checked { background: $panel; border: 1px solid $a
     font-weight: 600; }
 QWidget#segmented QToolButton:focus { border: 1px dashed $accent; }
 QWidget#job_panel { background: $panel; border-right: 1px solid $border; }
+QWidget#send_footer { background: $panel; border-top: 1px solid $border; border-right: 1px solid $border; }
 QFrame#panel_line { color: $border; max-height: 1px; border: 0; background: $border; }
 QLabel#section_title { font-weight: 600; font-size: 14px; color: $ink; }
 QLabel#cutter_state { color: $muted; }
