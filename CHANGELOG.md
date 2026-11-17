@@ -1,5 +1,29 @@
 # Changes
 
+## 0.9.0
+
+Colours: a design of several colours, drawn with several pens or cut from
+several colours of vinyl, one colour after another.
+
+**Colours**
+- An SVG of several colours opens in its colours. A window shows each colour of the file and the
+  colour of the design it goes to: similar colours (delta E under 15: two pinks, two greys) are
+  merged, so one pen draws them; or each on its own; or all in one colour, as before. Gradients
+  count as their first colour; invisible shapes are left out. Shapes filled in the file get a line
+  fill for the pen.
+- The Colours panel (when there is more than one): the order they are drawn in, a colour left out,
+  a click selects its elements, and each colour's name, colour, pen width and where its stroke lies.
+  On the sheet and in the element list every element shows in its colour.
+- The right mouse button → Colour moves elements to another colour, or to a new one.
+- Start goes colour after colour: the check list names them in order, and before each a window asks
+  to put in its pen (or its vinyl), with Skip this colour and Finish. All the colours keep the same
+  origin, so they land exactly on each other.
+- Save .hpgl writes one file for each colour.
+- Settings → Drawing: what the colours window proposes first, Merge similar or Each on its own.
+- A demo to try it: docs/demo/vintyl-demo.svg, Vintyl's logo and name in nine colours (five when
+  merged).
+- Projects keep their colours. A project without them (from an older Vintyl) opens in one colour.
+
 ## 0.8.1
 
 Four more languages, and small fixes.

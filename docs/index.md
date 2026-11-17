@@ -26,7 +26,7 @@ description: Vintyl is free software for vinyl cutters on Linux. Draw, open SVG 
 
 <p class="lead">Vintyl runs the popular, inexpensive <strong>drag-knife vinyl cutters</strong> (VEVOR, Seiki and the many models built on the same control board) that come with Windows-only software such as SignMaster. Draw a design or open a file, see it on the sheet as the material lies in the cutter, check the force and speed, and cut it, straight from the window.</p>
 
-> **Version 0.8.1, ready for use.** Tested and cutting cleanly on the
+> **Version 0.9.0, ready for use.** Tested and cutting cleanly on the
 > **VEVOR KI-375A** and the **Seiki SK-870T**. Small glitches in the
 > interface may still turn up: please
 > [report them]({{ site.repo }}/issues/new/choose).
@@ -93,6 +93,18 @@ description: Vintyl is free software for vinyl cutters on Linux. Draw, open SVG 
 </div>
 
 <div class="showcase">
+  <div class="shot-col"><a href="{{ img }}colours.png"><img loading="lazy" src="{{ img }}colours.png" alt="A design of five colours: the Colours panel and the logo, each colour in its own"></a></div>
+  <div class="text-col">
+    <h3>Several colours, one after another</h3>
+    <ul>
+      <li>An SVG of several colours opens in its colours; similar ones are merged, so one pen draws them. You see and change what goes where.</li>
+      <li>The Colours panel: the order they are drawn in, a colour left out, its own pen width.</li>
+      <li>Start goes colour after colour, with a pause to put in the next pen, or the next colour of vinyl; the origin stays, so the colours land on each other.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="showcase reverse">
   <div class="shot-col"><a href="{{ img }}to-origin-after.png"><img loading="lazy" src="{{ img }}to-origin-after.png" alt="The design moved up to the origin with its weeding frame"></a></div>
   <div class="text-col">
     <h3>Lay it out, waste no vinyl</h3>

@@ -27,7 +27,7 @@ description: Vintyl to darmowy program do ploterów tnących folię na Linuksa. 
 
 <p class="lead">Vintyl obsługuje popularne, niedrogie <strong>plotery z nożem wleczonym</strong> (VEVOR, Seiki i wiele modeli na tej samej płycie sterującej), do których producent daje program tylko na Windowsa, np. SignMaster. Rysujesz albo otwierasz plik, widzisz go na arkuszu tak, jak materiał leży w ploterze, sprawdzasz nacisk i prędkość i tniesz prosto z okna.</p>
 
-> **Wersja 0.8.1, do użytku.** Przetestowana i czysto tnie na
+> **Wersja 0.9.0, do użytku.** Przetestowana i czysto tnie na
 > **VEVOR KI-375A** i **Seiki SK-870T**. W interfejsie mogą się jeszcze
 > trafić drobne błędy: prosimy,
 > [zgłaszaj je]({{ site.repo }}/issues/new/choose).
@@ -94,6 +94,18 @@ description: Vintyl to darmowy program do ploterów tnących folię na Linuksa. 
 </div>
 
 <div class="showcase">
+  <div class="shot-col"><a href="{{ img }}colours.png"><img loading="lazy" src="{{ img }}colours.png" alt="Projekt w pięciu kolorach: panel Kolory i logo, każdy kolor osobno"></a></div>
+  <div class="text-col">
+    <h3>Kilka kolorów, jeden po drugim</h3>
+    <ul>
+      <li>SVG w kilku kolorach otwiera się w swoich kolorach; podobne są łączone, więc rysuje je jeden pisak. Widzisz i możesz zmienić, co gdzie trafia.</li>
+      <li>Panel Kolory: kolejność rysowania, pominięcie koloru, własna grubość pisaka.</li>
+      <li>Start idzie kolor po kolorze, z przerwą na włożenie następnego pisaka albo założenie folii w następnym kolorze; punkt zerowy zostaje, więc kolory trafiają jeden na drugi.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="showcase reverse">
   <div class="shot-col"><a href="{{ img }}to-origin-after.png"><img loading="lazy" src="{{ img }}to-origin-after.png" alt="Projekt dosunięty do punktu zerowego razem z ramką"></a></div>
   <div class="text-col">
     <h3>Układanie bez marnowania folii</h3>

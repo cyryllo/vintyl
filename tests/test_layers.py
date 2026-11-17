@@ -146,3 +146,13 @@ def test_an_import_plan_offers_merged_and_separate_over_the_same_layers():
     # a colour like an existing layer goes to it when merged
     _c, merged, _s = plan({"#fe0101": 1}, [red])
     assert merged["#fe0101"] is red
+
+
+def test_the_first_layer_is_named_in_the_windows_language():
+    from vintyl import i18n
+    try:
+        i18n.setup("pl")
+        assert Design().layers[0].name == "Czarny"
+    finally:
+        i18n.setup("en")
+    assert Design().layers[0].name == "Black"

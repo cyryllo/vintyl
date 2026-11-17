@@ -35,7 +35,7 @@ from vintyl import i18n  # noqa: E402
 
 i18n.setup(LANG)
 
-from PySide6.QtCore import QPoint, QPointF, QRectF  # noqa: E402
+from PySide6.QtCore import QPoint, QPointF, QRectF, Qt  # noqa: E402
 from PySide6.QtGui import QPainter  # noqa: E402
 from PySide6.QtTest import QTest  # noqa: E402
 from PySide6.QtWidgets import QApplication, QDialog  # noqa: E402
@@ -223,6 +223,42 @@ def to_origin():
     save(win.grab(), "to-origin-after.png")
 
 
+def colours():
+    """The demo drawing of several colours (docs/demo/vintyl-demo.svg): the
+    colours window when it opens, the window with its colours, and the pause
+    before the second colour."""
+    demo = os.path.join(HERE, "..", "docs", "demo", "vintyl-demo.svg")
+    win = window()
+    dialog_shot(lambda: win.import_svg(demo), "colours-open.png")
+    win.import_svg(demo, "auto")
+    win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
+    win.material_box.setCurrentIndex(win.material_box.findData("paper"))
+    # the drawing large, not the whole 780 mm sheet: the view on its elements
+    win.selected, win.selection = None, []          # nothing selected: the colours seen, not the frames
+    win.refresh()
+    view = win.view
+    wait(400)                     # the sheet drawn again for the window's size first (it fits the view)
+    view._user_zoomed = True      # as if zoomed by hand: kept when the sheet is drawn again
+    box = None
+    for item in view._items:
+        box = item.sceneBoundingRect() if box is None else box.united(item.sceneBoundingRect())
+    view.fitInView(box.adjusted(-25, -25, 25, 25), Qt.KeepAspectRatio)
+    view._show_zoom()
+    wait(200)
+    save(win.grab(), "colours.png")
+    from vintyl.gui import start_dialogs
+    from vintyl.gui.main_window import MaterialView
+    pink = win.design.layers[1]
+    width = MaterialView._mm(pink.pen_width_mm or win.pen_width.value()) + " mm"
+    dlg = start_dialogs.confirm_colour(win, 2, len(win.design.layers), pink.name, pink.color, True, width,
+                                       show=False)
+    dlg.show()
+    wait(150)
+    save(dlg.grab(), "colour-pause.png")
+    dlg.close()
+    win.hide()
+
+
 def dialog_shot(open_it, name, size=None):
     """A window that waits for a click: its picture (at `size`, or its own),
     then closed."""
@@ -249,6 +285,7 @@ def main():
     pen_mode()
     knife_path()
     to_origin()
+    colours()
     dialog_shot(win.edit_profile, "cutter-settings.png", None)       # their own size, 1000 x 700
     dialog_shot(win.edit_material, "materials.png", None)
     dialog_shot(lambda: win.show_shortcuts(), "shortcuts.png", (1180, 760))

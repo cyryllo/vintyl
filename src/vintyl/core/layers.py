@@ -23,7 +23,7 @@ import math
 import re
 from dataclasses import dataclass
 
-from ..i18n import N_
+from ..i18n import N_, _
 
 DEFAULT_ID = "black"
 DEFAULT_COLOR = "#000000"
@@ -49,7 +49,7 @@ class Layer:
 
 def default_layer():
     """The layer of a design without colours (old projects, new drawings)."""
-    return Layer(DEFAULT_ID, N_("Black"), DEFAULT_COLOR)
+    return Layer(DEFAULT_ID, _("Black"), DEFAULT_COLOR)       # named in the window's language
 
 
 def new_id(layers):

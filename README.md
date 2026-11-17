@@ -14,7 +14,7 @@ Windows-only software such as SignMaster, so they can be used on Linux.
 ([po polsku](https://cyryllo.github.io/vintyl/pl/),
 [instrukcja](https://cyryllo.github.io/vintyl/pl/guide.html)).
 
-> **Version 0.8.1, ready for use.** Tested and cutting cleanly on the
+> **Version 0.9.0, ready for use.** Tested and cutting cleanly on the
 > **VEVOR KI-375A** and the **Seiki SK-870T**; it should work the same on
 > similar cutters and clones with the same board. Small glitches in the
 > interface may still turn up: please
@@ -54,6 +54,14 @@ Windows-only software such as SignMaster, so they can be used on Linux.
 
 **Pens**: switch the tool to the marker pen to draw on paper or card, with
 the stroke on, outside or inside the line and nine fill patterns.
+
+**Colours**: an SVG of several colours opens in its colours (similar ones
+merged, so one pen draws them; you see and change what goes where). The
+Colours panel sets the order they are drawn in, leaves a colour out and
+gives it its own pen width. Start goes colour after colour, with a pause to
+put in the next pen (or the next colour of vinyl); the origin stays, so the
+colours land on each other. Try it with
+[docs/demo/vintyl-demo.svg](docs/demo/vintyl-demo.svg).
 
 **And**: English, Polish, German, Spanish, French and Brazilian Portuguese; a
 light and a dark look; keyboard shortcuts for

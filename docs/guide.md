@@ -10,7 +10,7 @@ other_lang: pl/guide.html
 
 Vintyl drives drag-knife vinyl cutters from Linux: it places your designs on
 a picture of the material, lets you draw and edit them, and sends the job to
-the cutter. This guide is for version 0.8.1.
+the cutter. This guide is for version 0.9.0.
 
 > Nothing is sent to the cutter until you confirm it in the check list.
 > Before the first cut of a new material, cut the knife test.
@@ -24,9 +24,10 @@ the cutter. This guide is for version 0.8.1.
 - [7. Laying out the design](#s7)
 - [8. Cutting](#s8)
 - [9. Drawing with a pen](#s9)
-- [10. Settings](#s10)
-- [11. Keyboard shortcuts](#s11)
-- [12. When something goes wrong](#s12)
+- [10. Colours](#s10)
+- [11. Settings](#s11)
+- [12. Keyboard shortcuts](#s12)
+- [13. When something goes wrong](#s13)
 
 <a id="s1"></a>
 
@@ -231,10 +232,12 @@ place freely. The grid (Ctrl+') and its step are in the settings.
 
 - **Open** (Ctrl+O): Vintyl projects (.vintyl), **SVG** and **DXF**. A DXF
   without units asks whether it is in millimetres, centimetres or inches.
+  An SVG of several colours opens in its colours (see [10](#s10)).
 - **Save** (Ctrl+S) keeps the project: the design, the cutter and the
   material, the job's switches.
 - **Save .hpgl** (Ctrl+E) writes the cutter's file, to cut it some other
-  way.
+  way. A design of several colours gets one file for each colour
+  (`logo-1-Black.hpgl`, `logo-2-Pink.hpgl`…).
 
 <a id="s7"></a>
 
@@ -323,10 +326,53 @@ spacing a little less than the pen's width.
 
 <a id="s10"></a>
 
-## 10. Settings
+## 10. Colours
+
+A design can have several colours: with the pen, each colour is drawn with
+its own pen; with the knife, each colour is cut from its own vinyl. The
+cutter has one holder, so Vintyl does one colour, stops, and asks for the
+next pen (or the next vinyl).
+
+**Opening an SVG of several colours.** A window shows each colour of the
+file and the colour of the design it goes to. Similar colours (two pinks,
+two greys that the eye hardly tells apart) are **merged** into one, so one
+pen draws them; **Each on its own** keeps every colour apart, and
+**All in one colour** opens the drawing as before, in one colour. Change any
+row before you press **Open**. Shapes filled in the file get a line fill for
+the pen. To try it, open the demo:
+[vintyl-demo.svg](https://github.com/cyryllo/vintyl/raw/main/docs/demo/vintyl-demo.svg).
+
+![The colours of an SVG when it opens: nine colours of the file go to five colours of the design]({{ img }}colours-open.png)
+
+**The Colours panel** (in the left panel, when the design has more than one
+colour) lists the colours **in the order they are drawn**: the arrows move
+the chosen colour earlier or later (light colours first and the black
+outline last is usual). The tick leaves a colour out of the job. A click on
+a colour selects its elements; the gear sets its name, its colour and its
+own **pen width** and **where its stroke lies** (empty: as in the window).
+On the sheet and in the element list every element shows in its colour.
+
+To give elements another colour, use the right mouse button → **Colour**:
+choose one of the design's colours, or **New colour…**.
+
+![A design of five colours, drawn with pens]({{ img }}colours.png)
+
+**Start, colour after colour.** The check list names the colours in their
+order. Before each colour a window asks you to put in its pen (or its vinyl)
+and to leave the material where it is: the origin stays the same, so the
+colours land exactly on each other. **Skip this colour** goes on with the
+next one; **Finish** stops there.
+
+![Before the second colour: put in the pink pen]({{ img }}colour-pause.png)
+
+<a id="s11"></a>
+
+## 11. Settings
 
 Settings (Ctrl+,):
-- **Drawing**: the grid's step, snapping to other shapes.
+- **Drawing**: the grid's step, snapping to other shapes, and what the
+  colours window proposes first for an SVG of several colours: **Merge
+  similar** or **Each on its own**.
 - **Language and look**: English, Polish, German, Spanish, French or
   Brazilian Portuguese (or the system's), light, dark
   or the system's look; they change at the next start.
@@ -334,9 +380,9 @@ Settings (Ctrl+,):
   nothing about you is sent), or **Check now**. A new version shows in a bar
   under the ribbon.
 
-<a id="s11"></a>
+<a id="s12"></a>
 
-## 11. Keyboard shortcuts
+## 12. Keyboard shortcuts
 
 Help → Keyboard shortcuts (Ctrl+F1) lists every key, with a search.
 
@@ -357,9 +403,9 @@ Help → Keyboard shortcuts (Ctrl+F1) lists every key, with a search.
 | Ctrl+0 | Fit | Ctrl+K | Knife path |
 | + / - | Zoom in / out | Ctrl+' | Grid |
 
-<a id="s12"></a>
+<a id="s13"></a>
 
-## 12. When something goes wrong
+## 13. When something goes wrong
 
 - **"No permission to use…" or "…is not there now" under the cutter**: join the group (see
   [1](#s1)) and log in again; check the cable, that the cutter is on, and

@@ -10,7 +10,7 @@ other_lang: guide.html
 
 Vintyl steruje z Linuksa ploterami tnącymi z nożem wleczonym: układa Twoje
 projekty na obrazie materiału, pozwala je rysować i zmieniać, a potem wysyła
-zadanie do plotera. Instrukcja dotyczy wersji 0.8.1.
+zadanie do plotera. Instrukcja dotyczy wersji 0.9.0.
 
 > Nic nie trafia do plotera, dopóki nie potwierdzisz tego na liście
 > kontrolnej. Przed pierwszym cięciem nowego materiału wytnij test noża.
@@ -24,9 +24,10 @@ zadanie do plotera. Instrukcja dotyczy wersji 0.8.1.
 - [7. Układanie projektu](#s7)
 - [8. Cięcie](#s8)
 - [9. Rysowanie pisakiem](#s9)
-- [10. Ustawienia](#s10)
-- [11. Skróty klawiszowe](#s11)
-- [12. Gdy coś nie działa](#s12)
+- [10. Kolory](#s10)
+- [11. Ustawienia](#s11)
+- [12. Skróty klawiszowe](#s12)
+- [13. Gdy coś nie działa](#s13)
 
 <a id="s1"></a>
 
@@ -233,11 +234,13 @@ odstęp są w ustawieniach.
 ## 6. Otwieranie i zapisywanie plików
 
 - **Otwórz** (Ctrl+O): projekty Vintyla (.vintyl), **SVG** i **DXF**. Plik
-  DXF bez jednostek zapyta, czy to milimetry, centymetry czy cale.
+  DXF bez jednostek zapyta, czy to milimetry, centymetry czy cale. SVG w
+  kilku kolorach otwiera się w swoich kolorach (zobacz [10](#s10)).
 - **Zapisz** (Ctrl+S) zapisuje projekt: rysunek, ploter i materiał,
   przełączniki zadania.
 - **Zapisz .hpgl** (Ctrl+E) zapisuje plik dla plotera, żeby wyciąć go w
-  inny sposób.
+  inny sposób. Projekt w kilku kolorach dostaje osobny plik na każdy kolor
+  (`logo-1-Czarny.hpgl`, `logo-2-Różowy.hpgl`…).
 
 <a id="s7"></a>
 
@@ -326,10 +329,54 @@ ustaw odstęp trochę mniejszy niż grubość pisaka.
 
 <a id="s10"></a>
 
-## 10. Ustawienia
+## 10. Kolory
+
+Projekt może mieć kilka kolorów: pisakiem każdy kolor rysuje się swoim
+pisakiem, nożem każdy kolor tnie się z folii w tym kolorze. Ploter ma jedną
+oprawkę, więc Vintyl robi jeden kolor, zatrzymuje się i prosi o następny
+pisak (albo następną folię).
+
+**Otwieranie SVG w kilku kolorach.** Okno pokazuje każdy kolor z pliku i
+kolor projektu, do którego trafi. Podobne kolory (dwa różowe, dwa szare,
+których oko prawie nie odróżnia) są **łączone** w jeden, więc rysuje je
+jeden pisak; **Każdy osobno** zostawia każdy kolor oddzielnie, a
+**Wszystko w jednym kolorze** otwiera rysunek jak dawniej, w jednym
+kolorze. Każdy wiersz możesz zmienić przed kliknięciem **Otwórz**. Kształty
+wypełnione w pliku dostają wypełnienie liniami dla pisaka. Żeby
+wypróbować, otwórz demo:
+[vintyl-demo.svg](https://github.com/cyryllo/vintyl/raw/main/docs/demo/vintyl-demo.svg).
+
+![Kolory pliku SVG przy otwieraniu: dziewięć kolorów pliku trafia do pięciu kolorów projektu]({{ img }}colours-open.png)
+
+**Panel Kolory** (w lewym panelu, gdy projekt ma więcej niż jeden kolor)
+pokazuje kolory **w kolejności rysowania**: strzałki przesuwają wybrany
+kolor wcześniej albo później (zwykle najpierw jasne kolory, a czarny kontur
+na końcu). Odznaczony kolor zostaje pominięty w zadaniu. Kliknięcie koloru
+zaznacza jego elementy; zębatka ustawia jego nazwę, kolor oraz własną
+**grubość pisaka** i to, **gdzie leży kreska** (puste: jak w oknie). Na
+arkuszu i na liście elementów każdy element jest w swoim kolorze.
+
+Żeby dać elementom inny kolor, użyj prawego przycisku myszy → **Kolor**:
+wybierz jeden z kolorów projektu albo **Nowy kolor…**.
+
+![Projekt w pięciu kolorach, rysowany pisakami]({{ img }}colours.png)
+
+**Start kolor po kolorze.** Lista kontrolna wymienia kolory w ich
+kolejności. Przed każdym kolorem okno prosi o włożenie jego pisaka (albo
+założenie jego folii) i o to, żeby nie ruszać materiału: punkt zerowy
+zostaje ten sam, więc kolory trafiają dokładnie jeden na drugi. **Pomiń ten
+kolor** przechodzi do następnego; **Zakończ** kończy w tym miejscu.
+
+![Przed drugim kolorem: włóż różowy pisak]({{ img }}colour-pause.png)
+
+<a id="s11"></a>
+
+## 11. Ustawienia
 
 Ustawienia (Ctrl+,):
-- **Rysowanie**: odstęp siatki, przyciąganie do innych kształtów.
+- **Rysowanie**: odstęp siatki, przyciąganie do innych kształtów oraz co
+  okno kolorów proponuje najpierw dla SVG w kilku kolorach: **Łącz
+  podobne** albo **Każdy osobno**.
 - **Język i wygląd**: polski, angielski, niemiecki, hiszpański, francuski
   albo portugalski brazylijski (albo jak w systemie), wygląd
   jasny, ciemny albo jak w systemie; zmieniają się przy następnym
@@ -338,9 +385,9 @@ Ustawienia (Ctrl+,):
   jest tylko GitHub, nic o Tobie nie jest wysyłane), albo **Sprawdź
   teraz**. Nowa wersja pokaże się w pasku pod wstążką.
 
-<a id="s11"></a>
+<a id="s12"></a>
 
-## 11. Skróty klawiszowe
+## 12. Skróty klawiszowe
 
 Pomoc → Skróty klawiszowe (Ctrl+F1) pokazuje wszystkie klawisze, z
 wyszukiwaniem.
@@ -362,9 +409,9 @@ wyszukiwaniem.
 | Ctrl+0 | Dopasuj | Ctrl+K | Ścieżka noża |
 | + / - | Przybliż / Oddal | Ctrl+' | Siatka |
 
-<a id="s12"></a>
+<a id="s13"></a>
 
-## 12. Gdy coś nie działa
+## 13. Gdy coś nie działa
 
 - **„Brak uprawnień do…” albo „Nie ma teraz…” pod ploterem**: dołącz do grupy
   (zobacz [1](#s1)) i zaloguj się ponownie; sprawdź kabel, czy ploter jest
