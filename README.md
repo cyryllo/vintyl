@@ -80,7 +80,8 @@ software (SignMaster, SignCut), so they can be used on Linux without it.
 |---|---|---|
 | VEVOR KI-375A (14 in, cuts 285 mm) | USB printer (`/dev/usb/lp…`), HPGL | **tested**: cuts cleanly |
 | VEVOR 870 mm (34 in, cuts 780 mm) | USB printer, HPGL (as the KI-375A) | profile ready, to be checked |
-| Seiki SK-870T (cuts 780 mm) | to be checked | profile ready, to be checked |
+| Seiki SK-870T (cuts 780 mm, system 6.8H) | USB printer, HPGL (the same board as the KI-375A) | **tested**: test square and knife on vinyl, as the KI-375A |
+| another VEVOR or Seiki (the same board) | USB printer, HPGL | "VEVOR / Seiki, other model": set its cutting width |
 | other HPGL / DMPL drag-knife cutters | USB printer or serial port | add a profile of your own |
 
 The VEVOR KI-375A has two USB modes in its menu, "Printer" and "Virtual

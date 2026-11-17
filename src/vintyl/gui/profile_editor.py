@@ -243,7 +243,9 @@ class ProfileEditor(QDialog):
         elif port and not os.path.exists(port):
             text, color = _("Not plugged in now (or switched off)."), theme.token("muted")
         elif port:
-            text, color = _("Found, and you may use it."), theme.token("ok")
+            found = transport.device_name(port)
+            text, color = ((_("Found: %s; you may use it.") % found) if found
+                           else _("Found, and you may use it.")), theme.token("ok")
         else:
             text, color = "", theme.token("muted")
         self.port_note.setText(text)

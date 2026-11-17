@@ -1,27 +1,36 @@
-# Seiki SK-870T (sold also as VEVOR 870).
-# Manual: feeds up to 870 mm, cuts up to 780 mm; DMPL and HPGL; RS-232.
-# Values marked "check" are first guesses until tested on the cutter.
+# Seiki SK-870T (sold also as VEVOR 870), system 6.8H on the owner's cutter.
+# Manual: feeds up to 870 mm, cuts up to 780 mm.
+#
+# Checked on the cutter on 17.11.2026 (the owner's, USB only, no COM port):
+#   the same control board as the VEVOR KI-375A: USB 0483:5750, "XILI",
+#   "STM32 USB DEVICE"; Linux sees it as a USB printer (/dev/usb/lp1, group lp,
+#   the kernel's usblp, no driver to install);
+#   HPGL with 40 units per mm: the 20 mm test square came out right, in the
+#   same place and the same way round as on the KI-375A (no swap, no mirror).
+# Knife on vinyl (17.11.2026), the knife test sets A and B: the same as on the
+# KI-375A: without offset small burrs at the corners, with 0.25 mm and a
+# 0.5 mm overcut clean.
 
 name = "Seiki SK-870T"
 
 width_mm = 780.0          # cutting width from the manual (870 mm is the feed)
 length_mm = 0.0           # roll: no limit
 
-connection = "serial"     # check: the manual says RS-232; it may be a USB printer like the KI-375A
-port = "/dev/ttyUSB0"     # check
+connection = "usb-printer" # checked 17.11.2026
+port = "/dev/usb/lp1"     # checked (the number may differ with other USB printers)
 send_speed_force = false  # speed and force on the panel only (the owner, 16.11.2026)
 
-baud = 9600               # check: set in the cutter's menu
-flow = "none"             # check: a forum post used rtscts
+baud = 9600               # not used: this cutter has no serial port
+flow = "none"             # not used
 
-language = "hpgl"         # check: CutScape uses DMPL mode 3 for the VEVOR KH-870
-units_per_mm = 40.0       # check: Inkcut uses 40.2 (1021 per inch)
+language = "hpgl"         # checked 17.11.2026
+units_per_mm = 40.0       # checked: the 20 mm square came out 20 mm
 
-swap_xy = false           # check with the 20 mm test square and its X mark
-invert_x = false
-invert_y = false
+swap_xy = false           # checked: as the KI-375A
+invert_x = false          # checked
+invert_y = false          # checked
 
-knife_offset_mm = 0.25    # usual for a 45 degree blade
-overcut_mm = 0.5
+knife_offset_mm = 0.25    # checked on vinyl 17.11.2026: as on the KI-375A (0 leaves small burrs)
+overcut_mm = 0.5          # checked on vinyl 17.11.2026: closes cleanly
 
-pacing = "none"           # check
+pacing = "none"           # checked with the test square (everything at once); check with a big job

@@ -1,0 +1,31 @@
+# VEVOR or Seiki cutter of another size: they share one control board
+# ("XILI", USB 0483:5750), checked on the VEVOR KI-375A (16.11.2026) and the
+# Seiki SK-870T (17.11.2026): a USB printer (/dev/usb/lp…), HPGL 40 units per
+# mm, origin at the front right, speed and force on the panel only.
+# Only the cutting width differs: set yours in the cutter's settings (it is
+# smaller than the size in the model's name: an "870 mm" cuts about 780 mm).
+# The width here is the smallest of them, so nothing runs off a small cutter.
+
+name = "VEVOR / Seiki, other model (set the width)"
+
+width_mm = 285.0          # SET YOUR CUTTER'S CUTTING WIDTH in its settings
+length_mm = 0.0           # roll: no limit
+
+connection = "usb-printer" # as all of them (checked on two)
+port = "/dev/usb/lp0"     # the number depends on other USB printers: choose it in the settings
+send_speed_force = false  # speed and force on the panel only
+
+baud = 9600               # not used over USB
+flow = "none"             # not used
+
+language = "hpgl"
+units_per_mm = 40.0
+
+swap_xy = false
+invert_x = false
+invert_y = false
+
+knife_offset_mm = 0.25    # a usual 45 degree blade (ideal on the KI-375A)
+overcut_mm = 0.5
+
+pacing = "none"           # everything at once (they keep the job in their memory)

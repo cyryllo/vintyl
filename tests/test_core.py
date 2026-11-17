@@ -200,7 +200,7 @@ def test_save_writes_exactly_the_commands(tmp_path):
 # ---- profiles ----------------------------------------------------------------------
 
 def test_builtin_profiles_load():
-    assert prof.builtin_names() == ["seiki-sk-870t", "vevor-870", "vevor-ki-375a"]
+    assert prof.builtin_names() == ["seiki-sk-870t", "vevor-870", "vevor-ki-375a", "xili-usb"]
     sk = prof.load_builtin("seiki-sk-870t")
     assert sk.width_mm == 780.0 and sk.language == "hpgl" and sk.units_per_mm == 40.0
     assert prof.load_builtin("vevor-ki-375a").width_mm == 285.0

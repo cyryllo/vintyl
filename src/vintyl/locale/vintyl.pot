@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-16 23:05+0100\n"
+"POT-Creation-Date: 2026-11-17 18:08+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -611,6 +611,10 @@ msgid "Forget your changes of \"%s\" and use the settings it came with?"
 msgstr ""
 
 msgid "Found, and you may use it."
+msgstr ""
+
+#, python-format
+msgid "Found: %s; you may use it."
 msgstr ""
 
 msgid "Frame round the design"

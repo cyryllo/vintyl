@@ -384,6 +384,43 @@ zgłasza się inaczej. [POTW, `lsusb -v` i dziennik jądra]
    dodał jej jako zwykłej drukarki, bo wtedy wysyłka może iść przez kolejkę
    CUPS.
 
+## A4b. Duży ploter (17.11.2026)
+
+Ploter przywieziony przez właściciela 17.11.2026; ma tylko gniazdo USB (bez
+portu COM). Pod Windowsem działał na tym samym sterowniku co KI-375A.
+
+**Rozpoznanie (bez wysyłania).** Po włączeniu jądro zgłasza:
+
+    usb 1-7.1: New USB device found, idVendor=0483, idProduct=5750
+    usb 1-7.1: Product: STM32 USB DEVICE, Manufacturer: XILI, SerialNumber: STM3210
+    usblp 1-7.1:1.0: usblp1: USB Bidirectional printer dev 7 if 0 alt 0 proto 2 vid 0x0483 pid 0x5750
+
+Czyli dokładnie to samo co KI-375A: ta sama płyta sterująca (XILI, STM32),
+drukarka USB `/dev/usb/lp1` (grupa `lp`), bez sterownika (usblp z jądra).
+
+**Krok 1: kwadrat 20 mm** (`tests/a4/kwadrat_20mm.hpgl`, HPGL, 40 jednostek
+na mm, wysłany `tools/a4_port.py` na `/dev/usb/lp1`). Pierwsze wysłanie:
+110 bajtów bez błędu; na prośbę właściciela wysłane drugi raz. Wynik
+(właściciel): „tak, jest ok”, wycięty poprawnie, jak na KI-375A.
+
+Model z tabliczki: **Seiki SK-870T, system 6.8H**. Profil
+`seiki-sk-870t.toml` poprawiony na sprawdzone wartości: drukarka USB
+`/dev/usb/lp1`, HPGL, 40 jednostek na mm, osie jak w KI-375A.
+
+**Krok 2: nóż na folii** (`tests/a4/noz_A_bez.hpgl` bez kompensacji,
+`noz_B_z.hpgl` z kompensacją 0,25 mm i nadcięciem 0,5 mm; 2197 i 5125
+bajtów, wysłane jeden po drugim). Wynik (właściciel): „jest tak samo” jak na
+KI-375A, czyli A z drobnymi zadziorkami na narożnikach, B czysto. Wartości
+0,25 mm i 0,5 mm wpisane do profilu jako sprawdzone.
+
+Według właściciela wszystkie plotery VEVOR i Seiki tej rodziny mają tę samą
+płytę; dodany ogólny profil `xili-usb.toml` („VEVOR / Seiki, other model”)
+z szerokością do ustawienia, a Vintyl rozpoznaje płytę po USB 0483:5750.
+
+Dalszych testów (cięcie z Vintyla przyciskiem Start, większe zadanie) właściciel
+nie robi (17.11.2026): ta sama płyta i te same pliki co w KI-375A, na którym
+Start z Vintyla i AppImage tną poprawnie.
+
 ## A5. Test odniesienia z Inkcutem (część bez plotera: zrobiona)
 
 **Jak:** Inkcut 2.1.8 z PyPI zainstalowany w osobnym środowisku

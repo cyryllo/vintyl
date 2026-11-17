@@ -64,7 +64,7 @@ def test_window_opens_empty(win):
     assert not win.btn_start.isEnabled() and not win.btn_stop.isEnabled()
     # the panel shows only the machine; its port and width in one line
     assert win.job_profile().knife_offset_mm == pytest.approx(0.25)
-    assert "780" in win.cutter_info.text() and "/dev/ttyUSB0" in win.cutter_info.text()
+    assert "780" in win.cutter_info.text() and "/dev/usb/lp1" in win.cutter_info.text()
 
 
 def test_open_svg_places_it_near_the_origin(win, svg_file):

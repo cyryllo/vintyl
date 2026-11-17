@@ -180,6 +180,32 @@ def access_problem(path):
             % {"group": group.gr_name, "port": path})
 
 
+# the control board of the VEVOR and Seiki cutters (checked on the KI-375A and the SK-870T)
+KNOWN_BOARDS = {("0483", "5750"): "VEVOR / Seiki (XILI board)"}
+
+
+def device_name(path):
+    """What is behind a USB printer device, from Linux's sysfs: the known
+    board's name ("VEVOR / Seiki (XILI board)"), else "maker product (vid:pid)";
+    None when it cannot be told (not a USB printer, not Linux)."""
+    name = os.path.basename(path or "")
+    usb = os.path.join("/sys/class/usbmisc", name, "device", "..")
+    try:
+        vid = open(os.path.join(usb, "idVendor")).read().strip()
+        pid = open(os.path.join(usb, "idProduct")).read().strip()
+    except OSError:
+        return None
+    if (vid, pid) in KNOWN_BOARDS:
+        return KNOWN_BOARDS[(vid, pid)]
+    parts = []
+    for f in ("manufacturer", "product"):
+        try:
+            parts.append(open(os.path.join(usb, f)).read().strip())
+        except OSError:
+            pass
+    return "%s (%s:%s)" % (" ".join(p for p in parts if p) or "USB", vid, pid)
+
+
 def find_ports():
     """Device files that may be a cutter: USB printers and serial ports."""
     import glob

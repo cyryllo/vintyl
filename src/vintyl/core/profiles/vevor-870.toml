@@ -1,9 +1,11 @@
 # VEVOR 870 mm (34 inch) vinyl cutter, sold as KH-870A, KW-870 and similar.
 # Feeds 870 mm, cuts 780 mm (the owner, 16.11.2026; VEVOR's listing says
 # 780 mm too, one answer in its questions 765 mm).
-# The owner of a KI-375A says VEVOR's larger cutters have the same control
-# board, so this profile starts from the KI-375A's checked values. Not yet
-# tested on this cutter: everything marked "check".
+# VEVOR's larger cutters have the same control board as the KI-375A: the
+# Seiki SK-870T (sold also as VEVOR 870) was checked on 17.11.2026 and is the
+# same board (USB 0483:5750, a USB printer, HPGL 40 units per mm). This
+# profile starts from those values; not yet tried on a VEVOR-branded 870
+# itself: everything marked "check".
 
 name = "VEVOR 870 mm (34 in)"
 
