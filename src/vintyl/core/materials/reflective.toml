@@ -7,6 +7,9 @@
 name = "Reflective vinyl"
 tool = "knife"
 blade = "60"
+# the 60 degree blade's offset (Roland's Cutter Blade Reference Guide, 2017:
+# ZEC-U3050, 60 degrees / 0.50 mm offset, for reflective and thick materials)
+knife_offset_mm = 0.5
 weed_frame = true
 note = "Starting values: check them with the knife test."
 

@@ -20,7 +20,9 @@ def test_built_in_materials_have_starting_values_for_the_xili_cutters():
     for mid, m in entries.items():
         # force and speed for every cutter with the XILI board, inside its range
         # (10-500 g, 1-80 cm/s); offsets stay the cutter's own
-        assert set(m.per_cutter) == xili and m.knife_offset_mm is None, mid
+        assert set(m.per_cutter) == xili, mid
+        # the offset: the cutter's own (its 45 degree blade), except the 60 degree blade's
+        assert m.knife_offset_mm == (0.5 if mid == "reflective" else None), mid
         for force, speed in (m.for_cutter(pid) for pid in xili):
             assert 10 <= force <= 500 and 1 <= speed <= 80, mid
     # the small cutter presses hard: half of the big ones' (the owner's), at 300 mm/s

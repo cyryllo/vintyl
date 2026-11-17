@@ -15,7 +15,7 @@ number jumps from 0.2 to 0.8: the cutters are tested and cut cleanly, and
 - Starting force and speed in the built-in materials for the cutters with the XILI board (VEVOR,
   Seiki), all at 300 mm/s. The big 870 mm cutters: vinyl 80 g, heat transfer vinyl 120 g, reflective
   80 g, pens 70 g; the small KI-375A (and another model) presses harder: half (vinyl 50 g). Check
-  them with the knife test.
+  them with the knife test. Reflective vinyl: the 60° blade with its 0.50 mm knife offset.
 
 **The window**
 - Light and dark looks in the same style for every window; the cutter, the tool and the material

@@ -145,8 +145,8 @@ Gdzie to ustawić: wartość plotera jest w ustawieniach plotera
 (Przesunięcie noża, 0,25 mm dla dołączonego ostrza 45°). Materiał, który
 potrzebuje innego ostrza, może mieć własną: w oknie materiałów pola Ostrze
 i Przesunięcie noża (puste: wartość plotera). Wbudowana folia odblaskowa
-podaje ostrze 60°, ale zostawia przesunięcie plotera: jeśli Twoje ostrze
-60° ma 0,50 mm, wpisz tam 0,5.
+ma ostrze 60° z przesunięciem 0,50 mm; jeśli Twoje ostrze 60° ma inne,
+zmień je tam.
 
 **Jak czytać narożniki** (Roland): zaokrąglone narożniki to za małe
 przesunięcie; małe chorągiewki wystające na narożnikach to za duże.

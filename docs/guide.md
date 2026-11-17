@@ -146,9 +146,9 @@ angles, but their offsets can differ: cut the knife test.
 Where to set it: the cutter's own value is in the cutter settings (Knife
 offset, 0.25 mm for the 45° blade it comes with). A material that needs
 another blade can have its own: in the materials window, Blade and Knife
-offset (empty: the cutter's value). The built-in reflective vinyl names
-the 60° blade but keeps the cutter's offset: if your 60° blade is a
-0.50 mm one, write 0.5 there.
+offset (empty: the cutter's value). The built-in reflective vinyl has the
+60° blade with its 0.50 mm offset; if your 60° blade has another offset,
+change it there.
 
 **Reading the corners** (Roland): rounded corners mean too little offset;
 small flaps sticking out at the corners mean too much.
