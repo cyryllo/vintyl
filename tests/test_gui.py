@@ -165,12 +165,16 @@ def test_profile_change_moves_the_material_edge(win, svg_file):
 def test_speed_on_the_panel_only_or_sent(win, svg_file):
     import dataclasses
     win.import_svg(svg_file)
-    assert win.job_profile().speed_cm_s is None
+    # the material's starting speed (vinyl: 300 mm/s on the XILI cutters)
+    assert win.job_profile().speed_cm_s == 30.0
     # both built-in cutters take speed and force from their panel only (checked 16.11.2026)
     assert not win.profile.send_speed_force
-    win.use_profile_values(speed_cm_s=20.0)            # the panel's speed, written in its settings
     assert "VS" not in win.build().text                # not sent ...
-    assert "min at 200 mm/s" in win.job_label.text()    # ... but used for the time estimate (in mm/s)
+    assert "min at 300 mm/s" in win.job_label.text()    # ... but used for the time estimate (in mm/s)
+    # without a material's speed: the panel's speed, written in the cutter's settings
+    win.material_box.setCurrentIndex(-1)
+    win.use_profile_values(speed_cm_s=20.0)
+    assert win.job_profile().speed_cm_s == 20.0 and "min at 200 mm/s" in win.job_label.text()
     # a cutter that takes them from the computer gets them
     win.profile = dataclasses.replace(win.profile, send_speed_force=True)
     assert "VS20;" in win.build().text
@@ -1595,13 +1599,13 @@ def test_the_materials_window_keeps_values_for_each_cutter(win, tmp_path, monkey
     dlg.force.setValue(90)
     dlg.speed.setValue(300.0)                                        # mm/s on screen: 30 cm/s kept
     dlg.for_cutter.setCurrentIndex(dlg.for_cutter.findData("seiki-sk-870t"))
-    assert dlg.force.value() == 0                                    # the other cutter: not set yet
+    assert dlg.force.value() == 80                                   # the other cutter: its own (starting) value
     dlg.force.setValue(110)
     assert not dlg.panel_note.isHidden()                              # it takes them from its panel
     dlg.save()
     m = {e["id"]: e for e in mats.catalogue()}["vinyl"]
     assert m["changed"] and m["material"].for_cutter("vevor-ki-375a") == (90.0, 30.0)
-    assert m["material"].for_cutter("seiki-sk-870t") == (110.0, None)
+    assert m["material"].for_cutter("seiki-sk-870t") == (110.0, 30.0)
     assert dlg.chosen == "vinyl"
 
 
@@ -1797,14 +1801,15 @@ def test_the_check_list_always_shows_the_cutting_values(win):
     """A built-in material has no force or speed: the card is still there,
     with dashes, where to write them, and the knife's own values."""
     from PySide6.QtWidgets import QLabel
-    win.material_box.setCurrentIndex(win.material_box.findData("vinyl"))
-    values = win.material_values()
+    from vintyl.core.material import Material
+    bare = Material(name="Own vinyl", blade="45")                   # the user's own, no values yet
+    values = win.material_values(bare)
     assert values is not None and values[1] is None and values[2] is None
-    details = dict(win.cut_details())
+    details = dict(win.cut_details(bare))
     assert details["Blade"] == "45° (standard)" and details["Knife offset"].endswith(" mm")
     assert "Overcut" in details
-    dlg = REAL_START_DIALOGS[0](win, "VEVOR KI-375A", "/dev/usb/lp1", False, "Vinyl film", values, True,
-                                False, "", show=False, details=win.cut_details())
+    dlg = REAL_START_DIALOGS[0](win, "VEVOR KI-375A", "/dev/usb/lp1", False, "Own vinyl", values, True,
+                                False, "", show=False, details=win.cut_details(bare))
     texts = " ".join(l.text() for l in dlg.findChildren(QLabel))
     assert "–" in texts and "has no force or speed" in texts and "Knife offset <b>" in texts
     assert "not in the material" not in texts                     # one hint, not one under each dash

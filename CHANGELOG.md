@@ -12,6 +12,9 @@ number jumps from 0.2 to 0.8: the cutters are tested and cut cleanly, and
   transfer vinyl, reflective vinyl, paper with a fineliner, card with a marker; add your own.
 - Choosing a material sets the job's switches; it is remembered for each cutter and in the project.
 - A cutter that takes force and speed from its panel only gets them shown in large type before Start.
+- Starting force and speed in the built-in materials for the cutters with the XILI board (VEVOR,
+  Seiki): vinyl 100 g (Seiki 80 g), heat transfer vinyl 120 g, reflective 80 g, pens 70 g, all at
+  300 mm/s; from VEVOR's manual and a Seiki SK-870T user. Check them with the knife test.
 
 **The window**
 - Light and dark looks in the same style for every window; the cutter, the tool and the material

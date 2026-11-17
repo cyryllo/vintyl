@@ -9,7 +9,8 @@ pen's width and where its stroke lies, whether the job is mirrored (heat
 transfer vinyl) and framed for weeding, and a note shown before Start.
 
 Like the cutter profiles (vintyl.core.profile): built-in materials live in
-vintyl/core/materials/ (names and tools only: no made-up forces or speeds),
+vintyl/core/materials/ (starting forces and speeds for the cutters with
+the XILI board, each with its source in the file's comment),
 the user's own in user_dir() (by default ~/.config/vintyl/materials); a
 user's file with a built-in one's name is that material as the user changed
 it, and deleting it brings the built-in one back.
@@ -26,10 +27,11 @@ from importlib import resources
 
 from ..i18n import N_
 
-# the built-in materials' names, so they are translated in the window
+# the built-in materials' names and notes, so they are translated in the window
 BUILTIN_NAMES = (N_("Vinyl film"), N_("Heat transfer vinyl (flex)"), N_("Reflective vinyl"),
                  N_("Paper, fineliner"), N_("Card, marker"),
-                 N_("Shiny side (the carrier) down, the matt side up to the knife."))
+                 N_("Shiny side (the carrier) down, the matt side up to the knife."),
+                 N_("Starting values: check them with the knife test."))
 
 BUILTIN_ORDER = ("vinyl", "htv", "reflective", "paper", "card")
 

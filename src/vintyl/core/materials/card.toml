@@ -1,5 +1,22 @@
 # Card with a marker in the holder.
+# Force and speed (the owner's choice, 17.11.2026): 70 g, 300 mm/s.
 name = "Card, marker"
 tool = "pen"
 pen_width_mm = 1.0
 pen_place = "on"
+
+[per_cutter."seiki-sk-870t"]
+force_g = 70
+speed_cm_s = 30.0
+
+[per_cutter."vevor-870"]
+force_g = 70
+speed_cm_s = 30.0
+
+[per_cutter."vevor-ki-375a"]
+force_g = 70
+speed_cm_s = 30.0
+
+[per_cutter."xili-usb"]
+force_g = 70
+speed_cm_s = 30.0

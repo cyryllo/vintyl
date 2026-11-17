@@ -1,5 +1,26 @@
-# Vinyl film for signs and stickers. Force and speed: set your own (per cutter).
+# Vinyl film for signs and stickers.
+# Starting force and speed (17.11.2026), the same board in all of these cutters:
+#   VEVOR's manual (KI series): "a cutting force of 100g is a good general starting
+#   place", "a cutting speed of 300 mm/s is a reasonable default"; a Seiki SK-870T
+#   user (Morristown Makers, 2020): 70-90 g at about 300 mm/s for outdoor vinyl.
 name = "Vinyl film"
 tool = "knife"
 blade = "45"
 weed_frame = true
+note = "Starting values: check them with the knife test."
+
+[per_cutter."seiki-sk-870t"]
+force_g = 80
+speed_cm_s = 30.0
+
+[per_cutter."vevor-870"]
+force_g = 100
+speed_cm_s = 30.0
+
+[per_cutter."vevor-ki-375a"]
+force_g = 100
+speed_cm_s = 30.0
+
+[per_cutter."xili-usb"]
+force_g = 100
+speed_cm_s = 30.0

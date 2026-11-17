@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 19:51+0100\n"
+"POT-Creation-Date: 2026-11-17 19:58+0100\n"
 "PO-Revision-Date: 2026-11-15 17:49+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -1693,6 +1693,9 @@ msgstr "Start"
 
 msgid "Start an empty design"
 msgstr "Zacznij pusty projekt"
+
+msgid "Starting values: check them with the knife test."
+msgstr "Wartości startowe: sprawdź je testem noża."
 
 msgid "Stop"
 msgstr "Stop"
