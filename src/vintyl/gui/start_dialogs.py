@@ -108,7 +108,7 @@ def _footer(dlg, outer, go_text, go_icon):
 
 
 def confirm_start(parent, cutter, port, pen, material_name, values, panel_only, mirror, note, show=True,
-                  details=()):
+                  details=(), colours=""):
     """The check list before Start. values: (title, force text, speed text)
     or None; details: [(heading, [(label, value)])] of the knife or the pen,
     under them (see _values_card);
@@ -125,6 +125,11 @@ def confirm_start(parent, cutter, port, pen, material_name, values, panel_only, 
     if values is not None:
         body.addWidget(_values_card(values))
     _details(body, details)
+    if colours:
+        # a design of several colours: which, in what order (a pause before each)
+        line = QLabel(colours)
+        line.setWordWrap(True)
+        body.addWidget(line)
     card = widgets.Card(_("Check before you go on"))
     if pen:
         items = [_("The pen (not the knife) is in the holder, its tip just above the paper"),
@@ -195,3 +200,53 @@ def confirm_knife_test(parent, cutter, size_mm, test_paths, values=None, show=Tr
     if not show:
         return dlg
     return dlg.exec() == QDialog.Accepted
+
+
+def confirm_colour(parent, index, total, name, color, pen, pen_width_text="", show=True):
+    """Before each colour of a design of several (0.9): "Colour 2 of 3:
+    Pink", what to put in (the pen, or the vinyl of that colour), and that
+    the origin stays. Returns "go", "skip" (this colour left out) or None
+    (stop: no more colours). show=False returns the dialog, not run."""
+    from vintyl.gui.colour_import import swatch
+    dlg, outer, body = _dialog(parent, _("Colour %(n)d of %(total)d: %(name)s") % {"n": index, "total": total,
+                                                                                  "name": name})
+    top = QHBoxLayout()
+    top.setSpacing(16)
+    dot = QLabel()
+    dot.setPixmap(swatch(color, 56))
+    top.addWidget(dot, 0, Qt.AlignTop)
+    if pen:
+        what = _("Put in the pen: <b>%(name)s</b>%(width)s.") % {
+            "name": name, "width": (" (%s)" % pen_width_text) if pen_width_text else ""}
+        keep = _("Do not move the paper: the origin stays the same, so the colours fall on each other.")
+    else:
+        what = _("Put in the vinyl: <b>%s</b>.") % name
+        keep = _("Set the origin (Origin key) at the same place as for the first colour, so the colours "
+                 "fall on each other.")
+    text = QLabel("%s<br><br>%s" % (what, keep))
+    text.setWordWrap(True)
+    top.addWidget(text, 1)
+    body.addLayout(top)
+    hint = QLabel(_("To stop the cutter at once: Test (pause) or Reset on its panel."))
+    hint.setObjectName("muted")
+    hint.setWordWrap(True)
+    body.addWidget(hint)
+    answer = []
+    skip = QPushButton(_("Skip this colour"))
+    skip.clicked.connect(lambda: (answer.append("skip"), dlg.accept()))
+    stop = QPushButton(_("Finish"))
+    stop.setToolTip(_("No more colours"))
+    stop.clicked.connect(dlg.reject)
+    go = QPushButton(icons.tabler("player-play", "#ffffff"), _("Draw") if pen else _("Cut it"))
+    go.setObjectName("primary")
+    go.setDefault(True)
+    go.clicked.connect(lambda: (answer.append("go"), dlg.accept()))
+    widgets.footer(outer, [stop, go], [skip])
+    outer.activate()
+    dlg.resize(dlg.minimumWidth(), outer.totalHeightForWidth(dlg.minimumWidth()))
+    dlg.go_button, dlg.skip_button, dlg.stop_button = go, skip, stop
+    if not show:
+        return dlg
+    if dlg.exec() != QDialog.Accepted:
+        return None
+    return answer[-1] if answer else None

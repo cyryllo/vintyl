@@ -63,6 +63,13 @@ def outermost(rings):
             if not any(j != i and point_in_polygon(r[0], other) for j, other in enumerate(rings))]
 
 
+def _box_of(polylines):
+    """(xmin, xmax, ymin, ymax) of polylines (material mm)."""
+    xs = [x for poly in polylines for x, _y in poly]
+    ys = [y for poly in polylines for _x, y in poly]
+    return min(xs), max(xs), min(ys), max(ys)
+
+
 class _SideScroll(QScrollArea):
     """The left panel's scroll area. It gives the panel the window's height
     (the project list gives way first) and scrolls only when even the panel's
@@ -1785,30 +1792,96 @@ class MainWindow(QMainWindow):
             return self.knife_test(material=dlg.test_material)
         return dlg
 
-    def build(self):
-        """The job as it would go to the cutter now (raises JobError / ProfileError)."""
-        polys, groups = self.design.material_paths()
+    def _layered(self):
+        """A design of several colours: its layers are drawn (cut) one after another."""
+        return len(self.design.layers) > 1
+
+    def _layer_paths(self, layer=None):
+        """(polylines, groups) of one colour layer (None: every element), as
+        they go to the cutter: with a pen, the outlines placed against the
+        stroke of the layer's pen (its width and place, else the window's)
+        and each element's fill before its outline."""
+        polys, groups = self.design.material_paths(layer=layer)
+        if self.is_pen():
+            width = layer.pen_width_mm if layer is not None and layer.pen_width_mm else self.pen_width.value()
+            place = layer.pen_place if layer is not None and layer.pen_place else self.pen_place.currentData()
+            polys, groups = pens.place(polys, groups, width, place)
+            fills, fill_groups = self.design.material_fills(layer=layer)
+            polys, groups = pens.merge(fills, fill_groups, polys, groups)
+        return polys, groups
+
+    def _enabled_paths(self):
+        """(polylines, groups) of every colour that is drawn, in the colours'
+        order (the groups keep it: a colour's elements before the next's)."""
+        if not self._layered():
+            return self._layer_paths()
+        polys, groups = [], []
+        for i, layer in enumerate(self.design.layers):
+            if not layer.enabled:
+                continue
+            p, g = self._layer_paths(layer)
+            polys += p
+            groups += [i * 1000000 + k for k in g]
+        return polys, groups
+
+    def _job_of(self, polys, groups, mirror_box=None, align_bounds=None):
+        """A job from polylines (the weeding frame added for the knife)."""
         if self.is_pen():
             # the outlines placed against the pen's stroke, each element's fill before its outline,
             # in the list's order (nothing comes loose on paper)
-            polys, groups = pens.place(polys, groups, self.pen_width.value(), self.pen_place.currentData())
-            fills, fill_groups = self.design.material_fills()
-            polys, groups = pens.merge(fills, fill_groups, polys, groups)
-            return build_job(self._mirrored(polys), self.job_profile(), groups, False)
-        frame = self.weed_frame_polyline(self._frame_polys(polys, groups))
+            return build_job(self._mirrored(polys, mirror_box), self.job_profile(), groups, False,
+                             align_bounds=align_bounds)
+        frame = self.weed_frame_polyline(self._frame_polys(polys, groups)) if polys else None
         if frame:
             polys = polys + [frame]                      # in its own last group: cut last
             groups = groups + [max(groups) + 1]
-        return build_job(self._mirrored(polys), self.job_profile(), groups, self.inside_first.isChecked())
+        return build_job(self._mirrored(polys, mirror_box), self.job_profile(), groups, self.inside_first.isChecked(),
+                         align_bounds=align_bounds)
 
-    def _mirrored(self, polys):
+    def build(self, layer=None):
+        """The job as it would go to the cutter now (raises JobError /
+        ProfileError): every colour that is drawn, or one colour (layer)."""
+        if layer is None:
+            return self._job_of(*self._enabled_paths())
+        for ly, job in self.layer_jobs():
+            if ly is layer:
+                return job
+        raise JobError(_("There is nothing to cut."))
+
+    def layer_jobs(self):
+        """[(layer, job)]: each colour that is drawn and has something to cut,
+        in order, as it goes to the cutter on its own. One colour: [(None, job)]."""
+        if not self._layered():
+            return [(None, self.build())]
+        out = []
+        whole = self.build()                     # raises when the design does not fit
+        box = _box_of(whole.knife_paths)
+        polys_all, _g = self._enabled_paths()
+        across = [a for poly in polys_all for _x, a in poly]
+        mirror_box = (min(across), max(across)) if across else None
+        for layer in self.design.layers:
+            if not layer.enabled:
+                continue
+            polys, groups = self._layer_paths(layer)
+            if not polys:
+                continue
+            try:
+                out.append((layer, self._job_of(polys, groups, mirror_box, box)))
+            except JobError:
+                continue                         # e.g. shorter than one cutter step: nothing to cut
+        return out
+
+    def _mirrored(self, polys, box=None):
         """Heat transfer vinyl is cut from the back: the job is mirrored left to
-        right (across the material) within its own box, so it stays in place.
+        right (across the material) within its own box, so it stays in place
+        (box: (lo, hi) across, the whole design's for one of its colours).
         The design on the screen stays as it will look on the shirt."""
         if not self.mirror_job.isChecked() or not polys:
             return polys
-        across = [a for poly in polys for _x, a in poly]
-        lo, hi = min(across), max(across)
+        if box is None:
+            across = [a for poly in polys for _x, a in poly]
+            box = (min(across), max(across))
+        lo, hi = box
         return [[(x, lo + hi - a) for x, a in poly] for poly in polys]
 
     def _frame_polys(self, polys, groups):
@@ -3549,40 +3622,99 @@ class MainWindow(QMainWindow):
 
     # ---- output --------------------------------------------------------------------------
     def save_cutter_file(self, path=None):
-        """Save the cutter commands to a file. Returns the path, or None."""
+        """Save the cutter commands to a file; a design of several colours:
+        one file per colour, numbered in their order ("logo-1-Black.hpgl"),
+        as each goes to the cutter on its own. Returns the (first) path, or
+        None."""
         try:
-            job = self.build()
+            jobs = self.layer_jobs()
         except (JobError, ProfileError) as e:
             widgets.warn(self, _("Save cutter file"), str(e))
             return None
+        if not jobs:
+            widgets.warn(self, _("Save cutter file"), _("There is nothing to cut: every colour is left out."))
+            return None
+        ext = jobs[0][1].extension
         if path is None:
-            path, _f = QFileDialog.getSaveFileName(self, _("Save cutter file"), "design" + job.extension,
-                                                   _("Cutter files (*%s)") % job.extension)
+            path, _f = QFileDialog.getSaveFileName(self, _("Save cutter file"), "design" + ext,
+                                                   _("Cutter files (*%s)") % ext)
             if not path:
                 return None
-        job.save(path)
-        self.statusBar().showMessage(_("Saved %s (%d bytes)") % (os.path.basename(path), len(job.text)), 8000)
-        return path
+        if jobs[0][0] is None:
+            jobs[0][1].save(path)
+            self.statusBar().showMessage(_("Saved %s (%d bytes)") % (os.path.basename(path), len(jobs[0][1].text)),
+                                         8000)
+            return path
+        import re
+        stem = path[:-len(ext)] if path.endswith(ext) else path
+        paths = []
+        for n, (layer, job) in enumerate(jobs, 1):
+            safe = re.sub(r"[^\w-]+", "_", layer.name, flags=re.UNICODE).strip("_") or layer.id
+            paths.append("%s-%d-%s%s" % (stem, n, safe, ext))
+            job.save(paths[-1])
+        self.statusBar().showMessage(ngettext("Saved %d file, one per colour: %s", "Saved %d files, one per colour: %s",
+                                              len(paths)) % (len(paths), ", ".join(os.path.basename(p) for p in paths)),
+                                     10000)
+        return paths[0]
 
     # ---- sending ---------------------------------------------------------------------------
     def start(self):
         """Start: cut the design, after a check list. (Saving the cutter file
         without cutting is the Save button.)"""
         try:
-            job = self.build()
+            jobs = self.layer_jobs()
         except (JobError, ProfileError) as e:
             widgets.warn(self, _("Start"), str(e))
+            return None
+        if not jobs:
+            widgets.warn(self, _("Start"), _("There is nothing to cut: every colour is left out."))
             return None
         p = self.job_profile()
         # the check list (UI v2): the cutter, the tool, the material; its force and speed; what to check
         from vintyl.gui import start_dialogs
         m = self.material()
         note = (_(m.note) if self._material_is_builtin() else m.note) if m is not None and m.note else ""
+        colours = ""
+        if jobs[0][0] is not None:
+            # a design of several colours: one after another, a pause before each
+            names = ", ".join("<b>%s</b>" % layer.name for layer, _j in jobs)
+            colours = ngettext("%(n)d colour, one after another: %(names)s.",
+                               "%(n)d colours, one after another: %(names)s.", len(jobs)) % {"n": len(jobs),
+                                                                                              "names": names}
         if not start_dialogs.confirm_start(self, p.name, p.port, self.is_pen(), self._material_name(),
                                            self.material_values(), not self.profile.send_speed_force,
-                                           self.mirror_job.isChecked(), note, details=self.cut_details()):
+                                           self.mirror_job.isChecked(), note, details=self.cut_details(),
+                                           colours=colours):
             return None
-        return self._send(job, p, "the design")
+        if jobs[0][0] is None:
+            return self._send(jobs[0][1], p, "the design")
+        self._colour_queue = list(jobs)
+        self._colour_total = len(jobs)
+        self._colour_index = 0
+        return self._next_colour()
+
+    def _next_colour(self):
+        """The next colour of the design: its window (put in the pen, or the
+        vinyl, of that colour), then send it. Returns the sending, or None
+        when no colour is left (or the user finished)."""
+        from vintyl.gui import start_dialogs
+        p = self.job_profile()
+        while getattr(self, "_colour_queue", None):
+            layer, job = self._colour_queue.pop(0)
+            self._colour_index += 1
+            width = ""
+            if self.is_pen():
+                width = MaterialView._mm(layer.pen_width_mm or self.pen_width.value()) + " mm"
+            answer = start_dialogs.confirm_colour(self, self._colour_index, self._colour_total, layer.name,
+                                                  layer.color, self.is_pen(), width)
+            if answer is None:
+                self._colour_queue = []
+                self.statusBar().showMessage(_("Finished: the other colours are not drawn."), 10000)
+                return None
+            if answer == "skip":
+                continue
+            return self._send(job, p, "the colour %s" % layer.name)
+        return None
 
     def _send(self, job, p, what):
         """Send a job to the cutter in the background (after the user said yes)."""
@@ -3856,7 +3988,11 @@ class MainWindow(QMainWindow):
         self._set_sending(False)
         self.statusBar().showMessage(message, 15000)
         if not ok:
+            self._colour_queue = []          # stopped (or failed): no more colours
             widgets.warn(self, _("Cutting"), message)
+        elif getattr(self, "_colour_queue", None):
+            from PySide6.QtCore import QTimer
+            QTimer.singleShot(0, self._next_colour)  # the next colour, once this one's message is shown
 
     def _set_sending(self, on):
         """While sending: Stop works, nothing else that would change the job."""

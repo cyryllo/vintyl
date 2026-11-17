@@ -139,13 +139,16 @@ def _round(v):
     return int(math.floor(v + 0.5)) if v >= 0 else -int(math.floor(-v + 0.5))
 
 
-def build_job(polylines, profile, groups=None, inside_first=False):
+def build_job(polylines, profile, groups=None, inside_first=False, align_bounds=None):
     """Turn paths (lists of (x, y) in material mm) into a Job. Raises
     JobError when there is nothing to cut or the design does not fit.
 
     groups: the element number of each path (the user's cutting order);
     inside_first: reorder (see knife.order). Without it the paths are cut
-    exactly in the order given."""
+    exactly in the order given. align_bounds: the box an axis along the
+    material is turned within (to_machine); several jobs of one design (its
+    colours, one after another) give the whole design's, so they still fall
+    on each other. None: this job's own."""
     profile.validate()
     groups = list(groups) if groups is not None else [0] * len(polylines)
     if len(groups) != len(polylines):
@@ -171,7 +174,7 @@ def build_job(polylines, profile, groups=None, inside_first=False):
     enc = encoder_for(profile)
     scale = enc.units_per_mm
     # mirror within the box of what the knife really does (after compensation)
-    machine = to_machine(polys, profile, _bounds(polys))
+    machine = to_machine(polys, profile, align_bounds or _bounds(polys))
 
     # units, and the safety check on what really goes out
     unit_polys = []

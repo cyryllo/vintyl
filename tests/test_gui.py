@@ -35,7 +35,7 @@ def app():
 
 # the real windows before sending, kept before the fixture below answers them
 from vintyl.gui import start_dialogs as _start_dialogs  # noqa: E402
-REAL_START_DIALOGS = (_start_dialogs.confirm_start, _start_dialogs.confirm_knife_test)
+REAL_START_DIALOGS = (_start_dialogs.confirm_start, _start_dialogs.confirm_knife_test, _start_dialogs.confirm_colour)
 
 
 @pytest.fixture(autouse=True)
@@ -63,6 +63,7 @@ def messages(monkeypatch):
     # the windows before sending say yes; their own tests use REAL_START_DIALOGS
     monkeypatch.setattr(start_dialogs, "confirm_start", lambda *a, **k: True)
     monkeypatch.setattr(start_dialogs, "confirm_knife_test", lambda *a, **k: True)
+    monkeypatch.setattr(start_dialogs, "confirm_colour", lambda *a, **k: "go")
     return shown
 
 
@@ -2146,3 +2147,91 @@ def test_a_drawing_of_many_colours_scrolls_its_list(win, tmp_path):
     _e, candidates, chosen, merged, separate = win._colour_plan(groups)
     dlg = colour_import.colour_dialog(win, groups, candidates, chosen, merged, separate, show=False)
     assert len(dlg.combos) == 20 and dlg.height() < 768
+
+
+def test_each_colour_is_a_job_of_its_own_and_they_fall_on_each_other(win):
+    """The colours' jobs, one after another: each only its colour's paths;
+    together the same paths as the whole design's job; mirrored, each within
+    the whole design's box (so the colours still fall on each other)."""
+    win.import_svg(DEMO_SVG, "auto")
+    d = win.design
+    jobs = win.layer_jobs()
+    assert [layer for layer, _j in jobs] == [ly for ly in d.layers if d.elements_of(ly)]
+    whole = win.build()
+    assert sum(len(j.knife_paths) for _l, j in jobs) == len(whole.knife_paths) - (1 if win.weed_frame.isChecked() else 0) \
+        or not win.weed_frame.isChecked()
+    def box(job):
+        xs = [x for p in job.knife_paths for x, _y in p]
+        ys = [y for p in job.knife_paths for _x, y in p]
+        return min(xs), max(xs), min(ys), max(ys)
+    # mirrored: the pink V is mirrored within the whole design's width, not its own
+    # (so it stays where it belongs against the black text); 1 mm: the knife's compensation
+    win.mirror_job.setChecked(True)
+    pink_layer = d.layers[1]
+    pink = [j for layer, j in win.layer_jobs() if layer is pink_layer][0]
+    every = [a for p in d.material_paths()[0] for _x, a in p]
+    lo, hi = min(every), max(every)
+    own = [a for p in d.material_paths(layer=pink_layer)[0] for _x, a in p]
+    expected = (lo + hi - max(own), lo + hi - min(own))
+    got = box(pink)[2:]
+    assert got[0] == pytest.approx(expected[0], abs=1.0) and got[1] == pytest.approx(expected[1], abs=1.0)
+    # a colour left out is not cut, and alone it is "nothing to cut"
+    d.layers[1].enabled = False
+    assert d.layers[1] not in [layer for layer, _j in win.layer_jobs()]
+    with pytest.raises(Exception):
+        win.build(d.layers[1])
+
+
+def test_start_draws_colour_after_colour_with_a_pause(win, monkeypatch, messages):
+    """Start with several colours: the check list once, then before each
+    colour its window (put in that pen); the next colour goes once the one
+    before is sent; a colour can be skipped, and Finish stops the rest."""
+    from vintyl.gui import start_dialogs
+    win.import_svg(DEMO_SVG, "auto")
+    win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
+    jobs = win.layer_jobs()
+    asked, sent = [], []
+    answers = ["go", "skip", "go", None]
+
+    def colour(parent, index, total, name, color, pen, width, show=True):
+        asked.append((index, total, name, pen))
+        return answers[len(asked) - 1]
+    monkeypatch.setattr(start_dialogs, "confirm_colour", colour)
+    monkeypatch.setattr(win, "_send", lambda job, p, what: sent.append(job.text) or "worker")
+    assert win.start() == "worker"
+    assert asked == [(1, len(jobs), jobs[0][0].name, True)] and sent == [jobs[0][1].text]
+    win._send_finished(True, "Sent")                  # the first colour is sent: the next window
+    from PySide6.QtTest import QTest
+    QTest.qWait(30)
+    assert [a[0] for a in asked] == [1, 2, 3] and sent == [jobs[0][1].text, jobs[2][1].text]   # 2 skipped
+    win._send_finished(True, "Sent")
+    QTest.qWait(30)
+    assert len(asked) == 4 and len(sent) == 2 and not win._colour_queue                     # finished
+    # a stop (or a failure) leaves the other colours
+    asked.clear()
+    answers[:] = ["go"] * 9
+    sent.clear()
+    win.start()
+    win._send_finished(False, "Stopped")
+    QTest.qWait(30)
+    assert len(sent) == 1 and not win._colour_queue
+
+
+def test_the_colour_window_says_what_to_put_in(win):
+    dlg = REAL_START_DIALOGS[2](win, 2, 3, "Pink", "#be185d", True, "0,4 mm", show=False)
+    from PySide6.QtWidgets import QLabel
+    texts = " ".join(l.text() for l in dlg.findChildren(QLabel))
+    assert dlg.windowTitle() == "Colour 2 of 3: Pink" and "Put in the pen: <b>Pink</b> (0,4 mm)" in texts
+    assert dlg.go_button.text() == "Draw" and dlg.skip_button.text() == "Skip this colour"
+    dlg = REAL_START_DIALOGS[2](win, 1, 2, "Black", "#1f2430", False, show=False)
+    assert "Put in the vinyl: <b>Black</b>" in " ".join(l.text() for l in dlg.findChildren(QLabel))
+
+
+def test_save_hpgl_writes_a_file_per_colour(win, tmp_path):
+    win.import_svg(DEMO_SVG, "auto")
+    first = win.save_cutter_file(str(tmp_path / "logo.hpgl"))
+    jobs = win.layer_jobs()
+    files = sorted(os.listdir(tmp_path))
+    assert first.endswith("logo-1-%s.hpgl" % jobs[0][0].name) and len(files) == len(jobs)
+    for n, (layer, job) in enumerate(jobs, 1):
+        assert (tmp_path / ("logo-%d-%s.hpgl" % (n, layer.name.replace(" ", "_")))).read_text() == job.text

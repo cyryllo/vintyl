@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 23:00+0100\n"
+"POT-Creation-Date: 2026-11-17 23:06+0100\n"
 "PO-Revision-Date: 2026-11-17 21:27+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -17,6 +17,12 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
+
+#, python-format
+msgid "%(n)d colour, one after another: %(names)s."
+msgid_plural "%(n)d colours, one after another: %(names)s."
+msgstr[0] "%(n)d Farbe, eine nach der anderen: %(names)s."
+msgstr[1] "%(n)d Farben, eine nach der anderen: %(names)s."
 
 #, python-format
 msgid "%.0f × %.0f mm"
@@ -393,6 +399,10 @@ msgstr ""
 msgid "Colour"
 msgstr "Farbe"
 
+#, python-format
+msgid "Colour %(n)d of %(total)d: %(name)s"
+msgstr "Farbe %(n)d von %(total)d: %(name)s"
+
 msgid "Colours"
 msgstr "Farben"
 
@@ -663,6 +673,13 @@ msgstr ""
 msgid "Do again what was taken back"
 msgstr "Wiederholen, was zurückgenommen wurde"
 
+msgid ""
+"Do not move the paper: the origin stays the same, so the colours fall on "
+"each other."
+msgstr ""
+"Das Papier nicht bewegen: der Nullpunkt bleibt derselbe, damit die Farben"
+" aufeinander passen."
+
 msgid "Do not remind about this version again (a later one is shown)"
 msgstr "Nicht mehr an diese Version erinnern (eine spätere wird angezeigt)"
 
@@ -817,6 +834,12 @@ msgstr ""
 
 msgid "Find"
 msgstr "Suchen"
+
+msgid "Finish"
+msgstr "Beenden"
+
+msgid "Finished: the other colours are not drawn."
+msgstr "Beendet: die anderen Farben werden nicht gezeichnet."
 
 msgid "Fit"
 msgstr "Einpassen"
@@ -1282,6 +1305,9 @@ msgstr "Kein Befehl passt."
 msgid "No line fits between the shapes; try a smaller margin."
 msgstr "Keine Linie passt zwischen die Formen; einen kleineren Rand versuchen."
 
+msgid "No more colours"
+msgstr "Keine weiteren Farben"
+
 #, python-format
 msgid ""
 "No permission to use %(port)s: it belongs to the group %(group)s. Join "
@@ -1525,6 +1551,14 @@ msgstr "Vorschau Ihrer Form"
 msgid "Purple"
 msgstr "Lila"
 
+#, python-format
+msgid "Put in the pen: <b>%(name)s</b>%(width)s."
+msgstr "Den Stift einsetzen: <b>%(name)s</b>%(width)s."
+
+#, python-format
+msgid "Put in the vinyl: <b>%s</b>."
+msgstr "Die Folie einlegen: <b>%s</b>."
+
 msgid "Put the copied elements back, 5 mm beside where they were"
 msgstr "Die kopierten Elemente zurücklegen, 5 mm neben ihrem Platz"
 
@@ -1690,6 +1724,12 @@ msgid "Save the project under another name"
 msgstr "Das Projekt unter einem anderen Namen speichern"
 
 #, python-format
+msgid "Saved %d file, one per colour: %s"
+msgid_plural "Saved %d files, one per colour: %s"
+msgstr[0] "%d Datei gespeichert, eine pro Farbe: %s"
+msgstr[1] "%d Dateien gespeichert, eine pro Farbe: %s"
+
+#, python-format
 msgid "Saved %s"
 msgstr "%s gespeichert"
 
@@ -1784,6 +1824,13 @@ msgid "Set on the cutter's panel"
 msgstr "Am Bedienfeld des Plotters einstellen"
 
 msgid ""
+"Set the origin (Origin key) at the same place as for the first colour, so"
+" the colours fall on each other."
+msgstr ""
+"Den Nullpunkt (Origin-Taste) an dieselbe Stelle setzen wie für die erste "
+"Farbe, damit die Farben aufeinander passen."
+
+msgid ""
 "Set the selected text along the selected shape (a line, a curve, a "
 "circle...): select the text and the shape"
 msgstr ""
@@ -1843,6 +1890,9 @@ msgstr "Größe"
 
 msgid "Size (mm)"
 msgstr "Größe (mm)"
+
+msgid "Skip this colour"
+msgstr "Diese Farbe überspringen"
 
 msgid "Skip this version"
 msgstr "Diese Version überspringen"
@@ -2152,6 +2202,9 @@ msgstr "Es gibt noch nichts zu schneiden."
 
 msgid "There is nothing to cut."
 msgstr "Es gibt nichts zu schneiden."
+
+msgid "There is nothing to cut: every colour is left out."
+msgstr "Es gibt nichts zu schneiden: jede Farbe ist ausgelassen."
 
 msgid "There is nothing to cut: every path is shorter than one cutter step."
 msgstr "Es gibt nichts zu schneiden: jeder Pfad ist kürzer als ein Plotterschritt."

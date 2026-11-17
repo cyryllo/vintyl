@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 23:00+0100\n"
+"POT-Creation-Date: 2026-11-17 23:06+0100\n"
 "PO-Revision-Date: 2026-11-17 21:27+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pt_BR\n"
@@ -17,6 +17,12 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
+
+#, python-format
+msgid "%(n)d colour, one after another: %(names)s."
+msgid_plural "%(n)d colours, one after another: %(names)s."
+msgstr[0] "%(n)d cor, uma após a outra: %(names)s."
+msgstr[1] "%(n)d cores, uma após a outra: %(names)s."
 
 #, python-format
 msgid "%.0f × %.0f mm"
@@ -390,6 +396,10 @@ msgstr ""
 msgid "Colour"
 msgstr "Cor"
 
+#, python-format
+msgid "Colour %(n)d of %(total)d: %(name)s"
+msgstr "Cor %(n)d de %(total)d: %(name)s"
+
 msgid "Colours"
 msgstr "Cores"
 
@@ -658,6 +668,11 @@ msgstr ""
 msgid "Do again what was taken back"
 msgstr "Refazer o que foi desfeito"
 
+msgid ""
+"Do not move the paper: the origin stays the same, so the colours fall on "
+"each other."
+msgstr "Não mexa no papel: a origem continua a mesma, assim as cores coincidem."
+
 msgid "Do not remind about this version again (a later one is shown)"
 msgstr "Não lembrar mais desta versão (uma posterior será mostrada)"
 
@@ -811,6 +826,12 @@ msgstr ""
 
 msgid "Find"
 msgstr "Procurar"
+
+msgid "Finish"
+msgstr "Encerrar"
+
+msgid "Finished: the other colours are not drawn."
+msgstr "Encerrado: as outras cores não serão desenhadas."
 
 msgid "Fit"
 msgstr "Ajustar"
@@ -1271,6 +1292,9 @@ msgstr "Nenhum comando corresponde."
 msgid "No line fits between the shapes; try a smaller margin."
 msgstr "Nenhuma linha cabe entre as formas; tente uma margem menor."
 
+msgid "No more colours"
+msgstr "Sem mais cores"
+
 #, python-format
 msgid ""
 "No permission to use %(port)s: it belongs to the group %(group)s. Join "
@@ -1512,6 +1536,14 @@ msgstr "Prévia da sua forma"
 msgid "Purple"
 msgstr "Roxo"
 
+#, python-format
+msgid "Put in the pen: <b>%(name)s</b>%(width)s."
+msgstr "Coloque a caneta: <b>%(name)s</b>%(width)s."
+
+#, python-format
+msgid "Put in the vinyl: <b>%s</b>."
+msgstr "Coloque o vinil: <b>%s</b>."
+
 msgid "Put the copied elements back, 5 mm beside where they were"
 msgstr "Colocar de volta os elementos copiados, 5 mm ao lado de onde estavam"
 
@@ -1677,6 +1709,12 @@ msgid "Save the project under another name"
 msgstr "Salvar o projeto com outro nome"
 
 #, python-format
+msgid "Saved %d file, one per colour: %s"
+msgid_plural "Saved %d files, one per colour: %s"
+msgstr[0] "Salvo %d arquivo, um por cor: %s"
+msgstr[1] "Salvos %d arquivos, um por cor: %s"
+
+#, python-format
 msgid "Saved %s"
 msgstr "Salvo: %s"
 
@@ -1769,6 +1807,13 @@ msgid "Set on the cutter's panel"
 msgstr "Ajustar no painel da plotter"
 
 msgid ""
+"Set the origin (Origin key) at the same place as for the first colour, so"
+" the colours fall on each other."
+msgstr ""
+"Defina a origem (tecla Origin) no mesmo lugar da primeira cor, para as "
+"cores coincidirem."
+
+msgid ""
 "Set the selected text along the selected shape (a line, a curve, a "
 "circle...): select the text and the shape"
 msgstr ""
@@ -1825,6 +1870,9 @@ msgstr "Tamanho"
 
 msgid "Size (mm)"
 msgstr "Tamanho (mm)"
+
+msgid "Skip this colour"
+msgstr "Pular esta cor"
 
 msgid "Skip this version"
 msgstr "Pular esta versão"
@@ -2126,6 +2174,9 @@ msgstr "Ainda não há nada para recortar."
 
 msgid "There is nothing to cut."
 msgstr "Não há nada para recortar."
+
+msgid "There is nothing to cut: every colour is left out."
+msgstr "Não há nada para recortar: todas as cores estão puladas."
 
 msgid "There is nothing to cut: every path is shorter than one cutter step."
 msgstr ""
