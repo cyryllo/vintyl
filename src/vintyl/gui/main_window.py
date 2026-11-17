@@ -1313,7 +1313,12 @@ class MainWindow(QMainWindow):
         self.btn_layer_edit.setIcon(icons.tabler("settings"))
         self.btn_layer_edit.setToolTip(_("This colour's name, colour and pen"))
         self.btn_layer_edit.clicked.connect(lambda: self.edit_layer())
-        for b in (self.btn_layer_up, self.btn_layer_down, self.btn_layer_edit):
+        # a fill for the whole colour (pen only, as the ribbon's Fill)
+        self.btn_layer_fill = QToolButton()
+        self.btn_layer_fill.setIcon(icons.tabler("bucket-droplet"))
+        self.btn_layer_fill.setToolTip(_("Fill every closed shape of this colour with a pattern"))
+        self.btn_layer_fill.clicked.connect(lambda: self.fill_layer())
+        for b in (self.btn_layer_up, self.btn_layer_down, self.btn_layer_fill, self.btn_layer_edit):
             box.head.addWidget(b)
         self.layer_list = QListWidget()
         self.layer_list.setObjectName("layer_list")
@@ -1616,6 +1621,7 @@ class MainWindow(QMainWindow):
         self.frame_row.setVisible(not pen)
         # the fill is for drawing: with the knife it is not offered (it would cut the vinyl into strips)
         self.act_fill.setVisible(pen)
+        self.btn_layer_fill.setVisible(pen)
         self._mark_sets()
         self.view.pen_mode = pen
         self.act_knife.setText(_("Pen path") if pen else _("Knife path"))
@@ -2530,6 +2536,27 @@ class MainWindow(QMainWindow):
         if not chosen:
             self.statusBar().showMessage(_("Select a closed shape to fill."), 6000)
             return []
+        return self._fill_these(chosen, values)
+
+    def fill_layer(self, layer=None, values=None):
+        """A fill pattern for a whole colour (the one chosen in the Colours
+        list): every closed shape of it gets it, also the ones drawn as an
+        outline in the file. The same window as Fill (values: None asks;
+        {"pattern": None} removes it). Pen only. Returns the elements filled."""
+        if not self.is_pen():
+            return []
+        layer = layer or self._layer()
+        chosen = [e for e in self.design.elements_of(layer) if any(sub["closed"] for sub in e.paths)]
+        if not chosen:
+            self.statusBar().showMessage(_("This colour has no closed shape to fill."), 6000)
+            return []
+        done = self._fill_these(chosen, values)
+        if done:
+            layer.fill = dict(done[0].fill) if done[0].fill else None     # kept with the colour, in the project
+        return done
+
+    def _fill_these(self, chosen, values):
+        """chosen (closed shapes) get the fill: values, or asked in the Fill window."""
         if values is None:
             before = [e.fill for e in chosen]
             values = self._ask_fill(chosen)
@@ -3331,9 +3358,15 @@ class MainWindow(QMainWindow):
         was = self.layer_list.currentRow()
         self.layer_list.blockSignals(True)
         self.layer_list.clear()
+        names = dict(self.FILL_PATTERNS)
         for layer in layers:
-            n = len(self.design.elements_of(layer))
-            item = QListWidgetItem(self.color_icon(layer.color), "%s  ·  %d" % (layer.name, n))
+            els = self.design.elements_of(layer)
+            text = "%s  ·  %d" % (layer.name, len(els))
+            # with the pen: its fill, when all its closed shapes have the same pattern
+            patterns = {(e.fill or {}).get("pattern") for e in els if any(s["closed"] for s in e.paths)}
+            if self.is_pen() and len(patterns) == 1 and None not in patterns:
+                text += "  ·  " + _(names.get(patterns.pop(), ""))
+            item = QListWidgetItem(self.color_icon(layer.color), text)
             item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
             item.setCheckState(Qt.Checked if layer.enabled else Qt.Unchecked)
             self.layer_list.addItem(item)

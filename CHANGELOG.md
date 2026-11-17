@@ -14,6 +14,8 @@ several colours of vinyl, one colour after another.
 - The Colours panel (when there is more than one): the order they are drawn in, a colour left out,
   a click selects its elements, and each colour's name, colour, pen width and where its stroke lies.
   On the sheet and in the element list every element shows in its colour.
+- A fill for a whole colour (the bucket in the Colours panel, with the pen): every closed shape of
+  that colour gets the pattern, in the same window as Fill; the list shows it beside the colour.
 - The right mouse button → Colour moves elements to another colour, or to a new one.
 - Start goes colour after colour: the check list names them in order, and before each a window asks
   to put in its pen (or its vinyl), with Skip this colour and Finish. All the colours keep the same

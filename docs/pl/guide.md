@@ -353,8 +353,11 @@ pokazuje kolory **w kolejności rysowania**: strzałki przesuwają wybrany
 kolor wcześniej albo później (zwykle najpierw jasne kolory, a czarny kontur
 na końcu). Odznaczony kolor zostaje pominięty w zadaniu. Kliknięcie koloru
 zaznacza jego elementy; zębatka ustawia jego nazwę, kolor oraz własną
-**grubość pisaka** i to, **gdzie leży kreska** (puste: jak w oknie). Na
-arkuszu i na liście elementów każdy element jest w swoim kolorze.
+**grubość pisaka** i to, **gdzie leży kreska** (puste: jak w oknie).
+**Wiaderko** (przy pisaku) wypełnia wzorem każdy zamknięty kształt
+wybranego koloru, w tym samym oknie co Wypełnienie, także kształty, które w
+pliku były tylko konturem; lista pokazuje wzór obok koloru. Na arkuszu i na
+liście elementów każdy element jest w swoim kolorze.
 
 Żeby dać elementom inny kolor, użyj prawego przycisku myszy → **Kolor**:
 wybierz jeden z kolorów projektu albo **Nowy kolor…**.

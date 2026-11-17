@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 23:06+0100\n"
+"POT-Creation-Date: 2026-11-17 23:27+0100\n"
 "PO-Revision-Date: 2026-11-17 21:27+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pt_BR\n"
@@ -806,6 +806,9 @@ msgstr "Preenchimento"
 msgctxt "tool strip"
 msgid "Fill"
 msgstr "Preencher"
+
+msgid "Fill every closed shape of this colour with a pattern"
+msgstr "Preencher com um padrão cada forma fechada desta cor"
 
 msgid "Fill it"
 msgstr "Preencher"
@@ -2185,6 +2188,9 @@ msgstr ""
 
 msgid "Third-party licences"
 msgstr "Licenças das bibliotecas"
+
+msgid "This colour has no closed shape to fill."
+msgstr "Esta cor não tem nenhuma forma fechada para preencher."
 
 msgid "This colour's name, colour and pen"
 msgstr "Nome, cor e caneta desta cor"

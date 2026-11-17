@@ -2227,6 +2227,34 @@ def test_the_colour_window_says_what_to_put_in(win):
     assert "Put in the vinyl: <b>Black</b>" in " ".join(l.text() for l in dlg.findChildren(QLabel))
 
 
+def test_a_colour_gets_a_fill_of_its_own(win):
+    """The bucket in the Colours head: every closed shape of the chosen
+    colour gets the pattern, also an outline (the green ring); pen only."""
+    win.show()
+    win.import_svg(DEMO_SVG, "auto")
+    d = win.design
+    green = [layer for layer in d.layers if layer.name == "Green"][0]
+    # the knife: no fill, and no button
+    assert win.btn_layer_fill.isHidden() and win.fill_layer(green, {"pattern": "cross", "spacing": 1.0}) == []
+    win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
+    assert not win.btn_layer_fill.isHidden()
+    assert all(e.fill is None for e in d.elements_of(green))            # a stroke in the file: no fill yet
+    done = win.fill_layer(green, {"pattern": "cross", "spacing": 1.0, "angle": 0.0, "margin": 0.0})
+    assert done and set(map(id, done)) == set(map(id, d.elements_of(green)))
+    assert all(e.fill["pattern"] == "cross" for e in done) and green.fill["pattern"] == "cross"
+    assert win.layer_list.item(d.layers.index(green)).text().endswith("Cross-hatch")
+    # the other colours keep theirs
+    pink = d.layers[1]
+    assert {(e.fill or {}).get("pattern") for e in d.elements_of(pink)} <= {"lines", None}
+    # removed, and undone
+    win.fill_layer(green, {"pattern": None})
+    assert all(e.fill is None for e in d.elements_of(green)) and green.fill is None
+    win.undo()
+    back = [layer for layer in win.design.layers if layer.id == green.id][0]     # undo gives copies
+    assert back.fill["pattern"] == "cross" and all(e.fill["pattern"] == "cross"
+                                                   for e in win.design.elements_of(back))
+
+
 def test_save_hpgl_writes_a_file_per_colour(win, tmp_path):
     win.import_svg(DEMO_SVG, "auto")
     first = win.save_cutter_file(str(tmp_path / "logo.hpgl"))

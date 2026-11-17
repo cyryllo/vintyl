@@ -350,6 +350,9 @@ the chosen colour earlier or later (light colours first and the black
 outline last is usual). The tick leaves a colour out of the job. A click on
 a colour selects its elements; the gear sets its name, its colour and its
 own **pen width** and **where its stroke lies** (empty: as in the window).
+The **bucket** (with the pen) fills every closed shape of the chosen colour
+with a pattern, in the same window as Fill, also the shapes that were only
+an outline in the file; the list shows the pattern beside the colour.
 On the sheet and in the element list every element shows in its colour.
 
 To give elements another colour, use the right mouse button → **Colour**:

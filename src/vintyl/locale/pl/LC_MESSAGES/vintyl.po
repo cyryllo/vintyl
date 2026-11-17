@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 23:06+0100\n"
+"POT-Creation-Date: 2026-11-17 23:27+0100\n"
 "PO-Revision-Date: 2026-11-15 17:49+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -816,6 +816,9 @@ msgstr "Wypełnienie"
 msgctxt "tool strip"
 msgid "Fill"
 msgstr "Wypełnienie"
+
+msgid "Fill every closed shape of this colour with a pattern"
+msgstr "Wypełnij wzorem każdy zamknięty kształt w tym kolorze"
 
 msgid "Fill it"
 msgstr "Wypełnij"
@@ -2176,6 +2179,9 @@ msgstr "Nie ma nic do cięcia: każda ścieżka jest krótsza niż jeden krok pl
 
 msgid "Third-party licences"
 msgstr "Licencje bibliotek"
+
+msgid "This colour has no closed shape to fill."
+msgstr "Ten kolor nie ma zamkniętego kształtu do wypełnienia."
 
 msgid "This colour's name, colour and pen"
 msgstr "Nazwa, kolor i pisak tego koloru"
