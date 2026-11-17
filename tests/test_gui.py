@@ -1791,3 +1791,25 @@ def test_start_save_and_the_knife_test_are_pinned_under_the_panel(win):
         assert not panel.isAncestorOf(b) and win.send_footer.isAncestorOf(b)
     bottom = win.send_footer.mapTo(win, win.send_footer.rect().bottomLeft()).y()
     assert win.btn_start.isVisible() and bottom <= win.height()
+
+
+def test_the_check_list_always_shows_the_cutting_values(win):
+    """A built-in material has no force or speed: the card is still there,
+    with dashes, where to write them, and the knife's own values."""
+    from PySide6.QtWidgets import QLabel
+    win.material_box.setCurrentIndex(win.material_box.findData("vinyl"))
+    values = win.material_values()
+    assert values is not None and values[1] is None and values[2] is None
+    details = dict(win.cut_details())
+    assert details["Blade"] == "45° (standard)" and details["Knife offset"].endswith(" mm")
+    assert "Overcut" in details
+    dlg = REAL_START_DIALOGS[0](win, "VEVOR KI-375A", "/dev/usb/lp1", False, "Vinyl film", values, True,
+                                False, "", show=False, details=win.cut_details())
+    texts = " ".join(l.text() for l in dlg.findChildren(QLabel))
+    assert "–" in texts and "has no force or speed" in texts and "Knife offset <b>" in texts
+    assert "not in the material" not in texts                     # one hint, not one under each dash
+    # the pen: its width and where its stroke lies
+    win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
+    assert [label for label, _v in win.cut_details()] == ["Pen width", "Draw"]
+    # the knife test shows the knife's values, also from the pen mode
+    assert "Knife offset" in dict(win.cut_details(pen=False))

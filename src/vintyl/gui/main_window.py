@@ -1580,16 +1580,37 @@ class MainWindow(QMainWindow):
 
     def material_values(self, material=None):
         """(title, force text, speed text) of the material for this cutter, for
-        the windows before Start; None when it has neither (speeds in mm/s)."""
+        the windows before Start (a text None when not set; speeds in mm/s);
+        None without a material."""
         m = material if material is not None else self.material()
         if m is None:
             return None
         force, speed = m.for_cutter(self.profile_box.currentData())
-        if force is None and speed is None:
-            return None
+        # also with neither: the window then says where to write them
         title = _("Vintyl sends to the cutter") if self.profile.send_speed_force else _("Set on the cutter's panel")
         return (title, "%g g" % force if force is not None else None,
                 "%g mm/s" % round(speed * 10.0, 1) if speed is not None else None)
+
+    def cut_details(self, material=None, pen=None):
+        """[(label, value)] of the rest the job uses, for the windows before
+        sending: the knife's blade (from the material), offset and overcut;
+        the pen's width and where its stroke lies."""
+        from vintyl import i18n
+        from vintyl.gui.material_editor import BLADE_NAMES
+
+        def mm(v):                                   # as the window writes numbers (a comma in Polish)
+            text = "%g mm" % round(v, 2)
+            return text.replace(".", ",") if i18n.current_language() == "pl" else text
+        pen = self.is_pen() if pen is None else pen
+        if pen:
+            return [(_("Pen width"), mm(self.pen_width.value())), (_("Draw"), self.pen_place.currentText())]
+        m = material if material is not None else self.material()
+        p = self.job_profile(material)
+        out = []
+        if m is not None and m.blade:
+            out.append((_("Blade"), _(BLADE_NAMES[m.blade])))
+        out += [(_("Knife offset"), mm(p.knife_offset_mm)), (_("Overcut"), mm(p.overcut_mm))]
+        return out
 
     def _material_is_builtin(self):
         e = self.material_entries.get(self.material_box.currentData())
@@ -3164,7 +3185,7 @@ class MainWindow(QMainWindow):
         note = (_(m.note) if self._material_is_builtin() else m.note) if m is not None and m.note else ""
         if not start_dialogs.confirm_start(self, p.name, p.port, self.is_pen(), self._material_name(),
                                            self.material_values(), not self.profile.send_speed_force,
-                                           self.mirror_job.isChecked(), note):
+                                           self.mirror_job.isChecked(), note, details=self.cut_details()):
             return None
         return self._send(job, p, "the design")
 
@@ -3429,7 +3450,8 @@ class MainWindow(QMainWindow):
         from vintyl.gui import start_dialogs
         if not start_dialogs.confirm_knife_test(self, p.name, self.KNIFE_TEST_MM,
                                                 weeding.knife_test(self.KNIFE_TEST_MM),
-                                                self.material_values(material)):
+                                                self.material_values(material),
+                                                details=self.cut_details(material, pen=False)):
             return None
         return self._send(job, p, "knife test")
 

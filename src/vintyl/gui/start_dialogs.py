@@ -35,8 +35,10 @@ def _checks(card, items):
         card.body.addLayout(row)
 
 
-def _values_card(values):
-    """The force and speed in large type, on the information colour."""
+def _values_card(values, details=()):
+    """The force and speed in large type, on the information colour; under
+    them the rest of what the job uses (details: [(label, value)]: the
+    blade, the knife offset and overcut, or the pen's width)."""
     title, force, speed = values
     box = QFrame()
     box.setObjectName("info")
@@ -50,17 +52,29 @@ def _values_card(values):
     grid.setHorizontalSpacing(24)
     # both are always shown: a value the material has not got for this cutter
     # is a dash and a note, so it does not look forgotten by the program
+    neither = force is None and speed is None
     for col, (name, value) in enumerate(((_("Force"), force), (_("Speed"), speed))):
         small = QLabel(name)
         big = QLabel(value if value is not None else "–")
         big.setObjectName("big_value")
         grid.addWidget(small, 0, col)
         grid.addWidget(big, 1, col)
-        if value is None:
+        if value is None and not neither:
             missing = QLabel(_("not in the material: as the cutter has it now"))
             missing.setWordWrap(True)
             grid.addWidget(missing, 2, col)
     lay.addLayout(grid)
+    if neither:
+        # a built-in material has no force or speed (none is made up): say
+        # where to write them, so they show here the next time
+        hint = QLabel(_("The material has no force or speed for this cutter yet. Write them in the "
+                        "material (the button beside Material) and they show here."))
+        hint.setWordWrap(True)
+        lay.addWidget(hint)
+    if details:
+        line = QLabel(" &nbsp;·&nbsp; ".join("%s <b>%s</b>" % (label, value) for label, value in details))
+        line.setWordWrap(True)
+        lay.addWidget(line)
     return box
 
 
@@ -85,9 +99,11 @@ def _footer(dlg, outer, go_text, go_icon):
     dlg.resize(dlg.minimumWidth(), outer.totalHeightForWidth(dlg.minimumWidth()))
 
 
-def confirm_start(parent, cutter, port, pen, material_name, values, panel_only, mirror, note, show=True):
+def confirm_start(parent, cutter, port, pen, material_name, values, panel_only, mirror, note, show=True,
+                  details=()):
     """The check list before Start. values: (title, force text, speed text)
-    or None; panel_only: the cutter takes force and speed from its panel;
+    or None; details: [(label, value)] of the knife or the pen, under them;
+    panel_only: the cutter takes force and speed from its panel;
     True = go on. show=False returns the dialog, not run (for tests)."""
     dlg, outer, body = _dialog(parent, _("Draw now?") if pen else _("Cut now?"))
     # what is going to happen: which cutter, which tool, which material
@@ -98,7 +114,7 @@ def confirm_start(parent, cutter, port, pen, material_name, values, panel_only, 
     facts.setWordWrap(True)
     body.addWidget(facts)
     if values is not None:
-        body.addWidget(_values_card(values))
+        body.addWidget(_values_card(values, details))
     card = widgets.Card(_("Check before you go on"))
     if pen:
         items = [_("The pen (not the knife) is in the holder, its tip just above the paper"),
@@ -142,7 +158,7 @@ def confirm_start(parent, cutter, port, pen, material_name, values, panel_only, 
     return dlg.exec() == QDialog.Accepted
 
 
-def confirm_knife_test(parent, cutter, size_mm, test_paths, values=None, show=True):
+def confirm_knife_test(parent, cutter, size_mm, test_paths, values=None, show=True, details=()):
     """The knife test: its picture, the question, what to look at after
     cutting. values as in confirm_start (or None). True = cut it."""
     from vintyl.gui.canvas import shape_icon
@@ -158,7 +174,7 @@ def confirm_knife_test(parent, cutter, size_mm, test_paths, values=None, show=Tr
     top.addWidget(question, 1)
     body.addLayout(top)
     if values is not None:
-        body.addWidget(_values_card(values))
+        body.addWidget(_values_card(values, details))
     card = widgets.Card(_("After cutting"))
     _checks(card, [_("Peel the triangle off: it should come away cleanly, and the backing must not be cut through"),
                    _("Too shallow: more force on the cutter's panel. Marks in the backing: less"),
