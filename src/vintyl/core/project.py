@@ -13,7 +13,9 @@ inside it.
 "layers" and an element's "layer" (the colour layers, vintyl.core.layers)
 came in 0.9; they are optional, so the version stays 1: a project without
 them opens with one black layer, and an older Vintyl opens a project with
-them, only without its colours.
+them, only without its colours. So is a fill's "layer" (after 0.9.0: the
+colour the fill is drawn with, when not the outline's); an older Vintyl
+draws such a fill in the outline's colour.
 
 Copyright (C) 2026 Vintyl contributors
 Licensed under the GNU General Public License v3 or later. See LICENSE.
@@ -75,8 +77,11 @@ def _fill(f):
     from .patterns import PATTERN_CODES
     if not isinstance(f, dict) or f.get("pattern") not in PATTERN_CODES or float(f.get("spacing", 0)) <= 0:
         raise ValueError
-    return {"pattern": f["pattern"], "spacing": float(f["spacing"]), "angle": float(f.get("angle", 0.0)),
-            "margin": float(f.get("margin", 0.0))}
+    out = {"pattern": f["pattern"], "spacing": float(f["spacing"]), "angle": float(f.get("angle", 0.0)),
+           "margin": float(f.get("margin", 0.0))}
+    if f.get("layer"):
+        out["layer"] = str(f["layer"])           # drawn with another colour layer than the outline
+    return out
 
 
 def _layer(d):

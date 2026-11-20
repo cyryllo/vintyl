@@ -156,3 +156,26 @@ def test_the_first_layer_is_named_in_the_windows_language():
     finally:
         i18n.setup("en")
     assert Design().layers[0].name == "Black"
+
+
+def test_a_fill_can_be_drawn_with_another_colour(tmp_path):
+    """A black outline with a pink fill: the outline goes with black, the
+    fill with pink (two pens); saved and read back; a fill naming a colour
+    that is gone is drawn with the outline's."""
+    d = Design()
+    pink = Layer("c1", "Pink", "#ec4899")
+    d.layers.append(pink)
+    e = Element("heart", shapes.ellipse(-60, -60, -20, -20),
+                fill={"pattern": "lines", "spacing": 2.0, "angle": 0.0, "margin": 0.0, "layer": "c1"})
+    d.elements.append(e)
+    black = d.layers[0]
+    assert d.layer_of(e) is black and d.fill_layer_of(e) is pink
+    assert d.drawn_in(black) == [e] and d.drawn_in(pink) == [e] and d.elements_of(pink) == []
+    assert d.material_fills(layer=black) == ([], []) and d.material_fills(layer=pink)[0]
+    assert d.material_paths(layer=pink) == ([], []) and d.material_paths(layer=black)[0]
+    path = str(tmp_path / "p.vintyl")
+    project.save(path, d)
+    again, _s = project.load(path)
+    assert again.elements[0].fill["layer"] == "c1" and again.fill_layer_of(again.elements[0]) is again.layers[1]
+    e.fill["layer"] = "gone"
+    assert d.fill_layer_of(e) is black

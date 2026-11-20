@@ -2278,6 +2278,27 @@ def test_a_colour_gets_a_fill_of_its_own(win):
                                                    for e in win.design.elements_of(back))
 
 
+def test_a_fill_in_another_colour_goes_with_that_colour(win):
+    """A black outline, a pink fill: the black job draws the outline only, the
+    pink one the fill only; the sheet shows the fill in pink, and the Colours
+    list counts the shape under both."""
+    from vintyl.core.layers import Layer
+    win.show()
+    win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
+    win._on_drawn("ellipse", QRectF(-100, -100, 60, 60))
+    e = win.design.elements[0]
+    pink = Layer("c1", "Pink", "#ec4899")
+    win.design.layers.append(pink)
+    e.fill = {"pattern": "lines", "spacing": 2.0, "angle": 0.0, "margin": 0.0, "layer": "c1"}
+    win.refresh()
+    jobs = dict((layer.id, job) for layer, job in win.layer_jobs())
+    outline, fill = jobs["black"].knife_paths, jobs["c1"].knife_paths
+    assert len(outline) == 1 and len(fill) > 5                    # the circle; its fill's lines
+    item = [i for i in win.view._items if i.element is e][0]
+    assert item.fill_color.name() != item.color.name()
+    assert [win.layer_list.item(i).text() for i in range(2)] == ["Black  ·  1", "Pink  ·  1  ·  Lines"]
+
+
 def test_save_hpgl_writes_a_file_per_colour(win, tmp_path):
     win.import_svg(DEMO_SVG, "auto")
     first = win.save_cutter_file(str(tmp_path / "logo.hpgl"))

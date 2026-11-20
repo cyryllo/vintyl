@@ -3359,11 +3359,14 @@ class MainWindow(QMainWindow):
         self.layer_list.blockSignals(True)
         self.layer_list.clear()
         names = dict(self.FILL_PATTERNS)
+        d = self.design
         for layer in layers:
-            els = self.design.elements_of(layer)
+            els = d.drawn_in(layer)                  # its outlines, and the fills drawn with it
             text = "%s  ·  %d" % (layer.name, len(els))
-            # with the pen: its fill, when all its closed shapes have the same pattern
-            patterns = {(e.fill or {}).get("pattern") for e in els if any(s["closed"] for s in e.paths)}
+            # with the pen: the pattern this pen draws, when it is the same in all its closed
+            # shapes (a shape whose fill another colour draws counts as one without)
+            patterns = {e.fill["pattern"] if e.fill and d.fill_layer_of(e) is layer else None
+                        for e in els if any(s["closed"] for s in e.paths)}
             if self.is_pen() and len(patterns) == 1 and None not in patterns:
                 text += "  ·  " + _(names.get(patterns.pop(), ""))
             item = QListWidgetItem(self.color_icon(layer.color), text)
@@ -3386,9 +3389,10 @@ class MainWindow(QMainWindow):
             self.refresh()
 
     def _layer_clicked(self, item):
-        """A click on a colour selects its elements on the sheet."""
+        """A click on a colour selects its elements on the sheet (also the
+        ones whose fill only it draws)."""
         layer = self.design.layers[self.layer_list.row(item)]
-        els = self.design.elements_of(layer)
+        els = self.design.drawn_in(layer)
         if els:
             self.view.select_many(els)
             self.selection, self.selected = list(els), els[0]

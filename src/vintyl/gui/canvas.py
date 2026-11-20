@@ -122,7 +122,7 @@ class ElementItem(QGraphicsPathItem):
     """One element. Its paths are already in scene coordinates; a drag moves
     the item and, when the mouse is released, the element's nodes."""
 
-    def __init__(self, element, view, color=None):
+    def __init__(self, element, view, color=None, fill_color=None):
         super().__init__(painter_path(element.paths))
         self.element = element
         self.view = view
@@ -131,6 +131,8 @@ class ElementItem(QGraphicsPathItem):
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
         # its colour layer's colour (a design of several colours), else the accent
         self.color = QColor(color) if color else QColor(COLORS["cut"])
+        # its fill's: another colour's when the fill is drawn with another pen
+        self.fill_color = QColor(fill_color) if fill_color else self.color
         self.setPen(cosmetic_pen(self.color if element.cut else COLORS["skip"], 1.6,
                                  Qt.SolidLine if element.cut else Qt.DashLine))
         self._press = None
@@ -156,7 +158,7 @@ class ElementItem(QGraphicsPathItem):
     def paint(self, painter, option, widget=None):
         painter.setBrush(Qt.NoBrush)
         if not self.fill_path.isEmpty() and self.view.pen_mode:      # a knife has no fill: not shown
-            color = QColor(self.color if self.element.cut else COLORS["skip"])
+            color = QColor(self.fill_color if self.element.cut else COLORS["skip"])
             color.setAlpha(170)
             painter.setPen(cosmetic_pen(color, 1.0))
             painter.drawPath(self.fill_path)
@@ -423,7 +425,8 @@ class MaterialView(QGraphicsView):
         # the accent, as always)
         layered = len(getattr(design, "layers", ())) > 1
         for e in design.elements:
-            item = ElementItem(e, self, screen_color(design.layer_of(e).color) if layered else None)
+            item = ElementItem(e, self, screen_color(design.layer_of(e).color) if layered else None,
+                               screen_color(design.fill_layer_of(e).color) if layered and e.fill else None)
             scene.addItem(item)
             item.setFlag(QGraphicsItem.ItemIsMovable, self.tool == "select")
             self._items.append(item)

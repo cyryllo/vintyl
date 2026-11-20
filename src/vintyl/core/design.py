@@ -36,7 +36,9 @@ class Element:
     spec: dict = None
     group: str = ""                   # elements with the same group are selected and moved together
     # a fill pattern inside the closed outlines, drawn with a pen (a knife skips it):
-    # {"pattern": "lines", "spacing": mm, "angle": degrees, "margin": mm}; None = no fill
+    # {"pattern": "lines", "spacing": mm, "angle": degrees, "margin": mm}; None = no fill.
+    # Its "layer" (optional): the colour layer the fill is drawn with, when it is not
+    # the outline's (a black outline, a pink fill: two pens)
     fill: dict = None
     # the colour layer it belongs to (vintyl.core.layers); "" = the design's first
     layer: str = ""
@@ -152,6 +154,22 @@ class Design:
         """The elements of a layer, in list order."""
         return [e for e in self.elements if self.layer_of(e) is layer]
 
+    def fill_layer_of(self, element):
+        """The layer an element's fill is drawn with: the one its fill names,
+        else (none, or one that is gone) the element's own."""
+        want = (element.fill or {}).get("layer")
+        if want:
+            for layer in self.layers:
+                if layer.id == want:
+                    return layer
+        return self.layer_of(element)
+
+    def drawn_in(self, layer):
+        """The elements a layer draws something of: their outline, or their
+        fill, in list order."""
+        return [e for e in self.elements
+                if self.layer_of(e) is layer or (e.fill and self.fill_layer_of(e) is layer)]
+
     def bounds(self, only_cut=False):
         els = [e for e in self.elements if e.cut or not only_cut]
         boxes = [e.bounds for e in els if e.paths]
@@ -181,10 +199,11 @@ class Design:
     def material_fills(self, tol=curves.FLATNESS_MM, layer=None):
         """(polylines, groups) of the fill patterns of the elements marked
         "cut" (for the pen; material coordinates, as material_paths); layer:
-        only that layer's."""
+        only the fills drawn with that layer (fill_layer_of), whoever's
+        outline they fill."""
         out, groups = [], []
         for k, e in enumerate(self.elements):
-            if not e.cut or not e.fill or (layer is not None and self.layer_of(e) is not layer):
+            if not e.cut or not e.fill or (layer is not None and self.fill_layer_of(e) is not layer):
                 continue
             for line in e.fill_lines(tol):
                 out.append([view_to_material(x, y) for x, y in line])
