@@ -91,7 +91,8 @@ the cutter. This guide is for version 0.9.0.
   cutter starts (its Origin key); X runs up along the material, Y to the
   left across it. Rulers in mm, the cutting width at the top, zoom buttons
   at the bottom right; the mouse wheel zooms, the middle button moves the
-  view.
+  view. Zooming out stops at the whole sheet (100%), where it sits as Fit
+  puts it; zooming in has no such limit.
 - **The tool strip** on the right. A small triangle in a button's corner
   means it opens a set of tools.
 

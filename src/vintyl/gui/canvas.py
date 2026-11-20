@@ -1034,11 +1034,7 @@ class MaterialView(QGraphicsView):
 
     # ---- mouse, keys and wheel ------------------------------------------------------
     def wheelEvent(self, event):
-        factor = 1.25 if event.angleDelta().y() > 0 else 1 / 1.25
-        if 0.02 < self.transform().m11() * factor < 400:
-            self._user_zoomed = True
-            self.scale(factor, factor)
-            self._show_zoom()
+        self._zoom(1.25 if event.angleDelta().y() > 0 else 1 / 1.25)      # about the mouse
 
     def mousePressEvent(self, event):
         if event.button() == Qt.MiddleButton:
@@ -1265,12 +1261,28 @@ class MaterialView(QGraphicsView):
 
     def zoom_by(self, factor):
         """Zoom about the middle of the view (keys + and -)."""
-        if 0.02 < self.transform().m11() * factor < 400:
-            self._user_zoomed = True
-            self.setTransformationAnchor(QGraphicsView.AnchorViewCenter)
-            self.scale(factor, factor)
+        self.setTransformationAnchor(QGraphicsView.AnchorViewCenter)
+        try:
+            self._zoom(factor)
+        finally:
             self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
-            self._show_zoom()
+
+    MAX_SCALE = 400.0                    # view pixels per mm, the closest zoom
+
+    def _zoom(self, factor):
+        """Zoom in as close as you like, but out no further than the whole
+        sheet: there it stops, with the sheet where Fit puts it (and it
+        follows the window's size again)."""
+        now = self.transform().m11()
+        if now * factor > self.MAX_SCALE:
+            return
+        fit = self._fit()
+        if fit is not None and now * factor <= fit[0] * 1.0001:
+            self.fit_requested()
+            return
+        self._user_zoomed = True
+        self.scale(factor, factor)
+        self._show_zoom()
 
     def show_preview(self, paths):
         """A dashed preview of shapes about to be added (curves subpaths, view
@@ -1341,22 +1353,31 @@ class MaterialView(QGraphicsView):
             self.zoom_label.setText("%d%%" % self.zoom_percent())
             self._place_zoom_box()
 
-    def fit_all(self):
+    def _fit(self):
+        """(scale, middle) that show the whole sheet and every element in the
+        view now; None while the view has no room. As fitInView, but the room
+        round it is in screen pixels, so a narrow sheet still reaches the
+        window's edges."""
         rect = self.material_rect(getattr(self, "length_mm", MIN_STRIP_LENGTH))
         for item in self._items:
             rect = rect.united(item.sceneBoundingRect())
-        # as fitInView, but the room round it is in screen pixels, so a narrow
-        # sheet still reaches the window's edges
         mh, mv = FIT_LEFT_PX + FIT_RIGHT_PX, FIT_TOP_PX + FIT_BOTTOM_PX
         vw, vh = self.viewport().width(), self.viewport().height()
         if rect.width() <= 0 or rect.height() <= 0 or vw <= mh or vh <= mv:
-            return
+            return None
         k = min((vw - mh) / rect.width(), (vh - mv) / rect.height())
-        self.setTransform(QTransform.fromScale(k, k))
         # the margins are not the same on each side: the sheet's middle goes to
         # the middle of the room the margins leave
-        self.centerOn(rect.center().x() + (FIT_RIGHT_PX - FIT_LEFT_PX) / (2 * k),
-                      rect.center().y() + (FIT_BOTTOM_PX - FIT_TOP_PX) / (2 * k))
+        return k, QPointF(rect.center().x() + (FIT_RIGHT_PX - FIT_LEFT_PX) / (2 * k),
+                          rect.center().y() + (FIT_BOTTOM_PX - FIT_TOP_PX) / (2 * k))
+
+    def fit_all(self):
+        fit = self._fit()
+        if fit is None:
+            return
+        k, middle = fit
+        self.setTransform(QTransform.fromScale(k, k))
+        self.centerOn(middle)
         self._fit_scale = k
         self._show_zoom()
 

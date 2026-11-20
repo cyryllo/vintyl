@@ -1,5 +1,11 @@
 # Changes
 
+## Next
+
+**Changed**
+- Zooming out stops at the whole sheet (100%), which then sits where Fit puts it and follows the
+  window's size again; zooming in has no such limit.
+
 ## 0.9.0
 
 Colours: a design of several colours, drawn with several pens or cut from

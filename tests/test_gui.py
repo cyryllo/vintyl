@@ -1513,6 +1513,29 @@ def test_the_zoom_box_zooms_and_fits_again(win):
     assert win.view.zoom_percent() == 100
 
 
+def test_zoom_out_stops_at_the_whole_sheet(win):
+    """In as close as you like; out no further than the whole sheet, which
+    then sits where Fit puts it (the wheel and the buttons alike)."""
+    from PySide6.QtCore import QPoint, QPointF
+    from PySide6.QtGui import QWheelEvent
+    win.show()
+    view = win.view
+    view.fit_requested()
+    fitted = view.mapFromScene(QPointF(0, 0))
+    for _i in range(5):
+        view.zoom_by(1 / 1.25)
+    assert view.zoom_percent() == 100 and not view._user_zoomed
+    for _i in range(3):
+        view.zoom_by(1.25)
+    assert view.zoom_percent() == 195 and view._user_zoomed
+    view.horizontalScrollBar().setValue(view.horizontalScrollBar().value() + 80)    # moved aside
+    for _i in range(6):                                                          # the wheel, away from you
+        view.wheelEvent(QWheelEvent(QPointF(200, 200), QPointF(200, 200), QPoint(0, 0), QPoint(0, -120),
+                                    Qt.NoButton, Qt.NoModifier, Qt.ScrollEnd, False))
+    assert view.zoom_percent() == 100 and not view._user_zoomed
+    assert view.mapFromScene(QPointF(0, 0)) == fitted                           # back in its place
+
+
 def test_the_cutter_settings_list_switches_and_asks_about_changes(win, monkeypatch):
     """Every cutter on the left; a change and then another cutter: asked
     (here: Save); the saved copy is marked changed."""

@@ -89,7 +89,8 @@ zadanie do plotera. Instrukcja dotyczy wersji 0.9.0.
   ploter zaczyna (klawisz Origin); X biegnie w górę wzdłuż materiału, Y w
   lewo w poprzek. Linijki w mm, szerokość cięcia u góry, przyciski
   powiększenia w prawym dolnym rogu; kółko myszy powiększa, środkowy
-  przycisk przesuwa widok.
+  przycisk przesuwa widok. Oddalanie kończy się na całym arkuszu (100%),
+  który wraca wtedy na miejsce jak po Dopasuj; przybliżać można dowolnie.
 - **Pasek narzędzi** po prawej. Mały trójkąt w rogu przycisku znaczy, że
   otwiera zestaw narzędzi.
 
