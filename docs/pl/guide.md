@@ -10,7 +10,7 @@ other_lang: guide.html
 
 Vintyl steruje z Linuksa ploterami tnącymi z nożem wleczonym: układa Twoje
 projekty na obrazie materiału, pozwala je rysować i zmieniać, a potem wysyła
-zadanie do plotera. Instrukcja dotyczy wersji 0.9.0.
+zadanie do plotera. Instrukcja dotyczy wersji 0.9.1.
 
 > Nic nie trafia do plotera, dopóki nie potwierdzisz tego na liście
 > kontrolnej. Przed pierwszym cięciem nowego materiału wytnij test noża.
@@ -373,7 +373,13 @@ wybierz jeden z kolorów projektu albo **Nowy kolor…**.
 wiaderku) wybierz **Kolor** wypełnienia: kontur zostaje przy swoim pisaku,
 a wypełnienie idzie z innym, jako osobny kolor w panelu. Nowy kolor dla
 wypełnienia trafia przed kolor konturu, więc kontur rysuje się na końcu i
-daje kształtowi czystą krawędź.
+daje kształtowi czystą krawędź. Dwa pisaki rzadko siedzą w oprawce
+identycznie: jeśli wypełnienie wychodzi za kontur, ustaw wypełnieniu
+**Margines** około 0,2–0,3 mm.
+
+Prawy przycisk myszy na kolorze w panelu: jego ustawienia, wypełnienie oraz
+**Usuń ten kolor**: jego elementy przechodzą do pierwszego innego koloru, a
+wypełnienia, które rysował, do koloru swoich kształtów (Ctrl+Z przywraca).
 
 ![Projekt w pięciu kolorach, rysowany pisakami]({{ img }}colours.png)
 

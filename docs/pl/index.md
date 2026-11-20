@@ -27,7 +27,7 @@ description: Vintyl to darmowy program do ploterów tnących folię na Linuksa. 
 
 <p class="lead">Vintyl obsługuje popularne, niedrogie <strong>plotery z nożem wleczonym</strong> (VEVOR, Seiki i wiele modeli na tej samej płycie sterującej), do których producent daje program tylko na Windowsa, np. SignMaster. Rysujesz albo otwierasz plik, widzisz go na arkuszu tak, jak materiał leży w ploterze, sprawdzasz nacisk i prędkość i tniesz prosto z okna.</p>
 
-> **Wersja 0.9.0, do użytku.** Przetestowana i czysto tnie na
+> **Wersja 0.9.1, do użytku.** Przetestowana i czysto tnie na
 > **VEVOR KI-375A** i **Seiki SK-870T**. W interfejsie mogą się jeszcze
 > trafić drobne błędy: prosimy,
 > [zgłaszaj je]({{ site.repo }}/issues/new/choose).

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-20 21:48+0100\n"
+"POT-Creation-Date: 2026-11-20 21:55+0100\n"
 "PO-Revision-Date: 2026-11-15 17:49+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -413,6 +413,10 @@ msgstr ""
 
 msgid "Colour"
 msgstr "Kolor"
+
+#, python-format
+msgid "Colour %(gone)s removed; its elements are now %(to)s."
+msgstr "Usunięto kolor %(gone)s; jego elementy są teraz w kolorze %(to)s."
 
 #, python-format
 msgid "Colour %(n)d of %(total)d: %(name)s"
@@ -1612,6 +1616,9 @@ msgstr "Usuń wypełnienie"
 
 msgid "Remove the holes inside"
 msgstr "Usuń wewnętrzne otwory"
+
+msgid "Remove this colour"
+msgstr "Usuń ten kolor"
 
 msgid "Report a problem"
 msgstr "Zgłoś problem"

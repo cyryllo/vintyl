@@ -1330,6 +1330,10 @@ class MainWindow(QMainWindow):
         self.layer_list.itemChanged.connect(self._layer_item_changed)
         self.layer_list.itemClicked.connect(self._layer_clicked)
         self.layer_list.itemDoubleClicked.connect(lambda _i: self.edit_layer())
+        # the right button: this colour's settings, fill, removal (not the Delete key: it
+        # deletes the selected elements, everywhere in the window)
+        self.layer_list.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.layer_list.customContextMenuRequested.connect(lambda pos: self.layer_context_menu(pos))
         lay.addWidget(self.layer_list)
         box.setVisible(False)
         box.line.setVisible(False)
@@ -2872,6 +2876,14 @@ class MainWindow(QMainWindow):
             for e in chosen:
                 e.fill = dict(spec)
             self.refresh()
+            new = new_layer[0]
+            if new is not None and spec and spec.get("layer") == new.id:
+                # a new colour is not in the design yet: the sheet shows the fill in it all the same
+                from vintyl.gui.canvas import screen_color
+                for item in self.view._items:
+                    if any(item.element is e for e in chosen):
+                        item.fill_color = QColor(screen_color(new.color))
+                        item.update()
         prev.ready.connect(show_result)
         prev.busy.connect(lambda b: b and status.setText(_("Working it out…")))
         pattern.currentIndexChanged.connect(ask_preview)
@@ -3449,8 +3461,9 @@ class MainWindow(QMainWindow):
             self.layer_list.addItem(item)
         self.layer_list.setCurrentRow(min(max(was, 0), len(layers) - 1))
         self.layer_list.blockSignals(False)
-        # as high as its rows (it does not scroll with a few colours)
-        rows = min(len(layers), 6)
+        # as high as its rows, up to LAYER_ROWS (more scroll): the element list above
+        # keeps its room on a 768 px screen
+        rows = min(len(layers), self.LAYER_ROWS)
         self.layer_list.setFixedHeight(rows * self.layer_list.sizeHintForRow(0) + 4)
         self.layer_summary.setText(ngettext("%d colour", "%d colours", len(layers)) % len(layers))
 
@@ -3471,6 +3484,52 @@ class MainWindow(QMainWindow):
             self.view.select_many(els)
             self.selection, self.selected = list(els), els[0]
             self._show_options()
+
+    LAYER_ROWS = 4                       # the Colours list's rows in sight
+
+    def layer_context_menu(self, pos, show=True):
+        """The right button on the Colours list: the colour under it is
+        chosen; its settings, its fill (pen), and Remove this colour.
+        Returns the menu."""
+        item = self.layer_list.itemAt(pos)
+        if item is None:
+            return None
+        self.layer_list.setCurrentItem(item)
+        layer = self._layer()
+        menu = QMenu(self)
+        menu.addAction(icons.tabler("settings"), _("This colour's name, colour and pen"),
+                       lambda: self.edit_layer(layer))
+        if self.is_pen():
+            menu.addAction(icons.tabler("bucket-droplet"), _("Fill every closed shape of this colour with a pattern"),
+                           lambda: self.fill_layer(layer))
+        menu.addSeparator()
+        gone = menu.addAction(icons.tabler("trash"), _("Remove this colour"), lambda: self.remove_layer(layer))
+        gone.setEnabled(len(self.design.layers) > 1)
+        if show:
+            menu.exec(self.layer_list.viewport().mapToGlobal(pos))
+        return menu
+
+    def remove_layer(self, layer=None):
+        """Remove a colour (the chosen one): its elements go to the first
+        other colour, the fills it drew to their shapes' own colour. The last
+        colour stays. Returns the colour its elements went to, or None."""
+        d = self.design
+        layer = layer or self._layer()
+        if len(d.layers) < 2 or layer not in d.layers:
+            return None
+        self._checkpoint()
+        d.pin_layers()                           # the others keep their colour, not their place
+        to = next(ly for ly in d.layers if ly is not layer)
+        for e in d.elements:
+            if e.layer == layer.id:
+                e.layer = to.id
+            if e.fill and e.fill.get("layer") == layer.id:
+                del e.fill["layer"]
+        d.layers.remove(layer)
+        self.refresh()
+        self.statusBar().showMessage(_("Colour %(gone)s removed; its elements are now %(to)s.")
+                                     % {"gone": layer.name, "to": to.name}, 6000)
+        return to
 
     def move_layer(self, step):
         """Draw the chosen colour earlier (-1) or later (+1)."""

@@ -2371,6 +2371,48 @@ def test_an_svg_outline_with_a_fill_of_another_colour_opens_as_two_pens(win, tmp
     assert set(dlg.combos) == {"#000000", "#ec4899", "#ffffff"}
 
 
+def test_a_colour_can_be_removed(win):
+    """Remove this colour (the Colours list's right button): its elements go
+    to the first other colour, the fills it drew to their shapes' colour;
+    undone with Ctrl+Z; the last colour stays."""
+    win.show()
+    win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
+    win.import_svg(DEMO_SVG, "auto")
+    d = win.design
+    assert win.layer_list.height() < 5 * win.layer_list.sizeHintForRow(0)     # 5 colours: 4 rows in sight
+    pink, black = d.layers[1], d.layers[0]
+    ring = d.elements_of([ly for ly in d.layers if ly.name == "Green"][0])[0]
+    ring.fill = {"pattern": "lines", "spacing": 1.0, "angle": 0.0, "margin": 0.0, "layer": pink.id}
+    pinks = d.elements_of(pink)
+    menu = win.layer_context_menu(win.layer_list.visualItemRect(win.layer_list.item(1)).center(), show=False)
+    assert [a.text() for a in menu.actions() if a.text()][-1] == "Remove this colour"
+    assert win._layer() is pink
+    assert win.remove_layer() is black
+    assert pink not in d.layers and all(d.layer_of(e) is black for e in pinks) and "layer" not in ring.fill
+    assert len(d.layers) == 4 and "Pink" not in [win.layer_list.item(i).text().split()[0] for i in range(4)]
+    win.undo()
+    assert [ly.name for ly in win.design.layers][1] == "Pink"
+    # down to one colour: it stays
+    while len(win.design.layers) > 1:
+        win.remove_layer(win.design.layers[-1])
+    assert win.remove_layer(win.design.layers[0]) is None and len(win.design.layers) == 1
+
+
+def test_the_fill_in_a_new_colour_is_previewed_in_it(win, monkeypatch):
+    from PySide6.QtGui import QColor
+    from PySide6.QtWidgets import QColorDialog
+    win.show()
+    win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
+    win._on_drawn("rectangle", QRectF(-120, -80, 100, 60))
+    box = win.selected
+    dlg = win._ask_fill([box], show=False)
+    monkeypatch.setattr(QColorDialog, "getColor", staticmethod(lambda *a, **k: QColor("#22aa22")))
+    dlg.colour.setCurrentIndex(dlg.colour.findData(win.NEW_COLOUR))
+    item = lambda: [i for i in win.view._items if i.element is box][0]          # noqa: E731
+    assert _wait_for(lambda: box.fill and box.fill.get("layer") and item().fill_color.name() == "#22aa22")
+    dlg.previewer.wait()
+
+
 def test_save_hpgl_writes_a_file_per_colour(win, tmp_path):
     win.import_svg(DEMO_SVG, "auto")
     first = win.save_cutter_file(str(tmp_path / "logo.hpgl"))

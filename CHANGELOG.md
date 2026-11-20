@@ -1,6 +1,8 @@
 # Changes
 
-## Next
+## 0.9.1
+
+An outline and its fill in two colours, and a colour can be removed.
 
 **Colours**
 - An outline and its fill in two colours, drawn with two pens (a black outline, a pink fill): the
@@ -11,6 +13,11 @@
 - Opening an SVG: a shape with a stroke of another colour than its fill (a pink shape with a black
   edge) opens as a black outline with a pink fill; the colours window lists both colours, its
   picture shows the fills, and a colour that only fills others is drawn first.
+- Remove this colour (the right mouse button on a colour in the panel, with its settings and its
+  fill): its elements go to the first other colour, the fills it drew to their shapes' own colour.
+- The Colours list shows up to four colours and scrolls the rest, so the element list keeps its
+  room on a 768 px screen.
+- A fill in a new colour is previewed on the sheet in that colour while the Fill window is open.
 
 **Fixed**
 - Moving the first colour in the Colours panel (or putting a new one before it) no longer gives its

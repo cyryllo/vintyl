@@ -10,7 +10,7 @@ other_lang: pl/guide.html
 
 Vintyl drives drag-knife vinyl cutters from Linux: it places your designs on
 a picture of the material, lets you draw and edit them, and sends the job to
-the cutter. This guide is for version 0.9.0.
+the cutter. This guide is for version 0.9.1.
 
 > Nothing is sent to the cutter until you confirm it in the check list.
 > Before the first cut of a new material, cut the knife test.
@@ -368,7 +368,13 @@ choose one of the design's colours, or **New colour…**.
 bucket) choose the fill's **Colour**: the outline stays with its pen, the
 fill goes with the other, as its own colour in the panel. A new colour for
 a fill is put before the outline's, so the outline is drawn last and gives
-the shape a clean edge.
+the shape a clean edge. Two pens seldom sit exactly alike in the holder: if
+the fill shows past the outline, give the fill a **Margin** of about
+0.2–0.3 mm.
+
+The right mouse button on a colour in the panel: its settings, its fill, and
+**Remove this colour**: its elements go to the first other colour, the fills
+it drew to their shapes' own colour (Ctrl+Z brings it back).
 
 ![A design of five colours, drawn with pens]({{ img }}colours.png)
 
