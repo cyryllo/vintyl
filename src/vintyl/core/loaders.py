@@ -160,16 +160,33 @@ def svg_subpaths(path):
 
 
 def load_svg_colors(path):
-    """The visible shapes of an SVG by colour: {(colour, filled): subpaths}.
-    A shape's colour is its fill's, or its stroke's when it has no fill;
-    "filled" tells which (a filled shape gets a fill pattern with a pen)."""
+    """The visible shapes of an SVG by colour: {(colour, kind): subpaths},
+    colour the outline's. kind: True, a filled shape (its fill's colour; it
+    gets a fill pattern with a pen); False, a stroke only (its stroke's
+    colour); or another colour '#rrggbb', a filled shape with a stroke of
+    another colour: the outline in the stroke's colour, the fill in that
+    one (a black outline with a pink fill: two pens)."""
     groups = {}
     for subpaths, fill, stroke in svg_shapes(path):
-        key = (fill, True) if fill is not None else (stroke, False)
+        if fill is not None and stroke is not None and stroke != fill:
+            key = (stroke, fill)
+        else:
+            key = (fill, True) if fill is not None else (stroke, False)
         groups.setdefault(key, []).extend(subpaths)
     if not groups:
         raise LoadError(_("%s has no visible shapes to cut.") % os.path.basename(path))
     return groups
+
+
+def colour_counts(groups):
+    """{colour: how many shapes use it} of load_svg_colors' groups: as an
+    outline, or as the fill of another colour's outline."""
+    counts = {}
+    for (color, kind), subpaths in groups.items():
+        counts[color] = counts.get(color, 0) + len(subpaths)
+        if isinstance(kind, str):
+            counts[kind] = counts.get(kind, 0) + len(subpaths)
+    return counts
 
 
 def load_svg(path):

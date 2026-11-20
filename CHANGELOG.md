@@ -8,6 +8,9 @@
   colour of the design, or a new one, put before the outline's so the outline is drawn last. The
   Colours list counts and selects a shape under both colours. Saved in the project (a fill's
   "layer"); an older Vintyl draws such a fill in the outline's colour.
+- Opening an SVG: a shape with a stroke of another colour than its fill (a pink shape with a black
+  edge) opens as a black outline with a pink fill; the colours window lists both colours, its
+  picture shows the fills, and a colour that only fills others is drawn first.
 
 **Fixed**
 - Moving the first colour in the Colours panel (or putting a new one before it) no longer gives its

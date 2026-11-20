@@ -33,11 +33,15 @@ def swatch(color, size=16):
 
 def _picture(groups, colour_of, size=260):
     """The drawing with each colour of the file drawn in the colour of the
-    layer it goes to, fitted into a square."""
+    layer it goes to, fitted into a square: the outlines, and the filled
+    shapes tinted with their fill's colour."""
     from vintyl.gui.canvas import painter_path, screen_color
-    paths = [(painter_path(subs), colour_of(color)) for (color, _filled), subs in groups.items()]
+    paths = []
+    for (color, kind), subs in groups.items():
+        fill = colour_of(kind) if isinstance(kind, str) else (colour_of(color) if kind else None)
+        paths.append((painter_path(subs), colour_of(color), fill))
     box = QRectF()
-    for path, _c in paths:
+    for path, _c, _f in paths:
         box = box.united(path.boundingRect())
     pm = QPixmap(size, size)
     pm.fill(QColor(theme.token("sheet")))
@@ -50,7 +54,12 @@ def _picture(groups, colour_of, size=260):
     p.translate(size / 2.0, size / 2.0)
     p.scale(k, k)
     p.translate(-box.center().x(), -box.center().y())
-    for path, color in paths:
+    for path, _c, fill in paths:                 # the fills under every outline
+        if fill:
+            tint = QColor(screen_color(fill))
+            tint.setAlpha(110)
+            p.fillPath(path, tint)
+    for path, color, _f in paths:
         p.setPen(QPen(screen_color(color), 1.6 / k))
         p.drawPath(path)
     p.end()
@@ -63,9 +72,8 @@ def colour_dialog(parent, groups, candidates, chosen, merged, separate, show=Tru
     {colour: candidate} as proposed, merged, each on its own. Returns the
     chosen {colour: candidate}, or None (cancelled). show=False returns
     the dialog, not run (tests), with .combos {colour: combo box}."""
-    counts = {}
-    for (color, _filled), subs in groups.items():
-        counts[color] = counts.get(color, 0) + len(subs)
+    from vintyl.core.loaders import colour_counts
+    counts = colour_counts(groups)
     colours = sorted(counts, key=lambda c: (-counts[c], c))
     dlg, outer, body = widgets.plain_dialog(parent, _("Colours of the drawing"), 780)
     intro = QLabel(ngettext("The drawing has %d colour. Each goes to a colour of the design: check what the "

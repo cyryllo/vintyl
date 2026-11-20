@@ -179,3 +179,20 @@ def test_a_fill_can_be_drawn_with_another_colour(tmp_path):
     assert again.elements[0].fill["layer"] == "c1" and again.fill_layer_of(again.elements[0]) is again.layers[1]
     e.fill["layer"] = "gone"
     assert d.fill_layer_of(e) is black
+
+
+OUTLINED = ('<svg xmlns="http://www.w3.org/2000/svg" width="80mm" height="40mm" viewBox="0 0 80 40">'
+            '<rect x="5" y="5" width="30" height="30" fill="#ec4899" stroke="#000000" stroke-width="1"/>'
+            '<circle cx="60" cy="20" r="12" fill="#000000"/>'
+            '<circle cx="60" cy="20" r="5" fill="#ffffff" stroke="#ffffff"/></svg>')
+
+
+def test_an_outline_and_a_fill_of_two_colours_are_read_apart(tmp_path):
+    from vintyl.core.loaders import colour_counts, load_svg_colors
+    p = tmp_path / "o.svg"
+    p.write_text(OUTLINED)
+    groups = load_svg_colors(str(p))
+    # the pink square with a black stroke: a black outline filled with pink; the stroke of the
+    # same colour as the fill (the white dot) is an ordinary filled shape
+    assert set(groups) == {("#000000", "#ec4899"), ("#000000", True), ("#ffffff", True)}
+    assert colour_counts(groups) == {"#000000": 2, "#ec4899": 1, "#ffffff": 1}

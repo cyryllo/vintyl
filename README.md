@@ -58,7 +58,9 @@ the stroke on, outside or inside the line and nine fill patterns.
 **Colours**: an SVG of several colours opens in its colours (similar ones
 merged, so one pen draws them; you see and change what goes where). The
 Colours panel sets the order they are drawn in, leaves a colour out and
-gives it its own pen width and its own fill pattern. Start goes colour after colour, with a pause to
+gives it its own pen width and its own fill pattern. An outline and its fill
+can be two colours (a black outline, a pink fill), also straight from an
+SVG. Start goes colour after colour, with a pause to
 put in the next pen (or the next colour of vinyl); the origin stays, so the
 colours land on each other. Try it with
 [docs/demo/vintyl-demo.svg](docs/demo/vintyl-demo.svg).

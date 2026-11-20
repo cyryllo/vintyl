@@ -346,7 +346,10 @@ których oko prawie nie odróżnia) są **łączone** w jeden, więc rysuje je
 jeden pisak; **Każdy osobno** zostawia każdy kolor oddzielnie, a
 **Wszystko w jednym kolorze** otwiera rysunek jak dawniej, w jednym
 kolorze. Każdy wiersz możesz zmienić przed kliknięciem **Otwórz**. Kształty
-wypełnione w pliku dostają wypełnienie liniami dla pisaka. Żeby
+wypełnione w pliku dostają wypełnienie liniami dla pisaka; kształt z
+obwódką w innym kolorze niż wnętrze (różowy z czarną krawędzią) otwiera się
+jako czarny kontur z różowym wypełnieniem, rysowany dwoma pisakami, najpierw
+kolor wypełnienia. Żeby
 wypróbować, otwórz demo:
 [vintyl-demo.svg](https://github.com/cyryllo/vintyl/raw/main/docs/demo/vintyl-demo.svg).
 

@@ -343,7 +343,9 @@ two greys that the eye hardly tells apart) are **merged** into one, so one
 pen draws them; **Each on its own** keeps every colour apart, and
 **All in one colour** opens the drawing as before, in one colour. Change any
 row before you press **Open**. Shapes filled in the file get a line fill for
-the pen. To try it, open the demo:
+the pen; a shape with a stroke of another colour than its fill (a pink
+shape with a black edge) opens as a black outline with a pink fill, drawn
+with two pens, the fill's colour first. To try it, open the demo:
 [vintyl-demo.svg](https://github.com/cyryllo/vintyl/raw/main/docs/demo/vintyl-demo.svg).
 
 ![The colours of an SVG when it opens: nine colours of the file go to five colours of the design]({{ img }}colours-open.png)

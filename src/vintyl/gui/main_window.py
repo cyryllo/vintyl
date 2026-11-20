@@ -32,7 +32,7 @@ from vintyl.core import ready
 from vintyl.core import transport
 from vintyl.core.design import Design, Element
 from vintyl.core.job import JobError, build_job
-from vintyl.core.loaders import LoadError, load_svg, load_svg_colors
+from vintyl.core.loaders import LoadError, colour_counts, load_svg, load_svg_colors
 from vintyl.core.profile import ProfileError
 from vintyl.gui import N_, NP_, _, ngettext, pgettext
 from vintyl.gui import icons
@@ -2093,7 +2093,8 @@ class MainWindow(QMainWindow):
         # a drawing of several colours: which colour of the design each one goes to
         # (colours: "auto" merged, "separate" each its own, or {colour: layer}; None: the window)
         existing, candidates, chosen, merged, separate = self._colour_plan(groups)
-        if len({c for c, _f in groups}) > 1:
+        counts = colour_counts(groups)
+        if len(counts) > 1:
             if isinstance(colours, dict):
                 chosen = colours
             elif colours == "auto":
@@ -2107,11 +2108,11 @@ class MainWindow(QMainWindow):
                     return None
         self._checkpoint()
         # the new colours used, the one with most shapes first
-        counts = {}
-        for (color, _filled), subpaths in groups.items():
-            counts[color] = counts.get(color, 0) + len(subpaths)
         new = [layer for layer in candidates if layer not in existing and layer in chosen.values()]
-        new.sort(key=lambda ly: -sum(n for c, n in counts.items() if chosen[c] is ly))
+        # a colour that fills other colours' outlines first (the outline, drawn last, gives a
+        # clean edge), then by shapes
+        fills = {chosen[kind] for (c, kind) in groups if isinstance(kind, str) and chosen[kind] is not chosen[c]}
+        new.sort(key=lambda ly: (ly not in fills, -sum(n for c, n in counts.items() if chosen[c] is ly)))
         self.design.layers = existing + new
         elements = self._colour_elements(path, groups, chosen)
         # place them on the material, together, PLACE_MARGIN_MM from the origin (lower right) both ways
@@ -2140,9 +2141,7 @@ class MainWindow(QMainWindow):
         first = existing[0]
         if len(existing) == 1 and not design.elements_of(first) and first.id == lay.DEFAULT_ID:
             existing = []                      # the empty black layer of a new design
-        counts = {}
-        for (color, _filled), subpaths in groups.items():
-            counts[color] = counts.get(color, 0) + len(subpaths)
+        counts = colour_counts(groups)
 
         def name(c):
             return _(lay.color_name(c))
@@ -2163,20 +2162,34 @@ class MainWindow(QMainWindow):
         group = uuid.uuid4().hex[:8] if len(groups) > 1 else ""
         several = len({layer.id for layer in to_layer.values()}) > 1
         merged = {}
-        for (color, filled), subpaths in groups.items():     # the merged colours: one element per layer (and kind)
-            merged.setdefault((to_layer[color].id, filled and several), []).extend(subpaths)
+        for (color, kind), subpaths in groups.items():     # the merged colours: one element per layer (and kind)
+            # kind: False an outline only, True filled with its own colour, a layer id: filled with that
+            # colour (an outline and a fill of two colours); one colour (a sticker): outlines only
+            if not several or kind is False:
+                kind = False
+            elif isinstance(kind, str):
+                kind = True if to_layer[kind] is to_layer[color] else to_layer[kind].id
+            merged.setdefault((to_layer[color].id, kind), []).extend(subpaths)
+        by_id = {layer.id: layer for layer in design.layers}
         out = []
         for layer in design.layers:
-            for filled in (True, False):
-                subpaths = merged.get((layer.id, filled))
+            kinds = [True] + [ly.id for ly in design.layers if (layer.id, ly.id) in merged] + [False]
+            for kind in kinds:
+                subpaths = merged.get((layer.id, kind))
                 if not subpaths:
                     continue
-                e = Element(name if len(merged) == 1 else "%s – %s" % (name, layer.name), subpaths, source=path,
-                            group=group, layer=layer.id)
-                if filled:
-                    e.fill = dict(self.IMPORT_FILL)        # drawn with a pen; a knife cuts the outline only
-                    if layer.fill is None:
-                        layer.fill = dict(self.IMPORT_FILL)
+                label = name if len(merged) == 1 else "%s – %s" % (name, layer.name)
+                if isinstance(kind, str):
+                    label = _("%(name)s, filled with %(fill)s") % {"name": label, "fill": by_id[kind].name}
+                e = Element(label, subpaths, source=path, group=group, layer=layer.id)
+                if kind is not False:
+                    # drawn with a pen; a knife cuts the outline only
+                    filler = layer if kind is True else by_id[kind]
+                    e.fill = dict(self.IMPORT_FILL)
+                    if kind is not True:
+                        e.fill["layer"] = kind
+                    if filler.fill is None:
+                        filler.fill = dict(self.IMPORT_FILL)
                 out.append(e)
         return out
 

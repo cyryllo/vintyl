@@ -3,15 +3,6 @@
 Lista roboczych zadań Vintyla. Zrobione rzeczy przechodzą do
 [CHANGELOG.md](CHANGELOG.md).
 
-## Następny krok
-
-- [ ] **Kolor wypełnienia.** Wypełnienie może mieć inny kolor niż kontur
-  kształtu, żeby rysował je inny pisak: np. czarny kontur i różowe
-  wypełnienie. Teraz wypełnienie zawsze idzie w kolorze swojego kształtu.
-  W oknie Wypełnienie i przy wiaderku w panelu Kolory: wybór koloru projektu
-  (albo „jak kształt”); przy Starcie wypełnienie rysuje się razem z tym
-  kolorem, do którego należy.
-
 ## Funkcje
 
 - [ ] **Wektoryzacja obrazka** (PNG/JPG → kontury do cięcia), przeniesiona

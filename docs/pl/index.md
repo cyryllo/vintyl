@@ -99,7 +99,7 @@ description: Vintyl to darmowy program do ploterów tnących folię na Linuksa. 
     <h3>Kilka kolorów, jeden po drugim</h3>
     <ul>
       <li>SVG w kilku kolorach otwiera się w swoich kolorach; podobne są łączone, więc rysuje je jeden pisak. Widzisz i możesz zmienić, co gdzie trafia.</li>
-      <li>Panel Kolory: kolejność rysowania, pominięcie koloru, własna grubość pisaka i wzór wypełnienia.</li>
+      <li>Panel Kolory: kolejność rysowania, pominięcie koloru, własna grubość pisaka i wzór wypełnienia. Kontur i wypełnienie mogą być dwoma pisakami: czarny kontur, różowe wypełnienie.</li>
       <li>Start idzie kolor po kolorze, z przerwą na włożenie następnego pisaka albo założenie folii w następnym kolorze; punkt zerowy zostaje, więc kolory trafiają jeden na drugi.</li>
     </ul>
   </div>

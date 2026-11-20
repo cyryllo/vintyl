@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-20 21:46+0100\n"
+"POT-Creation-Date: 2026-11-20 21:48+0100\n"
 "PO-Revision-Date: 2026-11-15 17:49+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -25,6 +25,10 @@ msgid_plural "%(n)d colours, one after another: %(names)s."
 msgstr[0] "%(n)d kolor, jeden po drugim: %(names)s."
 msgstr[1] "%(n)d kolory, jeden po drugim: %(names)s."
 msgstr[2] "%(n)d kolorów, jeden po drugim: %(names)s."
+
+#, python-format
+msgid "%(name)s, filled with %(fill)s"
+msgstr "%(name)s, wypełnienie: %(fill)s"
 
 #, python-format
 msgid "%.0f × %.0f mm"

@@ -2348,6 +2348,29 @@ def test_moving_the_first_colour_keeps_the_elements_colours(win):
     assert d.layer_of(drawn) is black and d.layers[1] is black
 
 
+def test_an_svg_outline_with_a_fill_of_another_colour_opens_as_two_pens(win, tmp_path):
+    """A pink square with a black stroke: its outline in black, its fill in
+    pink; the pink (a fill only) is drawn before the black."""
+    from tests.test_layers import OUTLINED
+    p = tmp_path / "o.svg"
+    p.write_text(OUTLINED)
+    win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
+    win.import_svg(str(p), "auto")
+    d = win.design
+    assert [layer.name for layer in d.layers] == ["Pink", "Black", "White"]
+    pink, black = d.layers[0], d.layers[1]
+    square = [e for e in d.elements if e.fill and e.fill.get("layer") == pink.id]
+    assert len(square) == 1 and d.layer_of(square[0]) is black and square[0].name.endswith("filled with Pink")
+    jobs = dict((layer.id, job) for layer, job in win.layer_jobs())
+    assert set(jobs) == {pink.id, black.id, d.layers[2].id}
+    # the window shows the pink as a colour of the file, with its one shape
+    from vintyl.gui.colour_import import colour_dialog
+    groups = __import__("vintyl.core.loaders", fromlist=["x"]).load_svg_colors(str(p))
+    _e, candidates, chosen, merged, separate = win._colour_plan(groups)
+    dlg = colour_dialog(win, groups, candidates, chosen, merged, separate, show=False)
+    assert set(dlg.combos) == {"#000000", "#ec4899", "#ffffff"}
+
+
 def test_save_hpgl_writes_a_file_per_colour(win, tmp_path):
     win.import_svg(DEMO_SVG, "auto")
     first = win.save_cutter_file(str(tmp_path / "logo.hpgl"))
