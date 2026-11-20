@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 23:27+0100\n"
+"POT-Creation-Date: 2026-11-20 21:46+0100\n"
 "PO-Revision-Date: 2026-11-17 21:27+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -280,6 +280,9 @@ msgstr "Flèche"
 
 msgid "As many columns as fit in the width"
 msgstr "Autant de colonnes que la largeur le permet"
+
+msgid "As the shape"
+msgstr "Comme la forme"
 
 msgid "As the system"
 msgstr "Comme le système"
@@ -2395,6 +2398,13 @@ msgstr ""
 
 msgid "Where the text starts along its path, mm"
 msgstr "Où le texte commence le long de son tracé, mm"
+
+msgid ""
+"Which pen draws the fill: the shape's own colour, or another (a black "
+"outline with a pink fill)"
+msgstr ""
+"Quel stylo dessine le remplissage : la couleur de la forme ou une autre "
+"(contour noir, remplissage rose)"
 
 msgid "White"
 msgstr "Blanc"

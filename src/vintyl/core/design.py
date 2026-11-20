@@ -154,6 +154,13 @@ class Design:
         """The elements of a layer, in list order."""
         return [e for e in self.elements if self.layer_of(e) is layer]
 
+    def pin_layers(self):
+        """Every element names its layer: before the layers change their
+        order, as an element naming none (or one that is gone) belongs to
+        whichever layer is first, and would change colour with it."""
+        for e in self.elements:
+            e.layer = self.layer_of(e).id
+
     def fill_layer_of(self, element):
         """The layer an element's fill is drawn with: the one its fill names,
         else (none, or one that is gone) the element's own."""

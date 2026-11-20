@@ -2,6 +2,17 @@
 
 ## Next
 
+**Colours**
+- An outline and its fill in two colours, drawn with two pens (a black outline, a pink fill): the
+  Fill window (and the bucket in the Colours panel) chooses the fill's colour: as the shape, another
+  colour of the design, or a new one, put before the outline's so the outline is drawn last. The
+  Colours list counts and selects a shape under both colours. Saved in the project (a fill's
+  "layer"); an older Vintyl draws such a fill in the outline's colour.
+
+**Fixed**
+- Moving the first colour in the Colours panel (or putting a new one before it) no longer gives its
+  colour to the shapes drawn before the design had colours.
+
 **Changed**
 - Zooming out stops at the whole sheet (100%), which then sits where Fit puts it and follows the
   window's size again; zooming in has no such limit.

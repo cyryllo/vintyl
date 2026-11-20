@@ -324,7 +324,10 @@ zewnątrz linii** albo **wewnątrz linii**. Użyj małego nacisku.
 **Wypełnienie** (Shift+F, tylko pisak) wypełnia zamknięte kształty wzorem:
 linie, kratka, fale, zygzak, okręgi, plaster miodu, romby, cegiełki albo
 koncentryczne, z odstępem, kątem i marginesem. Dla pełnego zamalowania
-ustaw odstęp trochę mniejszy niż grubość pisaka.
+ustaw odstęp trochę mniejszy niż grubość pisaka. Pole **Kolor** mówi,
+którym pisakiem rysować wypełnienie: **Jak kształt**, innym kolorem
+projektu albo **Nowy kolor…**, np. czarny kontur i różowe wypełnienie
+(zobacz [10. Kolory](#s10)).
 
 ![Wypełnienie]({{ img }}fill.png)
 
@@ -362,6 +365,12 @@ liście elementów każdy element jest w swoim kolorze.
 
 Żeby dać elementom inny kolor, użyj prawego przycisku myszy → **Kolor**:
 wybierz jeden z kolorów projektu albo **Nowy kolor…**.
+
+**Kontur i wypełnienie w dwóch kolorach.** W oknie Wypełnienie (albo przy
+wiaderku) wybierz **Kolor** wypełnienia: kontur zostaje przy swoim pisaku,
+a wypełnienie idzie z innym, jako osobny kolor w panelu. Nowy kolor dla
+wypełnienia trafia przed kolor konturu, więc kontur rysuje się na końcu i
+daje kształtowi czystą krawędź.
 
 ![Projekt w pięciu kolorach, rysowany pisakami]({{ img }}colours.png)
 

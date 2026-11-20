@@ -2566,17 +2566,76 @@ class MainWindow(QMainWindow):
                 self.refresh()
                 return []
         self._checkpoint()
+        d = self.design
+        new = values.get("new_layer")
+        if new is not None and values.get("layer") == new.id and new not in d.layers:
+            # a new colour for the fill: drawn before the outlines it fills (the outline,
+            # drawn last, gives the shape its clean edge)
+            first = min(d.layers.index(d.layer_of(e)) for e in chosen)
+            d.pin_layers()                       # the elements keep their colour, not their place
+            d.layers.insert(first, new)
         for e in chosen:
             e.fill = self._fill_spec(values)
+            if e.fill and e.fill.get("layer") == d.layer_of(e).id:
+                del e.fill["layer"]                  # its own colour: as the shape
         self.refresh()
         return chosen
 
     @staticmethod
     def _fill_spec(values):
+        """The fill from the window's values; "layer": the colour that draws it
+        (none or "": the shape's)."""
         if not values.get("pattern"):
             return None
-        return {"pattern": values["pattern"], "spacing": float(values["spacing"]),
+        spec = {"pattern": values["pattern"], "spacing": float(values["spacing"]),
                 "angle": float(values.get("angle", 0.0)), "margin": float(values.get("margin", 0.0))}
+        if values.get("layer"):
+            spec["layer"] = str(values["layer"])
+        return spec
+
+    NEW_COLOUR = "\x00new"                     # the colour box's "New colour…" (not a layer id)
+
+    def _fill_colour_box(self, chosen, current=""):
+        """The Fill window's Colour: which pen draws the fill. "As the shape"
+        (its outline's colour), one of the design's colours, or "New colour…"
+        (a colour chosen there; the layer is made when the window is
+        accepted). Returns (the box, [the new layer or None])."""
+        from vintyl.core import layers as lay
+        box = QComboBox()
+        box.setToolTip(_("Which pen draws the fill: the shape's own colour, or another (a black outline "
+                         "with a pink fill)"))
+        box.addItem(_("As the shape"), "")
+        for layer in self.design.layers:
+            box.addItem(self.color_icon(layer.color), layer.name, layer.id)
+        box.addItem(_("New colour…"), self.NEW_COLOUR)
+        box.setCurrentIndex(max(0, box.findData(current)))
+        new_layer = [None]
+        last = [box.currentIndex()]
+
+        def chosen_now(i):
+            if box.itemData(i) != self.NEW_COLOUR:
+                last[0] = i
+                return
+            from PySide6.QtWidgets import QColorDialog
+            c = QColorDialog.getColor(QColor("#ec4899"), self, _("New colour"))
+            box.blockSignals(True)
+            if c.isValid():
+                taken = self.design.layers + ([new_layer[0]] if new_layer[0] else [])
+                if new_layer[0] is not None:                     # chosen again: the first one goes
+                    box.removeItem(box.findData(new_layer[0].id))
+                new_layer[0] = lay.Layer(lay.new_id(taken), lay.unique_name(_(lay.color_name(c.name())),
+                                                                            self.design.layers), c.name())
+                at = box.findData(self.NEW_COLOUR)
+                box.insertItem(at, self.color_icon(c.name()), new_layer[0].name, new_layer[0].id)
+                box.setCurrentIndex(at)
+                last[0] = at
+            else:
+                box.setCurrentIndex(last[0])
+            box.blockSignals(False)
+            box.currentIndexChanged.emit(box.currentIndex())
+        box.currentIndexChanged.connect(chosen_now)
+        box.new_layer = new_layer
+        return box, new_layer
 
     def _place_beside(self, dlg):
         """A dialog with a live preview goes to the right, over the tool bar,
@@ -2753,11 +2812,12 @@ class MainWindow(QMainWindow):
         margin = _spin(50.0, 2, " mm", minimum=0.0)
         margin.setValue(float(start["margin"]))
         margin.setToolTip(_("Keep the pattern this far from the outline"))
+        colour, new_layer = self._fill_colour_box(chosen, (current or {}).get("layer", ""))
         column, preview, status = self._preview_column()
         remove = QPushButton(_("Remove the fill"))
         remove.setEnabled(bool(current))
         rows = [("pattern", None, pattern), ("spacing", _("Spacing"), spacing), ("angle", _("Angle"), angle),
-                ("margin", _("Margin"), margin)]
+                ("margin", _("Margin"), margin), ("layer", _("Colour"), colour)]
         # "Fill it": the button's verb ("Fill" is the window's name, "Wypełnienie")
         dlg = widgets.form_dialog(self, _("Fill"), rows, action=_("Fill it"),
                                   hint=_("Only for the pen. A solid fill: the spacing a little less than "
@@ -2768,7 +2828,7 @@ class MainWindow(QMainWindow):
 
         def values_now():
             return {"pattern": pattern.currentData(), "spacing": spacing.value(), "angle": angle.value(),
-                    "margin": margin.value()}
+                    "margin": margin.value(), "layer": colour.currentData() or "", "new_layer": new_layer[0]}
 
         # the live preview: in the window, and the shapes on the sheet show the
         # fill as it would be; worked out in the background (into the fill
@@ -2804,9 +2864,10 @@ class MainWindow(QMainWindow):
         pattern.currentIndexChanged.connect(ask_preview)
         for w in (spacing, angle, margin):
             w.valueChanged.connect(ask_preview)
+        colour.currentIndexChanged.connect(ask_preview)
         ask_preview()
         dlg.values_now, dlg.preview, dlg.previewer, dlg.status = values_now, preview, prev, status
-        dlg.pattern, dlg.remove_button = pattern, remove
+        dlg.pattern, dlg.remove_button, dlg.colour = pattern, remove, colour
         if not show:
             return dlg
         if not self._run_preview_dialog(dlg, prev):
@@ -2814,8 +2875,8 @@ class MainWindow(QMainWindow):
         if removed:
             return {"pattern": None}
         values = values_now()
-        for k, v in values.items():
-            st.setValue("fill/" + k, v)
+        for k in ("pattern", "spacing", "angle", "margin"):       # the colour belongs to this design only
+            st.setValue("fill/" + k, values[k])
         return values
 
     # ---- select all, cut, copy, paste ------------------------------------------------------
@@ -3406,6 +3467,7 @@ class MainWindow(QMainWindow):
         if not (0 <= i < len(layers) and 0 <= j < len(layers)):
             return
         self._checkpoint()
+        self.design.pin_layers()                 # the elements keep their colour, not their place
         layers[i], layers[j] = layers[j], layers[i]
         self.layer_list.setCurrentRow(j)
         self.refresh()

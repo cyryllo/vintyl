@@ -321,7 +321,10 @@ overcut; set the **pen width** and where the stroke lies: **on the line**,
 **Fill** (Shift+F, pen only) fills closed shapes with a pattern: lines,
 cross-hatch, waves, zigzag, circles, honeycomb, diamonds, bricks or
 concentric, with its spacing, angle and margin. For a solid fill, set the
-spacing a little less than the pen's width.
+spacing a little less than the pen's width. Its **Colour** says which pen
+draws the fill: **As the shape**, another colour of the design, or
+**New colour…**, for a black outline with a pink fill (see
+[10. Colours](#s10)).
 
 ![Fill]({{ img }}fill.png)
 
@@ -358,6 +361,12 @@ On the sheet and in the element list every element shows in its colour.
 
 To give elements another colour, use the right mouse button → **Colour**:
 choose one of the design's colours, or **New colour…**.
+
+**An outline and a fill in two colours.** In the Fill window (or with the
+bucket) choose the fill's **Colour**: the outline stays with its pen, the
+fill goes with the other, as its own colour in the panel. A new colour for
+a fill is put before the outline's, so the outline is drawn last and gives
+the shape a clean edge.
 
 ![A design of five colours, drawn with pens]({{ img }}colours.png)
 

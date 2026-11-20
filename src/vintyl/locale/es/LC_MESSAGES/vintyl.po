@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-17 23:27+0100\n"
+"POT-Creation-Date: 2026-11-20 21:46+0100\n"
 "PO-Revision-Date: 2026-11-17 21:27+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es\n"
@@ -277,6 +277,9 @@ msgstr "Flecha"
 
 msgid "As many columns as fit in the width"
 msgstr "Tantas columnas como quepan en el ancho"
+
+msgid "As the shape"
+msgstr "Como la forma"
 
 msgid "As the system"
 msgstr "Como el sistema"
@@ -2393,6 +2396,13 @@ msgstr ""
 
 msgid "Where the text starts along its path, mm"
 msgstr "Dónde empieza el texto a lo largo de su trazado, mm"
+
+msgid ""
+"Which pen draws the fill: the shape's own colour, or another (a black "
+"outline with a pink fill)"
+msgstr ""
+"Qué rotulador dibuja el relleno: el color de la forma u otro (contorno "
+"negro, relleno rosa)"
 
 msgid "White"
 msgstr "Blanco"

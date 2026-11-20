@@ -1719,6 +1719,41 @@ def test_the_fill_window_has_nine_pictures_and_a_preview(win):
     dlg.previewer.wait()
 
 
+def test_the_fill_window_chooses_the_colour_that_draws_the_fill(win, monkeypatch):
+    """Colour: As the shape, the design's colours, New colour… (chosen in the
+    colour picker; the layer is made when the fill is accepted, before the
+    outline's colour, so the outline is drawn last)."""
+    from PySide6.QtGui import QColor
+    from PySide6.QtWidgets import QColorDialog
+    win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
+    win._on_drawn("rectangle", QRectF(-120, -80, 100, 60))
+    box = win.selected
+    dlg = win._ask_fill([box], show=False)
+    combo = dlg.colour
+    assert [combo.itemText(i) for i in range(combo.count())] == ["As the shape", "Black", "New colour…"]
+    assert combo.currentData() == ""
+    monkeypatch.setattr(QColorDialog, "getColor", staticmethod(lambda *a, **k: QColor("#ec4899")))
+    combo.setCurrentIndex(combo.findData(win.NEW_COLOUR))
+    assert combo.currentText() == "Pink" and len(win.design.layers) == 1         # not made yet
+    values = dlg.values_now()
+    dlg.previewer.wait()
+    assert values["layer"] == values["new_layer"].id
+    win._fill_these([box], values)
+    pink = win.design.layers[0]
+    assert [layer.name for layer in win.design.layers] == ["Pink", "Black"] and box.fill["layer"] == pink.id
+    assert win.design.fill_layer_of(box) is pink and win.design.layer_of(box).name == "Black"
+    # its own colour chosen: stored as "as the shape"
+    win._fill_these([box], {"pattern": "lines", "spacing": 1.0, "layer": win.design.layers[1].id})
+    assert "layer" not in box.fill
+    # cancelled picker: the box goes back to what it showed
+    dlg = win._ask_fill([box], show=False)
+    monkeypatch.setattr(QColorDialog, "getColor", staticmethod(lambda *a, **k: QColor()))
+    dlg.colour.setCurrentIndex(dlg.colour.findData(pink.id))
+    dlg.colour.setCurrentIndex(dlg.colour.findData(win.NEW_COLOUR))
+    assert dlg.colour.currentData() == pink.id
+    dlg.previewer.wait()
+
+
 def test_every_pattern_has_a_picture():
     from vintyl.gui.main_window import MainWindow
     from vintyl.gui.previews import pattern_icon
@@ -2297,6 +2332,20 @@ def test_a_fill_in_another_colour_goes_with_that_colour(win):
     item = [i for i in win.view._items if i.element is e][0]
     assert item.fill_color.name() != item.color.name()
     assert [win.layer_list.item(i).text() for i in range(2)] == ["Black  ·  1", "Pink  ·  1  ·  Lines"]
+
+
+def test_moving_the_first_colour_keeps_the_elements_colours(win):
+    """A shape drawn before the colours (it names no layer: the first one's)
+    keeps its colour when the first colour moves down."""
+    win._on_drawn("rectangle", QRectF(-300, -100, 60, 40))
+    drawn = win.design.elements[0]
+    win.import_svg(DEMO_SVG, "auto")
+    d = win.design
+    black = d.layer_of(drawn)
+    assert black is d.layers[0]
+    win.layer_list.setCurrentRow(0)
+    win.move_layer(1)
+    assert d.layer_of(drawn) is black and d.layers[1] is black
 
 
 def test_save_hpgl_writes_a_file_per_colour(win, tmp_path):
