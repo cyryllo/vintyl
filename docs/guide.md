@@ -280,6 +280,12 @@ place freely. The grid (Ctrl+') and its step are in the settings.
   knife.
 
   ![Before and after To 0,0]({{ img }}to-origin-after.png)
+- **Lay out tightly** (Object → Lay out tightly…): the parts (a group as
+  one part) are laid out as tightly as their rectangles allow, from the
+  origin along the material, turned by 90° where they fit better, a gap
+  apart: as short a piece of vinyl as can be. With some parts selected it
+  asks whether to lay out those or all. A part wider than the material
+  stays where it was. The way of Kerfly's nesting.
 - **Copies** (Object → Copies): rows along and columns across, a gap
   apart, or as many columns as fit in the width.
 - **The cutting order** is the element list: the arrows beside it, or the

@@ -2162,6 +2162,57 @@ def test_the_wheel_over_the_left_panel_does_not_change_its_fields(win):
     assert win.material_box.currentIndex() == material and win.pen_width.value() == width
 
 
+# ---- laid out tightly (nesting, from Kerfly's 2.0) ------------------------------------------------------
+def test_parts_are_laid_out_tightly_along_the_material(win):
+    """Parts spread over the sheet: laid out from the origin side by side,
+    a much shorter piece of material, never overlapping, a group as one
+    part; one undo step."""
+    win.weed_frame.setChecked(False)
+    for k in range(6):                                        # 60 x 40 mm, far apart along the material
+        win._on_drawn("rectangle", QRectF(-100 - 70 * (k % 2), -60 - 200 * k, 60, 40))
+    a, b = win.design.elements[0], win.design.elements[1]
+    win.selected, win.selection = a, [a, b]
+    win.group_selected()                                      # two of them: one part
+    win.selected, win.selection = None, []
+    before = [e.bounds for e in win.design.elements]
+    length = win.nest({"gap": 3.0, "turn": True})
+    boxes = [e.bounds for e in win.design.elements]
+    assert length is not None and length < 200                # it was over 1000 mm along
+    ymin = min(bx[2] for bx in boxes)
+    assert -ymin < 200 and max(bx[1] for bx in boxes) <= 0.0 and max(bx[3] for bx in boxes) <= 0.0
+    for i, p in enumerate(boxes):                             # 3 mm apart at least, nothing on another
+        for q in boxes[i + 1:]:
+            apart = (p[1] + 3 - 1e-6 <= q[0] or q[1] + 3 - 1e-6 <= p[0] or
+                     p[3] + 3 - 1e-6 <= q[2] or q[3] + 3 - 1e-6 <= p[2])
+            assert apart
+    import math
+    ga, gb = win.design.elements[0].bounds, win.design.elements[1].bounds
+    # the group moved as one (maybe turned by 90 degrees): its two rectangles as far apart as before
+    assert math.hypot(ga[0] - gb[0], ga[2] - gb[2]) == pytest.approx(
+        math.hypot(before[0][0] - before[1][0], before[0][2] - before[1][2]))
+    win.undo()
+    assert [v for bx in (e.bounds for e in win.design.elements) for v in bx] == \
+        pytest.approx([v for bx in before for v in bx])
+
+
+def test_nesting_asks_which_parts_when_some_are_selected(win, monkeypatch):
+    from vintyl.gui import widgets
+    for k in range(4):
+        win._on_drawn("rectangle", QRectF(-100, -60 - 100 * k, 30, 30))
+    first, second = win.design.elements[:2]
+    win.selected, win.selection = first, [first, second]
+    seen = {}
+
+    def fake(parent, title, rows, **kw):
+        seen["rows"] = [key for key, _l, _w in rows]
+        return {"which": "selected", "gap": 2.0, "turn": False}
+    monkeypatch.setattr(widgets, "form_dialog", fake)
+    still = [v for e in win.design.elements[2:] for v in e.bounds]
+    win.nest()
+    assert seen["rows"][0] == "which"
+    assert [v for e in win.design.elements[2:] for v in e.bounds] == pytest.approx(still)   # the others stay
+
+
 # ---- to the origin (as Kerfly's "design to the head") --------------------------------------------------
 def test_the_whole_design_moves_to_the_origin_as_it_is_laid_out(win):
     win._on_drawn("ellipse", QRectF(-300, -250, 60, 40))

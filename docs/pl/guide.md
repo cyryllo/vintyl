@@ -282,6 +282,12 @@ odstęp są w ustawieniach.
   nie marnuje się folii. Zostaje miejsce na ramkę do wybierania i nóż.
 
   ![Po „Do 0,0”]({{ img }}to-origin-after.png)
+- **Ułóż ciasno** (Obiekt → Ułóż ciasno…): części (grupa jako jedna
+  część) układają się tak ciasno, jak pozwalają ich prostokąty, od punktu
+  zerowego wzdłuż materiału, obrócone o 90°, gdzie lepiej pasują, z
+  odstępem: jak najkrótszy kawałek folii. Gdy zaznaczonych jest kilka
+  części, pyta, czy ułożyć tylko je, czy wszystkie. Część szersza niż
+  materiał zostaje na miejscu. Na wzór układania z Kerfly.
 - **Kopie** (Obiekt → Kopie): rzędy wzdłuż i kolumny w poprzek, z odstępem,
   albo tyle kolumn, ile zmieści się w szerokości.
 - **Kolejność cięcia** to lista elementów: strzałki obok niej albo prawy

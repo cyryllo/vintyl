@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-23 21:07+0100\n"
+"POT-Creation-Date: 2026-11-23 21:15+0100\n"
 "PO-Revision-Date: 2026-11-15 17:49+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -87,6 +87,13 @@ msgid_plural "%d outlines"
 msgstr[0] "%d kontur"
 msgstr[1] "%d kontury"
 msgstr[2] "%d konturów"
+
+#, python-format
+msgid "%d part is wider than the material: left where it was."
+msgid_plural "%d parts are wider than the material: left where they were."
+msgstr[0] "%d część jest szersza niż materiał: zostaje na miejscu."
+msgstr[1] "%d części są szersze niż materiał: zostają na miejscu."
+msgstr[2] "%d części jest szerszych niż materiał: zostają na miejscu."
 
 #, python-format
 msgid "%d shape"
@@ -310,6 +317,10 @@ msgstr "Wyrównaj"
 #, python-format
 msgid "Align the selected shapes to each other: %s"
 msgstr "Wyrównaj zaznaczone kształty do siebie: %s"
+
+#, python-format
+msgid "All (%d)"
+msgstr "Wszystkie (%d)"
 
 msgid "All in one colour"
 msgstr "Wszystko w jednym kolorze"
@@ -1219,6 +1230,10 @@ msgstr "Test noża"
 msgid "Knife test with these values"
 msgstr "Test noża z tymi wartościami"
 
+#, python-format
+msgid "Laid out: %(now)s mm of material along (it was %(was)s mm)."
+msgstr "Ułożono: %(now)s mm materiału wzdłuż (było %(was)s mm)."
+
 msgid "Language"
 msgstr "Język"
 
@@ -1227,6 +1242,15 @@ msgstr "Język i wygląd"
 
 msgid "Later"
 msgstr "Później"
+
+msgid "Lay out"
+msgstr "Ułóż"
+
+msgid "Lay out tightly"
+msgstr "Ułóż ciasno"
+
+msgid "Lay out tightly…"
+msgstr "Ułóż ciasno…"
 
 msgid "Leave out specks under"
 msgstr "Pomiń plamki poniżej"
@@ -1609,6 +1633,9 @@ msgstr "Papier do wycinania"
 msgid "Paper, fineliner"
 msgstr "Papier, cienkopis"
 
+msgid "Parts"
+msgstr "Części"
+
 msgid "Paste"
 msgstr "Wklej"
 
@@ -1773,6 +1800,11 @@ msgstr "Prawe krawędzie"
 msgid "Ring"
 msgstr "Pierścień"
 
+msgid "Room between the parts: enough for the knife and to weed them apart"
+msgstr ""
+"Odstęp między częściami: tyle, żeby nóż się zmieścił i dało się je "
+"rozdzielić przy wybieraniu"
+
 msgid "Rotate 90° clockwise"
 msgstr "Obróć o 90° w prawo"
 
@@ -1916,6 +1948,10 @@ msgstr "Zaznacz dwa lub więcej kształtów, żeby wyrównać je do siebie."
 
 msgid "Select two or more shapes with closed outlines."
 msgstr "Zaznacz dwa lub więcej kształtów z zamkniętymi konturami."
+
+#, python-format
+msgid "Selected (%d)"
+msgstr "Zaznaczone (%d)"
 
 #, python-format
 msgid "Selected: %s"
@@ -2291,6 +2327,22 @@ msgstr ""
 msgid "The paper is under the pinch rollers"
 msgstr "Papier jest pod rolkami dociskowymi"
 
+msgid ""
+"The parts (a group as one part) are laid out as tightly as their "
+"rectangles allow, from the origin along the material: as short a piece of"
+" vinyl as can be."
+msgstr ""
+"Części (grupa jako jedna część) układają się tak ciasno, jak pozwalają "
+"ich prostokąty, od punktu zerowego wzdłuż materiału: jak najkrótszy "
+"kawałek folii."
+
+msgid ""
+"The parts laid out as tightly as their rectangles allow, from the origin "
+"along the material: as short a piece of vinyl as can be"
+msgstr ""
+"Części ułożone tak ciasno, jak pozwalają ich prostokąty, od punktu "
+"zerowego wzdłuż materiału: jak najkrótszy kawałek folii"
+
 msgid "The pen (not the knife) is in the holder, its tip just above the paper"
 msgstr "W oprawce jest pisak (nie nóż), jego czubek tuż nad papierem"
 
@@ -2408,6 +2460,9 @@ msgstr "Przejazdy"
 msgid "Triangle"
 msgstr "Trójkąt"
 
+msgid "Turn by 90° where it fits better"
+msgstr "Obracaj o 90°, gdzie lepiej pasuje"
+
 msgid "Turn the selection by the angle (Enter in the field does the same)"
 msgstr "Obróć zaznaczenie o kąt (Enter w polu robi to samo)"
 
@@ -2420,6 +2475,9 @@ msgid ""
 msgstr ""
 "Zakręty mniejsze niż ten kąt są traktowane jak prosta: nóż jest obracany "
 "tylko na ostrzejszych narożnikach, więc łuki są cięte płynnie"
+
+msgid "Two or more parts are needed to lay them out."
+msgstr "Do ułożenia potrzeba co najmniej dwóch części."
 
 msgid "Type the text in the options bar first."
 msgstr "Najpierw wpisz napis w pasku opcji."

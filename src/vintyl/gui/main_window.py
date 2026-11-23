@@ -259,6 +259,9 @@ class MainWindow(QMainWindow):
         self.act_trace_picture = self._action(_("Trace a picture into shapes…"), lambda: self.trace_picture(),
                                               None, None, _("A logo or a picture (PNG, JPG): its dark areas "
                                                             "become shapes to cut, their holes too"))
+        self.act_nest = self._action(_("Lay out tightly…"), lambda: self.nest(), None, None,
+                                     _("The parts laid out as tightly as their rectangles allow, from the origin "
+                                       "along the material: as short a piece of vinyl as can be"))
         self.act_save = self._action(_("Save"), lambda: self.save_project(), "device-floppy", "Ctrl+S",
                                      _("Save the project (.vintyl): the design and the job's settings"))
         self.act_save_as = self._action(_("Save as…"), lambda: self.save_project(ask=True), None, "Ctrl+Shift+S",
@@ -403,7 +406,8 @@ class MainWindow(QMainWindow):
         self.menus["object"] = m
         for a in [self.act_group, self.act_ungroup, None] + list(self.act_boolean.values()) + [None] + \
                 [self.act_rot_left, self.act_rot_right, self.act_mirror_h, self.act_mirror_v, None] + \
-                list(self.act_align.values()) + [self.act_to_origin, None, self.act_offset, self.act_tile,
+                list(self.act_align.values()) + [self.act_to_origin, self.act_nest, None, self.act_offset,
+                                                 self.act_tile,
                                                  self.act_fill,
                                                  self.act_text_path, None, self.act_copies, self.act_panels,
                                                  self.act_weed_lines]:
@@ -834,6 +838,17 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage(_("Nothing to move: the design is empty."), 6000)
             return None
         self._checkpoint()
+        moved = self._to_origin(chosen)
+        self.refresh()
+        self.statusBar().showMessage(_("Moved to the origin (%s mm from it).") % MaterialView._mm(moved)
+                                     if moved else _("Moved to the origin."), 6000)
+        return moved
+
+    def _to_origin(self, chosen):
+        """Move the elements together so their box's corner is at the origin,
+        with the least room the job can be made with (the weeding frame, the
+        knife offset and overcut). Returns that room (mm). No undo step, no
+        refresh: the caller's."""
         # the bottom right corner of their box (the origin's corner) onto 0, 0
         boxes = [e.bounds for e in chosen]
         xmax, ymax = max(b[1] for b in boxes), max(b[3] for b in boxes)
@@ -853,10 +868,121 @@ class MainWindow(QMainWindow):
                 break                                   # this close the job can be made
             except (JobError, ProfileError):
                 continue                                # (the last: the room it needs, for another error)
-        self.refresh()
-        self.statusBar().showMessage(_("Moved to the origin (%s mm from it).") % MaterialView._mm(moved)
-                                     if moved else _("Moved to the origin."), 6000)
         return moved
+
+    def _room_beyond(self):
+        """What the knife cuts beyond the shapes on each side: the weeding
+        frame's margin, the knife offset and the overcut (mm)."""
+        p = self.job_profile()
+        frame = self.weed_margin.value() if self.weed_frame.isChecked() and not self.is_pen() else 0.0
+        return frame + p.knife_offset_mm + p.overcut_mm
+
+    def _parts(self, elements):
+        """The elements as parts that move as one: a group's together, the
+        others each alone, in list order."""
+        parts, by_group = [], {}
+        for e in elements:
+            if e.group:
+                if e.group not in by_group:
+                    by_group[e.group] = []
+                    parts.append(by_group[e.group])
+                by_group[e.group].append(e)
+            else:
+                parts.append([e])
+        return parts
+
+    def nest(self, values=None):
+        """Lay out the parts (a group as one part) as tightly as their
+        rectangles allow, from the origin along the material, so the vinyl
+        taken off the roll is as short as it can be (vintyl.core.nesting).
+        The selected parts when two or more are selected and the window says
+        so, else all. values: {"gap", "turn", "which"} without asking (tests).
+        Returns the length of material taken (mm), or None."""
+        from vintyl.core.nesting import pack_strip
+        everything = self._parts(self.design.elements)
+        chosen_parts = self._parts(self._chosen())
+        if len(everything) < 2:
+            self.statusBar().showMessage(_("Two or more parts are needed to lay them out."), 6000)
+            return None
+        if values is None:
+            values = self._ask_nest(len(everything), len(chosen_parts))
+            if values is None:
+                return None
+        parts = chosen_parts if values.get("which") == "selected" and len(chosen_parts) >= 2 else everything
+        room = self._room_beyond()
+        width = self.profile.width_mm - 2 * room - 1.0          # room for the frame and the knife on both sides
+
+        def box(els):
+            bs = [e.bounds for e in els]
+            return (min(b[0] for b in bs), max(b[1] for b in bs), min(b[2] for b in bs), max(b[3] for b in bs))
+        before = [box(p) for p in parts]
+        length_before = max(b[3] for b in before) - min(b[2] for b in before)
+        # across = the view's x (to the left of the origin), along = its y (up the sheet)
+        sizes = [(b[1] - b[0], b[3] - b[2]) for b in before]
+        places, length = pack_strip(sizes, width, float(values.get("gap", 3.0)), bool(values.get("turn", True)))
+        self._checkpoint()
+        placed, left_out = [], 0
+        for els, b, place in zip(parts, before, places):
+            if place is None:
+                left_out += 1                                  # wider than the material, also turned
+                continue
+            x, y, turned = place
+            if turned:
+                # a quarter turn clockwise on the screen, about the part's middle
+                cx, cy = (b[0] + b[1]) / 2.0, (b[2] + b[3]) / 2.0
+                for e in els:
+                    e.transform(lambda px, py: (cx - (py - cy), cy + (px - cx)))
+                    e.spec = None                      # turned: a shape now (as Rotate does)
+                b = box(els)
+            # the part's corner nearest to the origin: x across, y along from it
+            for e in els:
+                e.move_by(-x - b[1], -y - b[3])
+            placed.extend(els)
+        if placed:
+            self._to_origin(placed)
+        self.refresh()
+        if left_out:
+            self.statusBar().showMessage(ngettext("%d part is wider than the material: left where it was.",
+                                                  "%d parts are wider than the material: left where they were.",
+                                                  left_out) % left_out, 8000)
+        else:
+            self.statusBar().showMessage(_("Laid out: %(now)s mm of material along (it was %(was)s mm).")
+                                         % {"now": MaterialView._mm(length),
+                                            "was": MaterialView._mm(length_before)}, 8000)
+        return length
+
+    def _ask_nest(self, count, selected):
+        """The window: which parts (when some but not all are selected), the
+        gap between them, turning by 90 degrees. Returns the values or None."""
+        st = self.settings
+        rows = []
+        which = None
+        if 2 <= selected < count:
+            which = Segmented()
+            which.addItem(_("Selected (%d)") % selected, "selected")
+            which.addItem(_("All (%d)") % count, "all")
+            rows.append(("which", _("Parts"), which))
+        gap = _spin(50.0, 1, " mm", minimum=0.0)
+        gap.setSingleStep(0.5)
+        try:
+            gap.setValue(float(st.value("nest/gap", 3.0)))
+        except (TypeError, ValueError):
+            gap.setValue(3.0)
+        gap.setToolTip(_("Room between the parts: enough for the knife and to weed them apart"))
+        turn = Switch(_("Turn by 90° where it fits better"))
+        turn.setChecked(str(st.value("nest/turn", "true")) == "true")
+        rows += [("gap", _("Gap"), gap), ("turn", None, turn)]
+        got = widgets.form_dialog(self, _("Lay out tightly"), rows, action=_("Lay out"),
+                                  hint=_("The parts (a group as one part) are laid out as tightly as their "
+                                         "rectangles allow, from the origin along the material: as short a "
+                                         "piece of vinyl as can be."))
+        if got is None:
+            return None
+        st.setValue("nest/gap", got["gap"])
+        st.setValue("nest/turn", "true" if got["turn"] else "false")
+        if which is None:
+            got["which"] = "selected" if selected >= 2 else "all"
+        return got
 
     def distribute_selected(self, across=True):
         from vintyl.core.design import distribute

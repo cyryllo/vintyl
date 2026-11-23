@@ -5,13 +5,6 @@ Lista roboczych zadań Vintyla. Zrobione rzeczy przechodzą do
 
 ## Funkcje
 
-- [ ] **Układanie elementów na folii** jak najciaśniej, żeby oszczędzać
-  folię (z odstępem, obracane o 90°, gdy to pomaga), przeniesione z Kerfly,
-  gałąź `2.0`: `kerfly/core/nesting.py` (`pack`, `nest`: MaxRects po
-  prostokątach, grupa jako jedna część) i okno `kerfly/gui/nest_dialog.py`
-  („Arrange → Nest on the bed”). Z nagłówkiem o autorach i licencji. Do
-  przerobienia: w Kerfly arkusz to stół lasera, a tu szerokość cięcia
-  plotera i folia z rolki (jak najkrótszy pas, nie kolejne arkusze).
 - [ ] **Cięcie perforowane** (linia przerywana: odcinek cięty, odcinek
   nie) do papieru i kartonu: zginanie, odrywanie. Przełącznik na element,
   długość cięcia i przerwy.

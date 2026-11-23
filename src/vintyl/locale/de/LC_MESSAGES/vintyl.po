@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-23 21:07+0100\n"
+"POT-Creation-Date: 2026-11-23 21:15+0100\n"
 "PO-Revision-Date: 2026-11-17 21:27+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -79,6 +79,12 @@ msgid "%d outline"
 msgid_plural "%d outlines"
 msgstr[0] "%d Kontur"
 msgstr[1] "%d Konturen"
+
+#, python-format
+msgid "%d part is wider than the material: left where it was."
+msgid_plural "%d parts are wider than the material: left where they were."
+msgstr[0] "%d Teil ist breiter als das Material: bleibt, wo es war."
+msgstr[1] "%d Teile sind breiter als das Material: bleiben, wo sie waren."
 
 #, python-format
 msgid "%d shape"
@@ -301,6 +307,10 @@ msgstr "Ausrichten"
 #, python-format
 msgid "Align the selected shapes to each other: %s"
 msgstr "Die ausgewählten Formen aneinander ausrichten: %s"
+
+#, python-format
+msgid "All (%d)"
+msgstr "Alle (%d)"
 
 msgid "All in one colour"
 msgstr "Alles in einer Farbe"
@@ -1227,6 +1237,10 @@ msgstr "Messertest"
 msgid "Knife test with these values"
 msgstr "Messertest mit diesen Werten"
 
+#, python-format
+msgid "Laid out: %(now)s mm of material along (it was %(was)s mm)."
+msgstr "Angeordnet: %(now)s mm Material in der Länge (vorher %(was)s mm)."
+
 msgid "Language"
 msgstr "Sprache"
 
@@ -1235,6 +1249,15 @@ msgstr "Sprache und Aussehen"
 
 msgid "Later"
 msgstr "Später"
+
+msgid "Lay out"
+msgstr "Anordnen"
+
+msgid "Lay out tightly"
+msgstr "Eng anordnen"
+
+msgid "Lay out tightly…"
+msgstr "Eng anordnen…"
 
 msgid "Leave out specks under"
 msgstr "Flecken weglassen unter"
@@ -1625,6 +1648,9 @@ msgstr "Papier zum Schneiden"
 msgid "Paper, fineliner"
 msgstr "Papier, Fineliner"
 
+msgid "Parts"
+msgstr "Teile"
+
 msgid "Paste"
 msgstr "Einfügen"
 
@@ -1793,6 +1819,9 @@ msgstr "Rechte Kanten"
 msgid "Ring"
 msgstr "Ring"
 
+msgid "Room between the parts: enough for the knife and to weed them apart"
+msgstr "Abstand zwischen den Teilen: genug für das Messer und zum Entgittern"
+
 msgid "Rotate 90° clockwise"
 msgstr "Um 90° im Uhrzeigersinn drehen"
 
@@ -1939,6 +1968,10 @@ msgstr "Zwei oder mehr Formen auswählen, um sie aneinander auszurichten."
 
 msgid "Select two or more shapes with closed outlines."
 msgstr "Wählen Sie zwei oder mehr Formen mit geschlossenen Umrissen aus."
+
+#, python-format
+msgid "Selected (%d)"
+msgstr "Ausgewählte (%d)"
 
 #, python-format
 msgid "Selected: %s"
@@ -2319,6 +2352,22 @@ msgstr "Der Nullpunkt ist gesetzt (Origin-Taste), wo die Zeichnung beginnen soll
 msgid "The paper is under the pinch rollers"
 msgstr "Das Papier liegt unter den Andruckrollen"
 
+msgid ""
+"The parts (a group as one part) are laid out as tightly as their "
+"rectangles allow, from the origin along the material: as short a piece of"
+" vinyl as can be."
+msgstr ""
+"Die Teile (eine Gruppe als ein Teil) werden so eng angeordnet, wie ihre "
+"Rechtecke es zulassen, vom Nullpunkt entlang des Materials: ein möglichst"
+" kurzes Stück Folie."
+
+msgid ""
+"The parts laid out as tightly as their rectangles allow, from the origin "
+"along the material: as short a piece of vinyl as can be"
+msgstr ""
+"Die Teile so eng angeordnet, wie ihre Rechtecke es zulassen, vom "
+"Nullpunkt entlang des Materials: ein möglichst kurzes Stück Folie"
+
 msgid "The pen (not the knife) is in the holder, its tip just above the paper"
 msgstr ""
 "Der Stift (nicht das Messer) ist im Halter, seine Spitze knapp über dem "
@@ -2445,6 +2494,9 @@ msgstr "Leerfahrt"
 msgid "Triangle"
 msgstr "Dreieck"
 
+msgid "Turn by 90° where it fits better"
+msgstr "Um 90° drehen, wo es besser passt"
+
 msgid "Turn the selection by the angle (Enter in the field does the same)"
 msgstr "Die Auswahl um den Winkel drehen (Enter im Feld tut dasselbe)"
 
@@ -2457,6 +2509,9 @@ msgid ""
 msgstr ""
 "Kleinere Richtungswechsel gelten als gerade: das Messer wird nur an "
 "schärferen Ecken gedreht, damit Kurven glatt geschnitten werden"
+
+msgid "Two or more parts are needed to lay them out."
+msgstr "Zum Anordnen werden zwei oder mehr Teile gebraucht."
 
 msgid "Type the text in the options bar first."
 msgstr "Zuerst den Text in der Optionsleiste eingeben."

@@ -51,7 +51,8 @@ Windows-only software such as SignMaster, so they can be used on Linux.
 - Union, difference, intersection, exclusion, **offset**, node editing.
 - Move, resize with handles, rotate by any angle, mirror, align,
   distribute, group; **To 0,0** moves the selection or the whole design up
-  to the origin, so no vinyl is wasted; undo everything.
+  to the origin, so no vinyl is wasted; **lay out tightly** puts the parts
+  side by side in as short a piece of vinyl as can be; undo everything.
 - Open **SVG** and **DXF** files; **trace a picture** (PNG, JPG) into
   shapes to cut; save and open projects (.vintyl); save the cutter's file
   (.hpgl).

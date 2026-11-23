@@ -10,6 +10,12 @@
 - Card for cutting (60° blade) and paper for cutting, for the knife: no force and speed yet (no
   source gives them for these cutters), set with the knife test.
 
+**Laying out**
+- Lay out tightly (Object menu): the parts (a group as one part) side by side as tightly as their
+  rectangles allow, from the origin along the material, turned by 90 degrees where they fit better, a
+  gap apart, so the vinyl taken off the roll is as short as it can be; the selected parts or all.
+  From Kerfly's nesting (its rectangles), changed for a strip of vinyl instead of a laser's bed.
+
 **Fixed**
 - The ribbon no longer moves when the tool changes: the Knife path / Pen path button is as wide as
   the longer name, so Grid beside it stays put.

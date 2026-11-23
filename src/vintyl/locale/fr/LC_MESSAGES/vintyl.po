@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-23 21:07+0100\n"
+"POT-Creation-Date: 2026-11-23 21:15+0100\n"
 "PO-Revision-Date: 2026-11-17 21:27+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -79,6 +79,12 @@ msgid "%d outline"
 msgid_plural "%d outlines"
 msgstr[0] "%d contour"
 msgstr[1] "%d contours"
+
+#, python-format
+msgid "%d part is wider than the material: left where it was."
+msgid_plural "%d parts are wider than the material: left where they were."
+msgstr[0] "%d pièce est plus large que le matériau : laissée où elle était."
+msgstr[1] "%d pièces sont plus larges que le matériau : laissées où elles étaient."
 
 #, python-format
 msgid "%d shape"
@@ -303,6 +309,10 @@ msgstr "Aligner"
 #, python-format
 msgid "Align the selected shapes to each other: %s"
 msgstr "Aligner les formes sélectionnées entre elles : %s"
+
+#, python-format
+msgid "All (%d)"
+msgstr "Toutes (%d)"
 
 msgid "All in one colour"
 msgstr "Tout dans une couleur"
@@ -1220,6 +1230,10 @@ msgstr "Test de lame"
 msgid "Knife test with these values"
 msgstr "Test de lame avec ces valeurs"
 
+#, python-format
+msgid "Laid out: %(now)s mm of material along (it was %(was)s mm)."
+msgstr "Disposées : %(now)s mm de matériau en longueur (avant %(was)s mm)."
+
 msgid "Language"
 msgstr "Langue"
 
@@ -1228,6 +1242,15 @@ msgstr "Langue et apparence"
 
 msgid "Later"
 msgstr "Plus tard"
+
+msgid "Lay out"
+msgstr "Disposer"
+
+msgid "Lay out tightly"
+msgstr "Disposer serré"
+
+msgid "Lay out tightly…"
+msgstr "Disposer serré…"
 
 msgid "Leave out specks under"
 msgstr "Ignorer les taches sous"
@@ -1614,6 +1637,9 @@ msgstr "Papier à découper"
 msgid "Paper, fineliner"
 msgstr "Papier, feutre fin"
 
+msgid "Parts"
+msgstr "Pièces"
+
 msgid "Paste"
 msgstr "Coller"
 
@@ -1784,6 +1810,11 @@ msgstr "Bords droits"
 msgid "Ring"
 msgstr "Anneau"
 
+msgid "Room between the parts: enough for the knife and to weed them apart"
+msgstr ""
+"Espace entre les pièces : assez pour la lame et pour les écheniller "
+"séparément"
+
 msgid "Rotate 90° clockwise"
 msgstr "Pivoter de 90° dans le sens horaire"
 
@@ -1926,6 +1957,10 @@ msgstr "Sélectionnez deux formes ou plus pour les aligner entre elles."
 
 msgid "Select two or more shapes with closed outlines."
 msgstr "Sélectionnez au moins deux formes aux contours fermés."
+
+#, python-format
+msgid "Selected (%d)"
+msgstr "Sélectionnées (%d)"
 
 #, python-format
 msgid "Selected: %s"
@@ -2296,6 +2331,23 @@ msgstr "L'origine est réglée (touche Origin) là où le dessin doit commencer"
 msgid "The paper is under the pinch rollers"
 msgstr "Le papier est sous les galets presseurs"
 
+msgid ""
+"The parts (a group as one part) are laid out as tightly as their "
+"rectangles allow, from the origin along the material: as short a piece of"
+" vinyl as can be."
+msgstr ""
+"Les pièces (un groupe comme une pièce) sont disposées aussi serrées que "
+"leurs rectangles le permettent, depuis l'origine le long du matériau : le"
+" morceau de vinyle le plus court possible."
+
+msgid ""
+"The parts laid out as tightly as their rectangles allow, from the origin "
+"along the material: as short a piece of vinyl as can be"
+msgstr ""
+"Les pièces disposées aussi serrées que leurs rectangles le permettent, "
+"depuis l'origine le long du matériau : le morceau de vinyle le plus court"
+" possible"
+
 msgid "The pen (not the knife) is in the holder, its tip just above the paper"
 msgstr ""
 "Le stylo (pas la lame) est dans le porte-lame, sa pointe juste au-dessus "
@@ -2425,6 +2477,9 @@ msgstr "Déplacements"
 msgid "Triangle"
 msgstr "Triangle"
 
+msgid "Turn by 90° where it fits better"
+msgstr "Tourner de 90° là où ça s'ajuste mieux"
+
 msgid "Turn the selection by the angle (Enter in the field does the same)"
 msgstr "Tourner la sélection de cet angle (Entrée dans le champ fait de même)"
 
@@ -2438,6 +2493,9 @@ msgstr ""
 "Les changements de direction plus petits comptent comme droits : la lame "
 "n'est tournée qu'aux angles plus vifs, pour découper les courbes en "
 "douceur"
+
+msgid "Two or more parts are needed to lay them out."
+msgstr "Il faut deux pièces ou plus pour les disposer."
 
 msgid "Type the text in the options bar first."
 msgstr "Saisissez d'abord le texte dans la barre d'options."

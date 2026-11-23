@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-23 21:07+0100\n"
+"POT-Creation-Date: 2026-11-23 21:15+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -76,6 +76,12 @@ msgstr[1] ""
 #, python-format
 msgid "%d outline"
 msgid_plural "%d outlines"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "%d part is wider than the material: left where it was."
+msgid_plural "%d parts are wider than the material: left where they were."
 msgstr[0] ""
 msgstr[1] ""
 
@@ -273,6 +279,10 @@ msgstr ""
 
 #, python-format
 msgid "Align the selected shapes to each other: %s"
+msgstr ""
+
+#, python-format
+msgid "All (%d)"
 msgstr ""
 
 msgid "All in one colour"
@@ -1128,6 +1138,10 @@ msgstr ""
 msgid "Knife test with these values"
 msgstr ""
 
+#, python-format
+msgid "Laid out: %(now)s mm of material along (it was %(was)s mm)."
+msgstr ""
+
 msgid "Language"
 msgstr ""
 
@@ -1135,6 +1149,15 @@ msgid "Language and look"
 msgstr ""
 
 msgid "Later"
+msgstr ""
+
+msgid "Lay out"
+msgstr ""
+
+msgid "Lay out tightly"
+msgstr ""
+
+msgid "Lay out tightly…"
 msgstr ""
 
 msgid "Leave out specks under"
@@ -1492,6 +1515,9 @@ msgstr ""
 msgid "Paper, fineliner"
 msgstr ""
 
+msgid "Parts"
+msgstr ""
+
 msgid "Paste"
 msgstr ""
 
@@ -1648,6 +1674,9 @@ msgstr ""
 msgid "Ring"
 msgstr ""
 
+msgid "Room between the parts: enough for the knife and to weed them apart"
+msgstr ""
+
 msgid "Rotate 90° clockwise"
 msgstr ""
 
@@ -1787,6 +1816,10 @@ msgid "Select two or more shapes to align them to each other."
 msgstr ""
 
 msgid "Select two or more shapes with closed outlines."
+msgstr ""
+
+#, python-format
+msgid "Selected (%d)"
 msgstr ""
 
 #, python-format
@@ -2112,6 +2145,17 @@ msgstr ""
 msgid "The paper is under the pinch rollers"
 msgstr ""
 
+msgid ""
+"The parts (a group as one part) are laid out as tightly as their "
+"rectangles allow, from the origin along the material: as short a piece of"
+" vinyl as can be."
+msgstr ""
+
+msgid ""
+"The parts laid out as tightly as their rectangles allow, from the origin "
+"along the material: as short a piece of vinyl as can be"
+msgstr ""
+
 msgid "The pen (not the knife) is in the holder, its tip just above the paper"
 msgstr ""
 
@@ -2220,6 +2264,9 @@ msgstr ""
 msgid "Triangle"
 msgstr ""
 
+msgid "Turn by 90° where it fits better"
+msgstr ""
+
 msgid "Turn the selection by the angle (Enter in the field does the same)"
 msgstr ""
 
@@ -2229,6 +2276,9 @@ msgstr ""
 msgid ""
 "Turns smaller than this count as straight: the knife is turned only at "
 "sharper corners, so curves are cut smoothly"
+msgstr ""
+
+msgid "Two or more parts are needed to lay them out."
 msgstr ""
 
 msgid "Type the text in the options bar first."
