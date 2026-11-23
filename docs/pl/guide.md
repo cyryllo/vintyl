@@ -11,7 +11,7 @@ other_lang: guide.html
 Vintyl steruje z Linuksa ploterami tnącymi z nożem wleczonym, do cięcia
 nożem albo rysowania pisakiem w oprawce: układa Twoje projekty na obrazie
 materiału, pozwala je rysować i zmieniać, a potem wysyła zadanie do
-plotera. Instrukcja dotyczy wersji 0.9.2.
+plotera. Instrukcja dotyczy wersji 0.9.3.
 
 > Nic nie trafia do plotera, dopóki nie potwierdzisz tego na liście
 > kontrolnej. Przed pierwszym cięciem nowego materiału wytnij test noża.
@@ -34,10 +34,16 @@ plotera. Instrukcja dotyczy wersji 0.9.2.
 
 ## 1. Instalacja i pierwsze uruchomienie
 
-1. Pobierz AppImage z
-   [wydań]({{ site.repo }}/releases/latest). To jeden plik ze wszystkim w
-   środku, działa na większości 64-bitowych Linuksów.
-2. Nadaj mu prawo uruchamiania i uruchom:
+1. Pobierz Vintyl z [wydań]({{ site.repo }}/releases/latest), wersję dla
+   swojego systemu (w każdej jest ten sam program):
+   - **.deb** (Debian 12+, Ubuntu 22.04+, Mint 21+):
+     `sudo apt install ./vintyl_*_amd64.deb`; Vintyl jest wtedy w menu
+     aplikacji, a w terminalu uruchamia go `vintyl`.
+   - **AppImage** (większość innych 64-bitowych Linuksów): jeden plik, nic
+     do instalowania.
+   - **Flatpak**: `flatpak install --user ./Vintyl-*-x86_64.flatpak`, potem
+     `flatpak run io.github.cyryllo.Vintyl`.
+2. AppImage: nadaj mu prawo uruchamiania i uruchom:
 
    ```bash
    chmod +x Vintyl-*-x86_64.AppImage

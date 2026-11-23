@@ -27,7 +27,7 @@ description: Vintyl to darmowy program do cięcia i rysowania ploterem na Linuks
 
 <p class="lead">Vintyl obsługuje popularne, niedrogie <strong>plotery z nożem wleczonym</strong> (VEVOR, Seiki i wiele modeli na tej samej płycie sterującej), do których producent daje program tylko na Windowsa, np. SignMaster. Rysujesz albo otwierasz plik, widzisz go na arkuszu tak, jak materiał leży w ploterze, sprawdzasz nacisk i prędkość i tniesz nożem albo rysujesz pisakiem prosto z okna.</p>
 
-> **Wersja 0.9.2, do użytku.** Przetestowana i czysto tnie na
+> **Wersja 0.9.3, do użytku.** Przetestowana i czysto tnie na
 > **VEVOR KI-375A** i **Seiki SK-870T**. W interfejsie mogą się jeszcze
 > trafić drobne błędy: prosimy,
 > [zgłaszaj je]({{ site.repo }}/issues/new/choose).
@@ -144,10 +144,10 @@ materiału przed Startem.
 
 <div class="platforms">
   <div class="platform">
-    <h3>Linux <span class="tag">AppImage</span></h3>
-    <p>Jeden plik ze wszystkim w środku, dla większości 64-bitowych Linuksów z ostatnich lat.</p>
+    <h3>Linux <span class="tag">.deb</span> <span class="tag">AppImage</span> <span class="tag">Flatpak</span></h3>
+    <p>Ten sam program na trzy sposoby: .deb dla Debiana, Ubuntu i Minta, AppImage (jeden plik) dla większości innych 64-bitowych Linuksów albo Flatpak.</p>
     <p><a class="button primary" href="{{ site.repo }}/releases/latest">Najnowsze wydanie</a></p>
-    <p>Nadaj mu prawo uruchamiania i uruchom; Vintyl zaproponuje dodanie się do menu aplikacji. Zobacz <a href="{{ '/pl/guide.html#s1' | relative_url }}">Instalację</a>.</p>
+    <p>Zobacz <a href="{{ '/pl/guide.html#s1' | relative_url }}">Instalację</a>.</p>
   </div>
   <div class="platform">
     <h3>Ze źródeł</h3>

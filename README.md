@@ -16,7 +16,7 @@ Windows-only software such as SignMaster, so they can be used on Linux.
 ([po polsku](https://cyryllo.github.io/vintyl/pl/),
 [instrukcja](https://cyryllo.github.io/vintyl/pl/guide.html)).
 
-> **Version 0.9.2, ready for use.** Tested and cutting cleanly on the
+> **Version 0.9.3, ready for use.** Tested and cutting cleanly on the
 > **VEVOR KI-375A** and the **Seiki SK-870T**; it should work the same on
 > similar cutters and clones with the same board. Small glitches in the
 > interface may still turn up: please
@@ -107,16 +107,30 @@ knife's path.
 
 ## Download and install
 
-The AppImage from [Releases](https://github.com/cyryllo/vintyl/releases):
-one file with everything inside, built on Ubuntu 22.04, so it runs on most
-64-bit Linux systems of the last years.
+From [Releases](https://github.com/cyryllo/vintyl/releases), the one that
+suits your system (all three are the same program, with Python and Qt
+inside):
 
-```bash
-chmod +x Vintyl-*-x86_64.AppImage
-./Vintyl-*-x86_64.AppImage
-```
+- **.deb** for Debian 12+, Ubuntu 22.04+, Mint 21+: installs it into the
+  applications menu with the command `vintyl`.
 
-At the first start Vintyl offers to add itself to the applications menu.
+  ```bash
+  sudo apt install ./vintyl_*_amd64.deb
+  ```
+- **AppImage** for most other 64-bit Linux systems: one file, nothing to
+  install. At the first start it offers to add itself to the menu.
+
+  ```bash
+  chmod +x Vintyl-*-x86_64.AppImage
+  ./Vintyl-*-x86_64.AppImage
+  ```
+- **Flatpak** (a sandbox; Flathub to come): it may use the cutter's port
+  (`--device=all`).
+
+  ```bash
+  flatpak install --user ./Vintyl-*-x86_64.flatpak
+  flatpak run io.github.cyryllo.Vintyl
+  ```
 
 **Access to the cutter.** On Linux a cutter is a device file, and only the
 members of its group may send to it. Join the group once, then log out and

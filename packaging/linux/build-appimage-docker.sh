@@ -1,6 +1,6 @@
 #!/bin/sh
-# Build and check the AppImage on this computer, in an Ubuntu 22.04
-# container, the way the release workflow does on GitHub. Ubuntu 22.04 keeps
+# Build and check the AppImage and the .deb package on this computer, in an
+# Ubuntu 22.04 container, the way the release workflow does on GitHub. Ubuntu 22.04 keeps
 # the AppImage running on older systems; built straight on a newer system it
 # would not start there.
 #
@@ -48,11 +48,13 @@ chmod +x /work/appimagetool
 PYTHON=/venv/bin/python APPIMAGETOOL=/work/appimagetool packaging/linux/build-appimage.sh
 chmod +x dist/*.AppImage
 QT_QPA_PLATFORM=offscreen dist/Vintyl-*-x86_64.AppImage --appimage-extract-and-run --self-test
-cp dist/Vintyl-*-x86_64.AppImage /work/
+PYTHON=/venv/bin/python packaging/linux/build-deb.sh          # the same program as a .deb
+cp dist/Vintyl-*-x86_64.AppImage dist/vintyl_*_amd64.deb /work/
 chown -R "$HOST_UID:$HOST_GID" /work          # everything back to the user (the container runs as root)
 INSIDE
 chmod +x "$WORK/inside.sh"
 docker run --rm -v "$WORK:/work" -e HOST_UID="$(id -u)" -e HOST_GID="$(id -g)" ubuntu:22.04 /work/inside.sh
 mkdir -p "$ROOT/dist"
-cp "$WORK"/Vintyl-*-x86_64.AppImage "$ROOT/dist/"
+cp "$WORK"/Vintyl-*-x86_64.AppImage "$WORK"/vintyl_*_amd64.deb "$ROOT/dist/"
 echo "Written: $(ls "$ROOT"/dist/Vintyl-*-x86_64.AppImage | tail -1)"
+echo "Written: $(ls "$ROOT"/dist/vintyl_*_amd64.deb | tail -1)"

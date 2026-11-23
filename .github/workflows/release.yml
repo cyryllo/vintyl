@@ -1,7 +1,8 @@
-# Build the Linux AppImage on Ubuntu 22.04 (older glibc: it also runs on
-# older systems), check it with --self-test, and on a version tag (vX.Y.Z,
-# or a pre-release such as v0.1.0a1) publish it as a GitHub release with the
-# notes of that version from CHANGELOG.md. A tag with a, b or rc in it is
+# Build the Linux AppImage and the .deb package on Ubuntu 22.04 (older glibc:
+# they also run on older systems) and the Flatpak in Flathub's builder, check
+# each with --self-test, and on a version tag (vX.Y.Z, or a pre-release such
+# as v0.1.0a1) publish them as a GitHub release with the notes of that
+# version from CHANGELOG.md. A tag with a, b or rc in it is
 # published as a pre-release.
 # To try the AppImage without a release: Actions -> packages -> Run workflow
 # (the file is kept as a workflow artifact).
@@ -48,15 +49,48 @@ jobs:
         run: |
           chmod +x dist/*.AppImage
           dist/Vintyl-*-x86_64.AppImage --appimage-extract-and-run --self-test
+      - name: .deb package (the same program)
+        env:
+          PYTHON: python
+        run: packaging/linux/build-deb.sh
+      - name: Self-test of the installed .deb
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          sudo apt-get install -y ./dist/vintyl_*_amd64.deb
+          vintyl --self-test
       - uses: actions/upload-artifact@v7
         with:
           name: linux
-          path: dist/Vintyl-*-x86_64.AppImage
+          path: |
+            dist/Vintyl-*-x86_64.AppImage
+            dist/vintyl_*_amd64.deb
+          if-no-files-found: error
+
+  flatpak:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:kde-6.11
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v5
+      - name: Flatpak
+        run: packaging/flatpak/build-flatpak.sh
+      - name: Self-test of the Flatpak
+        run: |
+          flatpak install -y --noninteractive dist/Vintyl-*-x86_64.flatpak
+          flatpak run --env=QT_QPA_PLATFORM=offscreen io.github.cyryllo.Vintyl --self-test
+      - uses: actions/upload-artifact@v7
+        with:
+          name: flatpak
+          path: dist/Vintyl-*-x86_64.flatpak
           if-no-files-found: error
 
   release:
-    if: startsWith(github.ref, 'refs/tags/v')
-    needs: [linux]
+    # the AppImage and the .deb are needed; the Flatpak goes along when it was built
+    if: always() && startsWith(github.ref, 'refs/tags/v') && needs.linux.result == 'success'
+    needs: [linux, flatpak]
     runs-on: ubuntu-latest
     permissions:
       contents: write

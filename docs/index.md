@@ -26,7 +26,7 @@ description: Vintyl is free software to cut and draw with vinyl cutters on Linux
 
 <p class="lead">Vintyl runs the popular, inexpensive <strong>drag-knife vinyl cutters</strong> (VEVOR, Seiki and the many models built on the same control board) that come with Windows-only software such as SignMaster. Draw a design or open a file, see it on the sheet as the material lies in the cutter, check the force and speed, and cut it with the knife or draw it with a pen, straight from the window.</p>
 
-> **Version 0.9.2, ready for use.** Tested and cutting cleanly on the
+> **Version 0.9.3, ready for use.** Tested and cutting cleanly on the
 > **VEVOR KI-375A** and the **Seiki SK-870T**. Small glitches in the
 > interface may still turn up: please
 > [report them]({{ site.repo }}/issues/new/choose).
@@ -143,10 +143,10 @@ Start.
 
 <div class="platforms">
   <div class="platform">
-    <h3>Linux <span class="tag">AppImage</span></h3>
-    <p>One file with everything inside, for most Linux systems of the last years (64-bit).</p>
+    <h3>Linux <span class="tag">.deb</span> <span class="tag">AppImage</span> <span class="tag">Flatpak</span></h3>
+    <p>The same program three ways: a .deb for Debian, Ubuntu and Mint, an AppImage (one file) for most other 64-bit Linux systems, or a Flatpak.</p>
     <p><a class="button primary" href="{{ site.repo }}/releases/latest">Latest release</a></p>
-    <p>Make it executable and start it; Vintyl offers to add itself to the applications menu. See <a href="{{ '/guide.html#s1' | relative_url }}">Installation</a>.</p>
+    <p>See <a href="{{ '/guide.html#s1' | relative_url }}">Installation</a>.</p>
   </div>
   <div class="platform">
     <h3>From the source</h3>

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "vintyl"
-version = "0.9.2"
+version = "0.9.3"
 description = "Software to cut and draw with vinyl cutters: the knife cuts, a pen draws"
 readme = "README.md"
 license = "GPL-3.0-or-later"

@@ -10,7 +10,7 @@ other_lang: pl/guide.html
 
 Vintyl drives drag-knife vinyl cutters from Linux, to cut with the knife or
 to draw with a pen in the holder: it places your designs on a picture of the
-material, lets you draw and edit them, and sends the job to the cutter. This guide is for version 0.9.2.
+material, lets you draw and edit them, and sends the job to the cutter. This guide is for version 0.9.3.
 
 > Nothing is sent to the cutter until you confirm it in the check list.
 > Before the first cut of a new material, cut the knife test.
@@ -33,10 +33,16 @@ material, lets you draw and edit them, and sends the job to the cutter. This gui
 
 ## 1. Installation and the first start
 
-1. Download the AppImage from
-   [Releases]({{ site.repo }}/releases/latest). It is one file with
-   everything inside and runs on most 64-bit Linux systems.
-2. Make it executable and start it:
+1. Download Vintyl from [Releases]({{ site.repo }}/releases/latest), the
+   one for your system (the same program in each):
+   - **.deb** (Debian 12+, Ubuntu 22.04+, Mint 21+):
+     `sudo apt install ./vintyl_*_amd64.deb`; Vintyl is then in the
+     applications menu, and `vintyl` starts it in a terminal.
+   - **AppImage** (most other 64-bit Linux systems): one file, nothing to
+     install.
+   - **Flatpak**: `flatpak install --user ./Vintyl-*-x86_64.flatpak`, then
+     `flatpak run io.github.cyryllo.Vintyl`.
+2. The AppImage: make it executable and start it:
 
    ```bash
    chmod +x Vintyl-*-x86_64.AppImage

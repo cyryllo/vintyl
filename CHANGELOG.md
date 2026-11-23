@@ -1,6 +1,15 @@
 # Changes
 
-## Next
+## 0.9.3
+
+Materials for each tool, laying out tightly, perforation, and a .deb and a
+Flatpak beside the AppImage.
+
+**Packages**
+- A .deb package for Debian 12+, Ubuntu 22.04+ and Mint 21+ (the same program as the AppImage,
+  in /opt/vintyl, with the command vintyl, the menu entry and the .vintyl file type), and a Flatpak
+  (io.github.cyryllo.Vintyl, PySide6 from Flathub's base app; it may use the cutter's port). Both are
+  built and self-tested with every release.
 
 **Materials**
 - Each tool has its own materials: the list shows the knife's (vinyl, card and paper to cut) or the
