@@ -1,6 +1,9 @@
 # Changes
 
-## Next
+## 0.9.2
+
+Pictures: drawn with a pen as waves, a spiral or hatching, or traced into shapes to cut; welded
+letters; faster with big drawings.
 
 **Pens**
 - A picture as a drawing: File → Open a picture as a drawing… (or Open, for PNG, JPG, BMP, GIF,

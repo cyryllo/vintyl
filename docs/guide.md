@@ -10,7 +10,7 @@ other_lang: pl/guide.html
 
 Vintyl drives drag-knife vinyl cutters from Linux: it places your designs on
 a picture of the material, lets you draw and edit them, and sends the job to
-the cutter. This guide is for version 0.9.1.
+the cutter. This guide is for version 0.9.2.
 
 > Nothing is sent to the cutter until you confirm it in the check list.
 > Before the first cut of a new material, cut the knife test.

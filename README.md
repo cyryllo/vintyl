@@ -14,7 +14,7 @@ Windows-only software such as SignMaster, so they can be used on Linux.
 ([po polsku](https://cyryllo.github.io/vintyl/pl/),
 [instrukcja](https://cyryllo.github.io/vintyl/pl/guide.html)).
 
-> **Version 0.9.1, ready for use.** Tested and cutting cleanly on the
+> **Version 0.9.2, ready for use.** Tested and cutting cleanly on the
 > **VEVOR KI-375A** and the **Seiki SK-870T**; it should work the same on
 > similar cutters and clones with the same board. Small glitches in the
 > interface may still turn up: please
