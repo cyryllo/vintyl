@@ -1813,6 +1813,63 @@ def test_a_big_drawing_works_its_job_out_after_the_clicks(win, tmp_path, monkeyp
     assert _wait_for(lambda: win.last_job is not None and win.last_job.cut_mm > 0)
 
 
+def _square_png(path):
+    """A dark 40 x 40 px square with a hole of 10 x 10 px, in a 100 x 60 px white picture."""
+    from PySide6.QtGui import QColor, QImage
+    img = QImage(100, 60, QImage.Format_RGB32)
+    img.fill(QColor("white"))
+    for x in range(20, 60):
+        for y in range(10, 50):
+            if not (35 <= x < 45 and 25 <= y < 35):
+                img.setPixelColor(x, y, QColor("black"))
+    img.save(str(path))
+    return str(path)
+
+
+def test_a_picture_is_traced_into_shapes_to_cut(win, tmp_path, monkeypatch):
+    """Trace: the dark square and its hole become two closed outlines, in
+    mm where they are in the picture, the picture's box 10 mm from the
+    origin; Open takes a picture so with the knife, as lines with the pen."""
+    path = _square_png(tmp_path / "logo.png")
+    values = {"width": 50.0, "threshold": 50.0, "specks": 1.0, "detail": 0.15, "invert": False, "smooth": False}
+    e = win.trace_picture(path, values)
+    assert e in win.design.elements and len(e.paths) == 2 and all(s["closed"] for s in e.paths)
+    x0, x1, y0, y1 = e.bounds
+    # the picture is 50 x 30 mm (0.5 mm a pixel), its top-left at (-60, -40); the square 20 mm from the left
+    assert abs(x0 - (-60 + 10)) < 0.6 and abs(x1 - (-60 + 30)) < 0.6 and abs(y0 - (-40 + 5)) < 0.6
+    win.undo()
+    assert e not in win.design.elements
+    # Open: with the knife a picture is traced, with the pen it is drawn
+    called = []
+    monkeypatch.setattr(type(win), "trace_picture", lambda self, p=None, v=None: called.append("trace"))
+    monkeypatch.setattr(type(win), "import_picture", lambda self, p=None, v=None: called.append("draw"))
+    win.open_file(path)
+    win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
+    win.open_file(path)
+    assert called == ["trace", "draw"]
+
+
+def test_the_knife_can_trace_instead_of_drawing(win, tmp_path, monkeypatch):
+    from vintyl.gui import widgets
+    monkeypatch.setattr(widgets, "ask", lambda *a, **k: "trace")
+    traced = []
+    monkeypatch.setattr(type(win), "trace_picture", lambda self, p=None, v=None: traced.append(p) or "shape")
+    path = _square_png(tmp_path / "logo.png")
+    assert win.import_picture(path, {"style": "waves", "width": 50.0, "spacing": 2.0}) == "shape"
+    assert traced == [path] and not win.is_pen()
+
+
+def test_the_trace_window_previews_the_outlines(win, tmp_path):
+    from vintyl.gui import picture_import, trace_import
+    img = picture_import.load_image(_square_png(tmp_path / "logo.png"))
+    dlg = trace_import.trace_dialog(win, img, show=False)
+    dlg.show()
+    assert _wait_for(lambda: "2 outlines" in dlg.status.text())
+    assert not dlg.preview._outline.isEmpty() and dlg.values_now()["width"] > 0
+    dlg.previewer.wait()
+    dlg.close()
+
+
 def test_files_given_at_the_start_open_once_the_window_is_up(tmp_path, monkeypatch):
     """python -m vintyl photo.jpg drawing.svg: each opens (a picture too),
     after the window is shown; other files are left alone."""

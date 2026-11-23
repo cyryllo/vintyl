@@ -11,6 +11,12 @@
   white and one joined line, with a live preview, its size and the length to draw. With the knife
   the pen is offered first.
 
+**Drawing and files**
+- Trace a picture into shapes (File menu; Open does it with a picture when the tool is the knife): a
+  logo or a picture's dark areas become shapes to cut, their holes too, with the width, threshold,
+  specks left out, detail, smooth curves and invert, and a live preview. The tracer is Kerfly's.
+- A picture given at the start (`vintyl photo.jpg`) opens too.
+
 **Faster**
 - Big drawings (a photo as lines, tens of thousands of points): an element's box, polylines and
   outline are worked out once, until it changes; the sheet draws a big element line by line with a

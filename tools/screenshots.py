@@ -38,7 +38,7 @@ i18n.setup(LANG)
 from PySide6.QtCore import QPoint, QPointF, QRectF, Qt  # noqa: E402
 from PySide6.QtGui import QPainter  # noqa: E402
 from PySide6.QtTest import QTest  # noqa: E402
-from PySide6.QtWidgets import QApplication, QDialog  # noqa: E402
+from PySide6.QtWidgets import QApplication, QDialog, QDoubleSpinBox  # noqa: E402
 
 app = QApplication([])
 
@@ -311,6 +311,17 @@ def picture_drawing():
     view._show_zoom()
     wait(200)
     save(win.grab(), "picture-waves.png")
+    from vintyl.gui import trace_import
+    # Vintyl's own logo: a typical picture to trace for vinyl
+    logo = os.path.join(HERE, "..", "assets", "logo", "vintyl-logo-light.png")
+    dlg = trace_import.trace_dialog(win, picture_import.load_image(logo), show=False)
+    dlg.findChildren(QDoubleSpinBox)[1].setValue(65.0)     # the threshold: the grey words too
+    dlg.show()
+    until(lambda: "mm" in dlg.status.text())
+    wait(150)
+    save(dlg.grab(), "trace.png")
+    dlg.previewer.wait()
+    dlg.close()
     win.hide()
 
 

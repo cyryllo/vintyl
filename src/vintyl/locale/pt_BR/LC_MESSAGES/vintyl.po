@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-23 19:39+0100\n"
+"POT-Creation-Date: 2026-11-23 20:16+0100\n"
 "PO-Revision-Date: 2026-11-17 21:27+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pt_BR\n"
@@ -73,6 +73,12 @@ msgid "%d node selected"
 msgid_plural "%d nodes selected"
 msgstr[0] "%d nó selecionado"
 msgstr[1] "%d nós selecionados"
+
+#, python-format
+msgid "%d outline"
+msgid_plural "%d outlines"
+msgstr[0] "%d contorno"
+msgstr[1] "%d contornos"
 
 #, python-format
 msgid "%d shape"
@@ -207,6 +213,13 @@ msgstr ""
 "em faixas sobrepostas, dispostas uma após a outra no material"
 
 msgid ""
+"A logo or a picture (PNG, JPG): its dark areas become shapes to cut, "
+"their holes too"
+msgstr ""
+"Um logo ou imagem (PNG, JPG): suas áreas escuras viram formas para "
+"cortar, com os furos"
+
+msgid ""
 "A new outline round the selected shapes (or inside them), a set distance "
 "away: an edge round a text, a backing in another colour"
 msgstr ""
@@ -225,10 +238,12 @@ msgstr ""
 
 msgid ""
 "A picture is drawn with the pen: with the knife it would cut the material"
-" to strips. Switch the tool to the marker pen?"
+" to strips. Switch the tool to the marker pen, or trace the picture into "
+"shapes to cut?"
 msgstr ""
 "Uma imagem é desenhada com a caneta: com a lâmina cortaria o material em "
-"tiras. Trocar a ferramenta para a caneta?"
+"tiras. Trocar a ferramenta para a caneta ou vetorizar a imagem em formas "
+"para cortar?"
 
 #, python-format
 msgid ""
@@ -672,6 +687,9 @@ msgstr "Excluir o elemento selecionado"
 msgid "Delete this cutter"
 msgstr "Excluir esta plotter"
 
+msgid "Detail"
+msgstr "Precisão"
+
 msgid "Diagnostic report"
 msgstr "Relatório de diagnóstico"
 
@@ -1067,6 +1085,13 @@ msgid "How far the letters stand from the path, mm"
 msgstr "A que distância do caminho ficam as letras, mm"
 
 msgid ""
+"How far the outline may stray from the picture's edge: smaller follows "
+"every step of the pixels, larger gives calmer outlines"
+msgstr ""
+"Quanto o contorno pode se afastar da borda da imagem: menos segue cada "
+"degrau dos pixels, mais dá contornos mais calmos"
+
+msgid ""
 "How high the waves get where the picture is black (at 100 they fill the "
 "room between two lines)"
 msgstr ""
@@ -1122,6 +1147,9 @@ msgstr "Interseção: manter só onde as formas selecionadas se sobrepõem"
 
 msgid "Invert: lines where the picture is light"
 msgstr "Inverter: linhas onde a imagem é clara"
+
+msgid "Invert: trace the light areas"
+msgstr "Inverter: vetorizar as áreas claras"
 
 msgid "Italic"
 msgstr "Itálico"
@@ -1193,6 +1221,9 @@ msgstr "Idioma e aparência"
 
 msgid "Later"
 msgstr "Mais tarde"
+
+msgid "Leave out specks under"
+msgstr "Ignorar manchas abaixo de"
 
 msgid "Left edges"
 msgstr "Bordas esquerdas"
@@ -1439,6 +1470,13 @@ msgstr "Nada para mover: o projeto está vazio."
 
 msgid "Nothing to split: one outline, no group."
 msgstr "Nada para separar: um só contorno, nenhum grupo."
+
+msgid ""
+"Nothing to trace: no dark areas with these values (try a higher "
+"threshold, or invert)."
+msgstr ""
+"Nada para vetorizar: sem áreas escuras com estes valores (tente um limiar"
+" maior ou inverta)."
 
 #, python-format
 msgid "Now: %s"
@@ -1981,6 +2019,9 @@ msgstr "Pular esta cor"
 msgid "Skip this version"
 msgstr "Pular esta versão"
 
+msgid "Smooth curves (sharp corners stay sharp)"
+msgstr "Curvas suaves (cantos vivos continuam vivos)"
+
 msgid "Snap to other shapes (corners, centres, edges)"
 msgstr "Encaixar em outras formas (cantos, centros, bordas)"
 
@@ -2037,6 +2078,9 @@ msgid ""
 msgstr ""
 "Separar o grupo selecionado em elementos distintos; um elemento com "
 "vários contornos vira um elemento por contorno"
+
+msgid "Spots smaller than this are left out (too small to weed)"
+msgstr "Manchas menores que isto são ignoradas (pequenas demais para descascar)"
 
 msgid "Spread across"
 msgstr "Distribuir na largura"
@@ -2159,6 +2203,13 @@ msgid ""
 msgstr ""
 "A plotter não recebe dados há %d s. Ela está online (não em Leave), e a "
 "velocidade e o controle de fluxo da porta batem com o menu dela?"
+
+msgid ""
+"The dark areas become shapes to cut, their holes too. The preview is "
+"traced smaller; the shapes are finer."
+msgstr ""
+"As áreas escuras viram formas para cortar, com os furos. A prévia é "
+"calculada menor; as formas serão mais finas."
 
 #, python-format
 msgid "The design does not fit on the material: it sticks out %s by %.1f mm."
@@ -2311,6 +2362,9 @@ msgstr ""
 "Os valores próprios desta plotter. Um material pode ter o próprio "
 "deslocamento e sobrecorte."
 
+msgid "Threshold"
+msgstr "Limiar"
+
 msgctxt "ribbon"
 msgid "To 0,0"
 msgstr "Para 0,0"
@@ -2326,6 +2380,19 @@ msgstr "Ferramentas"
 
 msgid "Top edges"
 msgstr "Bordas superiores"
+
+msgid "Trace a picture"
+msgstr "Vetorizar uma imagem"
+
+msgid "Trace a picture into shapes…"
+msgstr "Vetorizar uma imagem em formas…"
+
+msgid "Trace into shapes"
+msgstr "Vetorizar em formas"
+
+#, python-format
+msgid "Traced %s"
+msgstr "%s vetorizada"
 
 msgid "Transform"
 msgstr "Transformar"
@@ -2478,6 +2545,9 @@ msgstr "Linhas de depilação"
 
 msgid "Weeding lines…"
 msgstr "Linhas de depilação…"
+
+msgid "What counts as dark: higher takes in lighter greys too"
+msgstr "O que conta como escuro: mais alto inclui também cinzas mais claros"
 
 msgid ""
 "What is in the cutter's holder. Pen: drawing on paper or card, with no "
@@ -2767,4 +2837,15 @@ msgstr "← Y na largura, mm"
 #~ "Altura das ondas onde a imagem é"
 #~ " preta: 100% preenche o espaço entre"
 #~ " duas linhas"
+
+#~ msgid ""
+#~ "A picture is drawn with the pen:"
+#~ " with the knife it would cut "
+#~ "the material to strips. Switch the "
+#~ "tool to the marker pen?"
+#~ msgstr ""
+#~ "Uma imagem é desenhada com a "
+#~ "caneta: com a lâmina cortaria o "
+#~ "material em tiras. Trocar a ferramenta"
+#~ " para a caneta?"
 

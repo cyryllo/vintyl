@@ -49,8 +49,9 @@ Windows-only software such as SignMaster, so they can be used on Linux.
 - Move, resize with handles, rotate by any angle, mirror, align,
   distribute, group; **To 0,0** moves the selection or the whole design up
   to the origin, so no vinyl is wasted; undo everything.
-- Open **SVG** and **DXF** files; save and open projects (.vintyl); save the
-  cutter's file (.hpgl).
+- Open **SVG** and **DXF** files; **trace a picture** (PNG, JPG) into
+  shapes to cut; save and open projects (.vintyl); save the cutter's file
+  (.hpgl).
 
 **Pens**: switch the tool to the marker pen to draw on paper or card, with
 the stroke on, outside or inside the line and nine fill patterns. **A

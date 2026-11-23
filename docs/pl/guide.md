@@ -239,6 +239,18 @@ odstęp są w ustawieniach.
   kilku kolorach otwiera się w swoich kolorach (zobacz [10](#s10)).
 - **Zapisz** (Ctrl+S) zapisuje projekt: rysunek, ploter i materiał,
   przełączniki zadania.
+- **Obrysuj obraz w kształty…** (menu Plik; Otwórz robi to z obrazem, gdy
+  narzędziem jest nóż): logo albo obraz (PNG, JPG, BMP, GIF, WebP), którego
+  ciemne miejsca stają się kształtami do cięcia, razem z dziurami. Ustaw
+  **szerokość**, **próg** (co liczy się jako ciemne), **pomiń plamki**
+  mniejsze niż podana powierzchnia (za małe, żeby je wybrać),
+  **dokładność** (jak wiernie kontur idzie za pikselami) i **gładkie
+  krzywe**; **odwróć** obrysowuje jasne miejsca. Podgląd liczy się na
+  mniejszym obrazie, szybko; kształty wychodzą dokładniejsze. Kod z
+  obrysowywania Kerfly.
+
+  ![Obrysuj obraz]({{ img }}trace.png)
+
 - **Zapisz .hpgl** (Ctrl+E) zapisuje plik dla plotera, żeby wyciąć go w
   inny sposób. Projekt w kilku kolorach dostaje osobny plik na każdy kolor
   (`logo-1-Czarny.hpgl`, `logo-2-Różowy.hpgl`…).

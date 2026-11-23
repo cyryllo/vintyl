@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-23 19:39+0100\n"
+"POT-Creation-Date: 2026-11-23 20:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -70,6 +70,12 @@ msgstr[1] ""
 #, python-format
 msgid "%d node selected"
 msgid_plural "%d nodes selected"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "%d outline"
+msgid_plural "%d outlines"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -198,6 +204,11 @@ msgid ""
 msgstr ""
 
 msgid ""
+"A logo or a picture (PNG, JPG): its dark areas become shapes to cut, "
+"their holes too"
+msgstr ""
+
+msgid ""
 "A new outline round the selected shapes (or inside them), a set distance "
 "away: an edge round a text, a backing in another colour"
 msgstr ""
@@ -212,7 +223,8 @@ msgstr ""
 
 msgid ""
 "A picture is drawn with the pen: with the knife it would cut the material"
-" to strips. Switch the tool to the marker pen?"
+" to strips. Switch the tool to the marker pen, or trace the picture into "
+"shapes to cut?"
 msgstr ""
 
 #, python-format
@@ -636,6 +648,9 @@ msgstr ""
 msgid "Delete this cutter"
 msgstr ""
 
+msgid "Detail"
+msgstr ""
+
 msgid "Diagnostic report"
 msgstr ""
 
@@ -998,6 +1013,11 @@ msgid "How far the letters stand from the path, mm"
 msgstr ""
 
 msgid ""
+"How far the outline may stray from the picture's edge: smaller follows "
+"every step of the pixels, larger gives calmer outlines"
+msgstr ""
+
+msgid ""
 "How high the waves get where the picture is black (at 100 they fill the "
 "room between two lines)"
 msgstr ""
@@ -1046,6 +1066,9 @@ msgid "Intersection: keep only where the selected shapes overlap"
 msgstr ""
 
 msgid "Invert: lines where the picture is light"
+msgstr ""
+
+msgid "Invert: trace the light areas"
 msgstr ""
 
 msgid "Italic"
@@ -1109,6 +1132,9 @@ msgid "Language and look"
 msgstr ""
 
 msgid "Later"
+msgstr ""
+
+msgid "Leave out specks under"
 msgstr ""
 
 msgid "Left edges"
@@ -1344,6 +1370,11 @@ msgid "Nothing to move: the design is empty."
 msgstr ""
 
 msgid "Nothing to split: one outline, no group."
+msgstr ""
+
+msgid ""
+"Nothing to trace: no dark areas with these values (try a higher "
+"threshold, or invert)."
 msgstr ""
 
 #, python-format
@@ -1842,6 +1873,9 @@ msgstr ""
 msgid "Skip this version"
 msgstr ""
 
+msgid "Smooth curves (sharp corners stay sharp)"
+msgstr ""
+
 msgid "Snap to other shapes (corners, centres, edges)"
 msgstr ""
 
@@ -1891,6 +1925,9 @@ msgstr ""
 msgid ""
 "Split the selected group into separate elements; a single element with "
 "several outlines is split into one element per outline"
+msgstr ""
+
+msgid "Spots smaller than this are left out (too small to weed)"
 msgstr ""
 
 msgid "Spread across"
@@ -1996,6 +2033,11 @@ msgstr ""
 msgid ""
 "The cutter has taken no data for %d s. Is it online (not Leave), and do "
 "the port's speed and flow control match its menu?"
+msgstr ""
+
+msgid ""
+"The dark areas become shapes to cut, their holes too. The preview is "
+"traced smaller; the shapes are finer."
 msgstr ""
 
 #, python-format
@@ -2126,6 +2168,9 @@ msgstr ""
 msgid "This cutter's own values. A material can have its own offset and overcut."
 msgstr ""
 
+msgid "Threshold"
+msgstr ""
+
 msgctxt "ribbon"
 msgid "To 0,0"
 msgstr ""
@@ -2140,6 +2185,19 @@ msgid "Tools"
 msgstr ""
 
 msgid "Top edges"
+msgstr ""
+
+msgid "Trace a picture"
+msgstr ""
+
+msgid "Trace a picture into shapes…"
+msgstr ""
+
+msgid "Trace into shapes"
+msgstr ""
+
+#, python-format
+msgid "Traced %s"
 msgstr ""
 
 msgid "Transform"
@@ -2284,6 +2342,9 @@ msgid "Weeding lines"
 msgstr ""
 
 msgid "Weeding lines…"
+msgstr ""
+
+msgid "What counts as dark: higher takes in lighter greys too"
 msgstr ""
 
 msgid ""

@@ -236,6 +236,17 @@ place freely. The grid (Ctrl+') and its step are in the settings.
   An SVG of several colours opens in its colours (see [10](#s10)).
 - **Save** (Ctrl+S) keeps the project: the design, the cutter and the
   material, the job's switches.
+- **Trace a picture into shapes…** (File menu; Open does it with a picture
+  when the tool is the knife): a logo or a picture (PNG, JPG, BMP, GIF, WebP)
+  whose dark areas become shapes to cut, their holes too. Set the **width**,
+  the **threshold** (what counts as dark), **leave out specks** smaller than
+  an area (too small to weed), the **detail** (how closely the outline
+  follows the pixels) and **smooth curves**; **invert** traces the light
+  areas. The preview is traced smaller and quickly; the shapes are finer.
+  Code from Kerfly's tracer.
+
+  ![Trace a picture]({{ img }}trace.png)
+
 - **Save .hpgl** (Ctrl+E) writes the cutter's file, to cut it some other
   way. A design of several colours gets one file for each colour
   (`logo-1-Black.hpgl`, `logo-2-Pink.hpgl`…).

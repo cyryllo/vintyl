@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-23 19:39+0100\n"
+"POT-Creation-Date: 2026-11-23 20:16+0100\n"
 "PO-Revision-Date: 2026-11-17 21:27+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es\n"
@@ -73,6 +73,12 @@ msgid "%d node selected"
 msgid_plural "%d nodes selected"
 msgstr[0] "%d nodo seleccionado"
 msgstr[1] "%d nodos seleccionados"
+
+#, python-format
+msgid "%d outline"
+msgid_plural "%d outlines"
+msgstr[0] "%d contorno"
+msgstr[1] "%d contornos"
 
 #, python-format
 msgid "%d shape"
@@ -207,6 +213,13 @@ msgstr ""
 "tiras que se solapan, colocadas una tras otra en el material"
 
 msgid ""
+"A logo or a picture (PNG, JPG): its dark areas become shapes to cut, "
+"their holes too"
+msgstr ""
+"Un logo o imagen (PNG, JPG): sus zonas oscuras se vuelven formas para "
+"cortar, con sus huecos"
+
+msgid ""
 "A new outline round the selected shapes (or inside them), a set distance "
 "away: an edge round a text, a backing in another colour"
 msgstr ""
@@ -226,10 +239,12 @@ msgstr ""
 
 msgid ""
 "A picture is drawn with the pen: with the knife it would cut the material"
-" to strips. Switch the tool to the marker pen?"
+" to strips. Switch the tool to the marker pen, or trace the picture into "
+"shapes to cut?"
 msgstr ""
 "Una imagen se dibuja con el rotulador: con la cuchilla cortaría el "
-"material en tiras. ¿Cambiar la herramienta al rotulador?"
+"material en tiras. ¿Cambiar la herramienta al rotulador o vectorizar la "
+"imagen en formas para cortar?"
 
 #, python-format
 msgid ""
@@ -676,6 +691,9 @@ msgstr "Eliminar el elemento seleccionado"
 msgid "Delete this cutter"
 msgstr "Eliminar este plóter"
 
+msgid "Detail"
+msgstr "Precisión"
+
 msgid "Diagnostic report"
 msgstr "Informe de diagnóstico"
 
@@ -1075,6 +1093,13 @@ msgid "How far the letters stand from the path, mm"
 msgstr "A qué distancia del trazado están las letras, mm"
 
 msgid ""
+"How far the outline may stray from the picture's edge: smaller follows "
+"every step of the pixels, larger gives calmer outlines"
+msgstr ""
+"Cuánto puede alejarse el contorno del borde de la imagen: menos sigue "
+"cada escalón de píxeles, más da contornos más tranquilos"
+
+msgid ""
 "How high the waves get where the picture is black (at 100 they fill the "
 "room between two lines)"
 msgstr ""
@@ -1130,6 +1155,9 @@ msgstr "Intersección: conservar solo donde las formas se solapan"
 
 msgid "Invert: lines where the picture is light"
 msgstr "Invertir: líneas donde la imagen es clara"
+
+msgid "Invert: trace the light areas"
+msgstr "Invertir: vectorizar las zonas claras"
 
 msgid "Italic"
 msgstr "Cursiva"
@@ -1201,6 +1229,9 @@ msgstr "Idioma y aspecto"
 
 msgid "Later"
 msgstr "Más tarde"
+
+msgid "Leave out specks under"
+msgstr "Omitir manchas menores de"
 
 msgid "Left edges"
 msgstr "Bordes izquierdos"
@@ -1447,6 +1478,13 @@ msgstr "Nada que mover: el diseño está vacío."
 
 msgid "Nothing to split: one outline, no group."
 msgstr "Nada que separar: un solo contorno, sin grupo."
+
+msgid ""
+"Nothing to trace: no dark areas with these values (try a higher "
+"threshold, or invert)."
+msgstr ""
+"Nada que vectorizar: sin zonas oscuras con estos valores (prueba un "
+"umbral más alto o invierte)."
 
 #, python-format
 msgid "Now: %s"
@@ -1990,6 +2028,9 @@ msgstr "Omitir este color"
 msgid "Skip this version"
 msgstr "Omitir esta versión"
 
+msgid "Smooth curves (sharp corners stay sharp)"
+msgstr "Curvas suaves (las esquinas agudas siguen agudas)"
+
 msgid "Snap to other shapes (corners, centres, edges)"
 msgstr "Ajustarse a otras formas (esquinas, centros, bordes)"
 
@@ -2046,6 +2087,9 @@ msgid ""
 msgstr ""
 "Separa el grupo seleccionado en elementos sueltos; un solo elemento con "
 "varios contornos se separa en un elemento por contorno"
+
+msgid "Spots smaller than this are left out (too small to weed)"
+msgstr "Las manchas más pequeñas se omiten (demasiado pequeñas para pelar)"
 
 msgid "Spread across"
 msgstr "Repartir a lo ancho"
@@ -2169,6 +2213,13 @@ msgstr ""
 "El plóter no ha recibido datos desde hace %d s. ¿Está en línea (no en "
 "Leave) y coinciden la velocidad y el control de flujo del puerto con su "
 "menú?"
+
+msgid ""
+"The dark areas become shapes to cut, their holes too. The preview is "
+"traced smaller; the shapes are finer."
+msgstr ""
+"Las zonas oscuras se vuelven formas para cortar, con sus huecos. La vista"
+" previa se calcula más pequeña; las formas serán más finas."
 
 #, python-format
 msgid "The design does not fit on the material: it sticks out %s by %.1f mm."
@@ -2319,6 +2370,9 @@ msgstr ""
 "Los valores propios de este plóter. Un material puede tener su propio "
 "desplazamiento y sobrecorte."
 
+msgid "Threshold"
+msgstr "Umbral"
+
 msgctxt "ribbon"
 msgid "To 0,0"
 msgstr "A 0,0"
@@ -2336,6 +2390,19 @@ msgstr "Herramientas"
 
 msgid "Top edges"
 msgstr "Bordes superiores"
+
+msgid "Trace a picture"
+msgstr "Vectorizar una imagen"
+
+msgid "Trace a picture into shapes…"
+msgstr "Vectorizar una imagen en formas…"
+
+msgid "Trace into shapes"
+msgstr "Vectorizar en formas"
+
+#, python-format
+msgid "Traced %s"
+msgstr "%s vectorizada"
 
 msgid "Transform"
 msgstr "Transformar"
@@ -2490,6 +2557,9 @@ msgstr "Líneas de pelado"
 
 msgid "Weeding lines…"
 msgstr "Líneas de pelado…"
+
+msgid "What counts as dark: higher takes in lighter greys too"
+msgstr "Qué cuenta como oscuro: más alto incluye también grises más claros"
 
 msgid ""
 "What is in the cutter's holder. Pen: drawing on paper or card, with no "
@@ -2780,4 +2850,15 @@ msgstr "← Y a lo ancho, mm"
 #~ "Qué altura alcanzan las ondas donde "
 #~ "la imagen es negra: 100 % llena"
 #~ " el espacio entre dos líneas"
+
+#~ msgid ""
+#~ "A picture is drawn with the pen:"
+#~ " with the knife it would cut "
+#~ "the material to strips. Switch the "
+#~ "tool to the marker pen?"
+#~ msgstr ""
+#~ "Una imagen se dibuja con el "
+#~ "rotulador: con la cuchilla cortaría el"
+#~ " material en tiras. ¿Cambiar la "
+#~ "herramienta al rotulador?"
 

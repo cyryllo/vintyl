@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-23 19:39+0100\n"
+"POT-Creation-Date: 2026-11-23 20:16+0100\n"
 "PO-Revision-Date: 2026-11-17 21:27+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -73,6 +73,12 @@ msgid "%d node selected"
 msgid_plural "%d nodes selected"
 msgstr[0] "%d nœud sélectionné"
 msgstr[1] "%d nœuds sélectionnés"
+
+#, python-format
+msgid "%d outline"
+msgid_plural "%d outlines"
+msgstr[0] "%d contour"
+msgstr[1] "%d contours"
 
 #, python-format
 msgid "%d shape"
@@ -210,6 +216,13 @@ msgstr ""
 "matériau"
 
 msgid ""
+"A logo or a picture (PNG, JPG): its dark areas become shapes to cut, "
+"their holes too"
+msgstr ""
+"Un logo ou une image (PNG, JPG) : ses zones sombres deviennent des formes"
+" à découper, trous compris"
+
+msgid ""
 "A new outline round the selected shapes (or inside them), a set distance "
 "away: an edge round a text, a backing in another colour"
 msgstr ""
@@ -229,10 +242,12 @@ msgstr ""
 
 msgid ""
 "A picture is drawn with the pen: with the knife it would cut the material"
-" to strips. Switch the tool to the marker pen?"
+" to strips. Switch the tool to the marker pen, or trace the picture into "
+"shapes to cut?"
 msgstr ""
 "Une image se dessine au stylo : avec la lame, elle découperait le "
-"matériau en bandes. Passer l'outil au stylo ?"
+"matériau en bandes. Passer l'outil au stylo, ou vectoriser l'image en "
+"formes à découper ?"
 
 #, python-format
 msgid ""
@@ -677,6 +692,9 @@ msgstr "Supprimer l'élément sélectionné"
 msgid "Delete this cutter"
 msgstr "Supprimer ce plotter"
 
+msgid "Detail"
+msgstr "Précision"
+
 msgid "Diagnostic report"
 msgstr "Rapport de diagnostic"
 
@@ -1073,6 +1091,13 @@ msgid "How far the letters stand from the path, mm"
 msgstr "À quelle distance du tracé se tiennent les lettres, mm"
 
 msgid ""
+"How far the outline may stray from the picture's edge: smaller follows "
+"every step of the pixels, larger gives calmer outlines"
+msgstr ""
+"Jusqu'où le contour peut s'écarter du bord de l'image : moins suit chaque"
+" marche des pixels, plus donne des contours plus calmes"
+
+msgid ""
 "How high the waves get where the picture is black (at 100 they fill the "
 "room between two lines)"
 msgstr ""
@@ -1126,6 +1151,9 @@ msgstr "Intersection : garder seulement là où les formes se chevauchent"
 
 msgid "Invert: lines where the picture is light"
 msgstr "Inverser : des lignes là où l'image est claire"
+
+msgid "Invert: trace the light areas"
+msgstr "Inverser : vectoriser les zones claires"
 
 msgid "Italic"
 msgstr "Italique"
@@ -1197,6 +1225,9 @@ msgstr "Langue et apparence"
 
 msgid "Later"
 msgstr "Plus tard"
+
+msgid "Leave out specks under"
+msgstr "Ignorer les taches sous"
 
 msgid "Left edges"
 msgstr "Bords gauches"
@@ -1443,6 +1474,13 @@ msgstr "Rien à déplacer : le motif est vide."
 
 msgid "Nothing to split: one outline, no group."
 msgstr "Rien à séparer : un seul contour, pas de groupe."
+
+msgid ""
+"Nothing to trace: no dark areas with these values (try a higher "
+"threshold, or invert)."
+msgstr ""
+"Rien à vectoriser : aucune zone sombre avec ces valeurs (essayez un seuil"
+" plus haut, ou inversez)."
 
 #, python-format
 msgid "Now: %s"
@@ -1982,6 +2020,9 @@ msgstr "Sauter cette couleur"
 msgid "Skip this version"
 msgstr "Ignorer cette version"
 
+msgid "Smooth curves (sharp corners stay sharp)"
+msgstr "Courbes lisses (les angles vifs restent vifs)"
+
 msgid "Snap to other shapes (corners, centres, edges)"
 msgstr "S'accrocher aux autres formes (coins, centres, bords)"
 
@@ -2038,6 +2079,9 @@ msgid ""
 msgstr ""
 "Séparer le groupe sélectionné en éléments distincts ; un élément à "
 "plusieurs contours est séparé en un élément par contour"
+
+msgid "Spots smaller than this are left out (too small to weed)"
+msgstr "Les taches plus petites sont ignorées (trop petites pour l'échenillage)"
 
 msgid "Spread across"
 msgstr "Répartir en travers"
@@ -2161,6 +2205,13 @@ msgstr ""
 "Le plotter n'a reçu aucune donnée depuis %d s. Est-il en ligne (pas sur "
 "Leave), et la vitesse et le contrôle de flux du port correspondent-ils à "
 "son menu ?"
+
+msgid ""
+"The dark areas become shapes to cut, their holes too. The preview is "
+"traced smaller; the shapes are finer."
+msgstr ""
+"Les zones sombres deviennent des formes à découper, trous compris. "
+"L'aperçu est calculé plus petit ; les formes seront plus fines."
 
 #, python-format
 msgid "The design does not fit on the material: it sticks out %s by %.1f mm."
@@ -2316,6 +2367,9 @@ msgstr ""
 "Les valeurs propres à ce plotter. Un matériau peut avoir son propre "
 "décalage et sa propre surcoupe."
 
+msgid "Threshold"
+msgstr "Seuil"
+
 msgctxt "ribbon"
 msgid "To 0,0"
 msgstr "Vers 0,0"
@@ -2335,6 +2389,19 @@ msgstr "Outils"
 
 msgid "Top edges"
 msgstr "Bords supérieurs"
+
+msgid "Trace a picture"
+msgstr "Vectoriser une image"
+
+msgid "Trace a picture into shapes…"
+msgstr "Vectoriser une image en formes…"
+
+msgid "Trace into shapes"
+msgstr "Vectoriser en formes"
+
+#, python-format
+msgid "Traced %s"
+msgstr "%s vectorisée"
 
 msgid "Transform"
 msgstr "Transformer"
@@ -2494,6 +2561,9 @@ msgstr "Lignes d'échenillage"
 
 msgid "Weeding lines…"
 msgstr "Lignes d'échenillage…"
+
+msgid "What counts as dark: higher takes in lighter greys too"
+msgstr "Ce qui compte comme sombre : plus haut prend aussi des gris plus clairs"
 
 msgid ""
 "What is in the cutter's holder. Pen: drawing on paper or card, with no "
@@ -2784,4 +2854,15 @@ msgstr "← Y en travers, mm"
 #~ "Hauteur des vagues là où l'image "
 #~ "est noire : 100 % remplit l'espace"
 #~ " entre deux lignes"
+
+#~ msgid ""
+#~ "A picture is drawn with the pen:"
+#~ " with the knife it would cut "
+#~ "the material to strips. Switch the "
+#~ "tool to the marker pen?"
+#~ msgstr ""
+#~ "Une image se dessine au stylo :"
+#~ " avec la lame, elle découperait le"
+#~ " matériau en bandes. Passer l'outil "
+#~ "au stylo ?"
 

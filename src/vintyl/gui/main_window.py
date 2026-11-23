@@ -256,6 +256,9 @@ class MainWindow(QMainWindow):
         self.act_open_picture = self._action(_("Open a picture as a drawing…"), lambda: self.import_picture(),
                                              None, None, _("A photo or a picture (PNG, JPG) drawn with the pen: "
                                                            "waves, a spiral or hatching"))
+        self.act_trace_picture = self._action(_("Trace a picture into shapes…"), lambda: self.trace_picture(),
+                                              None, None, _("A logo or a picture (PNG, JPG): its dark areas "
+                                                            "become shapes to cut, their holes too"))
         self.act_save = self._action(_("Save"), lambda: self.save_project(), "device-floppy", "Ctrl+S",
                                      _("Save the project (.vintyl): the design and the job's settings"))
         self.act_save_as = self._action(_("Save as…"), lambda: self.save_project(ask=True), None, "Ctrl+Shift+S",
@@ -387,7 +390,8 @@ class MainWindow(QMainWindow):
         self.menus = {}
         m = mb.addMenu(_("&File"))
         self.menus["file"] = m
-        for a in (self.act_new, self.act_open, self.act_open_picture, self.act_save, self.act_save_as, None,
+        for a in (self.act_new, self.act_open, self.act_open_picture, self.act_trace_picture, self.act_save,
+                  self.act_save_as, None,
                   self.act_save_cut, None, self.act_quit):
             m.addSeparator() if a is None else m.addAction(a)
         m = mb.addMenu(_("&Edit"))
@@ -1987,7 +1991,8 @@ class MainWindow(QMainWindow):
             if not path:
                 return None
         if path.lower().endswith(EXTENSIONS):
-            return self.import_picture(path)
+            # a picture: drawn with lines for the pen, traced into shapes for the knife
+            return self.import_picture(path) if self.is_pen() else self.trace_picture(path)
         if path.lower().endswith(project.EXTENSION):
             return self.open_project(path)
         if path.lower().endswith(".dxf"):
@@ -2010,8 +2015,12 @@ class MainWindow(QMainWindow):
         if not self.is_pen():
             answer = widgets.ask(self, _("Picture as a drawing"),
                                  _("A picture is drawn with the pen: with the knife it would cut the material "
-                                   "to strips. Switch the tool to the marker pen?"),
-                                 [("cancel", _("Cancel"), "cancel"), ("pen", _("Use the pen"), "main")])
+                                   "to strips. Switch the tool to the marker pen, or trace the picture into "
+                                   "shapes to cut?"),
+                                 [("trace", _("Trace into shapes"), "left"), ("cancel", _("Cancel"), "cancel"),
+                                  ("pen", _("Use the pen"), "main")])
+            if answer == "trace":
+                return self.trace_picture(path)
             if answer != "pen":
                 return None
             self.tool_box.setCurrentIndex(self.tool_box.findData("pen"))
@@ -2036,6 +2045,42 @@ class MainWindow(QMainWindow):
         e.move_by(-PLACE_MARGIN_MM - w, -PLACE_MARGIN_MM - h)
         self.add_element(e)
         self.statusBar().showMessage(_("Opened %s") % os.path.basename(path), 5000)
+        return e
+
+    def trace_picture(self, path=None, values=None):
+        """A picture (PNG, JPG...) traced into shapes to cut (vintyl.core.
+        trace): the window chooses the width, threshold, specks, detail
+        (values None asks); the outlines go in as one element, the picture's
+        box 10 mm from the origin. Returns the element or None."""
+        from PySide6.QtGui import QGuiApplication
+        from vintyl.gui import picture_import, trace_import
+        if path is None:
+            path, _f = QFileDialog.getOpenFileName(self, _("Trace a picture into shapes…"), "",
+                                                   _("Pictures (%s)") % picture_import.PICTURE_FILTER)
+            if not path:
+                return None
+        img = picture_import.load_image(path)
+        if img is None:
+            widgets.warn(self, _("Trace a picture"), _("Cannot read %s as a picture.") % os.path.basename(path))
+            return None
+        if values is None:
+            values = trace_import.trace_dialog(self, img)
+            if values is None:
+                return None
+        QGuiApplication.setOverrideCursor(Qt.WaitCursor)        # the fine trace takes a moment
+        try:
+            subpaths = trace_import.shapes_of(img, values)
+        finally:
+            QGuiApplication.restoreOverrideCursor()
+        if not subpaths:
+            widgets.warn(self, _("Trace a picture"),
+                         _("Nothing to trace: no dark areas with these values (try a higher threshold, or invert)."))
+            return None
+        e = Element(os.path.splitext(os.path.basename(path))[0], subpaths, source=path)
+        w, h = values["width"], values["width"] * img.height() / img.width()
+        e.move_by(-PLACE_MARGIN_MM - w, -PLACE_MARGIN_MM - h)   # the picture's box, as an opened file
+        self.add_element(e)
+        self.statusBar().showMessage(_("Traced %s") % os.path.basename(path), 5000)
         return e
 
     def import_dxf(self, path, units=None):

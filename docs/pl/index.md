@@ -114,7 +114,7 @@ description: Vintyl to darmowy program do ploterów tnących folię na Linuksa. 
       <li>Przesuwanie, zmiana rozmiaru uchwytami, obrót o dowolny kąt, lustro, wyrównywanie, rozmieszczanie, grupy.</li>
       <li><strong>Do 0,0</strong> dosuwa zaznaczenie albo cały projekt do punktu zerowego, z miejscem na ramkę i nóż.</li>
       <li>Kopie w rzędach i kolumnach oraz pasy dla projektów szerszych niż ploter.</li>
-      <li>Otwieranie plików SVG i DXF, zapis projektów, cofanie wszystkiego.</li>
+      <li>Otwieranie plików SVG i DXF, obrysowanie logo albo obrazu (PNG, JPG) w kształty do cięcia, zapis projektów, cofanie wszystkiego.</li>
     </ul>
   </div>
 </div>

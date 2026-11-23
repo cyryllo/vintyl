@@ -113,7 +113,7 @@ description: Vintyl is free software for vinyl cutters on Linux. Draw, open SVG 
       <li>Move, resize with handles, rotate by any angle, mirror, align, distribute, group.</li>
       <li><strong>To 0,0</strong> moves the selection, or the whole design, up to the origin, with room for the frame and the knife.</li>
       <li>Copies in rows and columns, and strips for designs wider than the cutter.</li>
-      <li>Open SVG and DXF files; save projects; undo everything.</li>
+      <li>Open SVG and DXF files, trace a logo or a picture (PNG, JPG) into shapes to cut; save projects; undo everything.</li>
     </ul>
   </div>
 </div>
