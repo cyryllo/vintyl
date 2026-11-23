@@ -13,9 +13,9 @@
 
 **Faster**
 - Big drawings (a photo as lines, tens of thousands of points): an element's box, polylines and
-  outline are worked out once, until it changes; the sheet paints a big element from a picture while
-  the view pans or it is selected; the job (the cut length, the knife path) is worked out a moment
-  after the last change, not at every click.
+  outline are worked out once, until it changes; the sheet draws a big element line by line with a
+  thin line (a zoom step from 0.7 s to a few ms); the job (the cut length, the knife path) is worked
+  out a moment after the last change, not at every click.
 
 ## 0.9.1
 

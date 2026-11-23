@@ -21,7 +21,7 @@ Licensed under the GNU General Public License v3 or later. See LICENSE.
 import math
 
 from PySide6.QtCore import QEvent, QObject, QPoint, QPointF, QRectF, Qt, Signal
-from PySide6.QtGui import QBrush, QColor, QFont, QPainter, QPainterPath, QPen, QTransform
+from PySide6.QtGui import QBrush, QColor, QFont, QPainter, QPainterPath, QPen, QPolygonF, QTransform
 from PySide6.QtWidgets import (QApplication, QGraphicsEllipseItem, QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem,
                                QGraphicsScene,
                                QGraphicsSimpleTextItem, QGraphicsView)
@@ -122,10 +122,10 @@ class ElementItem(QGraphicsPathItem):
     """One element. Its paths are already in scene coordinates; a drag moves
     the item and, when the mouse is released, the element's nodes."""
 
-    # an element with more points than this is painted once into a picture and
-    # that is shown while the view pans or the item is hovered, selected or
-    # dragged (a photo drawn as lines: tens of thousands of points)
-    CACHED_POINTS = 5000
+    # an element with more points than this (a photo drawn as lines: tens of
+    # thousands) is drawn line by line with a hairline: Qt draws a thick smoothed
+    # line along one huge path some 200 times slower (1.6 s a frame, at a zoom)
+    MANY_POINTS = 5000
 
     def __init__(self, element, view, color=None, fill_color=None):
         # the path is kept with the element's paths (made again only when they change)
@@ -145,8 +145,10 @@ class ElementItem(QGraphicsPathItem):
         self._dragging = False
         self._snap_cache = None
         self.polys = element.flat(0.1)                 # for snapping; shared, read only
-        if element.point_count() > self.CACHED_POINTS:
-            self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
+        self._lines = None
+        if element.point_count() > self.MANY_POINTS:
+            self._lines = element._kept("polygons", lambda: [QPolygonF([QPointF(x, y) for x, y in poly])
+                                                             for poly in self.polys])
         # the fill pattern (drawn by a pen; with the knife it is not shown)
         self.fill_path = QPainterPath()
         for line in element.fill_lines():           # the same as the job's: worked out once (cached)
@@ -170,8 +172,15 @@ class ElementItem(QGraphicsPathItem):
             color.setAlpha(170)
             painter.setPen(cosmetic_pen(color, 1.0))
             painter.drawPath(self.fill_path)
-        painter.setPen(self.pen())
-        painter.drawPath(self.path())
+        if self._lines is not None:
+            pen = QPen(self.pen())
+            pen.setWidthF(0)                         # a hairline: one pixel, the fast way
+            painter.setPen(pen)
+            for line in self._lines:
+                painter.drawPolyline(line)
+        else:
+            painter.setPen(self.pen())
+            painter.drawPath(self.path())
         r = self.path().boundingRect()
         if self.view.off_material(self.sceneBoundingRect()) and self.element.cut:
             tint = QColor(COLORS["off"])
