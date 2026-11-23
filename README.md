@@ -132,7 +132,7 @@ goes through the first cut step by step.
 ```bash
 python3 -m venv .venv
 .venv/bin/pip install -e '.[gui,dev]'
-.venv/bin/python -m vintyl              # the window; add an .svg or .vintyl file to open it
+.venv/bin/python -m vintyl              # the window; add an .svg, .dxf, .vintyl or a picture (.jpg, .png) to open it
 .venv/bin/python -m vintyl --self-test
 .venv/bin/python -m pytest              # the tests (the window ones run offscreen)
 ```

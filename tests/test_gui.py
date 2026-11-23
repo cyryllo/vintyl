@@ -1813,6 +1813,23 @@ def test_a_big_drawing_works_its_job_out_after_the_clicks(win, tmp_path, monkeyp
     assert _wait_for(lambda: win.last_job is not None and win.last_job.cut_mm > 0)
 
 
+def test_files_given_at_the_start_open_once_the_window_is_up(tmp_path, monkeypatch):
+    """python -m vintyl photo.jpg drawing.svg: each opens (a picture too),
+    after the window is shown; other files are left alone."""
+    from PySide6.QtTest import QTest
+    from PySide6.QtWidgets import QApplication
+    from vintyl.gui import app as vintyl_app
+    from vintyl.gui.main_window import MainWindow
+    opened = []
+    monkeypatch.setattr(MainWindow, "open_file", lambda self, p: opened.append((p, self.isVisible())))
+    monkeypatch.setattr(MainWindow, "check_for_updates", lambda self, auto=False: None)
+    monkeypatch.setattr(MainWindow, "install_menu_entry", lambda self, ask=False: None)
+    monkeypatch.setattr(QApplication, "exec", lambda self: QTest.qWait(50) or 0)
+    photo, svg = str(tmp_path / "photo.JPG"), str(tmp_path / "logo.svg")
+    assert vintyl_app.main(["vintyl", photo, svg, str(tmp_path / "notes.txt")]) == 0
+    assert opened == [(photo, True), (svg, True)]
+
+
 def test_the_picture_window_shows_the_fields_of_its_style_and_a_preview(win, tmp_path):
     from vintyl.gui import picture_import
     img = picture_import.load_image(_gradient_png(tmp_path / "g.png"))

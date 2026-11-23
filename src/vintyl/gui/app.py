@@ -1,5 +1,5 @@
 """
-Start the Vintyl window:  python -m vintyl [design.svg | drawing.dxf | project.vintyl ...]
+Start the Vintyl window:  python -m vintyl [design.svg | drawing.dxf | project.vintyl | photo.jpg ...]
 Checks:                   python -m vintyl --self-test   (or --version)
 
 Copyright (C) 2026 Vintyl contributors
@@ -45,17 +45,19 @@ def main(argv=None):
         app.installTranslator(qt_tr)
     app.setApplicationName("Vintyl")
     win = MainWindow()
-    for path in argv[1:]:
-        if path.lower().endswith((".svg", ".dxf", ".vintyl")):
-            win.open_file(path)
     win.show()
+    # the files given, once the window is up: an SVG of colours and a picture open a
+    # window of their own, placed beside this one
+    from PySide6.QtCore import QTimer
+    from vintyl.gui.picture_import import EXTENSIONS
+    files = [p for p in argv[1:] if p.lower().endswith((".svg", ".dxf", ".vintyl") + EXTENSIONS)]
+    QTimer.singleShot(0, lambda: [win.open_file(p) for p in files])
     # the log for bug reports; a new version (at most once a day, in the background);
     # the AppImage asks once to be put into the applications menu
     from vintyl import __version__
     from vintyl.core import diag
     diag.setup(__version__)
     win.check_for_updates(auto=True)
-    from PySide6.QtCore import QTimer
     QTimer.singleShot(800, lambda: win.install_menu_entry(ask=True))
     return app.exec()
 
