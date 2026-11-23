@@ -7,9 +7,11 @@ Lista roboczych zadań Vintyla. Zrobione rzeczy przechodzą do
 
 - [ ] **Wektoryzacja obrazka** (PNG/JPG → kontury do cięcia), przeniesiona
   z Kerfly: `kerfly/core/trace.py` (próg czerni, kontury z dziurami,
-  usuwanie drobnych plamek, upraszczanie, wygładzanie w krzywe; potrzebuje
-  tylko Pillow). Z nagłówkiem o autorach i licencji. Sprawdzić najpierw
-  aktualną wersję w Kerfly.
+  usuwanie drobnych plamek, upraszczanie, wygładzanie w krzywe). Z
+  nagłówkiem o autorach i licencji. Sprawdzić najpierw aktualną wersję w
+  Kerfly. Wczytywanie obrazu jest już w Vintylu (Qt, `gui/picture_import.py`,
+  jak przy obrazie jako rysunku), więc Pillow nie jest potrzebny: wejście
+  `trace` przerobić na siatkę jasności jak `vintyl.core.picture.Grey`.
 - [ ] **Łączenie liter w napisie** jednym przyciskiem: przy czcionkach
   pisanych litery zachodzą na siebie i nóż tnąłby w środku napisu. Suma
   kształtów już jest; brakuje „połącz napis” (litery w jeden kontur).
@@ -34,9 +36,6 @@ Lista roboczych zadań Vintyla. Zrobione rzeczy przechodzą do
 
 - [ ] **Dopracowanie kolorów (0.9).** Uwagi po testach właściciela, gdy
   będzie na nie czas.
-- [ ] **Lewy panel z kolorami.** Przy oknie wysokim na 768–860 px, gdy jest
-  panel Kolory, lista Elementów pokazuje tylko 2 wiersze (resztę widać po
-  przewinięciu panelu). Do decyzji, czy to poprawiać.
 
 ## Na koniec
 
