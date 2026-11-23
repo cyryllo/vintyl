@@ -1,5 +1,16 @@
 # Changes
 
+## Next
+
+**Pens**
+- A picture as a drawing: File → Open a picture as a drawing… (or Open, for PNG, JPG, BMP, GIF,
+  WebP) draws a photo with lines, in three styles: waves (rows that wobble like a seismograph's
+  trace, higher and faster where it is darker), a spiral (one line from the middle out) and
+  hatching (an engraving: one, two or three directions by the darkness). Width, line spacing, the
+  waves' height and density or the hatching's angle, contrast, brightness, invert, lifting the pen on
+  white and one joined line, with a live preview, its size and the length to draw. With the knife
+  the pen is offered first.
+
 ## 0.9.1
 
 An outline and its fill in two colours, and a colour can be removed.

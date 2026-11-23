@@ -259,6 +259,61 @@ def colours():
     win.hide()
 
 
+def test_picture(path):
+    """A picture with light and dark: a shaded ball, a letter, a gradient
+    (drawn here, so no photo of anyone is needed)."""
+    from PySide6.QtCore import QPointF as P
+    from PySide6.QtGui import QColor, QFont, QImage, QLinearGradient, QRadialGradient
+    img = QImage(300, 200, QImage.Format_RGB32)
+    img.fill(QColor("white"))
+    p = QPainter(img)
+    p.setRenderHint(QPainter.Antialiasing)
+    g = QLinearGradient(0, 0, 300, 0)
+    g.setColorAt(0, QColor("white"))
+    g.setColorAt(1, QColor("#777"))
+    p.fillRect(0, 150, 300, 50, g)
+    r = QRadialGradient(P(95, 65), 90, P(75, 45))
+    r.setColorAt(0, QColor("white"))
+    r.setColorAt(1, QColor("black"))
+    p.setBrush(r)
+    p.setPen(Qt.NoPen)
+    p.drawEllipse(P(100, 80), 65, 65)
+    p.setFont(QFont("Noto Sans", 40, QFont.Bold))
+    p.setPen(QColor("#222"))
+    p.drawText(QRectF(160, 30, 140, 100), Qt.AlignCenter, "V")
+    p.end()
+    img.save(path)
+    return path
+
+
+def picture_drawing():
+    """A picture as a drawing: the window (waves) and the waves on the sheet."""
+    from vintyl.gui import picture_import
+    path = test_picture(os.path.join(TEMP, "picture.png"))
+    win = window()
+    win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
+    win.material_box.setCurrentIndex(win.material_box.findData("paper"))
+    dlg = picture_import.picture_dialog(win, picture_import.load_image(path), show=False)
+    dlg.show()
+    until(lambda: "mm" in dlg.status.text())
+    wait(150)
+    save(dlg.grab(), "picture.png")
+    values = dlg.values_now()
+    dlg.previewer.wait()
+    dlg.close()
+    win.import_picture(path, dict(values, width=150.0))
+    win.selected, win.selection = None, []
+    win.refresh()
+    view = win.view
+    wait(400)
+    view._user_zoomed = True
+    view.fitInView(view._items[0].sceneBoundingRect().adjusted(-12, -12, 12, 12), Qt.KeepAspectRatio)
+    view._show_zoom()
+    wait(200)
+    save(win.grab(), "picture-waves.png")
+    win.hide()
+
+
 def dialog_shot(open_it, name, size=None):
     """A window that waits for a click: its picture (at `size`, or its own),
     then closed."""
@@ -286,6 +341,7 @@ def main():
     knife_path()
     to_origin()
     colours()
+    picture_drawing()
     dialog_shot(win.edit_profile, "cutter-settings.png", None)       # their own size, 1000 x 700
     dialog_shot(win.edit_material, "materials.png", None)
     dialog_shot(lambda: win.show_shortcuts(), "shortcuts.png", (1180, 760))

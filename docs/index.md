@@ -88,6 +88,7 @@ description: Vintyl is free software for vinyl cutters on Linux. Draw, open SVG 
       <li>Put a pen in the holder and switch the tool to the marker pen: no knife offset, no overcut.</li>
       <li>The stroke on, outside or inside the line, for the pen's width.</li>
       <li>Nine fill patterns: lines, cross-hatch, waves, zigzag, circles, honeycomb, diamonds, bricks, concentric.</li>
+      <li>A photo as a drawing: its light and dark made of seismograph waves, a spiral or hatching.</li>
     </ul>
   </div>
 </div>

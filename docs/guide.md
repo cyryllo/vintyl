@@ -328,6 +328,29 @@ draws the fill: **As the shape**, another colour of the design, or
 
 ![Fill]({{ img }}fill.png)
 
+**A picture as a drawing.** File → **Open a picture as a drawing…** (or
+Open, choosing a PNG, JPG, BMP, GIF or WebP) draws a photo or a picture with
+the pen, its light and dark made of lines, in one of three styles:
+- **Waves**: rows of lines that wobble like a seismograph's trace, higher
+  and faster where the picture is darker;
+- **Spiral**: one line from the middle outwards, wobbling the same way;
+- **Hatching**: as an engraving: light parts stay empty, darker ones get
+  lines in one direction, darker still a second and a third across.
+
+Set the **width** (the height follows the picture), the **line spacing**
+(not less than the pen's width; smaller gives more detail and takes longer),
+the waves' **height** and **density** or the hatching's **angle**, and the
+**contrast** and **brightness**. **Invert** draws the light parts instead
+of the dark; the pen can **lift where the picture is white**, and the waves
+can be **one line**, joined at the edges. The preview shows the lines, the
+size and how many metres the pen will draw. A transparent part of the
+picture is paper. The lines go in as one element: move it, resize it, give
+it a colour as any other.
+
+![A picture as a drawing: waves]({{ img }}picture.png)
+
+![The waves on the sheet]({{ img }}picture-waves.png)
+
 <a id="s10"></a>
 
 ## 10. Colours

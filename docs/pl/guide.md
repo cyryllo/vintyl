@@ -331,6 +331,31 @@ projektu albo **Nowy kolor…**, np. czarny kontur i różowe wypełnienie
 
 ![Wypełnienie]({{ img }}fill.png)
 
+**Obraz jako rysunek.** Plik → **Otwórz obraz jako rysunek…** (albo
+Otwórz i wybór pliku PNG, JPG, BMP, GIF lub WebP) rysuje zdjęcie albo obraz
+pisakiem: jego jasne i ciemne miejsca zrobione z linii, w jednym z trzech
+stylów:
+- **Fale**: rzędy linii, które drgają jak zapis sejsmografu, wyżej i
+  gęściej tam, gdzie obraz jest ciemniejszy;
+- **Spirala**: jedna linia od środka na zewnątrz, drgająca tak samo;
+- **Kreskowanie**: jak rycina: jasne miejsca zostają puste, ciemniejsze
+  dostają linie w jednym kierunku, jeszcze ciemniejsze drugi i trzeci na
+  krzyż.
+
+Ustaw **szerokość** (wysokość wynika z obrazu), **odstęp linii** (nie mniej
+niż grubość pisaka; mniejszy daje więcej szczegółów i dłuższe rysowanie),
+**wysokość** i **gęstość fal** albo **kąt** kreskowania oraz **kontrast** i
+**jasność**. **Odwróć** rysuje jasne miejsca zamiast ciemnych; pisak może
+się **podnosić tam, gdzie obraz jest biały**, a fale mogą być **jedną
+linią** połączoną na brzegach. Podgląd pokazuje linie, rozmiar i ile metrów
+narysuje pisak. Przezroczysta część obrazu to papier. Linie trafiają do
+projektu jako jeden element: można go przesuwać, zmieniać rozmiar i dać mu
+kolor jak każdemu innemu.
+
+![Obraz jako rysunek: fale]({{ img }}picture.png)
+
+![Fale na arkuszu]({{ img }}picture-waves.png)
+
 <a id="s10"></a>
 
 ## 10. Kolory

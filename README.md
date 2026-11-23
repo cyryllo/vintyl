@@ -53,7 +53,9 @@ Windows-only software such as SignMaster, so they can be used on Linux.
   cutter's file (.hpgl).
 
 **Pens**: switch the tool to the marker pen to draw on paper or card, with
-the stroke on, outside or inside the line and nine fill patterns.
+the stroke on, outside or inside the line and nine fill patterns. **A
+picture as a drawing**: a photo (PNG, JPG) drawn with lines, as seismograph
+waves, a spiral or hatching, with a live preview.
 
 **Colours**: an SVG of several colours opens in its colours (similar ones
 merged, so one pen draws them; you see and change what goes where). The
