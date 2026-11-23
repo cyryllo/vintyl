@@ -4,7 +4,7 @@ lang: pl
 other_lang: index.html
 title: Vintyl po polsku
 wide: true
-description: Vintyl to darmowy program do ploterów tnących folię na Linuksa. Rysuj, otwieraj pliki SVG i DXF, układaj je i tnij na ploterach VEVOR, Seiki i podobnych.
+description: Vintyl to darmowy program do cięcia i rysowania ploterem na Linuksa. Otwieraj pliki SVG, DXF i obrazy, układaj je, tnij nożem albo rysuj pisakiem na ploterach VEVOR, Seiki i podobnych.
 ---
 {% assign img = '/screenshots/pl/' | relative_url %}
 
@@ -12,7 +12,7 @@ description: Vintyl to darmowy program do ploterów tnących folię na Linuksa. 
   <img src="{{ '/assets/logo.svg' | relative_url }}" alt="Logo Vintyla">
   <div>
     <h1>Vintyl</h1>
-    <p>Darmowy program do ploterów tnących folię, na Linuksa. Rysujesz, układasz i tniesz w jednym oknie.</p>
+    <p>Darmowy program do cięcia i rysowania ploterem, na Linuksa. Nóż tnie, pisak rysuje, w jednym oknie.</p>
     <p class="badges"><span>Linux</span><span>AppImage</span><span>Wolne oprogramowanie</span><span>6 języków</span></p>
   </div>
 </div>
@@ -25,7 +25,7 @@ description: Vintyl to darmowy program do ploterów tnących folię na Linuksa. 
 
 <div class="shot"><a href="{{ img }}main-window.png"><img src="{{ img }}main-window.png" alt="Okno Vintyla: koło, gwiazda, napis i serce z wzorem gwiazdek na arkuszu plotera 780 mm"></a></div>
 
-<p class="lead">Vintyl obsługuje popularne, niedrogie <strong>plotery z nożem wleczonym</strong> (VEVOR, Seiki i wiele modeli na tej samej płycie sterującej), do których producent daje program tylko na Windowsa, np. SignMaster. Rysujesz albo otwierasz plik, widzisz go na arkuszu tak, jak materiał leży w ploterze, sprawdzasz nacisk i prędkość i tniesz prosto z okna.</p>
+<p class="lead">Vintyl obsługuje popularne, niedrogie <strong>plotery z nożem wleczonym</strong> (VEVOR, Seiki i wiele modeli na tej samej płycie sterującej), do których producent daje program tylko na Windowsa, np. SignMaster. Rysujesz albo otwierasz plik, widzisz go na arkuszu tak, jak materiał leży w ploterze, sprawdzasz nacisk i prędkość i tniesz nożem albo rysujesz pisakiem prosto z okna.</p>
 
 > **Wersja 0.9.2, do użytku.** Przetestowana i czysto tnie na
 > **VEVOR KI-375A** i **Seiki SK-870T**. W interfejsie mogą się jeszcze

@@ -2,9 +2,11 @@
 
 # Vintyl
 
-**Free software for vinyl cutters on Linux.** Draw a design or open an SVG
-or DXF file, lay it out on the sheet as the material lies in the cutter,
-check the force and speed, and cut it, straight from the window.
+**Free software to cut and draw with vinyl cutters on Linux.** The knife
+cuts vinyl, card and paper; a pen in the holder draws on paper, even photos
+as lines. Draw a design or open an SVG, DXF or picture, lay it out on the
+sheet as the material lies in the cutter, check the force and speed, and
+cut or draw it, straight from the window.
 
 Vintyl runs the popular, inexpensive drag-knife cutters (VEVOR, Seiki and
 the many models built on the same control board) that come with

@@ -3,10 +3,6 @@
 Lista roboczych zadań Vintyla. Zrobione rzeczy przechodzą do
 [CHANGELOG.md](CHANGELOG.md).
 
-## Funkcje
-
-
-
 ## Paczki
 
 - [ ] **Pakiet .deb** (Debian, Ubuntu, Mint) obok AppImage.

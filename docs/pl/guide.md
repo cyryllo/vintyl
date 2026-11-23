@@ -8,9 +8,10 @@ other_lang: guide.html
 
 # Instrukcja obsługi Vintyla
 
-Vintyl steruje z Linuksa ploterami tnącymi z nożem wleczonym: układa Twoje
-projekty na obrazie materiału, pozwala je rysować i zmieniać, a potem wysyła
-zadanie do plotera. Instrukcja dotyczy wersji 0.9.2.
+Vintyl steruje z Linuksa ploterami tnącymi z nożem wleczonym, do cięcia
+nożem albo rysowania pisakiem w oprawce: układa Twoje projekty na obrazie
+materiału, pozwala je rysować i zmieniać, a potem wysyła zadanie do
+plotera. Instrukcja dotyczy wersji 0.9.2.
 
 > Nic nie trafia do plotera, dopóki nie potwierdzisz tego na liście
 > kontrolnej. Przed pierwszym cięciem nowego materiału wytnij test noża.

@@ -41,7 +41,7 @@ make_logo() {   # $1 = light|dark, $2 = kolor nazwy, $3 = kolor podtytułu
 $BODY
   </g>
   <text x="408" y="232" style="font-weight:700;font-size:176px;font-family:'Noto Sans';letter-spacing:-3px;fill:$2">Vintyl</text>
-  <text x="414" y="314" style="font-weight:500;font-size:54px;font-family:'Noto Sans';letter-spacing:1px;fill:$3">Software for vinyl cutters</text>
+  <text x="414" y="314" style="font-weight:500;font-size:54px;font-family:'Noto Sans';letter-spacing:1px;fill:$3">Software to cut and draw</text>
 </svg>
 EOF
     inkscape "$TMP/logo-$1.svg" --export-text-to-path --export-plain-svg \

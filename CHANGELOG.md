@@ -22,6 +22,10 @@
   sheet; the knife path and the cutter's file have the dashes. Kept in the project (an element's
   "perforate"); an older Vintyl cuts such an element with a whole line.
 
+**Vintyl**
+- Described as what it is now: software to cut and draw (the knife cuts, a pen draws), in the README,
+  the site, the guide, the applications menu and the logo's line ("Software to cut and draw").
+
 **Fixed**
 - The ribbon no longer moves when the tool changes: the Knife path / Pen path button is as wide as
   the longer name, so Grid beside it stays put.

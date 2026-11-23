@@ -3,7 +3,7 @@ layout: default
 lang: en
 other_lang: pl/
 wide: true
-description: Vintyl is free software for vinyl cutters on Linux. Draw, open SVG and DXF files, lay them out and cut them on VEVOR, Seiki and similar cutters.
+description: Vintyl is free software to cut and draw with vinyl cutters on Linux. Open SVG, DXF and pictures, lay them out, cut them with the knife or draw them with a pen on VEVOR, Seiki and similar cutters.
 ---
 {% assign img = '/screenshots/' | relative_url %}
 
@@ -11,7 +11,7 @@ description: Vintyl is free software for vinyl cutters on Linux. Draw, open SVG 
   <img src="{{ '/assets/logo.svg' | relative_url }}" alt="Vintyl logo">
   <div>
     <h1>Vintyl</h1>
-    <p>Free software for vinyl cutters on Linux. Draw, lay out and cut in one window.</p>
+    <p>Free software to cut and draw with vinyl cutters on Linux. The knife cuts, a pen draws, in one window.</p>
     <p class="badges"><span>Linux</span><span>AppImage</span><span>Free &amp; open source</span><span>6 languages</span></p>
   </div>
 </div>
@@ -24,7 +24,7 @@ description: Vintyl is free software for vinyl cutters on Linux. Draw, open SVG 
 
 <div class="shot"><a href="{{ img }}main-window.png"><img src="{{ img }}main-window.png" alt="Vintyl's window: a circle, a star, a text and a heart with a pattern of stars on a 780 mm cutter's sheet"></a></div>
 
-<p class="lead">Vintyl runs the popular, inexpensive <strong>drag-knife vinyl cutters</strong> (VEVOR, Seiki and the many models built on the same control board) that come with Windows-only software such as SignMaster. Draw a design or open a file, see it on the sheet as the material lies in the cutter, check the force and speed, and cut it, straight from the window.</p>
+<p class="lead">Vintyl runs the popular, inexpensive <strong>drag-knife vinyl cutters</strong> (VEVOR, Seiki and the many models built on the same control board) that come with Windows-only software such as SignMaster. Draw a design or open a file, see it on the sheet as the material lies in the cutter, check the force and speed, and cut it with the knife or draw it with a pen, straight from the window.</p>
 
 > **Version 0.9.2, ready for use.** Tested and cutting cleanly on the
 > **VEVOR KI-375A** and the **Seiki SK-870T**. Small glitches in the
