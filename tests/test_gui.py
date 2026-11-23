@@ -2252,6 +2252,20 @@ def test_the_settings_windows_scroll_instead_of_squeezing_their_cards(win):
         dlg.close()
 
 
+def test_the_ribbon_does_not_move_when_the_tool_changes(win):
+    """Knife path / Pen path: the button keeps its width, so Grid beside it
+    stays where it is."""
+    win.resize(1366, 768)
+    win.show()
+    grid = [b for b in win.findChildren(QToolButton) if b.defaultAction() is win.act_grid][0]
+    where = []
+    for tool in ("knife", "pen", "knife"):
+        win.tool_box.setCurrentIndex(win.tool_box.findData(tool))
+        QApplication.processEvents()
+        where.append(grid.mapTo(win, grid.rect().topLeft()).x())
+    assert where[0] == where[1] == where[2]
+
+
 @pytest.mark.parametrize("lang", ["en", "pl", "de", "es", "fr", "pt_BR"])
 def test_the_window_fits_a_1366_screen_in_every_language(app, lang):
     """Longer words must not widen the selection bar past a 1366 px screen

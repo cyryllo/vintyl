@@ -1,5 +1,11 @@
 # Changes
 
+## Next
+
+**Fixed**
+- The ribbon no longer moves when the tool changes: the Knife path / Pen path button is as wide as
+  the longer name, so Grid beside it stays put.
+
 ## 0.9.2
 
 Pictures: drawn with a pen as waves, a spiral or hatching, or traced into shapes to cut; welded

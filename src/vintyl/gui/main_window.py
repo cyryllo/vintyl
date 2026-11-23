@@ -498,6 +498,8 @@ class MainWindow(QMainWindow):
                     button.setAutoRaise(True)
                     button.setFixedHeight(54)
                     button.setMinimumWidth(52)
+                    if action is self.act_knife:
+                        self._path_button = button       # its width: _keep_path_button_width
                     row.addWidget(button, 0, Qt.AlignTop)
                 v.addLayout(row)
             else:
@@ -532,6 +534,24 @@ class MainWindow(QMainWindow):
             tb.addWidget(group)
             self.ribbon_groups[title] = group
         self.addToolBar(Qt.TopToolBarArea, tb)
+        self._keep_path_button_width()
+
+    def _keep_path_button_width(self):
+        """The ribbon's Knife path / Pen path button: its name follows the tool,
+        so it is as wide as the longer name and the buttons beside it do not
+        move when the tool changes. Measured in the ribbon, with its style."""
+        button = getattr(self, "_path_button", None)
+        if button is None:
+            return
+        action = self.act_knife
+        shown = action.iconText()
+        button.ensurePolished()
+        widest = 52
+        for name in (pgettext("ribbon", "Knife path"), pgettext("ribbon", "Pen path")):
+            action.setIconText(name)
+            widest = max(widest, button.sizeHint().width())
+        action.setIconText(shown)
+        button.setMinimumWidth(widest)
 
     # the right-hand bar: a button per category; a click opens a square of
     # icons beside it (as SignMaster's), a category with one tool takes it at
