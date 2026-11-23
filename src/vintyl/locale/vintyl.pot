@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-20 21:55+0100\n"
+"POT-Creation-Date: 2026-11-23 19:39+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,7 +28,15 @@ msgid "%(name)s, filled with %(fill)s"
 msgstr ""
 
 #, python-format
+msgid "%(w).0f × %(h).0f mm"
+msgstr ""
+
+#, python-format
 msgid "%.0f × %.0f mm"
+msgstr ""
+
+#, python-format
+msgid "%.1f m to draw"
 msgstr ""
 
 #, python-format
@@ -50,6 +58,12 @@ msgstr[1] ""
 #, python-format
 msgid "%d element"
 msgid_plural "%d elements"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "%d line"
+msgid_plural "%d lines"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -191,6 +205,16 @@ msgstr ""
 msgid "A path has a point that is not a number."
 msgstr ""
 
+msgid ""
+"A photo or a picture (PNG, JPG) drawn with the pen: waves, a spiral or "
+"hatching"
+msgstr ""
+
+msgid ""
+"A picture is drawn with the pen: with the knife it would cut the material"
+" to strips. Switch the tool to the marker pen?"
+msgstr ""
+
 #, python-format
 msgid ""
 "A point would go to the cutter at %d,%d (below zero). Check the axis "
@@ -308,6 +332,9 @@ msgstr ""
 msgid "Bricks"
 msgstr ""
 
+msgid "Brightness"
+msgstr ""
+
 msgid "Brown"
 msgstr ""
 
@@ -324,6 +351,10 @@ msgstr ""
 
 #, python-format
 msgid "Cannot open %s: %s"
+msgstr ""
+
+#, python-format
+msgid "Cannot read %s as a picture."
 msgstr ""
 
 #, python-format
@@ -419,6 +450,9 @@ msgid "Connects as"
 msgstr ""
 
 msgid "Content"
+msgstr ""
+
+msgid "Contrast"
 msgstr ""
 
 #, python-format
@@ -640,6 +674,11 @@ msgid ""
 "little less than the pen's width."
 msgstr ""
 
+msgid ""
+"Distance between the lines (the spiral's turns). Smaller: more detail, "
+"longer to draw; not less than the pen's width"
+msgstr ""
+
 msgid "Do again what was taken back"
 msgstr ""
 
@@ -827,6 +866,9 @@ msgid ""
 "knife."
 msgstr ""
 
+msgid "For the pen: drawn with the knife, it would cut the material to strips."
+msgstr ""
+
 msgid ""
 "For vinyl ironed onto fabric: it is cut from the back, so the cut is "
 "mirrored. The design on the screen stays as it will look on the shirt."
@@ -905,6 +947,9 @@ msgstr ""
 msgid "HPGL: 40 units per mm on most cutters. Check with a 20 mm square."
 msgstr ""
 
+msgid "Hatching"
+msgstr ""
+
 msgid "Head length (%)"
 msgstr ""
 
@@ -952,6 +997,11 @@ msgstr ""
 msgid "How far the letters stand from the path, mm"
 msgstr ""
 
+msgid ""
+"How high the waves get where the picture is black (at 100 they fill the "
+"room between two lines)"
+msgstr ""
+
 msgid "How to do it"
 msgstr ""
 
@@ -993,6 +1043,9 @@ msgid "Intersection"
 msgstr ""
 
 msgid "Intersection: keep only where the selected shapes overlap"
+msgstr ""
+
+msgid "Invert: lines where the picture is light"
 msgstr ""
 
 msgid "Italic"
@@ -1076,6 +1129,9 @@ msgstr ""
 msgid "Licence"
 msgstr ""
 
+msgid "Lift the pen where the picture is white"
+msgstr ""
+
 msgid "Light"
 msgstr ""
 
@@ -1086,6 +1142,9 @@ msgid "Light grey"
 msgstr ""
 
 msgid "Line"
+msgstr ""
+
+msgid "Line spacing"
 msgstr ""
 
 msgid "Line: drag from end to end"
@@ -1276,6 +1335,11 @@ msgstr ""
 msgid "Nothing is left of the shapes after this operation."
 msgstr ""
 
+msgid ""
+"Nothing to draw: the picture is white with these values (try more "
+"contrast)."
+msgstr ""
+
 msgid "Nothing to move: the design is empty."
 msgstr ""
 
@@ -1319,6 +1383,9 @@ msgid ""
 " send to it:"
 msgstr ""
 
+msgid "One line: the rows joined at the edges"
+msgstr ""
+
 msgid ""
 "Only for the pen. A solid fill: the spacing a little less than the pen's "
 "width."
@@ -1348,6 +1415,9 @@ msgid "Open SVG"
 msgstr ""
 
 msgid "Open a Vintyl project, or add the shapes of an SVG file to the design"
+msgstr ""
+
+msgid "Open a picture as a drawing…"
 msgstr ""
 
 msgid "Open an SVG or DXF file, or draw a shape with the tools on the right."
@@ -1415,6 +1485,13 @@ msgstr ""
 msgid ""
 "Pen: click = corner, press and drag = smooth curve; the first node closes"
 " it, double-click or Enter leaves it open"
+msgstr ""
+
+msgid "Picture as a drawing"
+msgstr ""
+
+#, python-format
+msgid "Pictures (%s)"
 msgstr ""
 
 msgid "Pink"
@@ -1789,6 +1866,9 @@ msgstr ""
 msgid "Speed and force are set on the cutter's panel"
 msgstr ""
 
+msgid "Spiral"
+msgstr ""
+
 msgid "Split"
 msgstr ""
 
@@ -2133,6 +2213,9 @@ msgstr ""
 msgid "Updates"
 msgstr ""
 
+msgid "Use the pen"
+msgstr ""
+
 #, python-format
 msgid "Version %s"
 msgstr ""
@@ -2180,7 +2263,18 @@ msgstr ""
 msgid "W."
 msgstr ""
 
+msgid "Wave height"
+msgstr ""
+
 msgid "Waves"
+msgstr ""
+
+msgid ""
+"Waves in one centimetre where the picture is black (fewer where it is "
+"lighter)"
+msgstr ""
+
+msgid "Waves per cm"
 msgstr ""
 
 msgid "Website"

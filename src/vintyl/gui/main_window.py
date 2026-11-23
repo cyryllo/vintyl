@@ -253,6 +253,9 @@ class MainWindow(QMainWindow):
                                     _("Start an empty design"))
         self.act_open = self._action(_("Open"), lambda: self.open_file(), "folder-open", QKeySequence.Open,
                                      _("Open a Vintyl project, or add the shapes of an SVG file to the design"))
+        self.act_open_picture = self._action(_("Open a picture as a drawing…"), lambda: self.import_picture(),
+                                             None, None, _("A photo or a picture (PNG, JPG) drawn with the pen: "
+                                                           "waves, a spiral or hatching"))
         self.act_save = self._action(_("Save"), lambda: self.save_project(), "device-floppy", "Ctrl+S",
                                      _("Save the project (.vintyl): the design and the job's settings"))
         self.act_save_as = self._action(_("Save as…"), lambda: self.save_project(ask=True), None, "Ctrl+Shift+S",
@@ -384,8 +387,8 @@ class MainWindow(QMainWindow):
         self.menus = {}
         m = mb.addMenu(_("&File"))
         self.menus["file"] = m
-        for a in (self.act_new, self.act_open, self.act_save, self.act_save_as, None, self.act_save_cut, None,
-                  self.act_quit):
+        for a in (self.act_new, self.act_open, self.act_open_picture, self.act_save, self.act_save_as, None,
+                  self.act_save_cut, None, self.act_quit):
             m.addSeparator() if a is None else m.addAction(a)
         m = mb.addMenu(_("&Edit"))
         self.menus["edit"] = m
@@ -1973,19 +1976,67 @@ class MainWindow(QMainWindow):
                 box.setChecked(st[key])
 
     def open_file(self, path=None):
-        """Open a project (.vintyl) or add an SVG or DXF file's shapes."""
+        """Open a project (.vintyl), add an SVG or DXF file's shapes, or a
+        picture as a pen drawing."""
+        from vintyl.gui.picture_import import EXTENSIONS, PICTURE_FILTER
         if path is None:
             path, _f = QFileDialog.getOpenFileName(
                 self, _("Open"), os.path.dirname(self.project_path or ""),
                 _("Vintyl projects and drawings (*.vintyl *.svg *.dxf);;Vintyl projects (*.vintyl);;"
-                  "SVG files (*.svg);;DXF files (*.dxf)"))
+                  "SVG files (*.svg);;DXF files (*.dxf)") + ";;" + _("Pictures (%s)") % PICTURE_FILTER)
             if not path:
                 return None
+        if path.lower().endswith(EXTENSIONS):
+            return self.import_picture(path)
         if path.lower().endswith(project.EXTENSION):
             return self.open_project(path)
         if path.lower().endswith(".dxf"):
             return self.import_dxf(path)
         return self.import_svg(path)
+
+    def import_picture(self, path=None, values=None):
+        """A picture (PNG, JPG...) as a pen drawing (vintyl.core.picture):
+        the window chooses the style and its values (values None asks), and
+        the lines go in as one element, 10 mm from the origin. A knife is
+        offered the pen first: it would cut the material to strips. Returns
+        the element or None."""
+        from vintyl.core import curves
+        from vintyl.gui import picture_import
+        if path is None:
+            path, _f = QFileDialog.getOpenFileName(self, _("Open a picture as a drawing…"), "",
+                                                   _("Pictures (%s)") % picture_import.PICTURE_FILTER)
+            if not path:
+                return None
+        if not self.is_pen():
+            answer = widgets.ask(self, _("Picture as a drawing"),
+                                 _("A picture is drawn with the pen: with the knife it would cut the material "
+                                   "to strips. Switch the tool to the marker pen?"),
+                                 [("cancel", _("Cancel"), "cancel"), ("pen", _("Use the pen"), "main")])
+            if answer != "pen":
+                return None
+            self.tool_box.setCurrentIndex(self.tool_box.findData("pen"))
+        img = picture_import.load_image(path)
+        if img is None:
+            widgets.warn(self, _("Picture as a drawing"), _("Cannot read %s as a picture.") % os.path.basename(path))
+            return None
+        if values is None:
+            values = picture_import.picture_dialog(self, img)
+            if values is None:
+                return None
+        polys = picture_import.lines_of(img, values)
+        if not polys:
+            widgets.warn(self, _("Picture as a drawing"),
+                         _("Nothing to draw: the picture is white with these values (try more contrast)."))
+            return None
+        e = Element(os.path.splitext(os.path.basename(path))[0], curves.from_polylines(polys, [False] * len(polys)),
+                    source=path)
+        # the lines are in the picture's own box (0..w, 0..h): that box goes PLACE_MARGIN_MM
+        # from the origin, as an opened file (a white margin of the picture keeps its place)
+        w, h = values["width"], values["width"] * img.height() / img.width()
+        e.move_by(-PLACE_MARGIN_MM - w, -PLACE_MARGIN_MM - h)
+        self.add_element(e)
+        self.statusBar().showMessage(_("Opened %s") % os.path.basename(path), 5000)
+        return e
 
     def import_dxf(self, path, units=None):
         """Add a DXF drawing's shapes. units: for a drawing that does not say

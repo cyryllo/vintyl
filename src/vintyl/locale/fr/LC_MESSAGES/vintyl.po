@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-20 21:55+0100\n"
+"POT-Creation-Date: 2026-11-23 19:39+0100\n"
 "PO-Revision-Date: 2026-11-17 21:27+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -29,8 +29,16 @@ msgid "%(name)s, filled with %(fill)s"
 msgstr "%(name)s, rempli de %(fill)s"
 
 #, python-format
+msgid "%(w).0f × %(h).0f mm"
+msgstr "%(w).0f × %(h).0f mm"
+
+#, python-format
 msgid "%.0f × %.0f mm"
 msgstr "%.0f × %.0f mm"
+
+#, python-format
+msgid "%.1f m to draw"
+msgstr "%.1f m à dessiner"
 
 #, python-format
 msgid "%.2f m"
@@ -53,6 +61,12 @@ msgid "%d element"
 msgid_plural "%d elements"
 msgstr[0] "%d élément"
 msgstr[1] "%d éléments"
+
+#, python-format
+msgid "%d line"
+msgid_plural "%d lines"
+msgstr[0] "%d ligne"
+msgstr[1] "%d lignes"
 
 #, python-format
 msgid "%d node selected"
@@ -206,6 +220,20 @@ msgstr ""
 msgid "A path has a point that is not a number."
 msgstr "Un tracé a un point qui n'est pas un nombre."
 
+msgid ""
+"A photo or a picture (PNG, JPG) drawn with the pen: waves, a spiral or "
+"hatching"
+msgstr ""
+"Une photo ou une image (PNG, JPG) dessinée au stylo : vagues, spirale ou "
+"hachures"
+
+msgid ""
+"A picture is drawn with the pen: with the knife it would cut the material"
+" to strips. Switch the tool to the marker pen?"
+msgstr ""
+"Une image se dessine au stylo : avec la lame, elle découperait le "
+"matériau en bandes. Passer l'outil au stylo ?"
+
 #, python-format
 msgid ""
 "A point would go to the cutter at %d,%d (below zero). Check the axis "
@@ -332,6 +360,9 @@ msgstr "Bords inférieurs"
 msgid "Bricks"
 msgstr "Briques"
 
+msgid "Brightness"
+msgstr "Luminosité"
+
 msgid "Brown"
 msgstr "Marron"
 
@@ -351,6 +382,10 @@ msgstr "Annuler"
 #, python-format
 msgid "Cannot open %s: %s"
 msgstr "Impossible d'ouvrir %s : %s"
+
+#, python-format
+msgid "Cannot read %s as a picture."
+msgstr "Impossible de lire %s comme image."
 
 #, python-format
 msgid "Cannot read %s: %s"
@@ -450,6 +485,9 @@ msgstr "Se connecte comme"
 
 msgid "Content"
 msgstr "Contenu"
+
+msgid "Contrast"
+msgstr "Contraste"
 
 #, python-format
 msgid "Copied %d element."
@@ -681,6 +719,13 @@ msgstr ""
 "Distance entre les lignes (la taille d'un motif). Pour un remplissage "
 "plein : un peu moins que la largeur du stylo."
 
+msgid ""
+"Distance between the lines (the spiral's turns). Smaller: more detail, "
+"longer to draw; not less than the pen's width"
+msgstr ""
+"Distance entre les lignes (les tours de la spirale). Plus petite : plus "
+"de détails, dessin plus long ; pas moins que la largeur du stylo"
+
 msgid "Do again what was taken back"
 msgstr "Refaire ce qui a été annulé"
 
@@ -887,6 +932,9 @@ msgstr ""
 "Pour dessiner sur papier ou carton, pas pour le vinyle. Pour découper du "
 "vinyle, choisissez la lame."
 
+msgid "For the pen: drawn with the knife, it would cut the material to strips."
+msgstr "Pour le stylo : avec la lame, il découperait le matériau en bandes."
+
 msgid ""
 "For vinyl ironed onto fabric: it is cut from the back, so the cut is "
 "mirrored. The design on the screen stays as it will look on the shirt."
@@ -969,6 +1017,9 @@ msgstr ""
 "HPGL : 40 unités par mm sur la plupart des plotters. Vérifiez avec un "
 "carré de 20 mm."
 
+msgid "Hatching"
+msgstr "Hachures"
+
 msgid "Head length (%)"
 msgstr "Longueur de la pointe (%)"
 
@@ -1021,6 +1072,13 @@ msgstr ""
 msgid "How far the letters stand from the path, mm"
 msgstr "À quelle distance du tracé se tiennent les lettres, mm"
 
+msgid ""
+"How high the waves get where the picture is black (at 100 they fill the "
+"room between two lines)"
+msgstr ""
+"Hauteur des vagues là où l'image est noire (à 100 elles remplissent "
+"l'espace entre deux lignes)"
+
 msgid "How to do it"
 msgstr "Comment faire"
 
@@ -1065,6 +1123,9 @@ msgstr "Intersection"
 
 msgid "Intersection: keep only where the selected shapes overlap"
 msgstr "Intersection : garder seulement là où les formes se chevauchent"
+
+msgid "Invert: lines where the picture is light"
+msgstr "Inverser : des lignes là où l'image est claire"
 
 msgid "Italic"
 msgstr "Italique"
@@ -1157,6 +1218,9 @@ msgstr ""
 msgid "Licence"
 msgstr "Licence"
 
+msgid "Lift the pen where the picture is white"
+msgstr "Lever le stylo là où l'image est blanche"
+
 msgid "Light"
 msgstr "Clair"
 
@@ -1168,6 +1232,9 @@ msgstr "Gris clair"
 
 msgid "Line"
 msgstr "Ligne"
+
+msgid "Line spacing"
+msgstr "Espacement des lignes"
 
 msgid "Line: drag from end to end"
 msgstr "Ligne : glissez d'un bout à l'autre"
@@ -1364,6 +1431,13 @@ msgstr "Il ne reste rien après le décalage (la forme est plus fine que cela)."
 msgid "Nothing is left of the shapes after this operation."
 msgstr "Il ne reste rien des formes après cette opération."
 
+msgid ""
+"Nothing to draw: the picture is white with these values (try more "
+"contrast)."
+msgstr ""
+"Rien à dessiner : avec ces valeurs l'image est blanche (essayez plus de "
+"contraste)."
+
 msgid "Nothing to move: the design is empty."
 msgstr "Rien à déplacer : le motif est vide."
 
@@ -1411,6 +1485,9 @@ msgstr ""
 "Sous Linux, un plotter est un fichier de périphérique, et seuls les "
 "membres de son groupe peuvent lui envoyer des données :"
 
+msgid "One line: the rows joined at the edges"
+msgstr "Une seule ligne : les rangées reliées aux bords"
+
 msgid ""
 "Only for the pen. A solid fill: the spacing a little less than the pen's "
 "width."
@@ -1448,6 +1525,9 @@ msgstr "Ouvrir un SVG"
 
 msgid "Open a Vintyl project, or add the shapes of an SVG file to the design"
 msgstr "Ouvrir un projet Vintyl, ou ajouter au motif les formes d'un fichier SVG"
+
+msgid "Open a picture as a drawing…"
+msgstr "Ouvrir une image comme dessin…"
 
 msgid "Open an SVG or DXF file, or draw a shape with the tools on the right."
 msgstr ""
@@ -1525,6 +1605,13 @@ msgid ""
 msgstr ""
 "Plume : clic = angle, cliquer-glisser = courbe lisse ; le premier nœud la"
 " ferme, double-clic ou Entrée la laisse ouverte"
+
+msgid "Picture as a drawing"
+msgstr "Image comme dessin"
+
+#, python-format
+msgid "Pictures (%s)"
+msgstr "Images (%s)"
 
 msgid "Pink"
 msgstr "Rose"
@@ -1918,6 +2005,9 @@ msgstr "Vitesse et force"
 
 msgid "Speed and force are set on the cutter's panel"
 msgstr "La vitesse et la force sont réglées sur le panneau du plotter"
+
+msgid "Spiral"
+msgstr "Spirale"
 
 msgid "Split"
 msgstr "Diviser"
@@ -2320,6 +2410,9 @@ msgstr "Modifications non enregistrées"
 msgid "Updates"
 msgstr "Mises à jour"
 
+msgid "Use the pen"
+msgstr "Utiliser le stylo"
+
 #, python-format
 msgid "Version %s"
 msgstr "Version %s"
@@ -2377,8 +2470,21 @@ msgstr ""
 msgid "W."
 msgstr "L."
 
+msgid "Wave height"
+msgstr "Hauteur des vagues"
+
 msgid "Waves"
 msgstr "Vagues"
+
+msgid ""
+"Waves in one centimetre where the picture is black (fewer where it is "
+"lighter)"
+msgstr ""
+"Vagues par centimètre là où l'image est noire (moins là où elle est plus "
+"claire)"
+
+msgid "Waves per cm"
+msgstr "Vagues par cm"
 
 msgid "Website"
 msgstr "Site web"
@@ -2666,4 +2772,16 @@ msgstr "← Y en travers, mm"
 
 #~ msgid "Ready"
 #~ msgstr "Prédéfinies"
+
+#~ msgid "Invert (light lines on a dark picture)"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "How high the waves get where the"
+#~ " picture is black: 100% fills the "
+#~ "room between two lines"
+#~ msgstr ""
+#~ "Hauteur des vagues là où l'image "
+#~ "est noire : 100 % remplit l'espace"
+#~ " entre deux lignes"
 

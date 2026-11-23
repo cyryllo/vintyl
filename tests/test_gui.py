@@ -1754,6 +1754,64 @@ def test_the_fill_window_chooses_the_colour_that_draws_the_fill(win, monkeypatch
     dlg.previewer.wait()
 
 
+def _gradient_png(path, w=120, h=80, alpha=False):
+    """A picture: white on the left to black on the right."""
+    from PySide6.QtGui import QColor, QImage
+    img = QImage(w, h, QImage.Format_ARGB32)
+    for x in range(w):
+        v = int(255 * (1 - x / (w - 1)))
+        for y in range(h):
+            img.setPixelColor(x, y, QColor(v, v, v, 0 if alpha and x > w // 2 else 255))
+    img.save(str(path))
+    return str(path)
+
+
+def test_a_picture_opens_as_a_pen_drawing(win, tmp_path, monkeypatch):
+    """Open a picture: the knife is offered the pen; the lines go in as one
+    element of open lines, the picture's box 10 mm from the origin."""
+    from vintyl.gui import widgets
+    path = _gradient_png(tmp_path / "g.png")
+    asked = []
+    monkeypatch.setattr(widgets, "ask", lambda *a, **k: asked.append(a[2]) or "pen")
+    values = {"style": "waves", "width": 60.0, "spacing": 2.0, "strength": 100.0, "waves": 10.0,
+              "contrast": 100.0, "brightness": 0.0, "invert": False, "lift": False, "joined": False}
+    e = win.import_picture(path, values)
+    assert asked and "pen" in asked[0] and win.is_pen()
+    assert e in win.design.elements and e.name == "g" and not any(s["closed"] for s in e.paths)
+    x0, x1, y0, y1 = e.bounds
+    assert -71.5 < x0 < -69 and -11 < x1 < -9.5                    # 60 mm wide, 10 mm from the origin
+    assert len(e.paths) == 20                                     # 40 mm high, a row every 2 mm
+    win.undo()
+    assert e not in win.design.elements
+    # each style; transparent is paper
+    for style in ("spiral", "hatching"):
+        assert win.import_picture(_gradient_png(tmp_path / "a.png", alpha=True), dict(values, style=style))
+    # a file that is no picture
+    bad = tmp_path / "bad.png"
+    bad.write_text("no")
+    warned = []
+    monkeypatch.setattr(widgets, "warn", lambda *a: warned.append(a[2]))
+    assert win.import_picture(str(bad), values) is None and "Cannot read" in warned[0]
+
+
+def test_the_picture_window_shows_the_fields_of_its_style_and_a_preview(win, tmp_path):
+    from vintyl.gui import picture_import
+    img = picture_import.load_image(_gradient_png(tmp_path / "g.png"))
+    dlg = picture_import.picture_dialog(win, img, show=False)
+    rows = {key: w for key, _l, w in dlg.rows}
+    shown = lambda key: not (rows[key] if key in ("lift", "joined", "invert") else rows[key].parentWidget()).isHidden()  # noqa: E731
+    dlg.show()
+    assert shown("strength") and shown("joined") and not shown("angle")
+    dlg.style.setCurrentIndex(dlg.style.findData("hatching"))
+    assert shown("angle") and not shown("strength") and not shown("joined") and not shown("lift")
+    dlg.style.setCurrentIndex(dlg.style.findData("spiral"))
+    assert shown("lift") and not shown("joined")
+    assert _wait_for(lambda: not dlg.preview._pattern.isEmpty() and "mm" in dlg.status.text())
+    assert dlg.values_now()["style"] == "spiral"
+    dlg.previewer.wait()
+    dlg.close()
+
+
 def test_every_pattern_has_a_picture():
     from vintyl.gui.main_window import MainWindow
     from vintyl.gui.previews import pattern_icon
