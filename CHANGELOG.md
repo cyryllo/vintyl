@@ -37,7 +37,8 @@ Flatpak beside the AppImage.
 
 **Fixed**
 - The ribbon no longer moves when the tool changes: the Knife path / Pen path button is as wide as
-  the longer name, so Grid beside it stays put.
+  the longer name, so Grid beside it stays put. In Polish the ribbon says just "Ścieżka" for both
+  (the menu keeps the full names), so it still fits a 1366 px screen with a wide font.
 
 ## 0.9.2
 
