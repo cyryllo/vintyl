@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-23 21:15+0100\n"
+"POT-Creation-Date: 2026-11-23 21:19+0100\n"
 "PO-Revision-Date: 2026-11-15 17:49+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -337,6 +337,9 @@ msgstr "Kąt"
 msgid "Applications menu"
 msgstr "Menu aplikacji"
 
+msgid "Apply"
+msgstr "Zastosuj"
+
 msgid "Arms"
 msgstr "Ramiona"
 
@@ -604,6 +607,9 @@ msgstr "Tnij wcześniej (wyżej na liście)"
 msgid "Cut first"
 msgstr "Tnij jako pierwszy"
 
+msgid "Cut in dashes"
+msgstr "Tnij w kreski"
+
 msgid "Cut it"
 msgstr "Tnij"
 
@@ -632,6 +638,13 @@ msgid ""
 msgstr ""
 "Wyciąć test noża na <b>%(cutter)s</b>: kwadrat %(size)g mm z trójkątem, "
 "przy punkcie zerowym?"
+
+msgid ""
+"Cut the selected elements in dashes (a cut, a gap...): card folds along "
+"them, paper tears off; with a pen, a dashed line"
+msgstr ""
+"Tnij zaznaczone elementy w kreski (cięcie, przerwa...): karton zegnie się"
+" wzdłuż nich, papier da się oderwać; pisakiem linia przerywana"
 
 msgid "Cut the test"
 msgstr "Wytnij test"
@@ -1120,6 +1133,12 @@ msgid ""
 msgstr ""
 "Jak wysokie są fale tam, gdzie obraz jest czarny (przy 100 wypełniają "
 "miejsce między dwiema liniami)"
+
+msgid "How long each cut is"
+msgstr "Jak długie jest każde cięcie"
+
+msgid "How much is left uncut between two cuts"
+msgstr "Ile zostaje nieciętego między dwoma cięciami"
 
 msgid "How to do it"
 msgstr "Jak to zrobić"
@@ -1670,6 +1689,12 @@ msgstr ""
 "Pióro: klik = narożnik, wciśnij i przeciągnij = gładka krzywa; pierwszy "
 "węzeł zamyka kształt, dwuklik lub Enter zostawia go otwartym"
 
+msgid "Perforation"
+msgstr "Perforacja"
+
+msgid "Perforation…"
+msgstr "Perforacja…"
+
 msgid "Picture as a drawing"
 msgstr "Obraz jako rysunek"
 
@@ -1936,6 +1961,9 @@ msgid ""
 msgstr ""
 "Zaznacz jeden tekst i jeden kształt (linię, krzywą, okrąg), wzdłuż "
 "którego ma biec."
+
+msgid "Select the elements to perforate."
+msgstr "Zaznacz elementy do perforacji."
 
 msgid "Select three or more shapes to spread them evenly."
 msgstr "Zaznacz trzy lub więcej kształtów, żeby je rozmieścić."
@@ -2425,6 +2453,14 @@ msgstr "Próg"
 msgctxt "ribbon"
 msgid "To 0,0"
 msgstr "Do 0,0"
+
+msgid ""
+"To fold card: longer cuts, short gaps (3 mm and 1 mm). To tear paper off:"
+" short both (1 mm and 1 mm). With a pen: a dashed line."
+msgstr ""
+"Do zginania kartonu: dłuższe cięcia, krótkie przerwy (3 mm i 1 mm). Do "
+"odrywania papieru: krótkie jedno i drugie (1 mm i 1 mm). Pisakiem: linia "
+"przerywana."
 
 msgid "To stop the cutter at once: Test (pause) or Reset on its panel."
 msgstr "Żeby od razu zatrzymać ploter: Test (pauza) albo Reset na jego panelu."

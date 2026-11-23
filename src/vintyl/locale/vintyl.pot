@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-23 21:15+0100\n"
+"POT-Creation-Date: 2026-11-23 21:19+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -300,6 +300,9 @@ msgstr ""
 msgid "Applications menu"
 msgstr ""
 
+msgid "Apply"
+msgstr ""
+
 msgid "Arms"
 msgstr ""
 
@@ -557,6 +560,9 @@ msgstr ""
 msgid "Cut first"
 msgstr ""
 
+msgid "Cut in dashes"
+msgstr ""
+
 msgid "Cut it"
 msgstr ""
 
@@ -582,6 +588,11 @@ msgstr ""
 msgid ""
 "Cut the knife test on <b>%(cutter)s</b>: a %(size)g mm square with a "
 "triangle, near the origin?"
+msgstr ""
+
+msgid ""
+"Cut the selected elements in dashes (a cut, a gap...): card folds along "
+"them, paper tears off; with a pen, a dashed line"
 msgstr ""
 
 msgid "Cut the test"
@@ -1033,6 +1044,12 @@ msgstr ""
 msgid ""
 "How high the waves get where the picture is black (at 100 they fill the "
 "room between two lines)"
+msgstr ""
+
+msgid "How long each cut is"
+msgstr ""
+
+msgid "How much is left uncut between two cuts"
 msgstr ""
 
 msgid "How to do it"
@@ -1550,6 +1567,12 @@ msgid ""
 " it, double-click or Enter leaves it open"
 msgstr ""
 
+msgid "Perforation"
+msgstr ""
+
+msgid "Perforation…"
+msgstr ""
+
 msgid "Picture as a drawing"
 msgstr ""
 
@@ -1804,6 +1827,9 @@ msgstr ""
 msgid ""
 "Select one text and one shape (a line, a curve, a circle) for it to run "
 "along."
+msgstr ""
+
+msgid "Select the elements to perforate."
 msgstr ""
 
 msgid "Select three or more shapes to spread them evenly."
@@ -2228,6 +2254,11 @@ msgstr ""
 
 msgctxt "ribbon"
 msgid "To 0,0"
+msgstr ""
+
+msgid ""
+"To fold card: longer cuts, short gaps (3 mm and 1 mm). To tear paper off:"
+" short both (1 mm and 1 mm). With a pen: a dashed line."
 msgstr ""
 
 msgid "To stop the cutter at once: Test (pause) or Reset on its panel."

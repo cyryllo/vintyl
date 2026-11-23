@@ -4,7 +4,7 @@ Vintyl project files (.vintyl): the whole design and the job's settings.
 A project is JSON text (readable, and easy to repair by hand):
     {"format": "vintyl", "version": 1,
      "layers": [{"id", "name", "color", "enabled", "pen_width_mm", "pen_place", "fill"}, ...],
-     "elements": [{"name", "paths", "cut", "source", "spec", "group", "fill", "layer"}, ...],
+     "elements": [{"name", "paths", "cut", "source", "spec", "group", "fill", "layer", "perforate"}, ...],
      "settings": {"profile": ..., "knife_offset_mm": ..., ...}}
 paths are curves subpaths (vintyl.core.curves) in view mm. "settings" holds
 what the window wants to keep with the design; this module does not look
@@ -15,7 +15,9 @@ came in 0.9; they are optional, so the version stays 1: a project without
 them opens with one black layer, and an older Vintyl opens a project with
 them, only without its colours. So is a fill's "layer" (after 0.9.0: the
 colour the fill is drawn with, when not the outline's); an older Vintyl
-draws such a fill in the outline's colour.
+draws such a fill in the outline's colour. And an element's "perforate"
+(after 0.9.2: {"cut": mm, "gap": mm}, cut in dashes); an older Vintyl
+cuts such an element with a whole line.
 
 Copyright (C) 2026 Vintyl contributors
 Licensed under the GNU General Public License v3 or later. See LICENSE.
@@ -24,6 +26,7 @@ import json
 import os
 
 from .design import Design, Element
+from . import perforate
 from .layers import PEN_PLACES, Layer, default_layer, parse_color
 from ..i18n import _
 
@@ -44,7 +47,8 @@ def to_dict(design, settings=None):
                     "pen_width_mm": layer.pen_width_mm, "pen_place": layer.pen_place, "fill": layer.fill}
                    for layer in design.layers],
         "elements": [{"name": e.name, "paths": e.paths, "cut": e.cut, "source": e.source,
-                      "spec": e.spec, "group": e.group, "fill": e.fill, "layer": e.layer}
+                      "spec": e.spec, "group": e.group, "fill": e.fill, "layer": e.layer,
+                      "perforate": e.perforate}
                      for e in design.elements],
         "settings": dict(settings or {}),
     }
@@ -119,7 +123,7 @@ def from_dict(data, name="project"):
             design.elements.append(Element(str(e.get("name", "")), paths, bool(e.get("cut", True)),
                                            str(e.get("source", "")), e.get("spec") or None,
                                            str(e.get("group", "")), _fill(e.get("fill")),
-                                           str(e.get("layer", ""))))
+                                           str(e.get("layer", "")), perforate.valid(e.get("perforate"))))
     except (KeyError, TypeError, ValueError, IndexError):
         raise ProjectError(_("%s is damaged: an element cannot be read.") % name) from None
     settings = data.get("settings") or {}

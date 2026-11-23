@@ -30,6 +30,8 @@ Windows-only software such as SignMaster, so they can be used on Linux.
   type, and what to check; nothing is sent until you confirm.
 - **Knife compensation** at the corners (curves stay smooth) and an
   **overcut**, so every closed shape closes; **inside shapes first**.
+- **Perforation**: elements cut in dashes, to fold card or tear paper off
+  (a dashed line with a pen).
 - A **weeding frame** round the design and **weeding lines** through the
   waste; **mirror** for heat transfer vinyl; a **knife test** to set the
   force; **copies** in rows and columns; **strips** for designs wider than

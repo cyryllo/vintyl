@@ -286,6 +286,11 @@ place freely. The grid (Ctrl+') and its step are in the settings.
   apart: as short a piece of vinyl as can be. With some parts selected it
   asks whether to lay out those or all. A part wider than the material
   stays where it was. The way of Kerfly's nesting.
+- **Perforation** (Object → Perforation…, or the right button): the
+  selected elements are cut in dashes, a cut and a gap, so card folds along
+  them or paper tears off; with a pen they are a dashed line. To fold card:
+  3 mm cuts and 1 mm gaps; to tear off: 1 mm and 1 mm. A perforated element
+  is dotted on the sheet; the knife path shows its dashes.
 - **Copies** (Object → Copies): rows along and columns across, a gap
   apart, or as many columns as fit in the width.
 - **The cutting order** is the element list: the arrows beside it, or the

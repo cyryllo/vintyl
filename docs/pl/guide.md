@@ -288,6 +288,12 @@ odstęp są w ustawieniach.
   odstępem: jak najkrótszy kawałek folii. Gdy zaznaczonych jest kilka
   części, pyta, czy ułożyć tylko je, czy wszystkie. Część szersza niż
   materiał zostaje na miejscu. Na wzór układania z Kerfly.
+- **Perforacja** (Obiekt → Perforacja… albo prawy przycisk): zaznaczone
+  elementy tnie się w kreski, cięcie i przerwa, więc karton zegnie się
+  wzdłuż nich albo papier da się oderwać; pisakiem to linia przerywana. Do
+  zginania kartonu: cięcia 3 mm i przerwy 1 mm; do odrywania: 1 mm i 1 mm.
+  Element z perforacją ma na arkuszu kropkowany kontur; ścieżka noża
+  pokazuje jego kreski.
 - **Kopie** (Obiekt → Kopie): rzędy wzdłuż i kolumny w poprzek, z odstępem,
   albo tyle kolumn, ile zmieści się w szerokości.
 - **Kolejność cięcia** to lista elementów: strzałki obok niej albo prawy

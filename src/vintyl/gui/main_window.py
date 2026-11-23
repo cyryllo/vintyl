@@ -259,6 +259,9 @@ class MainWindow(QMainWindow):
         self.act_trace_picture = self._action(_("Trace a picture into shapes…"), lambda: self.trace_picture(),
                                               None, None, _("A logo or a picture (PNG, JPG): its dark areas "
                                                             "become shapes to cut, their holes too"))
+        self.act_perforate = self._action(_("Perforation…"), lambda: self.perforate_selected(), None, None,
+                                          _("Cut the selected elements in dashes (a cut, a gap...): card folds "
+                                            "along them, paper tears off; with a pen, a dashed line"))
         self.act_nest = self._action(_("Lay out tightly…"), lambda: self.nest(), None, None,
                                      _("The parts laid out as tightly as their rectangles allow, from the origin "
                                        "along the material: as short a piece of vinyl as can be"))
@@ -406,7 +409,8 @@ class MainWindow(QMainWindow):
         self.menus["object"] = m
         for a in [self.act_group, self.act_ungroup, None] + list(self.act_boolean.values()) + [None] + \
                 [self.act_rot_left, self.act_rot_right, self.act_mirror_h, self.act_mirror_v, None] + \
-                list(self.act_align.values()) + [self.act_to_origin, self.act_nest, None, self.act_offset,
+                list(self.act_align.values()) + [self.act_to_origin, self.act_nest, None, self.act_perforate,
+                                                 self.act_offset,
                                                  self.act_tile,
                                                  self.act_fill,
                                                  self.act_text_path, None, self.act_copies, self.act_panels,
@@ -950,6 +954,46 @@ class MainWindow(QMainWindow):
                                          % {"now": MaterialView._mm(length),
                                             "was": MaterialView._mm(length_before)}, 8000)
         return length
+
+    def perforate_selected(self, values=None):
+        """Cut the selected elements in dashes, or with a whole line again
+        (vintyl.core.perforate). values: {"on", "cut", "gap"} without asking
+        (tests); None asks. Returns the elements changed."""
+        from vintyl.core import perforate
+        chosen = self._chosen()
+        if not chosen:
+            self.statusBar().showMessage(_("Select the elements to perforate."), 6000)
+            return []
+        if values is None:
+            current = next((e.perforate for e in chosen if e.perforate), None)
+            start = current or {"cut": float(self.settings.value("perforate/cut", perforate.DEFAULT["cut"])),
+                                "gap": float(self.settings.value("perforate/gap", perforate.DEFAULT["gap"]))}
+            on = Switch(_("Cut in dashes"))
+            on.setChecked(current is not None or not any(e.perforate for e in chosen))
+            cut = _spin(100.0, 1, " mm", minimum=perforate.SMALLEST_MM)
+            cut.setValue(start["cut"])
+            cut.setToolTip(_("How long each cut is"))
+            gap = _spin(100.0, 1, " mm", minimum=perforate.SMALLEST_MM)
+            gap.setValue(start["gap"])
+            gap.setToolTip(_("How much is left uncut between two cuts"))
+            on.toggled.connect(lambda v: (cut.setEnabled(v), gap.setEnabled(v)))
+            on.toggled.emit(on.isChecked())
+            got = widgets.form_dialog(self, _("Perforation"), [("on", None, on), ("cut", _("Cut"), cut),
+                                                               ("gap", _("Gap"), gap)], action=_("Apply"),
+                                      hint=_("To fold card: longer cuts, short gaps (3 mm and 1 mm). To tear "
+                                             "paper off: short both (1 mm and 1 mm). With a pen: a dashed line."))
+            if got is None:
+                return []
+            values = got
+            if values["on"]:
+                self.settings.setValue("perforate/cut", values["cut"])
+                self.settings.setValue("perforate/gap", values["gap"])
+        spec = perforate.valid({"cut": values["cut"], "gap": values["gap"]}) if values.get("on", True) else None
+        self._checkpoint()
+        for e in chosen:
+            e.perforate = dict(spec) if spec else None
+        self.refresh()
+        return chosen
 
     def _ask_nest(self, count, selected):
         """The window: which parts (when some but not all are selected), the
@@ -3659,6 +3703,7 @@ class MainWindow(QMainWindow):
             for a in (self.act_rot_left, self.act_rot_right, self.act_mirror_h, self.act_to_origin):
                 menu.addAction(a)
             self._colour_menu(menu)
+            menu.addAction(self.act_perforate)
             menu.addAction(icons.tabler("vector-bezier-2"), _("Edit nodes"), lambda: self._on_edit_nodes(element))
             cut = menu.addAction(icons.tabler("check"), _("Cut this element"))
             cut.setIconVisibleInMenu(False)            # the check mark of a checkable item shows it

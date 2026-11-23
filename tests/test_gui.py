@@ -2213,6 +2213,29 @@ def test_nesting_asks_which_parts_when_some_are_selected(win, monkeypatch):
     assert [v for e in win.design.elements[2:] for v in e.bounds] == pytest.approx(still)   # the others stay
 
 
+# ---- perforated cuts ---------------------------------------------------------------------------------------
+def test_a_selected_element_is_perforated_and_back(win):
+    """Perforation (Object menu, right-click): the job cuts it in dashes, the
+    sheet shows it dotted; off again: a whole line; undo."""
+    from PySide6.QtCore import Qt as _Qt
+    win.weed_frame.setChecked(False)
+    win._on_drawn("rectangle", QRectF(-100, -80, 40, 40))
+    e = win.selected
+    whole = win.build().cut_mm
+    win.perforate_selected({"on": True, "cut": 3.0, "gap": 1.0})
+    assert e.perforate == {"cut": 3.0, "gap": 1.0}
+    dashed = win.build()
+    assert dashed.cut_mm < whole * 0.85 and len(dashed.knife_paths) > 30
+    item = [i for i in win.view._items if i.element is e][0]
+    assert item.pen().style() == _Qt.DotLine
+    menu = win.show_context_menu(e, None, show=False)
+    assert win.act_perforate in menu.actions()
+    win.perforate_selected({"on": False, "cut": 3.0, "gap": 1.0})
+    assert e.perforate is None and win.build().cut_mm == pytest.approx(whole)
+    win.undo()
+    assert win.design.elements[0].perforate == {"cut": 3.0, "gap": 1.0}
+
+
 # ---- to the origin (as Kerfly's "design to the head") --------------------------------------------------
 def test_the_whole_design_moves_to_the_origin_as_it_is_laid_out(win):
     win._on_drawn("ellipse", QRectF(-300, -250, 60, 40))

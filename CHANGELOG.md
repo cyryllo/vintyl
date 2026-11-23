@@ -16,6 +16,12 @@
   gap apart, so the vinyl taken off the roll is as short as it can be; the selected parts or all.
   From Kerfly's nesting (its rectangles), changed for a strip of vinyl instead of a laser's bed.
 
+**Cutting**
+- Perforation (Object menu, the right button): the selected elements cut in dashes, a cut and a gap
+  (3 mm and 1 mm to fold card, 1 and 1 to tear paper off); with a pen a dashed line. Dotted on the
+  sheet; the knife path and the cutter's file have the dashes. Kept in the project (an element's
+  "perforate"); an older Vintyl cuts such an element with a whole line.
+
 **Fixed**
 - The ribbon no longer moves when the tool changes: the Knife path / Pen path button is as wide as
   the longer name, so Grid beside it stays put.

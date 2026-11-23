@@ -49,6 +49,7 @@ description: Vintyl is free software for vinyl cutters on Linux. Draw, open SVG 
       <li>Knife compensation at the corners (smooth curves stay smooth) and an overcut, so every closed shape closes.</li>
       <li>Inside shapes are cut first: nothing comes loose before its holes are cut.</li>
       <li>A weeding frame round the design and weeding lines through the waste.</li>
+      <li>Perforation: lines cut in dashes, to fold card or tear paper off.</li>
       <li>The knife path on the sheet, with the order of the cuts and the travels.</li>
     </ul>
   </div>

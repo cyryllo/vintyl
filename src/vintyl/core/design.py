@@ -42,11 +42,14 @@ class Element:
     fill: dict = None
     # the colour layer it belongs to (vintyl.core.layers); "" = the design's first
     layer: str = ""
+    # cut in dashes (vintyl.core.perforate): {"cut": mm, "gap": mm}; None = a whole line
+    perforate: dict = None
 
     def copy(self):
         return Element(self.name, curves.copy_path(self.paths), self.cut, self.source,
                        dict(self.spec) if self.spec else None, self.group,
-                       dict(self.fill) if self.fill else None, self.layer)
+                       dict(self.fill) if self.fill else None, self.layer,
+                       dict(self.perforate) if self.perforate else None)
 
     def fill_lines(self, tol=curves.FLATNESS_MM):
         """The fill pattern's lines (view mm), [] without a fill or closed outlines.
@@ -222,7 +225,11 @@ class Design:
         for k, e in enumerate(self.elements):
             if not e.cut or (layer is not None and self.layer_of(e) is not layer):
                 continue
-            for poly in e.flat(tol):
+            polys = e.flat(tol)
+            if e.perforate:                       # cut in dashes: a fold or tear-off line
+                from .perforate import dashes
+                polys = [d for poly in polys for d in dashes(poly, e.perforate["cut"], e.perforate["gap"])]
+            for poly in polys:
                 out.append([view_to_material(x, y) for x, y in poly])
                 groups.append(k)
         return out, groups

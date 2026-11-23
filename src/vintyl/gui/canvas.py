@@ -139,8 +139,9 @@ class ElementItem(QGraphicsPathItem):
         self.color = QColor(color) if color else QColor(COLORS["cut"])
         # its fill's: another colour's when the fill is drawn with another pen
         self.fill_color = QColor(fill_color) if fill_color else self.color
-        self.setPen(cosmetic_pen(self.color if element.cut else COLORS["skip"], 1.6,
-                                 Qt.SolidLine if element.cut else Qt.DashLine))
+        # cut: a whole line, perforated: dots (cut in dashes), not cut: grey dashes
+        style = (Qt.DotLine if element.perforate else Qt.SolidLine) if element.cut else Qt.DashLine
+        self.setPen(cosmetic_pen(self.color if element.cut else COLORS["skip"], 1.6, style))
         self._press = None
         self._dragging = False
         self._snap_cache = None

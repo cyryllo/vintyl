@@ -5,9 +5,6 @@ Lista roboczych zadań Vintyla. Zrobione rzeczy przechodzą do
 
 ## Funkcje
 
-- [ ] **Cięcie perforowane** (linia przerywana: odcinek cięty, odcinek
-  nie) do papieru i kartonu: zginanie, odrywanie. Przełącznik na element,
-  długość cięcia i przerwy.
 
 
 ## Paczki
