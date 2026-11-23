@@ -1818,8 +1818,16 @@ def test_files_given_at_the_start_open_once_the_window_is_up(tmp_path, monkeypat
     after the window is shown; other files are left alone."""
     from PySide6.QtTest import QTest
     from PySide6.QtWidgets import QApplication
+    from vintyl import i18n
+    from vintyl.core import diag
     from vintyl.gui import app as vintyl_app
+    from vintyl.gui import theme
     from vintyl.gui.main_window import MainWindow
+    # main() sets the language, the look and the log of the user's system: kept as the tests have them
+    real_setup = i18n.setup
+    monkeypatch.setattr(i18n, "setup", lambda language="": real_setup("en"))
+    monkeypatch.setattr(theme, "apply", lambda *a, **k: None)
+    monkeypatch.setattr(diag, "setup", lambda *a, **k: None)
     opened = []
     monkeypatch.setattr(MainWindow, "open_file", lambda self, p: opened.append((p, self.isVisible())))
     monkeypatch.setattr(MainWindow, "check_for_updates", lambda self, auto=False: None)
