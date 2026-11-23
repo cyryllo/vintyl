@@ -122,8 +122,14 @@ class ElementItem(QGraphicsPathItem):
     """One element. Its paths are already in scene coordinates; a drag moves
     the item and, when the mouse is released, the element's nodes."""
 
+    # an element with more points than this is painted once into a picture and
+    # that is shown while the view pans or the item is hovered, selected or
+    # dragged (a photo drawn as lines: tens of thousands of points)
+    CACHED_POINTS = 5000
+
     def __init__(self, element, view, color=None, fill_color=None):
-        super().__init__(painter_path(element.paths))
+        # the path is kept with the element's paths (made again only when they change)
+        super().__init__(element._kept("qpath", lambda: painter_path(element.paths)))
         self.element = element
         self.view = view
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
@@ -138,7 +144,9 @@ class ElementItem(QGraphicsPathItem):
         self._press = None
         self._dragging = False
         self._snap_cache = None
-        self.polys = curves.flatten(element.paths, tol=0.1)
+        self.polys = element.flat(0.1)                 # for snapping; shared, read only
+        if element.point_count() > self.CACHED_POINTS:
+            self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
         # the fill pattern (drawn by a pen; with the knife it is not shown)
         self.fill_path = QPainterPath()
         for line in element.fill_lines():           # the same as the job's: worked out once (cached)

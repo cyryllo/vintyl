@@ -11,6 +11,12 @@
   white and one joined line, with a live preview, its size and the length to draw. With the knife
   the pen is offered first.
 
+**Faster**
+- Big drawings (a photo as lines, tens of thousands of points): an element's box, polylines and
+  outline are worked out once, until it changes; the sheet paints a big element from a picture while
+  the view pans or it is selected; the job (the cut length, the knife path) is worked out a moment
+  after the last change, not at every click.
+
 ## 0.9.1
 
 An outline and its fill in two colours, and a colour can be removed.

@@ -196,3 +196,12 @@ def test_an_outline_and_a_fill_of_two_colours_are_read_apart(tmp_path):
     # same colour as the fill (the white dot) is an ordinary filled shape
     assert set(groups) == {("#000000", "#ec4899"), ("#000000", True), ("#ffffff", True)}
     assert colour_counts(groups) == {"#000000": 2, "#ec4899": 1, "#ffffff": 1}
+
+
+def test_an_elements_box_and_polylines_are_kept_until_its_paths_change():
+    e = Element("a", shapes.ellipse(-60, -60, -20, -20))
+    first = e.flat(0.1)
+    assert e.flat(0.1) is first and e.bounds == e.bounds                  # worked out once
+    e.move_by(5, 0)
+    assert e.flat(0.1) is not first and e.bounds[0] == pytest.approx(-55)  # new paths: new results
+    assert e.copy().point_count() == e.point_count() > 0

@@ -14,7 +14,7 @@ Licensed under the GNU General Public License v3 or later. See LICENSE.
 import dataclasses
 import os
 
-from PySide6.QtCore import QSize, Qt
+from PySide6.QtCore import QSize, Qt, QTimer
 from PySide6.QtGui import QAction, QActionGroup, QColor, QKeySequence
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QDoubleSpinBox, QFileDialog, QFontComboBox, QFormLayout,
                                QFrame, QLineEdit, QMenu, QScrollArea,
@@ -3763,7 +3763,26 @@ class MainWindow(QMainWindow):
         self.act_undo.setEnabled(bool(self._undo))
         self.act_redo.setEnabled(bool(self._redo))
         self._update_title()
-        self.refresh_job()
+        self._job_soon()
+
+    # a design with more points than this works its job out a moment after the
+    # last change, not at every click: building the job of a photo drawn as lines
+    # takes a good part of a second
+    JOB_LATER_POINTS = 20000
+
+    def _job_soon(self):
+        """refresh_job now, or for a big design a moment after the last change
+        (the clicks and drags in between do not wait for it)."""
+        if sum(e.point_count() for e in self.design.elements) <= self.JOB_LATER_POINTS:
+            self.refresh_job()
+            return
+        timer = getattr(self, "_job_timer", None)
+        if timer is None:
+            timer = self._job_timer = QTimer(self)
+            timer.setSingleShot(True)
+            timer.setInterval(300)
+            timer.timeout.connect(self.refresh_job)
+        timer.start()
 
     def _show_machine(self):
         """The machine's line under its name: connection, port, width."""

@@ -73,10 +73,34 @@ class Element:
             _fill_cache_put(key, lines)
         return [[(x + ax, y + ay) for x, y in line] for line in lines]
 
+    # An element's paths are never changed in place (every edit gives it new ones),
+    # so what is worked out of them is kept with the paths it came from: a picture
+    # drawn as lines has tens of thousands of points, and the window asks for its
+    # box and its polylines at every refresh.
+    def _kept(self, key, work):
+        kept = self.__dict__.setdefault("_kept_values", {})
+        got = kept.get(key)
+        if got is not None and got[0] is self.paths:
+            return got[1]
+        if kept and next(iter(kept.values()))[0] is not self.paths:
+            kept.clear()                                  # new paths: the old results go
+        value = work()
+        kept[key] = (self.paths, value)
+        return value
+
     @property
     def bounds(self):
         """(xmin, xmax, ymin, ymax) in view mm."""
-        return curves.bounds(self.paths)
+        return self._kept("bounds", lambda: curves.bounds(self.paths))
+
+    def flat(self, tol=curves.FLATNESS_MM):
+        """The paths as polylines (curves.flatten), kept until the paths
+        change. Read only: the lists are shared."""
+        return self._kept(("flat", tol), lambda: curves.flatten(self.paths, tol))
+
+    def point_count(self):
+        """How many nodes its paths have (a picture drawn as lines: many)."""
+        return self._kept("count", lambda: sum(len(sub["nodes"]) for sub in self.paths))
 
     @property
     def size(self):
@@ -198,7 +222,7 @@ class Design:
         for k, e in enumerate(self.elements):
             if not e.cut or (layer is not None and self.layer_of(e) is not layer):
                 continue
-            for poly in curves.flatten(e.paths, tol):
+            for poly in e.flat(tol):
                 out.append([view_to_material(x, y) for x, y in poly])
                 groups.append(k)
         return out, groups

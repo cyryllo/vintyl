@@ -1794,6 +1794,25 @@ def test_a_picture_opens_as_a_pen_drawing(win, tmp_path, monkeypatch):
     assert win.import_picture(str(bad), values) is None and "Cannot read" in warned[0]
 
 
+def test_a_big_drawing_works_its_job_out_after_the_clicks(win, tmp_path, monkeypatch):
+    """A design of many points (a photo as lines): the job is worked out a
+    moment after the last change, the sheet paints the element from a
+    picture; a small design still at once."""
+    from PySide6.QtWidgets import QGraphicsItem
+    win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
+    values = {"style": "waves", "width": 60.0, "spacing": 2.0, "strength": 100.0, "waves": 10.0,
+              "contrast": 100.0, "brightness": 0.0, "invert": False, "lift": False, "joined": False}
+    monkeypatch.setattr(type(win), "JOB_LATER_POINTS", 100)
+    from vintyl.gui.canvas import ElementItem
+    monkeypatch.setattr(ElementItem, "CACHED_POINTS", 100)
+    win.last_job = None
+    e = win.import_picture(_gradient_png(tmp_path / "g.png"), values)
+    item = [i for i in win.view._items if i.element is e][0]
+    assert item.cacheMode() == QGraphicsItem.DeviceCoordinateCache
+    assert win.last_job is None                                    # not yet
+    assert _wait_for(lambda: win.last_job is not None and win.last_job.cut_mm > 0)
+
+
 def test_the_picture_window_shows_the_fields_of_its_style_and_a_preview(win, tmp_path):
     from vintyl.gui import picture_import
     img = picture_import.load_image(_gradient_png(tmp_path / "g.png"))
