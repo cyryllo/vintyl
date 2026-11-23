@@ -11,6 +11,28 @@ Lista roboczych zadań Vintyla. Zrobione rzeczy przechodzą do
   manifestem; robi go właściciel (konto, przegląd Flathuba). Uprawnienie
   `--device=all` (port plotera) trzeba tam uzasadnić.
 
+- [ ] **Wspólne repozytorium APT dla wszystkich programów** (`cyryllo/apt`,
+  adres `https://cyryllo.github.io/apt`): Vintyl, LamaDeck, Kerfly, millwise
+  i kolejne, instalowane i aktualizowane zwykłym `apt`. Na wzór repozytorium
+  LamaDecka (`apt-repo.sh`, gałąź `gh-pages`, klucz RSA 4096, 3 ostatnie
+  wersje w puli):
+  1. repozytorium `cyryllo/apt` tylko ze skryptem, automatem i listą
+     projektów (`projects.txt`), bez plików `.deb` w historii gita;
+  2. automat (GitHub Actions): pobiera `.deb` z ostatnich wydań każdego
+     projektu (`gh release download`), buduje spisy dla `amd64`, `all` i
+     `arm64`, podpisuje `Release`/`InRelease` kluczem z sekretów, publikuje
+     na Pages z artefaktu;
+  3. uruchamiany sygnałem `repository_dispatch` z wydania każdego projektu
+     (token w sekretach projektów), do tego raz dziennie i ręcznie;
+  4. każda paczka dokłada wspólny wpis `/etc/apt/sources.list.d/cyryllo.sources`
+     i klucz, więc jedna instalacja daje aktualizacje wszystkich programów;
+  5. LamaDeck: kolejna wersja w starym repozytorium podmienia użytkownikom
+     wpis i klucz na wspólne;
+  6. Kerfly i millwise najpierw potrzebują własnej paczki `.deb` (na wzór
+     `packaging/linux/build-deb.sh` Vintyla).
+  Limit Pages ok. 1 GB (Vintyl 46 MB na wersję). Założenie repozytorium,
+  klucza i tokenów na GitHubie: tylko na polecenie właściciela.
+
 ## Później
 
 - [ ] **Dopracowanie kolorów (0.9).** Uwagi po testach właściciela, gdy
