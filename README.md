@@ -42,7 +42,8 @@ Windows-only software such as SignMaster, so they can be used on Linux.
 
 **Drawing and laying out**
 - Rectangle (with round corners), ellipse, polygon, line, polyline, pen
-  curves, freehand, **text** in your fonts, also **along a path**.
+  curves, freehand, **text** in your fonts, also **along a path**, its
+  letters **welded** into one outline for script fonts.
 - **Ready shapes** (star, heart, ring, rounded rectangle, arrow, cross,
   drop, gear) and **QR codes**; a **pattern of shapes** inside a shape.
 - Union, difference, intersection, exclusion, **offset**, node editing.

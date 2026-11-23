@@ -72,7 +72,7 @@ description: Vintyl is free software for vinyl cutters on Linux. Draw, open SVG 
   <div class="text-col">
     <h3>Draw and edit</h3>
     <ul>
-      <li>Rectangle (with round corners), ellipse, polygon, line, polyline, pen curves, freehand and text in any installed font, also along a path.</li>
+      <li>Rectangle (with round corners), ellipse, polygon, line, polyline, pen curves, freehand and text in any installed font, also along a path, its letters welded for script fonts.</li>
       <li>Ready shapes (star, heart, ring, arrow, gear...) and QR codes.</li>
       <li>Union, difference, intersection, exclusion, offset, node editing.</li>
       <li>A pattern of shapes: fill a shape with rows of small stars or hearts, each one whole, with a live preview.</li>

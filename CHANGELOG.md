@@ -16,6 +16,10 @@
   logo or a picture's dark areas become shapes to cut, their holes too, with the width, threshold,
   specks left out, detail, smooth curves and invert, and a live preview. The tracer is Kerfly's.
 - A picture given at the start (`vintyl photo.jpg`) opens too.
+- Weld a text's letters (the button beside italic): where they overlap (script fonts, tight spacing)
+  they become one outline, so the knife does not cut inside the word; the holes stay, and the text
+  stays editable (it is welded again when it changes). The text fields are a little narrower, so the
+  bar still fits a 1366 px screen in every language.
 
 **Faster**
 - Big drawings (a photo as lines, tens of thousands of points): an element's box, polylines and

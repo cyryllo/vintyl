@@ -210,8 +210,10 @@ arkuszu:
   odręcznie (F).
 - **Tekst** (T): kliknij, gdzie ma się zaczynać, i pisz w pasku
   zaznaczenia; dowolna zainstalowana czcionka, pogrubienie, kursywa, odstęp
-  liter. **Tekst po ścieżce** układa zaznaczony tekst wzdłuż innego
-  zaznaczonego kształtu.
+  liter. **Połącz litery** (przycisk obok kursywy) łączy nachodzące na
+  siebie litery w jeden kontur, czego potrzebują czcionki pisane, żeby nóż
+  nie ciął w środku słowa; napis da się dalej edytować. **Tekst po
+  ścieżce** układa zaznaczony tekst wzdłuż innego zaznaczonego kształtu.
 - **Węzły** (N albo dwuklik na kształcie): przeciągaj węzły i uchwyty;
   dwuklik na boku dodaje węzeł; D usuwa, L robi linię, C krzywą, O gładki
   węzeł, Z zamyka albo otwiera, B rozcina.

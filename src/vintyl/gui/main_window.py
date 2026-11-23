@@ -1047,10 +1047,13 @@ class MainWindow(QMainWindow):
         rows.addWidget(self.node_hint)
         self.text_defaults = dict(texts.DEFAULTS)
         self.opt_text = QLineEdit(self.text_defaults["text"])
-        self.opt_text.setFixedWidth(140)
+        # the text row's fields as narrow as they can be: with the weld button and a text on a
+        # path it must still fit a 1366 px screen in Spanish with a wide font (DejaVu Sans)
+        self.opt_text.setFixedWidth(124)
         self.opt_text.setToolTip(_("The text; Enter applies it"))
         self.opt_font = QFontComboBox()
-        self.opt_font.setFixedWidth(140)
+        self.opt_font.setFixedWidth(128)
+        self.opt_font.view().setMinimumWidth(260)            # its list wider than the field
         self.opt_font.setCurrentFont(self.opt_font.currentFont().__class__(self.text_defaults["family"]))
         self.opt_size = _spin(1000.0, 1, minimum=1.0)
         self.opt_size.setFixedWidth(90)
@@ -1067,14 +1070,23 @@ class MainWindow(QMainWindow):
         self.opt_italic.setIcon(icons.tabler("italic"))
         self.opt_italic.setCheckable(True)
         self.opt_italic.setToolTip(_("Italic"))
+        # weld: the letters that overlap (a script font) become one outline, so the knife
+        # does not cut inside the word; the text stays editable (it is welded again)
+        self.opt_weld = QToolButton()
+        self.opt_weld.setObjectName("toggle")
+        self.opt_weld.setIcon(icons.tabler("layers-union"))
+        self.opt_weld.setCheckable(True)
+        self.opt_weld.setToolTip(_("Weld the letters: where they overlap they become one outline, so the knife "
+                                   "does not cut inside the word"))
         self.opt_spacing = _spin(100.0, 2, minimum=-20.0)
-        self.opt_spacing.setFixedWidth(90)
+        self.opt_spacing.setFixedWidth(80)
         self.opt_spacing.setToolTip(_("Extra space between letters, mm"))
         self.text_widgets = [self.opt_text, self.opt_font, self.opt_size, self.opt_bold, self.opt_italic,
-                             self.opt_spacing]
+                             self.opt_weld, self.opt_spacing]
         self.text_labels = []
         for label, w in ((_("Content"), self.opt_text), (_("Font"), self.opt_font), (_("Size"), self.opt_size),
-                         (None, self.opt_bold), (None, self.opt_italic), (_("Spacing"), self.opt_spacing)):
+                         (None, self.opt_bold), (None, self.opt_italic), (None, self.opt_weld),
+                         (_("Spacing"), self.opt_spacing)):
             if label:
                 lab = QLabel(label)
                 lab.setObjectName("bar_label")
@@ -1117,7 +1129,7 @@ class MainWindow(QMainWindow):
         self.opt_font.currentFontChanged.connect(lambda _f: self._text_changed())
         for w in (self.opt_size, self.opt_spacing):
             w.valueChanged.connect(lambda _v: self._text_changed())
-        for w in (self.opt_bold, self.opt_italic):
+        for w in (self.opt_bold, self.opt_italic, self.opt_weld):
             w.toggled.connect(lambda _v: self._text_changed())
         for w in self.text_widgets + self.text_labels:
             w.setVisible(False)
@@ -2441,6 +2453,8 @@ class MainWindow(QMainWindow):
         spec = {"kind": "text", "text": self.opt_text.text(), "family": self.opt_font.currentFont().family(),
                 "size": self.opt_size.value(), "bold": self.opt_bold.isChecked(),
                 "italic": self.opt_italic.isChecked(), "spacing": self.opt_spacing.value()}
+        if self.opt_weld.isChecked():
+            spec["weld"] = True                  # only when on: an older text's spec stays as it was
         e = self.selected
         if self._is_text(e) and e.spec.get("path"):           # a text on a path keeps its path
             def exact(widget, key):
@@ -2481,6 +2495,7 @@ class MainWindow(QMainWindow):
             self.opt_size.setValue(spec["size"])
             self.opt_bold.setChecked(spec["bold"])
             self.opt_italic.setChecked(spec["italic"])
+            self.opt_weld.setChecked(bool(spec.get("weld")))
             self.opt_spacing.setValue(spec["spacing"])
             self._updating = False
 

@@ -208,8 +208,11 @@ Choose a tool on the right (or press its key), then drag on the sheet:
   line (Shift+L), pen (B: click for a corner, drag for a curve), freehand
   (F).
 - **Text** (T): click where it starts and type in the selection bar; any
-  installed font, bold, italic, letter spacing. **Text on a path** puts a
-  selected text along another selected shape.
+  installed font, bold, italic, letter spacing. **Weld** (the button beside
+  italic) joins the letters where they overlap into one outline, as script
+  fonts need, so the knife does not cut inside the word; the text stays
+  editable. **Text on a path** puts a selected text along another selected
+  shape.
 - **Nodes** (N, or a double click on a shape): drag the nodes and the
   handles; a double click on a side adds a node; D deletes, L makes a line,
   C a curve, O smooth, Z closes or opens, B breaks.

@@ -1870,6 +1870,37 @@ def test_the_trace_window_previews_the_outlines(win, tmp_path):
     dlg.close()
 
 
+def test_weld_joins_the_letters_and_the_text_stays_editable(win):
+    """Weld (the text's union button): overlapping letters become one
+    outline, the holes stay; the text is welded again when it changes; it
+    is kept in the text's spec."""
+    from PySide6.QtCore import QPointF
+    from vintyl.gui import text as texts
+    win.opt_text.setText("Vintyl")
+    win.opt_spacing.setValue(-2.0)                       # letters into each other
+    win._on_text_clicked(QPointF(-200, -100))
+    e = win.selected
+    apart = len(e.paths)
+    win.opt_weld.setChecked(True)
+    assert e.spec.get("weld") is True and len(e.paths) < apart
+    # holes stay: "oo" welded still has two holes
+    holes = texts.weld(texts.text_paths("oo", e.spec["family"], 20.0, False, False, 0.0))
+    assert len(holes) == 4
+    # edited: welded again, still where it was
+    x0 = e.bounds[0]
+    win.opt_text.setText("Vintyl Vintyl")
+    win._text_changed()
+    assert e.spec["text"] == "Vintyl Vintyl" and e.spec.get("weld") and abs(e.bounds[0] - x0) < 0.01
+    welded = len(e.paths)
+    win.opt_weld.setChecked(False)
+    assert "weld" not in e.spec and len(e.paths) > welded
+    # another text selected shows its own state
+    win.opt_weld.setChecked(True)
+    win.selected, win.selection = e, [e]
+    win._show_text_options()
+    assert win.opt_weld.isChecked()
+
+
 def test_files_given_at_the_start_open_once_the_window_is_up(tmp_path, monkeypatch):
     """python -m vintyl photo.jpg drawing.svg: each opens (a picture too),
     after the window is shown; other files are left alone."""

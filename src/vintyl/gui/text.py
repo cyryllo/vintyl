@@ -88,12 +88,33 @@ def text_paths(text, family=DEFAULTS["family"], size_mm=DEFAULTS["size"], bold=D
 
 def spec_paths(spec):
     """The outlines of a text spec: in a line from (0, 0), or along its path
-    (spec["path"], in view mm, where it is on the sheet)."""
+    (spec["path"], in view mm, where it is on the sheet); with spec["weld"],
+    the letters welded (weld)."""
     if spec.get("path"):
-        return path_text_paths(spec["text"], spec["family"], spec["size"], spec["bold"], spec["italic"],
-                               spec["path"], spec.get("offset", 0.0), spec.get("flip", False),
-                               spec.get("distance", 0.0), spec["spacing"])
-    return text_paths(spec["text"], spec["family"], spec["size"], spec["bold"], spec["italic"], spec["spacing"])
+        paths = path_text_paths(spec["text"], spec["family"], spec["size"], spec["bold"], spec["italic"],
+                                spec["path"], spec.get("offset", 0.0), spec.get("flip", False),
+                                spec.get("distance", 0.0), spec["spacing"])
+    else:
+        paths = text_paths(spec["text"], spec["family"], spec["size"], spec["bold"], spec["italic"],
+                           spec["spacing"])
+    return weld(paths) if spec.get("weld") and paths else paths
+
+
+WELD_SCALE = 10.0              # worked on 10 times bigger: Qt's curves become finer straight pieces
+
+
+def weld(paths):
+    """The letters' outlines united: where letters overlap (a script font,
+    tight spacing) they become one outline, so the knife does not cut inside
+    the word; the holes of the letters stay (the outlines are filled by the
+    nonzero rule, as fonts are). As the Union of shapes, Qt does the
+    geometry, on the outlines WELD_SCALE times bigger."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QTransform
+    from vintyl.gui.canvas import painter_path
+    path = QTransform.fromScale(WELD_SCALE, WELD_SCALE).map(painter_path(paths))
+    path.setFillRule(Qt.WindingFill)
+    return painter_path_to_curves(path.simplified(), 1.0 / WELD_SCALE)
 
 
 # ---- text on a path -------------------------------------------------------------------------------
