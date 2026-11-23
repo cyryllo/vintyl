@@ -5,9 +5,11 @@ Lista roboczych zadań Vintyla. Zrobione rzeczy przechodzą do
 
 ## Paczki
 
-- [ ] **Pakiet .deb** (Debian, Ubuntu, Mint) obok AppImage.
-- [ ] **Flatpak** (Flathub); dostęp do /dev/usb/lp* i portów szeregowych
-  trzeba sprawdzić, bo Flatpak domyślnie ich nie daje.
+- [ ] **Flathub.** Flatpak jest gotowy (od 0.9.3, plik w wydaniach:
+  `packaging/flatpak/io.github.cyryllo.Vintyl.yml`). Żeby był w sklepie
+  Flathub: wniosek (pull request) do github.com/flathub/flathub z tym
+  manifestem; robi go właściciel (konto, przegląd Flathuba). Uprawnienie
+  `--device=all` (port plotera) trzeba tam uzasadnić.
 
 ## Później
 
