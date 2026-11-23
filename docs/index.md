@@ -33,7 +33,7 @@ description: Vintyl is free software for vinyl cutters on Linux. Draw, open SVG 
 
 <div class="stats">
   <div><strong>4</strong><span>cutter profiles ready</span></div>
-  <div><strong>5</strong><span>materials with their force and speed</span></div>
+  <div><strong>7</strong><span>materials for the knife and the pen</span></div>
   <div><strong>8</strong><span>ready shapes, and QR codes</span></div>
   <div><strong>9</strong><span>fill patterns for pens</span></div>
   <div><strong>0,0</strong><span>the design to the origin in one key</span></div>

@@ -1647,16 +1647,21 @@ class MainWindow(QMainWindow):
         self.pen_place.setCurrentIndex(max(0, self.pen_place.findData(
             self.settings.value("cutter/pen_place/" + pid, "on"))))
         self._loading_tool = False
-        self._tool_changed(refresh=False)
-        self._select_material(self.settings.value("cutter/material/" + pid, ""), apply=False)
+        # the tool's materials, the one used last with it on this cutter (not applied: the
+        # cutter's own remembered pen values and switches stay)
+        self._tool_changed(refresh=False, materials=False)
         self.refresh()
 
     def is_pen(self):
         return self.tool_box.currentData() == "pen"
 
-    def _tool_changed(self, refresh=True):
+    def _tool_changed(self, refresh=True, materials=None):
         """Knife or pen: show the settings that matter for it, hide the others,
-        and remember the choice for this cutter."""
+        and remember the choice for this cutter (also called when the pen's
+        width or place changes, to remember them). materials: the list of
+        materials made again for the tool (True: and the chosen one applied;
+        False: not applied); None: only when the tool really changed, applied
+        then (a choice by hand)."""
         pen = self.is_pen()
         self.inside_first.setVisible(not pen)
         self.pen_fields.setVisible(pen)
@@ -1669,6 +1674,14 @@ class MainWindow(QMainWindow):
         self.view.pen_mode = pen
         self.act_knife.setText(_("Pen path") if pen else _("Knife path"))
         self.act_knife.setIconText(pgettext("ribbon", "Pen path") if pen else pgettext("ribbon", "Knife path"))
+        # the materials of this tool only (vinyl for the knife, papers for the pen), the
+        # one last used with it on this cutter chosen; chosen by hand, it is applied
+        tool = self.tool_box.currentData()
+        if hasattr(self, "material_box") and (materials is not None
+                                              or tool != getattr(self, "_materials_tool", None)):
+            self._materials_tool = tool
+            apply = materials if materials is not None else not getattr(self, "_loading_tool", False)
+            self.reload_materials(self._remembered_material(), apply=apply)
         name = self.profile_box.currentData()
         if name and not getattr(self, "_loading_tool", False):
             self.settings.setValue("cutter/tool/" + name, self.tool_box.currentData())
@@ -1703,21 +1716,46 @@ class MainWindow(QMainWindow):
         return p
 
     # ---- materials --------------------------------------------------------------------------
-    def reload_materials(self, select=None):
-        """Fill the material list; choose `select` (an id), else the one chosen now."""
+    def reload_materials(self, select=None, apply=False):
+        """Fill the material list with the chosen tool's materials (the knife's
+        or the pen's); choose `select` (an id), else the one chosen now, else
+        the first. apply: the chosen one's switches are set (as when chosen
+        by hand)."""
         from vintyl.core import material as mats
         from vintyl.gui.material_editor import display_name
         entries = [e for e in mats.catalogue() if e["material"] is not None]
-        self.material_entries = {e["id"]: e for e in entries}
+        self.material_entries = {e["id"]: e for e in entries}       # every one (a project may name any)
+        tool = self.tool_box.currentData()
         want = select if select in self.material_entries else self.material_box.currentData()
         self.material_box.blockSignals(True)
         self.material_box.clear()
         for e in entries:
-            icon = icons.own("drag-knife") if e["material"].tool == "knife" else icons.tabler("pencil")
+            if e["material"].tool != tool:
+                continue
+            icon = icons.own("drag-knife") if tool == "knife" else icons.tabler("pencil")
             self.material_box.addItem(icon, display_name(e), e["id"])
         self.material_box.setCurrentIndex(max(0, self.material_box.findData(want)))
         self.material_box.blockSignals(False)
+        if apply and self.material_box.count():
+            self._material_changed(self.material_box.currentIndex())
         self._show_material_hint()
+
+    def _material_key(self, tool=None):
+        """Where the material last used with a tool on this cutter is remembered."""
+        return "cutter/material/%s/%s" % (self.profile_box.currentData(), tool or self.tool_box.currentData())
+
+    def _remembered_material(self):
+        """The material last used with the chosen tool on this cutter (an id,
+        or None). Before 0.9.3 one material was remembered for each cutter,
+        whatever its tool: it counts for its own tool."""
+        mid = self.settings.value(self._material_key(), None)
+        if mid:
+            return str(mid)
+        old = self.settings.value("cutter/material/%s" % self.profile_box.currentData(), None)
+        e = getattr(self, "material_entries", {}).get(str(old)) if old else None
+        if e is not None and e["material"].tool == self.tool_box.currentData():
+            return str(old)
+        return None
 
     def material(self):
         """The chosen material (or None when there is none)."""
@@ -1735,25 +1773,24 @@ class MainWindow(QMainWindow):
         self._show_material_hint()
 
     def _material_changed(self, _index):
-        """A material chosen: it sets the tool, the mirror, the weeding frame and
-        the pen's values (changed by hand afterwards if wanted), and is
-        remembered for this cutter."""
+        """A material chosen (from the tool's own list): it sets the mirror,
+        the weeding frame and the pen's values (changed by hand afterwards if
+        wanted), and is remembered for this cutter and tool."""
         m = self.material()
         pid = self.profile_box.currentData()
         if m is not None:
-            self._loading_tool = True
-            self.tool_box.setCurrentIndex(self.tool_box.findData(m.tool))
-            if m.pen_width_mm is not None:
-                self.pen_width.setValue(m.pen_width_mm)
-            self.pen_place.setCurrentIndex(max(0, self.pen_place.findData(m.pen_place)))
-            self._loading_tool = False
-            self._tool_changed(refresh=False)
+            if m.tool == "pen":
+                self._loading_tool = True                # the pen's values: not remembered as hand-set
+                if m.pen_width_mm is not None:
+                    self.pen_width.setValue(m.pen_width_mm)
+                self.pen_place.setCurrentIndex(max(0, self.pen_place.findData(m.pen_place)))
+                self._loading_tool = False
             for box, on in ((self.mirror_job, m.mirror), (self.weed_frame, m.weed_frame)):
                 box.blockSignals(True)
                 box.setChecked(on)
                 box.blockSignals(False)
             if pid:
-                self.settings.setValue("cutter/material/" + pid, self.material_box.currentData())
+                self.settings.setValue(self._material_key(m.tool), self.material_box.currentData())
         self._show_material_hint()
         self.refresh_job()
 
@@ -1835,8 +1872,15 @@ class MainWindow(QMainWindow):
         dlg = MaterialEditor(self, self.material_box.currentData(), self.profile_box.currentData())
         dlg.exec()
         if dlg.chosen is not None:
-            self.reload_materials(dlg.chosen)
-            self._material_changed(self.material_box.currentIndex())
+            from vintyl.core import material as mats
+            chosen = next((x for x in mats.catalogue() if x["id"] == dlg.chosen and x["material"]), None)
+            if chosen is not None and chosen["material"].tool != self.tool_box.currentData():
+                # its tool changed in the window: the window follows it (the list of that tool)
+                self.settings.setValue(self._material_key(chosen["material"].tool), dlg.chosen)
+                self.tool_box.setCurrentIndex(self.tool_box.findData(chosen["material"].tool))
+            else:
+                self.reload_materials(dlg.chosen)
+                self._material_changed(self.material_box.currentIndex())
         if dlg.test_material is not None:
             return self.knife_test(material=dlg.test_material)
         return dlg
@@ -1996,11 +2040,12 @@ class MainWindow(QMainWindow):
         # the machine (its knife and port are its own settings, not the project's)
         if st.get("profile") in self.profile_names:
             self.profile_box.setCurrentIndex(self.profile_names.index(st["profile"]))
-        # the material of the project (older projects have none: the current one stays)
-        if st.get("material") in getattr(self, "material_entries", {}):
-            self._select_material(st["material"], apply=False)
+        # its tool first (it chooses the list of materials), then its material (older
+        # projects have none: the tool's remembered one stays)
         if st.get("tool") in ("knife", "pen"):
             self.tool_box.setCurrentIndex(self.tool_box.findData(st["tool"]))
+        if st.get("material") in getattr(self, "material_entries", {}):
+            self._select_material(st["material"], apply=False)
         if st.get("pen_place") in pens.PLACES:
             self.pen_place.setCurrentIndex(self.pen_place.findData(st["pen_place"]))
         for key, widget in (("weed_margin_mm", self.weed_margin), ("pen_width_mm", self.pen_width)):

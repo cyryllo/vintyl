@@ -173,19 +173,28 @@ profilach, ale nie był jeszcze sprawdzony na ploterze.
 Materiał mówi, jak go ciąć (albo po nim rysować): narzędzie, **nacisk i
 prędkość dla każdego plotera**, ostrze, przesunięcie noża i nadcięcie
 (puste: wartości plotera), lustro, ramkę do wybierania i notatkę
-pokazywaną przed Startem. Wybranie materiału ustawia narzędzie i
-przełączniki zadania.
+pokazywaną przed Startem. **Każde narzędzie ma swoje materiały:** lista
+obok pola Materiał pokazuje materiały noża (folie, karton i papier do
+wycinania) albo pisaka (papiery do rysowania), zależnie od wybranego
+narzędzia. Wybranie materiału ustawia przełączniki zadania; każde
+narzędzie pamięta swój ostatni materiał dla każdego plotera.
 
 Wbudowane, jako wartości startowe dla ploterów VEVOR i Seiki, wszystkie
 przy 300 mm/s:
 
-| Materiał | Mały KI-375A | Plotery 870 mm |
-|---|---|---|
-| Folia winylowa | 50 g | 80 g |
-| Folia termotransferowa (flex), w lustrze | 60 g | 120 g |
-| Folia odblaskowa, ostrze 60° | 40 g | 80 g |
-| Papier, cienkopis (pisak) | 35 g | 70 g |
-| Karton, marker (pisak) | 35 g | 70 g |
+| Materiał | Narzędzie | Mały KI-375A | Plotery 870 mm |
+|---|---|---|---|
+| Folia winylowa | nóż | 50 g | 80 g |
+| Folia termotransferowa (flex), w lustrze | nóż | 60 g | 120 g |
+| Folia odblaskowa, ostrze 60° | nóż | 40 g | 80 g |
+| Karton do wycinania, ostrze 60° | nóż | ustal testem noża | ustal testem noża |
+| Papier do wycinania | nóż | ustal testem noża | ustal testem noża |
+| Papier, cienkopis | pisak | 35 g | 70 g |
+| Karton, marker | pisak | 35 g | 70 g |
+
+Dla kartonu i papieru do wycinania żadne źródło nie podaje jeszcze wartości
+dla tych ploterów: zacznij od małego nacisku, wytnij test noża i dodawaj,
+aż przetnie na wylot; gruby karton może potrzebować mniejszej prędkości.
 
 Plotery różnią się nawet przy tej samej płycie: sprawdź wartości testem
 noża i wpisz własne w materiale. Okno materiałów otwiera przycisk obok

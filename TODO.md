@@ -16,12 +16,6 @@ Lista roboczych zadań Vintyla. Zrobione rzeczy przechodzą do
   nie) do papieru i kartonu: zginanie, odrywanie. Przełącznik na element,
   długość cięcia i przerwy.
 
-- [ ] **Materiały według narzędzia.** Lista materiałów pokazuje tylko te
-  dla wybranego narzędzia: przy nożu folie (winylowa, flex, odblaskowa) i
-  materiały do cięcia nożem (karton, papier, np. gruby papier do
-  wycinanek), przy pisaku papiery z pisakami (cienkopis, flamaster na
-  kartonie). Teraz wszystko jest na jednej liście. Do dodania wbudowane
-  materiały do cięcia nożem: karton i papier, z naciskiem i prędkością.
 
 ## Paczki
 

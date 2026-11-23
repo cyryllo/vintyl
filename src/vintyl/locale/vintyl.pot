@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-23 20:30+0100\n"
+"POT-Creation-Date: 2026-11-23 21:07+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -379,6 +379,9 @@ msgstr ""
 
 #, python-format
 msgid "Cannot work it out: %s"
+msgstr ""
+
+msgid "Card for cutting"
 msgstr ""
 
 msgid "Card, marker"
@@ -1483,6 +1486,9 @@ msgid ""
 "together."
 msgstr ""
 
+msgid "Paper for cutting"
+msgstr ""
+
 msgid "Paper, fineliner"
 msgstr ""
 
@@ -1810,6 +1816,11 @@ msgid "Serial port or USB-serial cable (/dev/ttyUSB0, /dev/ttyACM0)"
 msgstr ""
 
 msgid "Set on the cutter's panel"
+msgstr ""
+
+msgid ""
+"Set the force and speed with the knife test: start low and add until it "
+"cuts through."
 msgstr ""
 
 msgid ""

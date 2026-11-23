@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-23 20:30+0100\n"
+"POT-Creation-Date: 2026-11-23 21:07+0100\n"
 "PO-Revision-Date: 2026-11-17 21:27+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -413,6 +413,9 @@ msgstr "Impossible d'enregistrer %s : %s"
 #, python-format
 msgid "Cannot work it out: %s"
 msgstr "Impossible à calculer : %s"
+
+msgid "Card for cutting"
+msgstr "Carton à découper"
 
 msgid "Card, marker"
 msgstr "Carton, marqueur"
@@ -1605,6 +1608,9 @@ msgid ""
 "together."
 msgstr "Chevauchement : de combien les bandes se recouvrent, pour les assembler."
 
+msgid "Paper for cutting"
+msgstr "Papier à découper"
+
 msgid "Paper, fineliner"
 msgstr "Papier, feutre fin"
 
@@ -1951,6 +1957,13 @@ msgstr "Port série ou câble USB-série (/dev/ttyUSB0, /dev/ttyACM0)"
 
 msgid "Set on the cutter's panel"
 msgstr "À régler sur le panneau du plotter"
+
+msgid ""
+"Set the force and speed with the knife test: start low and add until it "
+"cuts through."
+msgstr ""
+"Réglez la force et la vitesse avec le test de lame : commencez bas et "
+"augmentez jusqu'à ce qu'elle traverse."
 
 msgid ""
 "Set the origin (Origin key) at the same place as for the first colour, so"

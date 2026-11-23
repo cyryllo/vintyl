@@ -1,0 +1,7 @@
+# Paper cut with the knife (not drawn on), e.g. thick paper for papercuts.
+# Force and speed: none given yet, as for card (see card-cut.toml): set them
+# with the knife test. The 45 degree blade, as for vinyl.
+name = "Paper for cutting"
+tool = "knife"
+blade = "45"
+note = "Set the force and speed with the knife test: start low and add until it cuts through."

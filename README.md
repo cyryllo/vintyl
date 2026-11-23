@@ -34,8 +34,10 @@ Windows-only software such as SignMaster, so they can be used on Linux.
   waste; **mirror** for heat transfer vinyl; a **knife test** to set the
   force; **copies** in rows and columns; **strips** for designs wider than
   the cutter; the **knife path** on the sheet with the order of the cuts.
-- **Materials**: vinyl film, heat transfer vinyl, reflective vinyl, paper
-  and card, and your own, each with its force and speed for each cutter.
+- **Materials** for each tool: for the knife vinyl film, heat transfer
+  vinyl, reflective vinyl, card and paper to cut; for the pen paper and
+  card to draw on; and your own, each with its force and speed for each
+  cutter.
 - **Cutter profiles** with their own settings window: port (with the
   devices found and whether you may use them), command language, axes,
   knife offset, overcut. Add your own cutters.

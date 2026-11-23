@@ -2,6 +2,14 @@
 
 ## Next
 
+**Materials**
+- Each tool has its own materials: the list shows the knife's (vinyl, card and paper to cut) or the
+  pen's (the papers to draw on), as the tool is chosen; choosing a material no longer switches the
+  tool. Each tool remembers its last material on each cutter (the one remembered before counts for
+  its own tool).
+- Card for cutting (60° blade) and paper for cutting, for the knife: no force and speed yet (no
+  source gives them for these cutters), set with the knife test.
+
 **Fixed**
 - The ribbon no longer moves when the tool changes: the Knife path / Pen path button is as wide as
   the longer name, so Grid beside it stays put.

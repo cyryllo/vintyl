@@ -1,0 +1,13 @@
+# Card cut with the knife (not drawn on): thick, so the 60 degree blade.
+# Force and speed: none given yet. No source gives them for the cutters with
+# the XILI board (VEVOR, Seiki); the guides only say thicker material needs
+# more force, a slower speed and sometimes a second pass (Sign Warehouse's
+# speed, force and blade guide; Silhouette's force article). Set them with the
+# knife test and write them here (the owner's values, when tested).
+name = "Card for cutting"
+tool = "knife"
+blade = "60"
+# the 60 degree blade's offset (Roland's Cutter Blade Reference Guide, 2017:
+# ZEC-U3050, 60 degrees / 0.50 mm offset, for reflective and thick materials)
+knife_offset_mm = 0.5
+note = "Set the force and speed with the knife test: start low and add until it cuts through."

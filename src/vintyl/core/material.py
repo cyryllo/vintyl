@@ -29,11 +29,16 @@ from ..i18n import N_
 
 # the built-in materials' names and notes, so they are translated in the window
 BUILTIN_NAMES = (N_("Vinyl film"), N_("Heat transfer vinyl (flex)"), N_("Reflective vinyl"),
+                 N_("Card for cutting"), N_("Paper for cutting"),
                  N_("Paper, fineliner"), N_("Card, marker"),
                  N_("Shiny side (the carrier) down, the matt side up to the knife."),
-                 N_("Starting values: check them with the knife test."))
+                 N_("Starting values: check them with the knife test."),
+                 N_("Set the force and speed with the knife test: start low and add until it cuts through."))
 
-BUILTIN_ORDER = ("vinyl", "htv", "reflective", "paper", "card")
+BUILTIN_ORDER = ("vinyl", "htv", "reflective", "card-cut", "paper-cut", "paper", "card")
+# built-in materials without a force and speed yet (no source gives them for the
+# XILI cutters): set with the knife test, written in when the owner has tested them
+BUILTIN_UNTESTED = ("card-cut", "paper-cut")
 
 TOOLS = ("knife", "pen")
 BLADES = ("", "45", "30", "60")       # "" = not said

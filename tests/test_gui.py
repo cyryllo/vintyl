@@ -1564,16 +1564,45 @@ def _choose_material(win, mid):
     win.material_box.setCurrentIndex(win.material_box.findData(mid))
 
 
-def test_choosing_a_material_sets_the_tool_and_the_switches(win):
+def _materials_listed(win):
+    return [win.material_box.itemData(i) for i in range(win.material_box.count())]
+
+
+def test_each_tool_has_its_own_materials(win):
+    """The knife's list: vinyl and the card and paper to cut; the pen's: the
+    papers to draw on. Choosing one sets the switches (not the tool); each
+    tool remembers its own on this cutter."""
+    pid = win.profile_box.currentData()
+    knife = _materials_listed(win)
+    assert {"vinyl", "htv", "reflective", "card-cut", "paper-cut"} <= set(knife) and "paper" not in knife
     _choose_material(win, "vinyl")
     win.weed_frame.setChecked(False)
     _choose_material(win, "htv")
     assert not win.is_pen() and win.mirror_job.isChecked() and win.weed_frame.isChecked()
-    _choose_material(win, "paper")
-    assert win.is_pen() and win.pen_width.value() == pytest.approx(0.4) and not win.mirror_job.isChecked()
-    assert win.settings.value("cutter/material/" + win.profile_box.currentData()) == "paper"
+    assert win.settings.value("cutter/material/%s/knife" % pid) == "htv"
     win.mirror_job.setChecked(True)                                  # changed by hand afterwards: kept
-    assert win.mirror_job.isChecked()
+    # the pen: its own list, its material applied (its pen width), remembered apart
+    win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
+    pens_ = _materials_listed(win)
+    assert {"paper", "card"} <= set(pens_) and not {"vinyl", "card-cut"} & set(pens_)
+    _choose_material(win, "paper")
+    assert win.pen_width.value() == pytest.approx(0.4) and not win.mirror_job.isChecked()
+    assert win.settings.value("cutter/material/%s/pen" % pid) == "paper"
+    win.pen_width.setValue(0.7)                                      # by hand: not undone by the list
+    assert win.pen_width.value() == pytest.approx(0.7) and win.material_box.currentData() == "paper"
+    # back to the knife: its own material again
+    win.tool_box.setCurrentIndex(win.tool_box.findData("knife"))
+    assert win.material_box.currentData() == "htv"
+
+
+def test_a_material_remembered_before_the_split_counts_for_its_tool(win):
+    """Before 0.9.3 one material was remembered for each cutter: it is the
+    one of its own tool now."""
+    pid = win.profile_box.currentData()
+    win.settings.setValue("cutter/material/%s" % pid, "card")
+    win.settings.remove("cutter/material/%s/pen" % pid)
+    win.tool_box.setCurrentIndex(win.tool_box.findData("pen"))
+    assert win.material_box.currentData() == "card"
 
 
 def test_a_materials_values_come_before_the_cutters(win, tmp_path, monkeypatch):

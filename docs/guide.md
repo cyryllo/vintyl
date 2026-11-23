@@ -175,18 +175,27 @@ been tried on a cutter yet.
 A material holds how to cut (or draw on) it: the tool, the **force and
 speed for each cutter**, the blade, the knife offset and overcut (empty:
 the cutter's own), the mirror, the weeding frame and a note shown before
-Start. Choosing a material sets the tool and the job's switches.
+Start. **Each tool has its own materials:** the list beside Material shows
+the knife's (vinyl, card and paper to cut) or the pen's (the papers to draw
+on), as the tool is chosen. Choosing a material sets the job's switches;
+each tool remembers its last material on each cutter.
 
 Built in, as starting values for the VEVOR and Seiki cutters, all at
 300 mm/s:
 
-| Material | Small KI-375A | 870 mm cutters |
-|---|---|---|
-| Vinyl film | 50 g | 80 g |
-| Heat transfer vinyl (flex), mirrored | 60 g | 120 g |
-| Reflective vinyl, 60° blade | 40 g | 80 g |
-| Paper, fineliner (pen) | 35 g | 70 g |
-| Card, marker (pen) | 35 g | 70 g |
+| Material | Tool | Small KI-375A | 870 mm cutters |
+|---|---|---|---|
+| Vinyl film | knife | 50 g | 80 g |
+| Heat transfer vinyl (flex), mirrored | knife | 60 g | 120 g |
+| Reflective vinyl, 60° blade | knife | 40 g | 80 g |
+| Card for cutting, 60° blade | knife | set with the knife test | set with the knife test |
+| Paper for cutting | knife | set with the knife test | set with the knife test |
+| Paper, fineliner | pen | 35 g | 70 g |
+| Card, marker | pen | 35 g | 70 g |
+
+For card and paper to cut no source gives values for these cutters yet:
+start with a low force, cut the knife test and add until it cuts through;
+thick card may need a slower speed.
 
 Cutters differ even with the same board: check the values with the knife
 test and write your own in the material. Open the materials window with

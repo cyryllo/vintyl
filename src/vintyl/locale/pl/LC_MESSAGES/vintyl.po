@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Vintyl VERSION\n"
 "Report-Msgid-Bugs-To: https://github.com/cyryllo/vintyl/issues\n"
-"POT-Creation-Date: 2026-11-23 20:30+0100\n"
+"POT-Creation-Date: 2026-11-23 21:07+0100\n"
 "PO-Revision-Date: 2026-11-15 17:49+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pl\n"
@@ -418,6 +418,9 @@ msgstr "Nie można zapisać %s: %s"
 #, python-format
 msgid "Cannot work it out: %s"
 msgstr "Nie da się tego policzyć: %s"
+
+msgid "Card for cutting"
+msgstr "Karton do wycinania"
 
 msgid "Card, marker"
 msgstr "Karton, marker"
@@ -1600,6 +1603,9 @@ msgid ""
 "together."
 msgstr "Zakładka: o tyle pasy na siebie zachodzą, żeby je złożyć."
 
+msgid "Paper for cutting"
+msgstr "Papier do wycinania"
+
 msgid "Paper, fineliner"
 msgstr "Papier, cienkopis"
 
@@ -1941,6 +1947,13 @@ msgstr "Port szeregowy albo kabel USB-szeregowy (/dev/ttyUSB0, /dev/ttyACM0)"
 
 msgid "Set on the cutter's panel"
 msgstr "Ustaw na panelu plotera"
+
+msgid ""
+"Set the force and speed with the knife test: start low and add until it "
+"cuts through."
+msgstr ""
+"Ustal nacisk i prędkość testem noża: zacznij od małego nacisku i dodawaj,"
+" aż przetnie na wylot."
 
 msgid ""
 "Set the origin (Origin key) at the same place as for the first colour, so"
